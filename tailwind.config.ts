@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        display: ["Fredoka", "sans-serif"],
+        body: ["Nunito", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,6 +61,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Paradise Custom Colors
+        "paradise-coral": "hsl(var(--paradise-coral))",
+        "paradise-pink": "hsl(var(--paradise-pink))",
+        "paradise-yellow": "hsl(var(--paradise-yellow))",
+        "paradise-sky": "hsl(var(--paradise-sky))",
+        "paradise-mint": "hsl(var(--paradise-mint))",
+        "paradise-purple": "hsl(var(--paradise-purple))",
+        "paradise-teal": "hsl(var(--paradise-teal))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -65,20 +77,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
