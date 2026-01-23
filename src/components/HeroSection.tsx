@@ -1,6 +1,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Star, BookOpen } from 'lucide-react';
+import { Sparkles, Star, BookOpen, PlayCircle } from 'lucide-react';
 
 const HeroSection = () => {
   const { t } = useLanguage();
@@ -45,12 +45,25 @@ const HeroSection = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delayed-more">
-          <Button variant="hero" size="lg" className="text-lg">
-            {t('hero.cta')}
-          </Button>
-          <Button variant="heroOutline" size="lg" className="text-lg">
-            {t('hero.availability')}
-          </Button>
+          {/* LEARN MORE BUTTON - Smooth scrolls to the 'About' section */}
+          <a href="#about" className="inline-block w-full sm:w-auto"> 
+            <Button variant="hero" size="lg" className="text-lg w-full">
+              Learn More
+            </Button>
+          </a>
+
+          {/* WATCH CLASS BUTTON - Opens your YouTube video */}
+          <a 
+            href="https://www.youtube.com/watch?v=VRnrJ2ngjQ8" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block w-full sm:w-auto"
+          >
+            <Button variant="heroOutline" size="lg" className="text-lg w-full flex items-center justify-center gap-2">
+              <PlayCircle className="w-5 h-5" />
+              Watch Class
+            </Button>
+          </a>
         </div>
       </div>
 
