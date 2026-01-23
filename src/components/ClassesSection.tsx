@@ -35,7 +35,6 @@ const AvailabilityBadge = ({ spotsLeft }: { spotsLeft: number }) => {
       </span>
     );
   }
-  
   if (spotsLeft <= 2) {
     return (
       <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-sm font-semibold">
@@ -44,7 +43,6 @@ const AvailabilityBadge = ({ spotsLeft }: { spotsLeft: number }) => {
       </span>
     );
   }
-  
   return (
     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-600 text-sm font-semibold">
       <CheckCircle className="w-4 h-4" />
@@ -57,9 +55,7 @@ const ClassCard = ({ slot, isGroup }: { slot: ClassSlot; isGroup: boolean }) => 
   return (
     <div className={cn(
       "p-4 rounded-2xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-lg mb-3",
-      slot.spotsLeft === 0 
-        ? "bg-slate-50 border-slate-200" 
-        : "bg-white border-blue-100 hover:border-pink-400"
+      slot.spotsLeft === 0 ? "bg-slate-50 border-slate-200" : "bg-white border-blue-100 hover:border-pink-400"
     )}>
       <div className="flex justify-between items-start mb-3">
         <div>
@@ -81,26 +77,20 @@ const ClassesSection = () => {
     <section id="classes" className="py-24 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-5xl font-bold text-slate-900 mb-4">
-            Class in Session: Take a Peek!
-          </h2>
-          <p className="text-xl text-slate-600">
-            Watch our students explore English through fun art projects!
-          </p>
+          <h2 className="text-5xl font-bold text-slate-900 mb-4">Class in Session: Take a Peek!</h2>
+          <p className="text-xl text-slate-600">Watch our students explore English through fun art projects!</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-20">
-          <div className="aspect-video rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-black relative">
+          <div className="aspect-video rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-black">
             <iframe 
               className="w-full h-full"
               src="https://www.youtube.com/embed/VRnrJ2ngjQ8" 
               title="Class Sample"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
               allowFullScreen
             ></iframe>
           </div>
-          
-          <div className="aspect-video rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-slate-100 relative flex items-center justify-center">
+          <div className="aspect-video rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-slate-100 flex items-center justify-center">
             <div className="text-center">
               <Play className="w-12 h-12 text-blue-300 mx-auto mb-2" />
               <p className="text-slate-400 font-medium">More Class Clips Coming Soon!</p>
@@ -111,9 +101,31 @@ const ClassesSection = () => {
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           <Card className="p-8 border-none shadow-xl bg-gradient-to-br from-white to-pink-50">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-pink-500 flex items-center justify-center shadow-lg shadow-pink-200">
+              <div className="w-16 h-16 rounded-2xl bg-pink-500 flex items-center justify-center shadow-lg">
                 <User className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-slate-900">One-on-One Classes</h3>
             </div>
-            {oneOnOneClasses.map((slot) =>
+            {oneOnOneClasses.map((slot) => (
+              <ClassCard key={slot.id} slot={slot} isGroup={false} />
+            ))}
+          </Card>
+
+          <Card className="p-8 border-none shadow-xl bg-gradient-to-br from-white to-blue-50">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center shadow-lg">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900">Group Classes</h3>
+            </div>
+            {groupClasses.map((slot) => (
+              <ClassCard key={slot.id} slot={slot} isGroup={true} />
+            ))}
+          </Card>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default ClassesSection;
