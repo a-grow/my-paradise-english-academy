@@ -1,6 +1,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Card } from '@/components/ui/card';
-import { User, Users, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { User, Users, CheckCircle, Clock, XCircle, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ClassSlot {
@@ -87,18 +87,39 @@ const ClassesSection = () => {
 
   return (
     <section id="classes" className="py-24 bg-background relative overflow-hidden">
-      {/* Decorative background */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-paradise-yellow/10 rounded-full blur-3xl"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-paradise-sky/10 rounded-full blur-3xl"></div>
       
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h2 className="text-5xl font-display font-bold text-foreground mb-4">
-            {t('classes.title')}
+            Class in Session: Take a Peek!
           </h2>
           <p className="text-xl text-muted-foreground">
             {t('classes.subtitle')}
           </p>
+        </div>
+
+        {/* Video Samples Section */}
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-20">
+          <div className="aspect-video rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-black relative group">
+            <iframe 
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+              title="Class Sample 1"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+            ></iframe>
+          </div>
+          <div className="aspect-video rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-black relative group">
+            <iframe 
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+              title="Class Sample 2"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+            ></iframe>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
