@@ -11,16 +11,12 @@ const groupClasses = [
 
 const ClassesSection = () => {
   return (
-    <section id="classes" className="py-24 bg-background relative overflow-hidden">
-      {/* Paradise Background Glows */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-paradise-yellow/10 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-paradise-sky/10 rounded-full blur-3xl"></div>
-
-      <div className="container mx-auto px-4 relative z-10">
+    <section id="classes" className="py-24 bg-transparent relative z-10">
+      <div className="container mx-auto px-4">
         
-        {/* MEET TEACHER ANDY */}
-        <div className="max-w-4xl mx-auto mb-20 bg-paradise-mint/10 rounded-[40px] p-8 md:p-12 border-4 border-dashed border-paradise-mint flex flex-col md:flex-row items-center gap-10">
-          <div className="w-48 h-48 shrink-0 rounded-3xl border-8 border-white shadow-2xl overflow-hidden rotate-3 bg-slate-100">
+        {/* TEACHER ANDY BIO */}
+        <div className="max-w-4xl mx-auto mb-20 bg-white/40 backdrop-blur-md rounded-[40px] p-8 md:p-12 border-4 border-dashed border-paradise-mint flex flex-col md:flex-row items-center gap-10 shadow-xl">
+          <div className="w-48 h-48 shrink-0 rounded-3xl border-8 border-white shadow-2xl overflow-hidden rotate-3 bg-white">
             <img 
               src="/andy.jpg" 
               alt="Teacher Andy" 
@@ -39,18 +35,16 @@ const ClassesSection = () => {
           </div>
         </div>
 
-        <div className="text-center mb-12">
-          <h2 className="text-5xl font-display font-bold text-foreground mb-4">Class in Session: Take a Peek!</h2>
-        </div>
-
+        {/* VIDEO */}
         <div className="max-w-4xl mx-auto mb-24">
           <div className="aspect-video rounded-3xl overflow-hidden shadow-2xl border-8 border-white bg-black">
             <iframe className="w-full h-full" src="https://www.youtube.com/embed/VRnrJ2ngjQ8" title="Class Sample" allowFullScreen></iframe>
           </div>
         </div>
 
+        {/* CLASSES */}
         <div className="max-w-4xl mx-auto mb-24">
-          <Card className="card-fun p-8 md:p-12 border-none shadow-2xl bg-white/50 backdrop-blur-sm">
+          <Card className="card-fun p-8 md:p-12 border-none shadow-2xl bg-white/60 backdrop-blur-sm">
             <div className="flex flex-col md:flex-row md:items-end gap-2 mb-10">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-paradise-sky to-paradise-purple flex items-center justify-center shadow-lg">
@@ -63,7 +57,7 @@ const ClassesSection = () => {
             
             <div className="grid gap-4">
               {groupClasses.map((slot) => (
-                <div key={slot.id} className="flex flex-col sm:flex-row justify-between items-center p-6 bg-white rounded-3xl border-2 border-paradise-sky/20 hover:border-paradise-coral transition-all gap-4">
+                <div key={slot.id} className="flex flex-col sm:flex-row justify-between items-center p-6 bg-white/80 rounded-3xl border-2 border-paradise-sky/20 hover:border-paradise-coral transition-all gap-4 shadow-sm">
                   <div>
                     <div className="flex items-center gap-3">
                       <p className="text-2xl font-bold text-foreground">{slot.day}</p>
@@ -87,12 +81,12 @@ const ClassesSection = () => {
         </div>
 
         {/* SOCIAL LINKS */}
-        <div className="text-center py-16 bg-paradise-yellow/10 rounded-[40px] border-4 border-white">
+        <div className="text-center py-16 bg-white/40 backdrop-blur-md rounded-[40px] border-4 border-white shadow-xl">
           <h2 className="text-5xl font-display font-bold mb-4">Ready to Start?</h2>
           <p className="text-2xl text-muted-foreground mb-10">Click the best link for you to contact us!</p>
           <div className="flex flex-wrap justify-center gap-8">
-            <a href="https://facebook.com/MyParadiseEnglish" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#1877F2] text-white px-10 py-5 rounded-3xl font-bold text-xl hover:scale-105 transition-transform shadow-xl"><Facebook className="w-8 h-8" /> Facebook</a>
-            <a href="https://instagram.com/MyParadiseEnglish" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white px-10 py-5 rounded-3xl font-bold text-xl hover:scale-105 transition-transform shadow-xl"><Instagram className="w-8 h-8" /> Instagram</a>
+            <a href="https://facebook.com/MyParadiseEnglish" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-[#1877F2] text-white px-10 py-5 rounded-3xl font-bold text-xl hover:scale-110 transition-transform shadow-xl"><Facebook className="w-8 h-8" /> Facebook</a>
+            <a href="https://instagram.com/MyParadiseEnglish" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white px-10 py-5 rounded-3xl font-bold text-xl hover:scale-110 transition-transform shadow-xl"><Instagram className="w-8 h-8" /> Instagram</a>
           </div>
         </div>
       </div>
