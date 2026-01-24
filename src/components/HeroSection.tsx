@@ -1,82 +1,66 @@
-import { useLanguage } from '@/contexts/LanguageContext';
-import { Button } from '@/components/ui/button';
-import { Sparkles, Star, BookOpen, PlayCircle } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 const HeroSection = () => {
-  const { t } = useLanguage();
-
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-paradise">
-      {/* Floating decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 animate-float">
-          <Star className="w-12 h-12 text-paradise-yellow opacity-80" fill="currentColor" />
-        </div>
-        <div className="absolute top-40 right-20 animate-float-delayed">
-          <Sparkles className="w-16 h-16 text-white opacity-60" />
-        </div>
-        <div className="absolute bottom-40 left-20 animate-float">
-          <BookOpen className="w-14 h-14 text-paradise-mint opacity-70" />
-        </div>
-        <div className="absolute bottom-20 right-10 animate-float-delayed">
-          <Star className="w-10 h-10 text-paradise-yellow opacity-80" fill="currentColor" />
-        </div>
-        
-        {/* Bubble decorations */}
-        <div className="bubble bubble-1"></div>
-        <div className="bubble bubble-2"></div>
-        <div className="bubble bubble-3"></div>
-      </div>
+    <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden bg-gradient-to-b from-paradise-sky/20 to-white">
+      {/* Animated background shapes */}
+      <div className="absolute top-20 left-10 w-32 h-32 bg-paradise-yellow/30 rounded-full blur-2xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-10 w-64 h-64 bg-paradise-pink/20 rounded-full blur-3xl animate-pulse delay-700"></div>
 
-      <div className="container mx-auto px-4 text-center relative z-10 pt-20">
-        <div className="animate-bounce-gentle inline-block mb-6">
-          <div className="bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 inline-flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-paradise-yellow" />
-            <span className="text-white font-semibold">Taiwan's Most Fun English School!</span>
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-4xl">
+          <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm mb-6 border border-paradise-sky/20">
+            <span className="flex h-2 w-2 rounded-full bg-paradise-coral animate-ping"></span>
+            <span className="text-paradise-teal font-semibold text-sm">Now Enrolling for 2026!</span>
           </div>
-        </div>
-        
-        <h1 className="text-6xl md:text-8xl font-display font-bold text-white mb-6 drop-shadow-xl animate-fade-in">
-          {t('hero.title')}
-        </h1>
-        
-        <p className="text-2xl md:text-3xl text-white/90 mb-10 font-medium max-w-2xl mx-auto animate-fade-in-delayed">
-          {t('hero.subtitle')}
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delayed-more">
-          {/* LEARN MORE BUTTON - Smooth scrolls to the 'About' section */}
-<a 
-  href="#classes" 
-  className="px-8 py-4 rounded-2xl bg-white text-paradise-teal font-bold hover:bg-opacity-90 transition-all shadow-lg"
->
-  Learn More
-</a>
-              Learn More
-            </Button>
-          </a>
-
-          {/* WATCH CLASS BUTTON - Opens your YouTube video */}
-          <a 
-            href="https://www.youtube.com/watch?v=VRnrJ2ngjQ8" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-block w-full sm:w-auto"
-          >
-            <Button variant="heroOutline" size="lg" className="text-lg w-full flex items-center justify-center gap-2">
-              <PlayCircle className="w-5 h-5" />
+          
+          <h1 className="text-6xl md:text-8xl font-display font-bold text-slate-900 leading-tight mb-6">
+            Where English <br />
+            <span className="text-paradise-coral">Becomes an Adventure</span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-slate-600 mb-10 max-w-2xl leading-relaxed">
+            Join Teacher Andy for fun, relaxing, and creative English classes using the world-class Oxford Discover curriculum.
+          </p>
+          
+          <div className="flex flex-wrap gap-4">
+            {/* WATCH CLASS BUTTON */}
+            <a 
+              href="#classes" 
+              className="group flex items-center gap-3 bg-paradise-coral text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-opacity-90 transition-all shadow-xl shadow-paradise-coral/20"
+            >
+              <div className="bg-white/20 rounded-full p-1 group-hover:scale-110 transition-transform">
+                <Play fill="currentColor" className="w-5 h-5" />
+              </div>
               Watch Class
-            </Button>
-          </a>
+            </a>
+
+            {/* LEARN MORE BUTTON - Now points to #classes too! */}
+            <a 
+              href="#classes" 
+              className="px-8 py-4 rounded-2xl bg-white text-paradise-teal border-2 border-paradise-sky/20 font-bold text-lg hover:border-paradise-coral transition-all shadow-lg"
+            >
+              Learn More
+            </a>
+          </div>
+
+          <div className="mt-12 flex items-center gap-6">
+            <div className="flex -space-x-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-slate-200 overflow-hidden">
+                  <img src={`https://i.pravatar.cc/150?u=student${i}`} alt="Student" />
+                </div>
+              ))}
+            </div>
+            <p className="text-slate-500 font-medium">
+              <span className="text-paradise-teal font-bold">20+ years</span> of teaching experience
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Wave decoration at bottom */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
-          <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="hsl(var(--background))"/>
-        </svg>
-      </div>
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-white" style={{ clipPath: 'polygon(0 100%, 100% 100%, 100% 0, 0 100%)' }}></div>
     </section>
   );
 };
