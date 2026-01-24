@@ -1,88 +1,50 @@
-import { useLanguage } from '@/contexts/LanguageContext';
 import { Card } from '@/components/ui/card';
-import { User, Users, CheckCircle, Clock, XCircle, Play } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Users, CheckCircle, XCircle, Facebook, Instagram, Play } from 'lucide-react';
 
-interface ClassSlot {
-  id: string;
-  time: string;
-  day: string;
-  spotsLeft: number;
-  maxSpots: number;
-  level: number;
-}
-
-const oneOnOneClasses: ClassSlot[] = [
-  { id: '1', time: '3:00 PM', day: 'Mon/Wed', spotsLeft: 3, maxSpots: 5, level: 1 },
-  { id: '2', time: '4:00 PM', day: 'Tue/Thu', spotsLeft: 1, maxSpots: 5, level: 2 },
-  { id: '3', time: '5:00 PM', day: 'Mon/Wed', spotsLeft: 0, maxSpots: 5, level: 3 },
-  { id: '4', time: '6:00 PM', day: 'Fri', spotsLeft: 4, maxSpots: 5, level: 4 },
+const groupClasses = [
+  { id: '1', time: '6:00 PM - 6:50 PM', day: 'Tuesday', book: 'Book 4', isFull: false },
+  { id: '2', time: '7:00 PM - 7:50 PM', day: 'Tuesday', book: 'Book 3', isFull: false },
+  { id: '3', time: '8:00 PM - 8:50 PM', day: 'Tuesday', book: 'Book 2', isFull: false },
+  { id: '4', time: '7:00 PM - 7:50 PM', day: 'Friday', book: 'Book 1', isFull: false },
+  { id: '5', time: '8:30 PM - 9:20 PM', day: 'Friday', book: 'Book 5', isFull: false },
 ];
-
-const groupClasses: ClassSlot[] = [
-  { id: '5', time: '3:30 PM', day: 'Mon/Wed/Fri', spotsLeft: 2, maxSpots: 5, level: 1 },
-  { id: '6', time: '4:30 PM', day: 'Tue/Thu', spotsLeft: 0, maxSpots: 5, level: 2 },
-  { id: '7', time: '5:30 PM', day: 'Mon/Wed', spotsLeft: 5, maxSpots: 5, level: 3 },
-  { id: '8', time: '6:30 PM', day: 'Sat', spotsLeft: 1, maxSpots: 5, level: 5 },
-];
-
-const AvailabilityBadge = ({ spotsLeft }: { spotsLeft: number }) => {
-  if (spotsLeft === 0) {
-    return (
-      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 text-red-600 text-sm font-semibold">
-        <XCircle className="w-4 h-4" />
-        Full
-      </span>
-    );
-  }
-  if (spotsLeft <= 2) {
-    return (
-      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-sm font-semibold">
-        <Clock className="w-4 h-4" />
-        {spotsLeft} Spots Left
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-600 text-sm font-semibold">
-      <CheckCircle className="w-4 h-4" />
-      Available
-    </span>
-  );
-};
-
-const ClassCard = ({ slot, isGroup }: { slot: ClassSlot; isGroup: boolean }) => {
-  return (
-    <div className={cn(
-      "p-4 rounded-2xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-lg mb-3",
-      slot.spotsLeft === 0 ? "bg-slate-50 border-slate-200" : "bg-white border-blue-100 hover:border-pink-400"
-    )}>
-      <div className="flex justify-between items-start mb-3">
-        <div>
-          <p className="text-lg font-bold text-slate-900">Oxford Discover {slot.level}</p>
-          <p className="text-slate-500">{slot.day} • {slot.time}</p>
-        </div>
-        <AvailabilityBadge spotsLeft={slot.spotsLeft} />
-      </div>
-      <div className="flex items-center gap-2 text-sm text-slate-500">
-        {isGroup ? <Users className="w-4 h-4" /> : <User className="w-4 h-4" />}
-        <span>{slot.spotsLeft}/{slot.maxSpots} spots available</span>
-      </div>
-    </div>
-  );
-};
 
 const ClassesSection = () => {
   return (
     <section id="classes" className="py-24 bg-white relative overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-12">
-          <h2 className="text-5xl font-bold text-slate-900 mb-4">Class in Session: Take a Peek!</h2>
-          <p className="text-xl text-slate-600">Watch our students explore English through fun art projects!</p>
+        
+        {/* MEET TEACHER ANDY SECTION */}
+        <div className="max-w-4xl mx-auto mb-20 bg-paradise-mint/10 rounded-[40px] p-8 md:p-12 border-4 border-dashed border-paradise-mint flex flex-col md:flex-row items-center gap-10 shadow-sm">
+          <div className="w-48 h-48 shrink-0 rounded-3xl border-8 border-white shadow-2xl overflow-hidden rotate-3 relative bg-slate-200">
+            <img 
+              src="/andy.jpg" 
+              alt="Teacher Andy" 
+              className="w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.src = "https://placehold.co/400x400?text=Teacher+Andy"; }}
+            />
+          </div>
+          <div>
+            <h2 className="text-4xl font-display font-bold text-slate-900 mb-4 text-center md:text-left">Meet Teacher Andy!</h2>
+            <p className="text-lg text-slate-700 leading-relaxed italic">
+              "Hello! My name is Teacher Andy. I believe learning should be an adventure! 
+              In my classroom, your child will find a fun, relaxing atmosphere where they 
+              can feel safe to express themselves and explore the English language through 
+              creativity. I’m here to make every lesson the highlight of their day!"
+            </p>
+            <p className="mt-6 font-bold text-paradise-teal text-lg">
+              🇺🇸 From USA • Bachelor's Degree • TEFL Certified • 20 Years Experience
+            </p>
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-20">
-          <div className="aspect-video rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-black">
+        {/* CLASS IN SESSION / VIDEO */}
+        <div className="text-center mb-12">
+          <h2 className="text-5xl font-display font-bold text-slate-900 mb-4">Class in Session: Take a Peek!</h2>
+        </div>
+
+        <div className="max-w-4xl mx-auto mb-24">
+          <div className="aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-black">
             <iframe 
               className="w-full h-full"
               src="https://www.youtube.com/embed/VRnrJ2ngjQ8" 
@@ -90,39 +52,74 @@ const ClassesSection = () => {
               allowFullScreen
             ></iframe>
           </div>
-          <div className="aspect-video rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-slate-100 flex items-center justify-center">
-            <div className="text-center">
-              <Play className="w-12 h-12 text-blue-300 mx-auto mb-2" />
-              <p className="text-slate-400 font-medium">More Class Clips Coming Soon!</p>
+        </div>
+
+        {/* GROUP CLASSES ONLY */}
+        <div className="max-w-4xl mx-auto mb-24">
+          <Card className="p-8 md:p-12 border-none shadow-2xl bg-gradient-to-br from-white to-paradise-sky/10 rounded-[40px]">
+            <div className="flex flex-col md:flex-row md:items-end gap-4 mb-10">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-paradise-sky flex items-center justify-center shadow-lg">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-4xl font-display font-bold text-slate-900">Group Classes</h3>
+              </div>
+              <p className="text-paradise-pink font-semibold text-lg md:mb-1">
+                (*All group classes use Oxford Discover books)
+              </p>
             </div>
+            
+            <div className="grid gap-4">
+              {groupClasses.map((slot) => (
+                <div key={slot.id} className="flex flex-col sm:flex-row justify-between items-center p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow gap-4">
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <p className="text-2xl font-bold text-slate-900">{slot.day}</p>
+                      <span className="px-3 py-1 bg-paradise-mint/20 text-paradise-teal rounded-lg font-bold text-sm">
+                        {slot.book}
+                      </span>
+                    </div>
+                    <p className="text-slate-500 font-medium text-lg">{slot.time}</p>
+                  </div>
+                  {slot.isFull ? (
+                    <span className="flex items-center gap-2 px-6 py-3 rounded-full bg-red-100 text-red-600 font-black tracking-wider shadow-sm">
+                      <XCircle className="w-6 h-6" /> FULL
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2 px-6 py-3 rounded-full bg-green-100 text-green-600 font-black tracking-wider shadow-sm">
+                      <CheckCircle className="w-6 h-6" /> AVAILABLE
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* READY TO START / CONTACT LINKS */}
+        <div id="contact-simple" className="text-center py-16 bg-paradise-yellow/20 rounded-[40px] border-4 border-white shadow-inner">
+          <h2 className="text-5xl font-display font-bold mb-4 text-slate-900">Ready to Start?</h2>
+          <p className="text-2xl text-slate-700 mb-10 font-medium">Click the best link for you to contact us!</p>
+          <div className="flex flex-wrap justify-center gap-8">
+            <a 
+              href="https://facebook.com/MyParadiseEnglish" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 bg-[#1877F2] text-white px-10 py-5 rounded-3xl font-bold text-xl hover:scale-105 transition-transform shadow-xl"
+            >
+              <Facebook className="w-8 h-8" /> Facebook
+            </a>
+            <a 
+              href="https://instagram.com/MyParadiseEnglish" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white px-10 py-5 rounded-3xl font-bold text-xl hover:scale-105 transition-transform shadow-xl"
+            >
+              <Instagram className="w-8 h-8" /> Instagram
+            </a>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          <Card className="p-8 border-none shadow-xl bg-gradient-to-br from-white to-pink-50">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-pink-500 flex items-center justify-center shadow-lg">
-                <User className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900">One-on-One Classes</h3>
-            </div>
-            {oneOnOneClasses.map((slot) => (
-              <ClassCard key={slot.id} slot={slot} isGroup={false} />
-            ))}
-          </Card>
-
-          <Card className="p-8 border-none shadow-xl bg-gradient-to-br from-white to-blue-50">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center shadow-lg">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-900">Group Classes</h3>
-            </div>
-            {groupClasses.map((slot) => (
-              <ClassCard key={slot.id} slot={slot} isGroup={true} />
-            ))}
-          </Card>
-        </div>
       </div>
     </section>
   );
