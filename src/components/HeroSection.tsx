@@ -46,8 +46,12 @@ const HeroSection = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delayed-more">
           {/* LEARN MORE BUTTON - Smooth scrolls to the 'About' section */}
-          <a href="#about" className="inline-block w-full sm:w-auto"> 
-            <Button variant="hero" size="lg" className="text-lg w-full">
+<a 
+  href="#classes" 
+  className="px-8 py-4 rounded-2xl bg-white text-paradise-teal font-bold hover:bg-opacity-90 transition-all shadow-lg"
+>
+  Learn More
+</a>
               Learn More
             </Button>
           </a>
