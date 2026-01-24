@@ -6,15 +6,13 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#fafafa]">
-      {/* THE MASTER BACKGROUND - This gives the color back to the whole site */}
+    <main className="min-h-screen bg-white relative">
+      {/* Background Colors */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-br from-paradise-sky/20 via-white to-paradise-pink/10" />
-        <div className="absolute top-[-10%] left-[-10%] w-[70%] h-[70%] bg-paradise-sky/30 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] bg-paradise-pink/30 rounded-full blur-[120px] animate-pulse delay-700" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-paradise-yellow/30 rounded-full blur-[120px] animate-pulse delay-1000" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#e0f2fe] via-white to-[#fdf2f8]" />
       </div>
 
+      {/* Content */}
       <div className="relative z-10">
         <Navbar />
         <HeroSection />
@@ -22,7 +20,7 @@ const Index = () => {
         <ClassesSection />
         <Footer />
       </div>
-    </div>
+    </main>
   );
 };
 
