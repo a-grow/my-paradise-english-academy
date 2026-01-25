@@ -5,7 +5,7 @@ const Footer = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-foreground py-8">
+    <footer className="bg-[#1e293b] py-8">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -15,8 +15,8 @@ const Footer = () => {
             </span>
           </div>
           
-          <p className="text-white/60 text-sm flex items-center gap-2">
-            Made with <Heart className="w-4 h-4 text-paradise-coral fill-current" /> in {t('footer.location')} 
+          <p className="text-white/60 text-sm flex items-center gap-2 flex-wrap justify-center">
+            {t('footer.made')} <Heart className="w-4 h-4 text-paradise-coral fill-current" /> {t('footer.location')} 
             <span className="mx-2">•</span>
             © 2024 {t('footer.rights')}
           </p>

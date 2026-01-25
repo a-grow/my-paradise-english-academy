@@ -10,6 +10,7 @@ interface LanguageContextType {
 
 const translations: Record<Language, Record<string, string>> = {
   en: {
+    'lang': 'en',
     // Navigation
     'nav.home': 'Home',
     'nav.classes': 'Classes',
@@ -17,40 +18,55 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.contact': 'Contact',
     
     // Hero
+    'hero.badge': "✨ Taiwan's Most Fun English School!",
     'hero.title': 'My Paradise English',
     'hero.subtitle': 'Where Learning English is an Adventure!',
-    'hero.cta': 'Start Your Journey',
-    'hero.availability': 'Check Class Availability',
+    
+    // What's New
+    'whatsNew.title': "What's New?",
+    
+    // Teacher
+    'teacher.title': 'Meet Teacher Andy!',
+    'teacher.quote': "Hello! My name is Teacher Andy. I believe learning should be an adventure! In my classroom, your child will find a fun, relaxing atmosphere where they can feel safe to express themselves and explore the English language through creativity. I'm here to make every lesson the highlight of their day!",
+    'teacher.from': 'From USA',
+    'teacher.degree': "Bachelor's Degree",
+    'teacher.cert': 'TEFL Certified',
+    'teacher.exp': '20 Years Experience',
+    
+    // Video
+    'video.badge': 'The Magic Screen',
+    'video.title': 'See the Magic in Action!',
+    'video.placeholder': 'Watch Our Class Preview',
     
     // Classes
-    'classes.title': 'Our Magical Classes',
-    'classes.subtitle': 'Choose your perfect learning adventure',
-    'classes.oneOnOne': 'One-on-One Classes',
-    'classes.oneOnOneDesc': 'Personalized attention with flexible curriculum tailored to your child\'s needs. Includes homework and progress tracking!',
-    'classes.group': 'Group Classes',
-    'classes.groupDesc': 'Learn with friends! Up to 5 students per class for interactive and fun group learning experiences.',
-    'classes.spotsLeft': 'spots left',
-    'classes.full': 'Full',
-    'classes.available': 'Available',
-    'classes.limited': 'Limited Spots',
+    'classes.badge': 'Class Schedule',
+    'classes.title': 'Group Classes',
+    'classes.subtitle': 'Join our fun and interactive group learning experiences',
+    'classes.groupTitle': 'Weekly Schedule',
+    'classes.note': 'All group classes use Oxford Discover books',
+    'classes.full': 'FULL',
+    'classes.available': 'AVAILABLE',
     
     // Curriculum
+    'curriculum.badge': 'World-Class Materials',
     'curriculum.title': 'Oxford Discover Curriculum',
     'curriculum.subtitle': 'World-class learning materials for every level',
-    'curriculum.level': 'Level',
-    'curriculum.ages': 'Ages',
     'curriculum.book': 'Oxford Discover',
+    'curriculum.level': 'Level',
+    'curriculum.clickHint': '👆 Click a book to see its class schedule',
     
     // Contact
+    'contact.badge': 'Start Your Adventure!',
     'contact.title': 'Ready to Start?',
     'contact.subtitle': 'Contact us today and begin your English adventure!',
-    'contact.cta': 'Get in Touch',
     
     // Footer
+    'footer.made': 'Made with',
+    'footer.location': 'in Taiwan',
     'footer.rights': 'All rights reserved',
-    'footer.location': 'Taiwan',
   },
   zh: {
+    'lang': 'zh',
     // Navigation
     'nav.home': '首頁',
     'nav.classes': '課程',
@@ -58,38 +74,52 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.contact': '聯繫我們',
     
     // Hero
+    'hero.badge': '✨ 台灣最有趣的英語學校！',
     'hero.title': 'My Paradise English',
     'hero.subtitle': '學習英語是一場奇妙的冒險！',
-    'hero.cta': '開始您的旅程',
-    'hero.availability': '查看課程空位',
+    
+    // What's New
+    'whatsNew.title': '最新消息',
+    
+    // Teacher
+    'teacher.title': '認識 Teacher Andy！',
+    'teacher.quote': '哈囉！我是 Teacher Andy。我相信學習應該是一場冒險！在我的課堂上，您的孩子會發現一個有趣、輕鬆的氛圍，讓他們可以安心地表達自己，透過創意探索英語世界。我會讓每一堂課都成為他們一天中最精彩的時刻！',
+    'teacher.from': '來自美國',
+    'teacher.degree': '學士學位',
+    'teacher.cert': 'TEFL 認證',
+    'teacher.exp': '20年教學經驗',
+    
+    // Video
+    'video.badge': '魔法螢幕',
+    'video.title': '看看課堂上的魔法！',
+    'video.placeholder': '觀看課程預覽',
     
     // Classes
-    'classes.title': '我們的神奇課程',
-    'classes.subtitle': '選擇您的完美學習冒險',
-    'classes.oneOnOne': '一對一課程',
-    'classes.oneOnOneDesc': '個人化教學，課程靈活安排，根據孩子的需求量身定制。包含作業和進度追蹤！',
-    'classes.group': '團體課程',
-    'classes.groupDesc': '與朋友一起學習！每班最多5位學生，互動有趣的團體學習體驗。',
-    'classes.spotsLeft': '個名額',
+    'classes.badge': '課程時間表',
+    'classes.title': '團體課程',
+    'classes.subtitle': '加入我們有趣又互動的團體學習體驗',
+    'classes.groupTitle': '每週時間表',
+    'classes.note': '所有團體課程均使用 Oxford Discover 教材',
     'classes.full': '已滿',
     'classes.available': '可報名',
-    'classes.limited': '名額有限',
     
     // Curriculum
+    'curriculum.badge': '世界級教材',
     'curriculum.title': 'Oxford Discover 教材',
     'curriculum.subtitle': '世界級的學習教材，適合每個程度',
-    'curriculum.level': '級別',
-    'curriculum.ages': '年齡',
     'curriculum.book': 'Oxford Discover',
+    'curriculum.level': '級別',
+    'curriculum.clickHint': '👆 點擊書本查看對應課程時間',
     
     // Contact
+    'contact.badge': '開始您的冒險！',
     'contact.title': '準備好開始了嗎？',
     'contact.subtitle': '今天就聯繫我們，開始您的英語冒險！',
-    'contact.cta': '立即聯繫',
     
     // Footer
+    'footer.made': '用',
+    'footer.location': '在台灣製作',
     'footer.rights': '版權所有',
-    'footer.location': '台灣',
   },
 };
 
