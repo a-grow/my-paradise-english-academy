@@ -6,7 +6,7 @@ const Navbar = () => {
   const { t } = useLanguage();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-paradise-coral/90 to-paradise-pink/90 backdrop-blur-md shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-paradise-purple/90 to-paradise-sky/90 backdrop-blur-md shadow-lg">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-8 h-8 text-paradise-yellow animate-bounce-gentle" />
