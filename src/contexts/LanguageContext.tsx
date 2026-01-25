@@ -34,8 +34,8 @@ const translations: Record<Language, Record<string, string>> = {
     'teacher.exp': '20 Years Experience',
     
     // Video
-    'video.badge': 'The Magic Screen',
-    'video.title': 'See the Magic in Action!',
+    'video.badge': 'Class in Session',
+    'video.title': 'Take a Peek!',
     'video.placeholder': 'Watch Our Class Preview',
     
     // Classes
@@ -90,8 +90,8 @@ const translations: Record<Language, Record<string, string>> = {
     'teacher.exp': '20年教學經驗',
     
     // Video
-    'video.badge': '魔法螢幕',
-    'video.title': '看看課堂上的魔法！',
+    'video.badge': '課堂進行中',
+    'video.title': '來看一看！',
     'video.placeholder': '觀看課程預覽',
     
     // Classes

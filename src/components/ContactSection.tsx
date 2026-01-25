@@ -1,11 +1,11 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Mail, Phone, Sparkles, Star } from 'lucide-react';
+import { Sparkles, Star } from 'lucide-react';
 
 const ContactSection = () => {
   const { t } = useLanguage();
 
   return (
-    <section id="contact" className="py-24 bg-gradient-to-br from-[#f43f5e] via-[#ec4899] via-[#a855f7] to-[#38bdf8] relative overflow-hidden">
+    <section id="contact" className="py-24 bg-gradient-to-br from-paradise-purple via-paradise-sky to-paradise-teal relative overflow-hidden">
       {/* Floating Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-20 w-40 h-40 bg-white/10 rounded-full blur-2xl animate-float" />
@@ -28,24 +28,6 @@ const ContactSection = () => {
           <p className="text-xl text-white/90 mb-12 max-w-xl mx-auto">
             {t('contact.subtitle')}
           </p>
-
-          {/* Contact Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <a 
-              href="mailto:hello@myparadiseenglish.com"
-              className="flex items-center justify-center gap-3 bg-white/20 backdrop-blur-sm px-8 py-4 rounded-full hover:bg-white/30 transition-colors"
-            >
-              <Mail className="w-5 h-5 text-white" />
-              <span className="text-white font-medium">hello@myparadiseenglish.com</span>
-            </a>
-            <a 
-              href="tel:+886123456789"
-              className="flex items-center justify-center gap-3 bg-white/20 backdrop-blur-sm px-8 py-4 rounded-full hover:bg-white/30 transition-colors"
-            >
-              <Phone className="w-5 h-5 text-white" />
-              <span className="text-white font-medium">+886 123 456 789</span>
-            </a>
-          </div>
 
           {/* Social Links */}
           <div className="flex justify-center gap-6">
