@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+// App wrapped with LanguageProvider for i18n support
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
