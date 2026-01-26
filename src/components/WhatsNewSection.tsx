@@ -32,33 +32,35 @@ const WhatsNewSection = () => {
           </div>
         )}
 
-        {/* Blog Posts */}
-        {blogPosts && blogPosts.length > 0 && (
-          <div className="space-y-6">
-            {blogPosts.map((post, index) => (
-              <div 
-                key={post.id || index}
-                className="relative bg-white/70 backdrop-blur-md rounded-[2rem] p-8 shadow-xl border-4 border-dashed border-paradise-coral/30"
-              >
-                {/* Corner Decorations */}
-                <Sparkles className="absolute -top-3 -left-3 w-8 h-8 text-paradise-yellow" />
-                <Sparkles className="absolute -top-3 -right-3 w-8 h-8 text-paradise-pink" />
-                
-                <div className="flex flex-col gap-2">
-                  <h3 className="text-2xl font-display font-bold text-foreground">
-                    {post.title}
-                  </h3>
-                  <p className="text-sm text-paradise-purple font-medium">
-                    {post.date}
-                  </p>
-                  <p className="text-lg text-muted-foreground leading-relaxed mt-2">
-                    {post.content}
-                  </p>
-                </div>
+        {/* Most Recent Blog Post */}
+        {blogPosts && blogPosts.length > 0 && (() => {
+          // Sort by ID descending and get the most recent post
+          const sortedPosts = [...blogPosts].sort((a, b) => {
+            const idA = parseInt(a.id || '0', 10);
+            const idB = parseInt(b.id || '0', 10);
+            return idB - idA;
+          });
+          const latestPost = sortedPosts[0];
+          
+          return (
+            <div 
+              className="relative bg-white/70 backdrop-blur-md rounded-[2rem] p-8 shadow-xl border-4 border-dashed border-paradise-coral/30"
+            >
+              {/* Corner Decorations */}
+              <Sparkles className="absolute -top-3 -left-3 w-8 h-8 text-paradise-yellow" />
+              <Sparkles className="absolute -top-3 -right-3 w-8 h-8 text-paradise-pink" />
+              
+              <div className="flex flex-col gap-2">
+                <h3 className="text-2xl font-display font-bold text-foreground">
+                  {latestPost.title}
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed mt-2">
+                  {latestPost.content}
+                </p>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          );
+        })()}
 
         {/* Empty State */}
         {blogPosts && blogPosts.length === 0 && (
