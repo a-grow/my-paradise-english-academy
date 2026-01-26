@@ -34,19 +34,24 @@ const WhatsNewSection = () => {
 
         {/* Most Recent Blog Post */}
         {blogPosts && blogPosts.length > 0 && (() => {
-          // Sort by ID descending and get the most recent post
-          const sortedPosts = [...blogPosts].sort((a, b) => {
-            const idA = parseInt(a.id || '0', 10);
-            const idB = parseInt(b.id || '0', 10);
+          // Filter out header row where ID equals 'id'
+          const filteredPosts = blogPosts.filter(post => post.ID !== 'id');
+          
+          // Sort by ID descending (convert to numbers)
+          const sortedPosts = [...filteredPosts].sort((a, b) => {
+            const idA = Number(a.ID) || 0;
+            const idB = Number(b.ID) || 0;
             return idB - idA;
           });
+          
+          // Only display the first item
           const latestPost = sortedPosts[0];
+          if (!latestPost) return null;
           
           return (
             <div 
               className="relative bg-white/70 backdrop-blur-md rounded-[2rem] p-8 shadow-xl border-4 border-dashed border-paradise-coral/30"
             >
-              {/* Corner Decorations */}
               <Sparkles className="absolute -top-3 -left-3 w-8 h-8 text-paradise-yellow" />
               <Sparkles className="absolute -top-3 -right-3 w-8 h-8 text-paradise-pink" />
               
