@@ -39,7 +39,7 @@ export interface ClassData {
 
 // Blog data type
 export interface BlogData {
-  id?: string;
+  ID?: string;
   title: string;
   date: string;
   content: string;
