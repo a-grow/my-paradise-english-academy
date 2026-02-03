@@ -1,26 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Lovable App</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>My Paradise English</title>
+	</head>
+	<body>
+		<h2>Weekly Schedule</h2>
+		<div id="schedule-display">Loading schedule...</div>
 
-    <!-- TODO: Update og:title to match your application name -->
-    <meta property="og:title" content="Lovable App" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+		<script type="module">
+			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+			const supabase = createClient(
+				"https://pzvnjadsbdzzowlavufz.supabase.co",
+				"sb_publishable_RGCE9NwkOsS3pPHRWBZd2wg_lh7As1-Y"
+			);
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+			async function loadSchedule() {
+				const { data, error } = await supabase
+					.from("schedule")
+					.select("*")
+					.order("id", { ascending: true });
+
+				if (error) {
+					document.getElementById("schedule-display").innerText =
+						"Error loading schedule.";
+					console.error(error);
+					return;
+				}
+
+				const container = document.getElementById("schedule-display");
+				container.innerHTML = "";
+
+				data.forEach((entry) => {
+					const row = document.createElement("div");
+					row.innerHTML = `
+				<strong>${entry.book_level}</strong> — ${entry.day} ${entry.start_time}–${entry.end_time} (${entry.status})
+			`;
+					container.appendChild(row);
+				});
+			}
+
+			loadSchedule();
+		</script>
+	</body>
 </html>
