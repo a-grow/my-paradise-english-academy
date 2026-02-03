@@ -1,55 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>My Paradise English</title>
-	</head>
-	<body>
-		<h2>Weekly Schedule</h2>
-		<div id="schedule-display">
-			If you see this, the schedule didn’t load. Try refreshing or check the
-			console.
-		</div>
+<head>
+  <meta charset="UTF-8">
+  <title>Weekly Schedule</title>
+</head>
+<body>
+  <h1>Weekly Schedule</h1>
+  <div id="schedule-display">
+    If you see this, the schedule didn’t load. Try refreshing or check the console.
+  </div>
 
-		<script type="module">
-			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+  <script type="module">
+    import { createClient } from '@supabase/supabase-js';
 
-			const supabase = createClient(
-  "https://pzvnjadsbdzzowlavufz.supabase.co",
-  "(REAL) eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6dm5qYWRzYmR6em93bGF2dWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwOTkxNzcsImV4cCI6MjA4NTY3NTE3N30.YiHGIME7xqCLK2Baznn6WmmQGX8AhhQsmK-Kxrioapg
-"
-);
+    // ✅ Correct Supabase client setup
+    const supabase = createClient(
+      "https://pzvnjadsbdzzowlavufz.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6dm5qYWRzYmR6em93bGF2dWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwOTkxNzcsImV4cCI6MjA4NTY3NTE3N30.YiHGIME7xqCLK2Baznn6WmmQGX8AhhQsmK-Kxrioapg"
+    );
 
+    async function loadSchedule() {
+      try {
+        const { data, error } = await supabase
+          .from('schedule')              // ✅ Correct table name
+          .select()
+          .order('time');                // ✅ Order by time
 
-			async function loadSchedule() {
-				try {
-					const { data, error } = await supabase
-						.from("schedule")
-						.select("*")
-						.order("id", { ascending: true });
+        if (error) {
+          console.error(error);
+          return;
+        }
 
-					if (error) {
-						console.error("Error loading schedule:", error);
-						return;
-					}
+        const container = document.getElementById('schedule-display');
+        container.innerHTML = '';
 
-					const container = document.getElementById("schedule-display");
-					container.innerHTML = "";
+        // ✅ Correct column names
+        data.forEach((row) => {
+          const item = document.createElement('div');
+          item.innerHTML = `<strong>${row.time}</strong> — ${row.book_level} (${row.status})`;
+          container.appendChild(item);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
 
-					data.forEach((entry) => {
-						const row = document.createElement("div");
-						row.innerHTML = `
-				<strong>${entry.book_level}</strong> — ${entry.day} ${entry.start_time}–${entry.end_time} (${entry.status})
-			`;
-						container.appendChild(row);
-					});
-				} catch (err) {
-					console.error("Unexpected error loading schedule:", err);
-				}
-			}
-
-			document.addEventListener("DOMContentLoaded", loadSchedule);
-		</script>
-	</body>
+    document.addEventListener('DOMContentLoaded', loadSchedule);
+  </script>
+</body>
 </html>
