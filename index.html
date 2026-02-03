@@ -7,7 +7,10 @@
 	</head>
 	<body>
 		<h2>Weekly Schedule</h2>
-		<div id="schedule-display">Loading schedule...</div>
+		<div id="schedule-display">
+			If you see this, the schedule didn’t load. Try refreshing or check the
+			console.
+		</div>
 
 		<script type="module">
 			import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -18,31 +21,33 @@
 			);
 
 			async function loadSchedule() {
-				const { data, error } = await supabase
-					.from("schedule")
-					.select("*")
-					.order("id", { ascending: true });
+				try {
+					const { data, error } = await supabase
+						.from("schedule")
+						.select("*")
+						.order("id", { ascending: true });
 
-				if (error) {
-					document.getElementById("schedule-display").innerText =
-						"Error loading schedule.";
-					console.error(error);
-					return;
-				}
+					if (error) {
+						console.error("Error loading schedule:", error);
+						return;
+					}
 
-				const container = document.getElementById("schedule-display");
-				container.innerHTML = "";
+					const container = document.getElementById("schedule-display");
+					container.innerHTML = "";
 
-				data.forEach((entry) => {
-					const row = document.createElement("div");
-					row.innerHTML = `
+					data.forEach((entry) => {
+						const row = document.createElement("div");
+						row.innerHTML = `
 				<strong>${entry.book_level}</strong> — ${entry.day} ${entry.start_time}–${entry.end_time} (${entry.status})
 			`;
-					container.appendChild(row);
-				});
+						container.appendChild(row);
+					});
+				} catch (err) {
+					console.error("Unexpected error loading schedule:", err);
+				}
 			}
 
-			loadSchedule();
+			document.addEventListener("DOMContentLoaded", loadSchedule);
 		</script>
 	</body>
 </html>
