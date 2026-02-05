@@ -3,5 +3,5 @@ services:
     name: pocketbase
     env: docker
     plan: free
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./pocketbase-deploy/Dockerfile
     autoDeploy: true
