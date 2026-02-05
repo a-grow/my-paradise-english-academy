@@ -3,49 +3,187 @@
 <head>
   <meta charset="UTF-8">
   <title>Weekly Schedule</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fdfdfd;
+      color: #333;
+    }
+
+    /* Hero section */
+    .hero {
+      background: #f48fb1; /* soft pink */
+      color: white;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 3em;
+      font-weight: bold;
+    }
+    .hero nav {
+      margin-top: 20px;
+    }
+    .hero nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+    .hero nav a:hover {
+      text-decoration: underline;
+    }
+
+    /* Schedule table */
+    #schedule {
+      margin: 40px auto;
+      width: 90%;
+      max-width: 800px;
+    }
+    #schedule table {
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    #schedule th, #schedule td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    #schedule th {
+      background: #f48fb1;
+      color: white;
+      font-weight: bold;
+    }
+    #schedule tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    /* Blog posts */
+    #blog {
+      margin: 40px auto;
+      width: 90%;
+      max-width: 800px;
+    }
+    #blog .post {
+      border: 1px solid #ddd;
+      padding: 20px;
+      margin-bottom: 20px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    #blog .post h2 {
+      margin: 0 0 10px;
+      font-size: 1.5em;
+      color: #f48fb1;
+    }
+    #blog .post .date {
+      font-size: 0.9em;
+      font-style: italic;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    #blog .post p {
+      line-height: 1.6;
+    }
+  </style>
 </head>
 <body>
   <h1>Weekly Schedule</h1>
   <div id="schedule-display">
     If you see this, the schedule didn’t load. Try refreshing or check the console.
   </div>
+  <div id="schedule"></div>
+  <div id="blog"></div>
 
   <script type="module">
-    import { createClient } from '@supabase/supabase-js';
+    import PocketBase from "https://cdn.jsdelivr.net/npm/pocketbase@latest/dist/pocketbase.es.min.js";
 
-    // ✅ Correct Supabase client setup
-    const supabase = createClient(
-      "https://pzvnjadsbdzzowlavufz.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6dm5qYWRzYmR6em93bGF2dWZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwOTkxNzcsImV4cCI6MjA4NTY3NTE3N30.YiHGIME7xqCLK2Baznn6WmmQGX8AhhQsmK-Kxrioapg"
-    );
+    const REAL_POCKETBASE_URL = "REPLACE_WITH_REAL_POCKETBASE_URL";
+    const pb = new PocketBase(REAL_POCKETBASE_URL);
 
-    async function loadSchedule() {
-      try {
-        const { data, error } = await supabase
-          .from('schedule')              // ✅ Correct table name
-          .select()
-          .order('time');                // ✅ Order by time
+    function renderScheduleTable(records) {
+      const container = document.getElementById("schedule");
+      if (!container) return;
 
-        if (error) {
-          console.error(error);
-          return;
-        }
+      const table = document.createElement("table");
 
-        const container = document.getElementById('schedule-display');
-        container.innerHTML = '';
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      ["Day", "Time", "Class"].forEach((label) => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
 
-        // ✅ Correct column names
-        data.forEach((row) => {
-          const item = document.createElement('div');
-          item.innerHTML = `<strong>${row.time}</strong> — ${row.book_level} (${row.status})`;
-          container.appendChild(item);
+      const tbody = document.createElement("tbody");
+      records.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.dataset.index = String(index);
+
+        [row.day, row.time, row.class].forEach((value) => {
+          const td = document.createElement("td");
+          td.textContent = value ?? "";
+          tr.appendChild(td);
         });
+
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+
+      container.innerHTML = "";
+      container.appendChild(table);
+    }
+
+    function renderBlogPosts(records) {
+      const container = document.getElementById("blog");
+      if (!container) return;
+
+      container.innerHTML = "";
+      records.forEach((post, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "post";
+
+        const title = document.createElement("h2");
+        title.textContent = post.title ?? "Untitled";
+
+        const date = document.createElement("div");
+        date.textContent = post.created ? new Date(post.created).toLocaleDateString() : "";
+        date.className = "date";
+
+        const content = document.createElement("p");
+        content.textContent = post.content ?? "";
+        content.style.margin = "0";
+
+        wrapper.appendChild(title);
+        wrapper.appendChild(date);
+        wrapper.appendChild(content);
+        container.appendChild(wrapper);
+      });
+    }
+
+    async function loadContent() {
+      try {
+        const scheduleRecords = await pb.collection("schedule").getFullList({
+          sort: "day",
+        });
+        renderScheduleTable(scheduleRecords);
+
+        const blogRecords = await pb.collection("blog").getFullList({
+          sort: "-created",
+        });
+        renderBlogPosts(blogRecords);
       } catch (err) {
         console.error(err);
       }
     }
 
-    document.addEventListener('DOMContentLoaded', loadSchedule);
+    document.addEventListener("DOMContentLoaded", loadContent);
   </script>
 </body>
-</html>
+</html

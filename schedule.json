@@ -1,0 +1,17 @@
+[
+  {
+    "day": "Monday",
+    "time": "10:00 AM",
+    "class": "Conversation"
+  },
+  {
+    "day": "Tuesday",
+    "time": "2:00 PM",
+    "class": "Business English"
+  },
+  {
+    "day": "Wednesday",
+    "time": "6:00 PM",
+    "class": "IELTS Prep"
+  }
+]
