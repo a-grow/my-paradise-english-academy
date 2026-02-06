@@ -3,8 +3,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, ArrowLeft, Calendar, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// SheetDB API endpoint - Update this with your actual SheetDB URL
-const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/YOUR_SHEETDB_ID';
+// SheetDB API endpoint
+const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/9ctz2zljbz6wx';
 
 interface BlogPost {
   title: string;
