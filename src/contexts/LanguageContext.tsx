@@ -39,10 +39,10 @@ const translations: Record<Language, Record<string, string>> = {
     'video.placeholder': 'Watch Our Class Preview',
     
     // Classes
-    'classes.badge': 'Class Schedule',
+    'classes.badge': 'Classes',
     'classes.title': 'Group Classes',
     'classes.subtitle': 'Join our fun and interactive group learning experiences',
-    'classes.groupTitle': 'Class Schedule',
+    'classes.groupTitle': 'Group Classes',
     'classes.note': 'All group classes use Oxford Discover books',
     'classes.full': 'FULL',
     'classes.available': 'AVAILABLE',
@@ -53,7 +53,7 @@ const translations: Record<Language, Record<string, string>> = {
     'curriculum.subtitle': 'World-class learning materials for every level',
     'curriculum.book': 'Oxford Discover',
     'curriculum.level': 'Level',
-    'curriculum.clickHint': '👆 Click a book to see its class schedule',
+    'curriculum.clickHint': '👆 Click a book to see class details',
     
     // Contact
     'contact.badge': 'Start Your Adventure!',
@@ -95,10 +95,10 @@ const translations: Record<Language, Record<string, string>> = {
     'video.placeholder': '觀看課程預覽',
     
     // Classes
-    'classes.badge': '課程時間表',
+    'classes.badge': '課程資訊',
     'classes.title': '團體課程',
     'classes.subtitle': '加入我們有趣又互動的團體學習體驗',
-    'classes.groupTitle': '每週時間表',
+    'classes.groupTitle': '團體課程',
     'classes.note': '所有團體課程均使用 Oxford Discover 教材',
     'classes.full': '已滿',
     'classes.available': '可報名',
@@ -109,7 +109,7 @@ const translations: Record<Language, Record<string, string>> = {
     'curriculum.subtitle': '世界級的學習教材，適合每個程度',
     'curriculum.book': 'Oxford Discover',
     'curriculum.level': '級別',
-    'curriculum.clickHint': '👆 點擊書本查看對應課程時間',
+    'curriculum.clickHint': '👆 點擊書本查看課程資訊',
     
     // Contact
     'contact.badge': '開始您的冒險！',
