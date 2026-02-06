@@ -195,6 +195,10 @@
     animation: fade-in 0.8s ease-out 0.6s forwards;
     opacity: 0;
   }
+
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
 }
 
 @keyframes float {
@@ -223,5 +227,20 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
   }
 }

@@ -23,8 +23,7 @@ const TeacherSection = () => {
                 <img 
                   src="/andy.jpg" 
                   alt="Teacher Andy" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => { e.currentTarget.src = "https://placehold.co/400x400/fb7185/ffffff?text=Teacher+Andy"; }} 
+                  className="w-full h-full object-cover object-top"
                 />
               </div>
             </div>

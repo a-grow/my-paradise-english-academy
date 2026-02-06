@@ -1,5 +1,6 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Sparkles, Tv } from 'lucide-react';
+import { Sparkles, Tv, Youtube } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const VideoSection = () => {
   const { t } = useLanguage();
@@ -34,6 +35,26 @@ const VideoSection = () => {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
               allowFullScreen
             />
+          </div>
+
+          {/* YouTube Button */}
+          <div className="text-center mt-8">
+            <Button
+              asChild
+              variant="hero"
+              size="lg"
+              className="bg-gradient-to-r from-paradise-coral to-paradise-pink text-white hover:from-paradise-pink hover:to-paradise-coral hover:animate-wiggle"
+            >
+              <a 
+                href="https://www.youtube.com/@MyParadiseEnglish" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2"
+              >
+                <Youtube className="w-5 h-5" />
+                {t('video.youtube')}
+              </a>
+            </Button>
           </div>
         </div>
       </div>
