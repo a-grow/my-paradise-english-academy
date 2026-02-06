@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Paradise English</title>
+    <script>
+      (function () {
+        var l = window.location;
+        var path = l.pathname.replace(/^\//, "");
+        var search = l.search ? l.search.replace(/&/g, "~and~") : "";
+        var newUrl = l.protocol + "//" + l.host + "/?/" + path + search + l.hash;
+        l.replace(newUrl);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
