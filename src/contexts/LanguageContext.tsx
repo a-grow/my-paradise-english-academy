@@ -16,6 +16,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.classes': 'Classes',
     'nav.curriculum': 'Curriculum',
     'nav.contact': 'Contact',
+    'nav.blog': 'Blog',
     
     // Hero
     'hero.badge': "✨ Taiwan's Most Fun English School!",
@@ -37,6 +38,7 @@ const translations: Record<Language, Record<string, string>> = {
     'video.badge': 'Class in Session',
     'video.title': 'Take a Peek!',
     'video.placeholder': 'Watch Our Class Preview',
+    'video.youtube': 'Visit My YouTube',
     
     // Classes
     'classes.badge': 'Class Schedule',
@@ -72,6 +74,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.classes': '課程',
     'nav.curriculum': '教材',
     'nav.contact': '聯繫我們',
+    'nav.blog': '部落格',
     
     // Hero
     'hero.badge': '✨ 台灣最有趣的英語學校！',
@@ -93,6 +96,7 @@ const translations: Record<Language, Record<string, string>> = {
     'video.badge': '課堂進行中',
     'video.title': '來看一看！',
     'video.placeholder': '觀看課程預覽',
+    'video.youtube': '訪問我的 YouTube',
     
     // Classes
     'classes.badge': '課程時間表',
