@@ -3,8 +3,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, ArrowLeft, Calendar, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// SheetDB API endpoint
-const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/9ctz2zljbz6wx';
+// SheetDB API endpoint for Blog tab
+const SHEETDB_API_URL = 'https://sheetdb.io/api/v1/9ctz2zljbz6wx?sheet=Blog';
+
+// Default tropical background for posts without images
+const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80';
 
 interface BlogPost {
   title: string;
@@ -12,10 +15,11 @@ interface BlogPost {
   date: string;
   content: string;
   content_zh?: string;
+  image?: string;
 }
 
 const Blog = () => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,21 +48,24 @@ const Blog = () => {
             title_zh: '🎉 2026春季班招生中！',
             date: '2026-02-01',
             content: 'Limited spots available for our new Book 1 class on Fridays! Contact us today to reserve your spot.',
-            content_zh: '週五新開Book 1班級，名額有限！立即聯繫我們預約名額。'
+            content_zh: '週五新開Book 1班級，名額有限！立即聯繫我們預約名額。',
+            image: ''
           },
           {
             title: '🌟 New Student Welcome Event',
             title_zh: '🌟 新生歡迎活動',
             date: '2026-01-15',
             content: 'Join us for our special new student orientation! Meet Teacher Andy and learn about our exciting curriculum.',
-            content_zh: '歡迎參加我們的新生說明會！認識Teacher Andy，了解我們精彩的課程內容。'
+            content_zh: '歡迎參加我們的新生說明會！認識Teacher Andy，了解我們精彩的課程內容。',
+            image: ''
           },
           {
             title: '📚 Oxford Discover Series Updates',
             title_zh: '📚 Oxford Discover 系列更新',
             date: '2026-01-10',
             content: 'We are excited to announce that all our classes now use the latest Oxford Discover curriculum materials!',
-            content_zh: '我們很高興宣布，所有課程現在都使用最新的 Oxford Discover 教材！'
+            content_zh: '我們很高興宣布，所有課程現在都使用最新的 Oxford Discover 教材！',
+            image: ''
           }
         ]);
       } finally {
@@ -75,6 +82,10 @@ const Blog = () => {
 
   const getContent = (post: BlogPost) => {
     return language === 'zh' && post.content_zh ? post.content_zh : post.content;
+  };
+
+  const getImage = (post: BlogPost) => {
+    return post.image && post.image.trim() !== '' ? post.image : DEFAULT_IMAGE;
   };
 
   const formatDate = (dateStr: string) => {
@@ -136,22 +147,34 @@ const Blog = () => {
             <Loader2 className="w-12 h-12 text-paradise-purple animate-spin" />
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {posts.map((post, index) => (
               <article
                 key={index}
-                className="bg-white/80 backdrop-blur-md rounded-[2rem] p-6 md:p-8 shadow-xl border-2 border-paradise-sky/20 hover:border-paradise-purple/30 transition-all duration-300 hover:-translate-y-1"
+                className="bg-white/80 backdrop-blur-md rounded-[2rem] overflow-hidden shadow-xl border-2 border-paradise-sky/20 hover:border-paradise-purple/30 transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="flex items-center gap-2 text-paradise-teal mb-3">
-                  <Calendar className="w-4 h-4" />
-                  <time className="text-sm font-medium">{formatDate(post.date)}</time>
+                {/* Blog Image */}
+                <div className="w-full h-48 md:h-64 overflow-hidden">
+                  <img 
+                    src={getImage(post)} 
+                    alt={getTitle(post)}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  />
                 </div>
-                <h3 className="text-2xl font-display font-bold text-foreground mb-4">
-                  {getTitle(post)}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed text-lg">
-                  {getContent(post)}
-                </p>
+                
+                {/* Content */}
+                <div className="p-6 md:p-8">
+                  <div className="flex items-center gap-2 text-paradise-teal mb-3">
+                    <Calendar className="w-4 h-4" />
+                    <time className="text-sm font-medium">{formatDate(post.date)}</time>
+                  </div>
+                  <h3 className="text-2xl font-display font-bold text-foreground mb-4">
+                    {getTitle(post)}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed text-lg">
+                    {getContent(post)}
+                  </p>
+                </div>
               </article>
             ))}
           </div>
