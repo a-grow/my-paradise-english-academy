@@ -42,7 +42,7 @@ const Schedule = () => {
 			<div className="container mx-auto px-4 max-w-6xl">
 				<div className="text-center mb-10">
 					<span className="inline-flex items-center gap-2 rounded-full bg-pink-100 text-pink-700 px-4 py-1 text-sm font-semibold">
-						Weekly Schedule
+						Class Schedule
 					</span>
 					<h1 className="mt-4 text-4xl md:text-5xl font-display font-bold text-pink-900">
 						Class Schedule

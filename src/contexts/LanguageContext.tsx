@@ -42,7 +42,7 @@ const translations: Record<Language, Record<string, string>> = {
     'classes.badge': 'Class Schedule',
     'classes.title': 'Group Classes',
     'classes.subtitle': 'Join our fun and interactive group learning experiences',
-    'classes.groupTitle': 'Weekly Schedule',
+    'classes.groupTitle': 'Class Schedule',
     'classes.note': 'All group classes use Oxford Discover books',
     'classes.full': 'FULL',
     'classes.available': 'AVAILABLE',
