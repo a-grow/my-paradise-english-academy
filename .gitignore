@@ -1,9 +1,24 @@
-# Ignore environment variables
-.env
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Ignore PocketBase files
-pocketbase.js
-pocketbase_0.36.2_darwin_arm64/
+node_modules
+dist
+dist-ssr
+*.local
 
-# Ignore node_modules
-node_modules/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
