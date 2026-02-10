@@ -1,8 +1,36 @@
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Sparkles, Star } from 'lucide-react';
+import { Sparkles, Star, Send, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 const ContactSection = () => {
   const { t } = useLanguage();
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSending(true);
+    setError('');
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch('https://formspree.io/f/xzaborke', {
+        method: 'POST',
+        body: formData,
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) throw new Error('Failed to send');
+      setSent(true);
+      form.reset();
+    } catch {
+      setError('Something went wrong. Please try again or reach out on social media!');
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <section id="contact" className="py-24 bg-gradient-to-br from-paradise-purple via-paradise-sky to-paradise-teal relative overflow-hidden">
@@ -30,91 +58,116 @@ const ContactSection = () => {
           </p>
 
           {/* Contact Form */}
-          <form
-            action="https://formspree.io/f/YOUR_FORM_ID"
-            method="POST"
-            className="bg-white/15 backdrop-blur-md rounded-3xl p-8 md:p-10 shadow-xl border border-white/20 text-left max-w-2xl mx-auto mb-12"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="contact-name" className="block text-sm font-semibold text-white mb-2">
-                  Name
+          {sent ? (
+            <div className="bg-white/15 backdrop-blur-md rounded-3xl p-10 shadow-xl border border-white/20 max-w-2xl mx-auto mb-12">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-400/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Send className="w-8 h-8 text-green-300" />
+                </div>
+                <h3 className="text-2xl font-display font-bold text-white mb-2">Message Sent! 🎉</h3>
+                <p className="text-white/80">We'll get back to you as soon as possible!</p>
+              </div>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white/15 backdrop-blur-md rounded-3xl p-8 md:p-10 shadow-xl border border-white/20 text-left max-w-2xl mx-auto mb-12"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="contact-name" className="block text-sm font-semibold text-white mb-2">
+                    Name *
+                  </label>
+                  <input
+                    id="contact-name"
+                    name="name"
+                    type="text"
+                    required
+                    maxLength={100}
+                    className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="contact-email" className="block text-sm font-semibold text-white mb-2">
+                    Email *
+                  </label>
+                  <input
+                    id="contact-email"
+                    name="email"
+                    type="email"
+                    required
+                    maxLength={255}
+                    className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                    placeholder="you@example.com"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="contact-phone" className="block text-sm font-semibold text-white mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    id="contact-phone"
+                    name="phone"
+                    type="tel"
+                    maxLength={20}
+                    className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                    placeholder="(555) 555-5555"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="contact-best-time" className="block text-sm font-semibold text-white mb-2">
+                    Best Time to Call
+                  </label>
+                  <input
+                    id="contact-best-time"
+                    name="bestTimeToCall"
+                    type="text"
+                    maxLength={100}
+                    className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                    placeholder="Weekdays after 4pm"
+                  />
+                </div>
+              </div>
+              <div className="mt-6">
+                <label htmlFor="contact-message" className="block text-sm font-semibold text-white mb-2">
+                  Message *
                 </label>
-                <input
-                  id="contact-name"
-                  name="name"
-                  type="text"
+                <textarea
+                  id="contact-message"
+                  name="message"
                   required
+                  rows={5}
+                  maxLength={2000}
                   className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
-                  placeholder="Your name"
+                  placeholder="How can we help?"
                 />
               </div>
-              <div>
-                <label htmlFor="contact-email" className="block text-sm font-semibold text-white mb-2">
-                  Email
-                </label>
-                <input
-                  id="contact-email"
-                  name="email"
-                  type="email"
-                  required
-                  className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
-                  placeholder="you@example.com"
-                />
+              {error && (
+                <p className="mt-4 text-paradise-yellow font-medium text-center">{error}</p>
+              )}
+              <div className="mt-8 flex justify-center">
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-paradise-yellow px-10 py-3 text-paradise-purple font-semibold shadow-lg transition-transform hover:scale-105 disabled:opacity-70"
+                >
+                  {sending ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5" />
+                  )}
+                  {sending ? 'Sending...' : 'Send'}
+                </button>
               </div>
-              <div>
-                <label htmlFor="contact-phone" className="block text-sm font-semibold text-white mb-2">
-                  Phone Number
-                </label>
-                <input
-                  id="contact-phone"
-                  name="phone"
-                  type="tel"
-                  className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
-                  placeholder="(555) 555-5555"
-                />
-              </div>
-              <div>
-                <label htmlFor="contact-best-time" className="block text-sm font-semibold text-white mb-2">
-                  Best Time to Call
-                </label>
-                <input
-                  id="contact-best-time"
-                  name="bestTimeToCall"
-                  type="text"
-                  className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
-                  placeholder="Weekdays after 4pm"
-                />
-              </div>
-            </div>
-            <div className="mt-6">
-              <label htmlFor="contact-message" className="block text-sm font-semibold text-white mb-2">
-                Message
-              </label>
-              <textarea
-                id="contact-message"
-                name="message"
-                required
-                rows={5}
-                className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
-                placeholder="How can we help?"
-              />
-            </div>
-            <div className="mt-8 flex justify-center">
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center rounded-full bg-paradise-yellow px-10 py-3 text-paradise-purple font-semibold shadow-lg transition-transform hover:scale-105"
-              >
-                Send
-              </button>
-            </div>
-          </form>
+            </form>
+          )}
 
           {/* Social Links */}
           <div className="flex justify-center gap-6">
-            <a 
-              href="https://facebook.com/myparadiseenglish" 
-              target="_blank" 
+            <a
+              href="https://facebook.com/myparadiseenglish"
+              target="_blank"
               rel="noopener noreferrer"
               className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 hover:scale-110 transition-all"
               aria-label="Facebook"
@@ -123,9 +176,9 @@ const ContactSection = () => {
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
-            <a 
-              href="https://instagram.com/myparadiseenglish" 
-              target="_blank" 
+            <a
+              href="https://instagram.com/myparadiseenglish"
+              target="_blank"
               rel="noopener noreferrer"
               className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 hover:scale-110 transition-all"
               aria-label="Instagram"
