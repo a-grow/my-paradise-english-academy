@@ -29,6 +29,87 @@ const ContactSection = () => {
             {t('contact.subtitle')}
           </p>
 
+          {/* Contact Form */}
+          <form
+            action="https://formspree.io/f/YOUR_FORM_ID"
+            method="POST"
+            className="bg-white/15 backdrop-blur-md rounded-3xl p-8 md:p-10 shadow-xl border border-white/20 text-left max-w-2xl mx-auto mb-12"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="contact-name" className="block text-sm font-semibold text-white mb-2">
+                  Name
+                </label>
+                <input
+                  id="contact-name"
+                  name="name"
+                  type="text"
+                  required
+                  className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                  placeholder="Your name"
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-email" className="block text-sm font-semibold text-white mb-2">
+                  Email
+                </label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  required
+                  className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                  placeholder="you@example.com"
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-phone" className="block text-sm font-semibold text-white mb-2">
+                  Phone Number
+                </label>
+                <input
+                  id="contact-phone"
+                  name="phone"
+                  type="tel"
+                  className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                  placeholder="(555) 555-5555"
+                />
+              </div>
+              <div>
+                <label htmlFor="contact-best-time" className="block text-sm font-semibold text-white mb-2">
+                  Best Time to Call
+                </label>
+                <input
+                  id="contact-best-time"
+                  name="bestTimeToCall"
+                  type="text"
+                  className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                  placeholder="Weekdays after 4pm"
+                />
+              </div>
+            </div>
+            <div className="mt-6">
+              <label htmlFor="contact-message" className="block text-sm font-semibold text-white mb-2">
+                Message
+              </label>
+              <textarea
+                id="contact-message"
+                name="message"
+                required
+                rows={5}
+                className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                placeholder="How can we help?"
+              />
+            </div>
+            <div className="mt-8 flex justify-center">
+              <button
+                type="submit"
+                className="inline-flex items-center justify-center rounded-full bg-paradise-yellow px-10 py-3 text-paradise-purple font-semibold shadow-lg transition-transform hover:scale-105"
+              >
+                Send
+              </button>
+            </div>
+          </form>
+
           {/* Social Links */}
           <div className="flex justify-center gap-6">
             <a 
