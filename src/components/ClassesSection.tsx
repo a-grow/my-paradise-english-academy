@@ -2,23 +2,39 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Calendar, Clock, Users, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-// SheetDB API endpoint for Classes tab
 const SHEETDB_CLASSES_URL = 'https://sheetdb.io/api/v1/9ctz2zljbz6wx?sheet=Classes';
 
-interface ClassItem {
-  id?: string;
-  day: string;
-  day_zh?: string;
-  time: string;
-  book: string;
-  level?: number;
-  status?: string;
+interface RawClassItem {
+  ID: string;
+  class_name: string;
+  schedule: string;
+  status: string;
 }
 
-// Day order for sorting
+interface ClassItem {
+  id: string;
+  className: string;
+  day: string;
+  time: string;
+  status: string;
+}
+
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const dayOrder: Record<string, number> = {
   'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6, 'Sunday': 7
 };
+
+function parseSchedule(schedule: string): { day: string; time: string } {
+  // Find which day name appears in the schedule string
+  for (const d of DAYS) {
+    const idx = schedule.toLowerCase().indexOf(d.toLowerCase());
+    if (idx !== -1) {
+      const time = schedule.substring(idx + d.length).trim();
+      return { day: d, time };
+    }
+  }
+  return { day: '', time: schedule };
+}
 
 const ClassesSection = () => {
   const { t, language } = useLanguage();
@@ -32,26 +48,33 @@ const ClassesSection = () => {
         setLoading(true);
         const response = await fetch(SHEETDB_CLASSES_URL);
         if (!response.ok) throw new Error('Failed to fetch classes');
-        const data: ClassItem[] = await response.json();
-        
-        // Sort by day and time ascending
-        const sorted = data.sort((a, b) => {
+        const data: RawClassItem[] = await response.json();
+
+        // Filter out header row and parse
+        const parsed: ClassItem[] = data
+          .filter(row => row.ID !== 'id' && row.class_name && row.schedule)
+          .map(row => {
+            const { day, time } = parseSchedule(row.schedule);
+            return {
+              id: row.class_name.toLowerCase().replace(/\s+/g, ''),
+              className: row.class_name,
+              day,
+              time,
+              status: row.status || 'Available',
+            };
+          });
+
+        // Sort by day then time
+        const sorted = parsed.sort((a, b) => {
           const dayDiff = (dayOrder[a.day] || 99) - (dayOrder[b.day] || 99);
           if (dayDiff !== 0) return dayDiff;
           return a.time.localeCompare(b.time);
         });
-        
+
         setClasses(sorted);
       } catch (err) {
         console.error('Error fetching classes:', err);
-        // Fallback to default data
-        setClasses([
-          { id: 'book4', time: '6:00 PM - 6:50 PM', day: 'Tuesday', day_zh: '週二', book: 'Book 4', level: 4, status: 'available' },
-          { id: 'book3', time: '7:00 PM - 7:50 PM', day: 'Tuesday', day_zh: '週二', book: 'Book 3', level: 3, status: 'available' },
-          { id: 'book2', time: '8:00 PM - 8:50 PM', day: 'Tuesday', day_zh: '週二', book: 'Book 2', level: 2, status: 'full' },
-          { id: 'book1', time: '7:00 PM - 7:50 PM', day: 'Friday', day_zh: '週五', book: 'Book 1', level: 1, status: 'available' },
-          { id: 'book5', time: '8:30 PM - 9:20 PM', day: 'Friday', day_zh: '週五', book: 'Book 5', level: 5, status: 'available' },
-        ]);
+        setClasses([]);
       } finally {
         setLoading(false);
       }
@@ -61,25 +84,15 @@ const ClassesSection = () => {
   }, []);
 
   useEffect(() => {
-    // Listen for book card clicks from curriculum section
     const handleBookClick = (e: CustomEvent) => {
       setHighlightedBook(e.detail);
-      // Remove highlight after 3 seconds
       setTimeout(() => setHighlightedBook(null), 3000);
     };
-
     window.addEventListener('highlightClass', handleBookClick as EventListener);
     return () => window.removeEventListener('highlightClass', handleBookClick as EventListener);
   }, []);
 
-  // Generate class ID from book name
-  const getClassId = (item: ClassItem) => {
-    return item.id || item.book.toLowerCase().replace(/\s+/g, '');
-  };
-
-  const isFull = (item: ClassItem) => {
-    return item.status?.toLowerCase() === 'full';
-  };
+  const isFull = (item: ClassItem) => item.status.toLowerCase() === 'full';
 
   return (
     <section id="classes" className="py-20 bg-[#fef9f3] relative">
@@ -113,50 +126,44 @@ const ClassesSection = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {classes.map((item, index) => {
-                const classId = getClassId(item);
-                return (
-                  <div 
-                    key={classId + index}
-                    id={`class-${classId}`}
-                    className={`
-                      flex flex-col sm:flex-row justify-between items-center p-5 
-                      bg-white rounded-2xl border-2 shadow-sm
-                      transition-all duration-500
-                      ${highlightedBook === classId 
-                        ? 'border-paradise-yellow shadow-[0_0_30px_rgba(251,191,36,0.5)] scale-[1.02]' 
-                        : 'border-transparent hover:border-paradise-sky/30'
-                      }
-                    `}
-                  >
-                    <div className="text-center sm:text-left mb-3 sm:mb-0">
-                      <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
-                        <p className="text-xl font-bold text-foreground">
-                          {language === 'zh' && item.day_zh ? item.day_zh : item.day}
-                        </p>
-                        <span className="bg-paradise-teal/10 text-paradise-teal px-3 py-1 rounded-full text-sm font-semibold">
-                          {item.book}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-muted-foreground mt-1 justify-center sm:justify-start">
-                        <Clock className="w-4 h-4" />
-                        <span>{item.time}</span>
-                      </div>
+              {classes.map((item, index) => (
+                <div
+                  key={item.id + index}
+                  id={`class-${item.id}`}
+                  className={`
+                    flex flex-col sm:flex-row justify-between items-center p-5 
+                    bg-white rounded-2xl border-2 shadow-sm
+                    transition-all duration-500
+                    ${highlightedBook === item.id
+                      ? 'border-paradise-yellow shadow-[0_0_30px_rgba(251,191,36,0.5)] scale-[1.02]'
+                      : 'border-transparent hover:border-paradise-sky/30'
+                    }
+                  `}
+                >
+                  <div className="text-center sm:text-left mb-3 sm:mb-0">
+                    <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
+                      <p className="text-xl font-bold text-foreground">{item.day}</p>
+                      <span className="bg-paradise-teal/10 text-paradise-teal px-3 py-1 rounded-full text-sm font-semibold">
+                        {item.className}
+                      </span>
                     </div>
-
-                    {/* Availability Badge */}
-                    <div className={`
-                      px-5 py-2 rounded-full font-bold text-sm uppercase tracking-wide
-                      ${isFull(item) 
-                        ? 'bg-red-100 text-red-600 border-2 border-red-200' 
-                        : 'bg-green-100 text-green-600 border-2 border-green-200'
-                      }
-                    `}>
-                      {isFull(item) ? t('classes.full') : t('classes.available')}
+                    <div className="flex items-center gap-2 text-muted-foreground mt-1 justify-center sm:justify-start">
+                      <Clock className="w-4 h-4" />
+                      <span>{item.time}</span>
                     </div>
                   </div>
-                );
-              })}
+
+                  <div className={`
+                    px-5 py-2 rounded-full font-bold text-sm uppercase tracking-wide
+                    ${isFull(item)
+                      ? 'bg-red-100 text-red-600 border-2 border-red-200'
+                      : 'bg-green-100 text-green-600 border-2 border-green-200'
+                    }
+                  `}>
+                    {isFull(item) ? t('classes.full') : t('classes.available')}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
