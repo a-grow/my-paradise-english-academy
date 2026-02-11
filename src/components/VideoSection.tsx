@@ -29,7 +29,7 @@ const VideoSection = () => {
           <div className="relative aspect-video rounded-2xl overflow-hidden shadow-inner">
             <iframe 
               className="w-full h-full"
-              src="https://www.youtube.com/embed/InfjQvWRa5U?si=o9FOPrKsVbGTb5v3" 
+              src="https://www.youtube.com/embed/InfjQvWRa5U?si=6xB1K1Us0jwB8EOV" 
               title="My Paradise English - Class in Session"
               frameBorder="0" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
