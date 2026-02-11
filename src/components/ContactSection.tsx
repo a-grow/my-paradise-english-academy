@@ -31,11 +31,12 @@ const ContactSection = () => {
 
           {/* Contact Form */}
           <form
-            action="https://formspree.io/f/YOUR_FORM_ID"
+            action="https://formsubmit.co/annkathrin.lin@gmail.com"
             method="POST"
             className="bg-white/15 backdrop-blur-md rounded-3xl p-8 md:p-10 shadow-xl border border-white/20 text-left max-w-2xl mx-auto mb-12"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <input type="hidden" name="_captcha" value="false" />
+            <div className="space-y-6">
               <div>
                 <label htmlFor="contact-name" className="block text-sm font-semibold text-white mb-2">
                   Name
@@ -45,6 +46,8 @@ const ContactSection = () => {
                   name="name"
                   type="text"
                   required
+                  minLength={2}
+                  maxLength={100}
                   className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
                   placeholder="Your name"
                 />
@@ -58,47 +61,26 @@ const ContactSection = () => {
                   name="email"
                   type="email"
                   required
+                  maxLength={255}
                   className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
                   placeholder="you@example.com"
                 />
               </div>
               <div>
-                <label htmlFor="contact-phone" className="block text-sm font-semibold text-white mb-2">
-                  Phone Number
+                <label htmlFor="contact-message" className="block text-sm font-semibold text-white mb-2">
+                  Message
                 </label>
-                <input
-                  id="contact-phone"
-                  name="phone"
-                  type="tel"
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  required
+                  minLength={10}
+                  maxLength={1000}
+                  rows={5}
                   className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
-                  placeholder="(555) 555-5555"
+                  placeholder="How can we help?"
                 />
               </div>
-              <div>
-                <label htmlFor="contact-best-time" className="block text-sm font-semibold text-white mb-2">
-                  Best Time to Call
-                </label>
-                <input
-                  id="contact-best-time"
-                  name="bestTimeToCall"
-                  type="text"
-                  className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
-                  placeholder="Weekdays after 4pm"
-                />
-              </div>
-            </div>
-            <div className="mt-6">
-              <label htmlFor="contact-message" className="block text-sm font-semibold text-white mb-2">
-                Message
-              </label>
-              <textarea
-                id="contact-message"
-                name="message"
-                required
-                rows={5}
-                className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
-                placeholder="How can we help?"
-              />
             </div>
             <div className="mt-8 flex justify-center">
               <button
