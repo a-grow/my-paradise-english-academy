@@ -9,6 +9,16 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- SPA redirect handler: restores real path from 404.html query-string redirect -->
+    <script>
+      (function () {
+        var q = window.location.search;
+        if (q.length > 1 && q.charAt(1) === '/') {
+          var decoded = q.slice(1).replace(/~and~/g, '&') + window.location.hash;
+          window.history.replaceState(null, '', decoded);
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
