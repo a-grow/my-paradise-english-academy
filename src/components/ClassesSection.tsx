@@ -5,20 +5,37 @@ import { useEffect, useState } from 'react';
 // SheetDB API endpoint for Classes tab
 const SHEETDB_CLASSES_URL = 'https://sheetdb.io/api/v1/9ctz2zljbz6wx?sheet=Classes';
 
+interface RawSheetRow {
+  ID: string;
+  class_name: string;
+  schedule: string;
+  status: string;
+}
+
 interface ClassItem {
-  id?: string;
+  id: string;
   day: string;
-  day_zh?: string;
   time: string;
   book: string;
-  level?: number;
-  status?: string;
+  status: string;
 }
 
 // Day order for sorting
 const dayOrder: Record<string, number> = {
   'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6, 'Sunday': 7
 };
+
+const dayNames = Object.keys(dayOrder);
+
+/** Parse "Tuesday 6:00 PM - 6:50 PM" → { day: "Tuesday", time: "6:00 PM - 6:50 PM" } */
+function parseSchedule(schedule: string): { day: string; time: string } {
+  for (const d of dayNames) {
+    if (schedule.includes(d)) {
+      return { day: d, time: schedule.replace(d, '').trim() };
+    }
+  }
+  return { day: '', time: schedule };
+}
 
 const ClassesSection = () => {
   const { t, language } = useLanguage();
@@ -32,25 +49,38 @@ const ClassesSection = () => {
         setLoading(true);
         const response = await fetch(SHEETDB_CLASSES_URL);
         if (!response.ok) throw new Error('Failed to fetch classes');
-        const data: ClassItem[] = await response.json();
-        
+        const raw: RawSheetRow[] = await response.json();
+
+        // Skip header-like row and map to ClassItem
+        const parsed: ClassItem[] = raw
+          .filter(r => r.ID !== 'id' && r.ID !== '')
+          .map(r => {
+            const { day, time } = parseSchedule(r.schedule);
+            return {
+              id: r.class_name.toLowerCase().replace(/\s+/g, ''),
+              day,
+              time,
+              book: r.class_name,
+              status: r.status,
+            };
+          });
+
         // Sort by day and time ascending
-        const sorted = data.sort((a, b) => {
+        const sorted = parsed.sort((a, b) => {
           const dayDiff = (dayOrder[a.day] || 99) - (dayOrder[b.day] || 99);
           if (dayDiff !== 0) return dayDiff;
           return a.time.localeCompare(b.time);
         });
-        
+
         setClasses(sorted);
       } catch (err) {
         console.error('Error fetching classes:', err);
-        // Fallback to default data
         setClasses([
-          { id: 'book4', time: '6:00 PM - 6:50 PM', day: 'Tuesday', day_zh: '週二', book: 'Book 4', level: 4, status: 'available' },
-          { id: 'book3', time: '7:00 PM - 7:50 PM', day: 'Tuesday', day_zh: '週二', book: 'Book 3', level: 3, status: 'available' },
-          { id: 'book2', time: '8:00 PM - 8:50 PM', day: 'Tuesday', day_zh: '週二', book: 'Book 2', level: 2, status: 'full' },
-          { id: 'book1', time: '7:00 PM - 7:50 PM', day: 'Friday', day_zh: '週五', book: 'Book 1', level: 1, status: 'available' },
-          { id: 'book5', time: '8:30 PM - 9:20 PM', day: 'Friday', day_zh: '週五', book: 'Book 5', level: 5, status: 'available' },
+          { id: 'book4', time: '6:00 PM - 6:50 PM', day: 'Tuesday', book: 'Book 4', status: 'available' },
+          { id: 'book3', time: '7:00 PM - 7:50 PM', day: 'Tuesday', book: 'Book 3', status: 'available' },
+          { id: 'book2', time: '8:00 PM - 8:50 PM', day: 'Tuesday', book: 'Book 2', status: 'full' },
+          { id: 'book1', time: '7:00 PM - 7:50 PM', day: 'Friday', book: 'Book 1', status: 'available' },
+          { id: 'book5', time: '8:30 PM - 9:20 PM', day: 'Friday', book: 'Book 5', status: 'available' },
         ]);
       } finally {
         setLoading(false);
@@ -132,7 +162,7 @@ const ClassesSection = () => {
                     <div className="text-center sm:text-left mb-3 sm:mb-0">
                       <div className="flex items-center gap-3 flex-wrap justify-center sm:justify-start">
                         <p className="text-xl font-bold text-foreground">
-                          {language === 'zh' && item.day_zh ? item.day_zh : item.day}
+                          {item.day}
                         </p>
                         <span className="bg-paradise-teal/10 text-paradise-teal px-3 py-1 rounded-full text-sm font-semibold">
                           {item.book}
