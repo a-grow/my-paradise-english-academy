@@ -53,6 +53,20 @@ const ContactSection = () => {
                 />
               </div>
               <div>
+                <label htmlFor="contact-phone" className="block text-sm font-semibold text-white mb-2">
+                  Phone Number
+                </label>
+                <input
+                  id="contact-phone"
+                  name="phone"
+                  type="tel"
+                  required
+                  pattern="[0-9+\-() ]{7,20}"
+                  className="w-full rounded-xl bg-white/80 px-4 py-3 text-paradise-purple placeholder-paradise-purple/60 outline-none ring-2 ring-transparent focus:ring-paradise-yellow"
+                  placeholder="Your phone number"
+                />
+              </div>
+              <div>
                 <label htmlFor="contact-email" className="block text-sm font-semibold text-white mb-2">
                   Email
                 </label>

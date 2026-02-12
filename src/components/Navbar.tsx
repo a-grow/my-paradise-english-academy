@@ -20,7 +20,7 @@ const Navbar = () => {
           <a href="#classes" className="nav-link">{t('nav.classes')}</a>
           <a href="#curriculum" className="nav-link">{t('nav.curriculum')}</a>
           <a href="#contact" className="nav-link">{t('nav.contact')}</a>
-          <a href="/blog" target="_blank" rel="noopener noreferrer" className="nav-link">{t('nav.blog')}</a>
+          <a href="/blog" className="nav-link">{t('nav.blog')}</a>
         </div>
 
         <LanguageToggle />
