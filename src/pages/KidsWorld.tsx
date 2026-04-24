@@ -508,7 +508,7 @@ const KidsWorld = () => {
   const [levelUpStage,setLevelUpStage]=useState<typeof STAGES[0]|null>(null);
   const [musicOn,setMusicOn]=useState(()=>localStorage.getItem("mpe_music")!=="off");
   const [sfxOn,setSfxOn]=useState(()=>localStorage.getItem("mpe_sfx")!=="off");
-  const [volume,setVolume]=useState(()=>parseFloat(localStorage.getItem("mpe_volume")||"0.35"));
+  const [volume,setVolume]=useState(()=>parseFloat(localStorage.getItem("mpe_volume")||"0.25"));
 
   const heartId=useRef(0);
   const creatureRef=useRef<HTMLDivElement>(null);
@@ -535,13 +535,18 @@ const KidsWorld = () => {
   // Music
   useEffect(()=>{
     if(!audioRef.current){audioRef.current=new Audio("/ocean-music.mp3");audioRef.current.loop=true;}
-    audioRef.current.volume=volume;
-    if(musicOn) audioRef.current.play().catch(()=>{});
+    audioRef.current.volume=volume*0.5;
+    if(musicOn){
+      audioRef.current.play().catch(()=>{
+        const tryPlay=()=>{audioRef.current?.play().catch(()=>{});};
+        document.addEventListener("pointerdown",tryPlay,{once:true});
+      });
+    }
     else audioRef.current.pause();
     localStorage.setItem("mpe_music",musicOn?"on":"off");
     return ()=>{audioRef.current?.pause();};
   },[musicOn]);
-  useEffect(()=>{if(audioRef.current) audioRef.current.volume=volume;localStorage.setItem("mpe_volume",String(volume));},[volume]);
+  useEffect(()=>{if(audioRef.current) audioRef.current.volume=volume*0.5;localStorage.setItem("mpe_volume",String(volume));},[volume]);
   useEffect(()=>{localStorage.setItem("mpe_sfx",sfxOn?"on":"off");},[sfxOn]);
 
   const getCtx=()=>{
@@ -627,7 +632,7 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
 
   const handleEggTap=()=>{setEggWiggle(true);playSfx("rattle");setTimeout(()=>setEggWiggle(false),700);};
   const claimDailyGift=()=>{
-    setTreats(t=>t+2);setJustEarned(2);playSfx("daily");setShowDailyGift(false);
+    setTreats(t=>t+1);setJustEarned(1);playSfx("daily");setShowDailyGift(false);
     localStorage.setItem(`mpe_gift_${code}_${studentName}`,new Date().toDateString());
     setTimeout(()=>setJustEarned(0),2500);
   };
@@ -757,7 +762,7 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
             </div>
             <div style={{color:"rgba(255,255,255,0.8)",fontFamily:"Nunito,sans-serif",
               fontSize:"1rem",marginBottom:"1.5rem",lineHeight:1.5}}>
-              {displayName} gets 2 treats today!<br/>
+              {displayName} gets 1 treat today!<br/>
               <span style={{fontSize:"0.82rem",opacity:0.65}}>Come back tomorrow for more!</span>
             </div>
             <button onClick={claimDailyGift} style={{
@@ -766,7 +771,7 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
               fontFamily:"'Fredoka One',cursive",fontSize:"1.25rem",
               padding:"0.85rem 2.5rem",cursor:"pointer",
               boxShadow:"0 6px 24px rgba(245,158,11,0.55)"}}>
-              Claim +2 Treats!
+              Claim +1 Treat!
             </button>
           </div>
         </div>
