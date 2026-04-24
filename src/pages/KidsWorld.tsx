@@ -6,13 +6,74 @@ const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 const MASTER_CODE = "1006";
 
 const STAGES = [
-  { name:"Egg",       label:"Sea Turtle Egg",   min:0,   max:9    },
-  { name:"Hatchling", label:"Baby Sea Turtle",   min:10,  max:24   },
-  { name:"Young",     label:"Young Sea Turtle",  min:25,  max:49   },
-  { name:"Grown",     label:"Grown Sea Turtle",  min:50,  max:9999 },
+  { name:"Egg",       label:"Sea Turtle Egg",   min:0,   max:14   },
+  { name:"Baby",      label:"Baby Sea Turtle",   min:15,  max:29   },
+  { name:"Young",     label:"Young Sea Turtle",  min:30,  max:44   },
+  { name:"Grown",     label:"Grown Sea Turtle",  min:45,  max:9999 },
 ];
 const getStage = (t:number) => STAGES.findLast(s=>t>=s.min) ?? STAGES[0];
-
+// ── EGG CRACKS ───────────────────────────────────────────────────────────────
+const EggCracks = ({treats}:{treats:number}) => {
+  const level = treats<=2?0:treats<=5?1:treats<=8?2:treats<=11?3:4;
+  if(level===0) return null;
+  return (
+    <svg viewBox="0 0 200 200" style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:10}}>
+      {level>=1&&(
+        <path d="M105,55 L112,70 L108,78 L115,92" 
+          stroke="#8B5E3C" strokeWidth="2.5" fill="none" strokeLinecap="round"
+          style={{filter:"drop-shadow(0 0 3px rgba(255,200,100,0.8))"}}/>
+      )}
+      {level>=2&&(
+        <>
+          <path d="M105,55 L112,70 L108,78 L115,92" 
+            stroke="#8B5E3C" strokeWidth="2.5" fill="none" strokeLinecap="round"
+            style={{filter:"drop-shadow(0 0 3px rgba(255,200,100,0.8))"}}/>
+          <path d="M88,70 L80,82 L85,90 L79,102"
+            stroke="#8B5E3C" strokeWidth="2" fill="none" strokeLinecap="round"
+            style={{filter:"drop-shadow(0 0 3px rgba(255,200,100,0.8))"}}/>
+        </>
+      )}
+      {level>=3&&(
+        <>
+          <path d="M105,55 L112,70 L108,78 L115,92" 
+            stroke="#7a4e2a" strokeWidth="3" fill="none" strokeLinecap="round"
+            style={{filter:"drop-shadow(0 0 4px rgba(255,200,100,0.9))"}}/>
+          <path d="M88,70 L80,82 L85,90 L79,102"
+            stroke="#7a4e2a" strokeWidth="2.5" fill="none" strokeLinecap="round"
+            style={{filter:"drop-shadow(0 0 4px rgba(255,200,100,0.9))"}}/>
+          <path d="M115,92 L122,100 L118,108"
+            stroke="#7a4e2a" strokeWidth="2" fill="none" strokeLinecap="round"
+            style={{filter:"drop-shadow(0 0 3px rgba(255,200,100,0.8))"}}/>
+          <path d="M100,110 L106,120 L102,128"
+            stroke="#7a4e2a" strokeWidth="2" fill="none" strokeLinecap="round"/>
+        </>
+      )}
+      {level>=4&&(
+        <>
+          <path d="M105,55 L112,70 L108,78 L115,92 L108,102 L114,115" 
+            stroke="#5a3010" strokeWidth="3.5" fill="none" strokeLinecap="round"
+            style={{filter:"drop-shadow(0 0 6px rgba(255,180,50,1))"}}/>
+          <path d="M88,70 L80,82 L85,90 L79,102 L85,112"
+            stroke="#5a3010" strokeWidth="3" fill="none" strokeLinecap="round"
+            style={{filter:"drop-shadow(0 0 5px rgba(255,180,50,0.9))"}}/>
+          <path d="M115,92 L125,98 L120,108 L127,116"
+            stroke="#5a3010" strokeWidth="2.5" fill="none" strokeLinecap="round"
+            style={{filter:"drop-shadow(0 0 4px rgba(255,180,50,0.8))"}}/>
+          <path d="M100,110 L106,122 L100,130 L107,140"
+            stroke="#5a3010" strokeWidth="2.5" fill="none" strokeLinecap="round"
+            style={{filter:"drop-shadow(0 0 4px rgba(255,180,50,0.8))"}}/>
+          <path d="M82,95 L75,105 L80,115"
+            stroke="#5a3010" strokeWidth="2" fill="none" strokeLinecap="round"/>
+          {/* Golden glow dots at crack tips */}
+          {[[114,115],[85,112],[127,116],[107,140]].map(([cx,cy],i)=>(
+            <circle key={i} cx={cx} cy={cy} r="3" fill="#ffd700" opacity="0.8"
+              style={{animation:`spL ${1+i*0.3}s ease-in-out infinite`}}/>
+          ))}
+        </>
+      )}
+    </svg>
+  );
+};
 // ── ROUND FACE COOKIE ─────────────────────────────────────────────────────────
 const FaceCookie = ({ size=24 }:{size?:number}) => (
   <svg width={size} height={size} viewBox="0 0 40 40" style={{display:"inline-block",flexShrink:0}}>
@@ -379,8 +440,8 @@ const EarnButtons = ({navigate,code,studentName}:{navigate:(p:string)=>void;code
   <div style={{display:"flex",flexDirection:"column",gap:"0.85rem"}}>
     {[
       {label:"Play a Game",sub:"Fun English games!",reward:"+2 treats",color:"#f97316",glow:"rgba(249,115,22,0.5)",path:`/game/${code}/${studentName}`},
-      {label:"Read & Quiz",sub:"Read a story, answer questions!",reward:"+4 treats",color:"#a855f7",glow:"rgba(168,85,247,0.5)",path:"/quiz"},
-      {label:"5-Day Streak!",sub:"Come back 5 days in a row!",reward:"+5 treats",color:"#10b981",glow:"rgba(16,185,129,0.5)",path:""},
+      {label:"Read & Quiz",sub:"Read a story, answer questions!",reward:"+3 treats",color:"#a855f7",glow:"rgba(168,85,247,0.5)",path:"/quiz"},
+      {label:"Visit 5 Days!",sub:"Come back any 5 days to earn a treat!",reward:"+3 treats",color:"#10b981",glow:"rgba(16,185,129,0.5)",path:""},
     ].map((btn,i)=>(
       <button key={i} onClick={()=>btn.path&&navigate(btn.path)} style={{
         width:"100%",padding:"1rem 1.25rem",
@@ -495,6 +556,10 @@ const KidsWorld = () => {
   const navigate=useNavigate();
 
   const isMaster=code===MASTER_CODE;
+if(isMaster){
+  localStorage.removeItem(`mpe_game_claimed_${code}_Test_${new Date().toDateString()}`);
+  localStorage.removeItem(`mpe_levelup_${code}_Test`);
+}
   const [treats,setTreats]=useState(0);
   const [loading,setLoading]=useState(!isMaster);
   const [hearts,setHearts]=useState<{id:number;x:number;y:number;delay:number}[]>([]);
@@ -503,7 +568,7 @@ const KidsWorld = () => {
   const [showDailyGift,setShowDailyGift]=useState(false);
   const [justEarned,setJustEarned]=useState(0);
   const [showSettings,setShowSettings]=useState(false);
-  const [lastHomework,setLastHomework]=useState<Date|null>(null);
+  const sad=false;
   const [petName,setPetName]=useState(()=>localStorage.getItem(`mpe_petname_${code}_${studentName}`)||"");
   const [levelUpStage,setLevelUpStage]=useState<typeof STAGES[0]|null>(null);
   const [musicOn,setMusicOn]=useState(()=>localStorage.getItem("mpe_music")!=="off");
@@ -524,12 +589,12 @@ const KidsWorld = () => {
     return s?.name??(n.charAt(0).toUpperCase()+n.slice(1));
   })();
 
-  const sad=!isMaster&&lastHomework!==null&&(Date.now()-lastHomework.getTime())>7*24*60*60*1000;
+  
   const stage=getStage(treats);
   const stageIdx=STAGES.indexOf(stage);
   const nextStage=STAGES[stageIdx+1];
   const isEgg=stageIdx===0;
-  const nearHatch=isEgg&&treats>=7;
+  const nearHatch=isEgg&&treats>=12;
   const progress=nextStage?Math.round(((treats-stage.min)/(nextStage.min-stage.min))*100):100;
 
   // Music
@@ -605,7 +670,7 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
       .then(r=>r.json())
       .then((data:any[])=>{
         const row=data.find(r=>r.familyCode===code&&r.studentName?.toLowerCase()===studentName?.toLowerCase());
-        if(row){setTreats(parseInt(row.treats)||0);if(row.lastHomework)setLastHomework(new Date(row.lastHomework));}
+        if(row){setTreats(parseInt(row.treats)||0);}
         setLoading(false);
       }).catch(()=>setLoading(false));
     const lastGift=localStorage.getItem(`mpe_gift_${code}_${studentName}`);
@@ -849,7 +914,9 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
               style={{width:"min(250px,65vw)",height:"min(210px,55vw)",
                 display:"flex",alignItems:"center",justifyContent:"center",
                 filter:sad?"saturate(0.4) brightness(0.75)":"none",
+                position:"relative",
                 transition:"filter 0.5s ease"}}>
+              {isEgg&&<EggCracks treats={treats}/>}
               <img src={creatureImg} alt={isEgg?"Turtle egg":"Sea turtle"}
                 style={{maxWidth:"100%",maxHeight:"100%",objectFit:"contain",
                   filter:sad?"none":"drop-shadow(0 8px 20px rgba(0,0,0,0.3))"}}
@@ -880,15 +947,6 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
             {stage.label}{isMaster?" (Master)":""}
           </div>
 
-          {sad&&(
-            <div style={{background:"rgba(255,255,255,0.92)",borderRadius:"1.4rem",
-              padding:"0.8rem 1.1rem",margin:"0.75rem auto 0",maxWidth:270,
-              fontFamily:"Nunito,sans-serif",fontSize:"0.92rem",color:"#333",lineHeight:1.5,
-              boxShadow:"0 4px 16px rgba(0,0,0,0.2)"}}>
-              I miss my homework!<br/>
-              <span style={{fontSize:"0.8rem",color:"#666"}}>我想念我的作業！</span>
-            </div>
-          )}
 
           {nextStage&&!isMaster&&(
             <div style={{marginTop:"1rem",padding:"0 0.5rem"}}>
@@ -918,32 +976,37 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
 
         {/* TREAT JAR */}
         <div className="glass" style={{padding:"1.25rem",marginBottom:"1rem",
-          display:"flex",alignItems:"center",justifyContent:"center",gap:"2rem",
           animation:"fadeUp 0.7s ease-out"}}>
-          <TreatJar treats={treats} nextStage={nextStage}/>
-          <div style={{textAlign:"center"}}>
-            <div style={{color:"white",fontFamily:"'Fredoka One',cursive",fontSize:"2.5rem",lineHeight:1}}>
-              {stageIdx+1}<span style={{fontSize:"1.2rem",opacity:0.6}}>/4</span>
-            </div>
-            <div style={{color:"rgba(255,255,255,0.6)",fontFamily:"Nunito,sans-serif",fontSize:"0.85rem"}}>
-              stages done
-            </div>
-            <div style={{marginTop:"0.75rem",display:"flex",alignItems:"center",gap:"0.4rem",justifyContent:"center"}}>
-              <FaceCookie size={22}/>
-              <span style={{color:"rgba(255,255,255,0.6)",fontFamily:"Nunito,sans-serif",fontSize:"0.75rem"}}> = 1 treat</span>
+          <div style={{color:"white",fontFamily:"'Fredoka One',cursive",
+            fontSize:"1.1rem",textAlign:"center",marginBottom:"0.75rem"}}>
+            Feed your Sea Turtle Treats!
+          </div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"2rem"}}>
+            <TreatJar treats={treats} nextStage={nextStage}/>
+            <div style={{textAlign:"center"}}>
+              <div style={{color:"white",fontFamily:"'Fredoka One',cursive",fontSize:"2.5rem",lineHeight:1}}>
+                {stageIdx+1}<span style={{fontSize:"1.2rem",opacity:0.6}}>/4</span>
+              </div>
+              <div style={{color:"rgba(255,255,255,0.6)",fontFamily:"Nunito,sans-serif",fontSize:"0.85rem"}}>
+                stages done
+              </div>
+              <div style={{marginTop:"0.75rem",display:"flex",alignItems:"center",gap:"0.4rem",justifyContent:"center"}}>
+                <FaceCookie size={22}/>
+                <span style={{color:"rgba(255,255,255,0.6)",fontFamily:"Nunito,sans-serif",fontSize:"0.75rem"}}> = Yummy Treat!</span>
+              </div>
             </div>
           </div>
         </div>
 
         {isMaster&&(
-          <button onClick={()=>{setTreats(t=>t+5);playSfx("treat");}} style={{
+          <button onClick={()=>{setTreats(t=>t+1);playSfx("treat");}} style={{
             width:"100%",padding:"0.9rem",
             background:"linear-gradient(135deg,#f59e0b,#ef4444)",
             border:"none",borderRadius:"999px",color:"white",
             fontFamily:"'Fredoka One',cursive",fontSize:"1.1rem",
             cursor:"pointer",marginBottom:"1rem",
             boxShadow:"0 6px 20px rgba(245,158,11,0.5)"}}>
-            Feed +5 Treats (Master Test)
+            Feed +1 Treat (Master Test)
           </button>
         )}
 
