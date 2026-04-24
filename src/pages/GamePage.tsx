@@ -191,6 +191,11 @@ const GamePage = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const isMaster = code === MASTER_CODE;
+if(isMaster){
+  Object.keys(localStorage)
+    .filter(k=>k.startsWith("mpe_game_claimed_1006"))
+    .forEach(k=>localStorage.removeItem(k));
+}
 const todayKey = `mpe_game_claimed_${code}_${studentName}_${new Date().toDateString()}`;
 
   useEffect(() => {
