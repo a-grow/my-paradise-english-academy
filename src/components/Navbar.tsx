@@ -21,6 +21,7 @@ const Navbar = () => {
           <a href="#curriculum" className="nav-link">{t('nav.curriculum')}</a>
           <a href="#contact" className="nav-link">{t('nav.contact')}</a>
           <a href="/blog" className="nav-link">{t('nav.blog')}</a>
+<a href="/portal" className="nav-link" style={{background:"linear-gradient(135deg,hsl(var(--paradise-coral)),hsl(var(--paradise-pink)))",color:"white",padding:"0.4rem 1.1rem",borderRadius:"999px",fontWeight:"bold"}}>Family Login</a>
         </div>
 
         <LanguageToggle />

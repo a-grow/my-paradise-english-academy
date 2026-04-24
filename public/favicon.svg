@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Sky background -->
+  <circle cx="50" cy="50" r="50" fill="#38bdf8"/>
+  <!-- Trunk -->
+  <path d="M48 90 Q44 70 46 50 Q48 35 50 25" stroke="#92400e" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- Left fronds -->
+  <path d="M50 28 Q35 18 22 22" stroke="#16a34a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M50 28 Q30 24 20 34" stroke="#16a34a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M50 28 Q32 32 26 44" stroke="#22c55e" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Right fronds -->
+  <path d="M50 28 Q65 18 78 22" stroke="#16a34a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M50 28 Q70 24 80 34" stroke="#16a34a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M50 28 Q68 32 74 44" stroke="#22c55e" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Top frond -->
+  <path d="M50 28 Q50 14 50 8" stroke="#15803d" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Coconuts -->
+  <circle cx="46" cy="32" r="3.5" fill="#92400e"/>
+  <circle cx="54" cy="31" r="3.5" fill="#92400e"/>
+  <!-- Ground/sand -->
+  <ellipse cx="50" cy="88" rx="18" ry="6" fill="#fbbf24"/>
+</svg>

@@ -49,7 +49,7 @@ const LoginScreen = () => {
           className="w-full px-5 py-4 rounded-2xl font-display font-bold text-xl text-center tracking-widest uppercase outline-none transition-all duration-200 mb-4"
           style={{ border: error ? "3px solid #f87171" : "3px solid hsl(var(--paradise-sky)/0.5)", background: error ? "#fef2f2" : "hsl(var(--paradise-sky)/0.07)" }}
           type="text"
-          placeholder="e.g. TIARA7"
+          placeholder="e.g. ELSA123"
           value={code}
           onChange={(e) => { setCode(e.target.value); setError(""); }}
           onKeyDown={(e) => e.key === "Enter" && handleLogin()}
