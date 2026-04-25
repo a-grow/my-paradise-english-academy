@@ -203,14 +203,7 @@ const TreatJar = ({treats,nextStage}:{treats:number;nextStage:typeof STAGES[0]|u
         color:"white",textShadow:"0 2px 6px rgba(0,0,0,0.4)",textAlign:"center"}}>
         {displayTreats} treats
       </div>
-      {remaining>0&&nextStage&&(
-        <div style={{fontFamily:"Nunito,sans-serif",fontSize:"0.78rem",
-          color:"rgba(255,255,255,0.9)",textAlign:"center",lineHeight:1.3,
-          background:"rgba(0,0,0,0.28)",borderRadius:"999px",
-          padding:"0.2rem 0.8rem",border:"1px solid rgba(255,255,255,0.15)"}}>
-          {remaining} more to {nextStage.name}!
-        </div>
-      )}
+      {remaining>0&&nextStage&&null}
       {!nextStage&&(
         <div style={{fontFamily:"Nunito,sans-serif",fontSize:"0.78rem",
           color:"#fbbf24",textAlign:"center",
@@ -559,8 +552,6 @@ const KidsWorld = () => {
 if(isMaster){
   localStorage.removeItem(`mpe_game_claimed_${code}_Test_${new Date().toDateString()}`);
   localStorage.removeItem(`mpe_levelup_${code}_Test`);
-  localStorage.removeItem(`mpe_jar_${code}_Test`);
-  localStorage.removeItem(`mpe_fed_${code}_Test`);
 }
   const [jarTreats,setJarTreats]=useState(()=>isMaster?0:parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`)||"0"));
 const [fedTreats,setFedTreats]=useState(()=>isMaster?0:parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`)||"0"));

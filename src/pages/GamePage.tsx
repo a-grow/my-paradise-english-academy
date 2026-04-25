@@ -184,7 +184,7 @@ const GamePage = () => {
   const [claimed, setClaimed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [musicOn, setMusicOn] = useState(() => localStorage.getItem("mpe_music") !== "off");
-  const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.3"));
+  const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.18"));
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
@@ -212,7 +212,7 @@ const todayKey = `mpe_game_claimed_${code}_${studentName}_${new Date().toDateStr
       audioRef.current.volume = 0;
       audioRef.current.play().catch(() => {});
       let v = 0;
-      const target = volume;
+      const target = volume * 0.4;
       const fade = setInterval(() => {
         v = Math.min(v + target/40, target);
         if (audioRef.current) audioRef.current.volume = v;
@@ -269,13 +269,17 @@ const todayKey = `mpe_game_claimed_${code}_${studentName}_${new Date().toDateStr
 
   useEffect(() => () => { if (timerRef.current) clearInterval(timerRef.current); }, []);
 
-  const handleClaim = () => {
+const handleClaim = () => {
     if (!canClaim || claimed) return;
     setClaimed(true);
     setShowCelebration(true);
-    localStorage.setItem(todayKey, "true");
+    if (!isMaster) {
+      localStorage.setItem(todayKey, "true");
+      const jarKey = `mpe_jar_${code}_${studentName}`;
+      const current = parseInt(localStorage.getItem(jarKey) || "0");
+      localStorage.setItem(jarKey, String(current + 2));
+    }
     playSfx("celebrate");
-    setTimeout(() => setShowCelebration(false), 3500);
   };
 
   const handleBookClick = (book: typeof BOOKS[0]) => {
@@ -341,9 +345,27 @@ const todayKey = `mpe_game_claimed_${code}_${studentName}_${new Date().toDateStr
             <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", color: "#333", margin: "0.5rem 0" }}>
               You earned 2 treats!
             </div>
-            <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", color: "#888" }}>
+            <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", color: "#888", marginBottom:"1.25rem" }}>
               太棒了！繼續加油！
             </div>
+            <button onClick={()=>setShowCelebration(false)} style={{
+              width:"100%", padding:"0.85rem",
+              background:"linear-gradient(135deg,#4ade80,#22d3ee)",
+              border:"none", borderRadius:"999px", color:"white",
+              fontFamily:"'Fredoka One',cursive", fontSize:"1.2rem",
+              cursor:"pointer", marginBottom:"0.6rem",
+              boxShadow:"0 6px 20px rgba(74,222,128,0.5)"}}>
+              Keep Playing!
+            </button>
+            <button onClick={()=>navigate(`/world/${code}/${studentName}`)} style={{
+              width:"100%", padding:"0.85rem",
+              background:"linear-gradient(135deg,#f97316,#fbbf24)",
+              border:"none", borderRadius:"999px", color:"white",
+              fontFamily:"'Fredoka One',cursive", fontSize:"1.2rem",
+              cursor:"pointer",
+              boxShadow:"0 6px 20px rgba(249,115,22,0.5)"}}>
+              Back to {studentName}'s World!
+            </button>
           </div>
         </div>
       )}
