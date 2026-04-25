@@ -1,6 +1,6 @@
 # 🌴 My Paradise English Academy
 
-Website for **My Paradise English Academy** — an online English school for Taiwanese students, run by Aaron & Shirley.
+Website for **My Paradise English Academy** — an online English school for Taiwanese students, run by Andy & Shirley.
 
 ## About
 We offer group and one-on-one online English classes using the Oxford Discover curriculum. Our site features a class schedule, blog, and parent/student portal.

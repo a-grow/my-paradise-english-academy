@@ -212,7 +212,7 @@ const todayKey = `mpe_game_claimed_${code}_${studentName}_${new Date().toDateStr
       audioRef.current.volume = 0;
       audioRef.current.play().catch(() => {});
       let v = 0;
-      const target = volume * 0.4;
+      const target = volume * 0.25;
       const fade = setInterval(() => {
         v = Math.min(v + target/40, target);
         if (audioRef.current) audioRef.current.volume = v;
@@ -364,7 +364,7 @@ const handleClaim = () => {
               fontFamily:"'Fredoka One',cursive", fontSize:"1.2rem",
               cursor:"pointer",
               boxShadow:"0 6px 20px rgba(249,115,22,0.5)"}}>
-              Back to {studentName}'s World!
+              Back to {studentName.charAt(0).toUpperCase() + studentName.slice(1)}'s World!
             </button>
           </div>
         </div>

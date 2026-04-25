@@ -575,6 +575,8 @@ const [treats,setTreats]=useState(0);
   const [feedingCookies,setFeedingCookies]=useState<{id:number;x:number;y:number}[]>([]);
   const creatureRef=useRef<HTMLDivElement>(null);
   const audioRef=useRef<HTMLAudioElement|null>(null);
+const harpRef=useRef<HTMLAudioElement|null>(null);
+const tadaRef=useRef<HTMLAudioElement|null>(null);
   const ctxRef=useRef<AudioContext|null>(null);
   const prevStageRef=useRef(-1);
   const levelUpFiredRef=useRef<Set<number>>(new Set());
@@ -631,7 +633,13 @@ const [treats,setTreats]=useState(0);
         chirp:()=>{play(600,0,.06);play(900,.08,.06);play(1100,.16,.1);},
         hearts:()=>{[523,659,784,1047].forEach((f,i)=>play(f,i*0.09,0.18));},
         levelup:()=>{[523,659,784,1047,1319,1568,2093].forEach((f,i)=>play(f,i*0.09,0.3,0.2));},
-        daily:()=>{[440,554,659,880].forEach((f,i)=>play(f,i*0.12,0.22,0.14));},
+        daily:()=>{
+  play(523,0,0.08,0.12);
+  play(659,0.1,0.08,0.14);
+  play(784,0.2,0.08,0.16);
+  play(1047,0.3,0.12,0.18);
+  play(1319,0.4,0.18,0.14);
+},
         treat:()=>{play(660,0,.05);play(880,.07,.05);},
         rattle:()=>{
           [0,0.08,0.16,0.24,0.32].forEach(t=>{
@@ -656,7 +664,17 @@ const [treats,setTreats]=useState(0);
       levelUpFiredRef.current.add(stageIdx);
 localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...levelUpFiredRef.current]));
       setLevelUpStage(STAGES[stageIdx]);
-      playSfx("levelup");
+      if(!tadaRef.current) tadaRef.current=new Audio("/tada-music.mp3");
+      tadaRef.current.currentTime=0;
+      tadaRef.current.volume=0;
+      tadaRef.current.play().catch(()=>playSfx("levelup"));
+      let tv=0;
+      const target=0.35;
+      const tadaFade=setInterval(()=>{
+        tv=Math.min(tv+target/20,target);
+        if(tadaRef.current) tadaRef.current.volume=tv;
+        if(tv>=target) clearInterval(tadaFade);
+      },25);
     }
     prevStageRef.current=stageIdx;
   },[stageIdx]);
@@ -674,11 +692,20 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
 const shownKey=`mpe_gift_shown_${code}_${studentName}_${new Date().toDateString()}`;
 if(lastGift!==new Date().toDateString()&&!localStorage.getItem(shownKey)){
   localStorage.setItem(shownKey,"true");
-  setTimeout(()=>setShowDailyGift(true),1800);
+  setTimeout(()=>{
+  setShowDailyGift(true);
+},1800);
 }
   },[]);
 
-  const savePetName=(name:string)=>{setPetName(name);localStorage.setItem(`mpe_petname_${code}_${studentName}`,name);};
+  const savePetName=(name:string)=>{
+    setPetName(name);
+    localStorage.setItem(`mpe_petname_${code}_${studentName}`,name);
+    if(!harpRef.current) harpRef.current=new Audio("/harp-music.mp3");
+    harpRef.current.currentTime=0;
+    harpRef.current.volume=0.3;
+    harpRef.current.play().catch(()=>{});
+  };
 
   const handleFeed=()=>{
     if(jarTreats<=0) return;
