@@ -193,7 +193,7 @@ const GamePage = () => {
   const isMaster = code === MASTER_CODE;
 if(isMaster){
   Object.keys(localStorage)
-    .filter(k=>k.startsWith("mpe_game_claimed_1006"))
+    .filter(k=>k.startsWith("mpe_game_claimed_"))
     .forEach(k=>localStorage.removeItem(k));
 }
 const todayKey = `mpe_game_claimed_${code}_${studentName}_${new Date().toDateString()}`;

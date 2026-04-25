@@ -559,8 +559,12 @@ const KidsWorld = () => {
 if(isMaster){
   localStorage.removeItem(`mpe_game_claimed_${code}_Test_${new Date().toDateString()}`);
   localStorage.removeItem(`mpe_levelup_${code}_Test`);
+  localStorage.removeItem(`mpe_jar_${code}_Test`);
+  localStorage.removeItem(`mpe_fed_${code}_Test`);
 }
-  const [treats,setTreats]=useState(0);
+  const [jarTreats,setJarTreats]=useState(()=>isMaster?0:parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`)||"0"));
+const [fedTreats,setFedTreats]=useState(()=>isMaster?0:parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`)||"0"));
+const [treats,setTreats]=useState(0);
   const [loading,setLoading]=useState(!isMaster);
   const [hearts,setHearts]=useState<{id:number;x:number;y:number;delay:number}[]>([]);
   const [petted,setPetted]=useState(false);
@@ -576,6 +580,8 @@ if(isMaster){
   const [volume,setVolume]=useState(()=>parseFloat(localStorage.getItem("mpe_volume")||"0.25"));
 
   const heartId=useRef(0);
+  const feedId=useRef(0);
+  const [feedingCookies,setFeedingCookies]=useState<{id:number;x:number;y:number}[]>([]);
   const creatureRef=useRef<HTMLDivElement>(null);
   const audioRef=useRef<HTMLAudioElement|null>(null);
   const ctxRef=useRef<AudioContext|null>(null);
@@ -590,12 +596,12 @@ if(isMaster){
   })();
 
   
-  const stage=getStage(treats);
+  const stage=getStage(fedTreats);
   const stageIdx=STAGES.indexOf(stage);
   const nextStage=STAGES[stageIdx+1];
   const isEgg=stageIdx===0;
-  const nearHatch=isEgg&&treats>=12;
-  const progress=nextStage?Math.round(((treats-stage.min)/(nextStage.min-stage.min))*100):100;
+  const nearHatch=isEgg&&fedTreats>=12;
+  const progress=nextStage?Math.round(((fedTreats-stage.min)/(nextStage.min-stage.min))*100):100;
 
   // Music
   useEffect(()=>{
@@ -674,10 +680,39 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
         setLoading(false);
       }).catch(()=>setLoading(false));
     const lastGift=localStorage.getItem(`mpe_gift_${code}_${studentName}`);
-    if(lastGift!==new Date().toDateString()) setTimeout(()=>setShowDailyGift(true),1800);
+const shownKey=`mpe_gift_shown_${code}_${studentName}_${new Date().toDateString()}`;
+if(lastGift!==new Date().toDateString()&&!localStorage.getItem(shownKey)){
+  localStorage.setItem(shownKey,"true");
+  setTimeout(()=>setShowDailyGift(true),1800);
+}
   },[]);
 
   const savePetName=(name:string)=>{setPetName(name);localStorage.setItem(`mpe_petname_${code}_${studentName}`,name);};
+
+  const handleFeed=()=>{
+    if(jarTreats<=0) return;
+    const newJar=jarTreats-1;
+    const newFed=fedTreats+1;
+    setJarTreats(newJar);
+    setFedTreats(newFed);
+    if(!isMaster){
+      localStorage.setItem(`mpe_jar_${code}_${studentName}`,String(newJar));
+      localStorage.setItem(`mpe_fed_${code}_${studentName}`,String(newFed));
+    }
+    playSfx("treat");
+    const id=feedId.current++;
+    const rect=creatureRef.current?.getBoundingClientRect();
+    const jarX=window.innerWidth/2-80;
+    const jarY=window.innerHeight/2+100;
+    setFeedingCookies(f=>[...f,{id,x:jarX,y:jarY}]);
+    setTimeout(()=>{
+      setFeedingCookies(f=>f.filter(c=>c.id!==id));
+      setPetted(true);
+      setTimeout(()=>setPetted(false),1200);
+    },1000);
+    setJustEarned(1);
+    setTimeout(()=>setJustEarned(0),2500);
+  };
 
   const spawnHearts=(cx:number,cy:number)=>{
     const nh=Array.from({length:4},(_,i)=>({id:heartId.current++,x:cx+(Math.random()-0.5)*80,y:cy-20,delay:i*0.15}));
@@ -696,9 +731,14 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
   };
 
   const handleEggTap=()=>{setEggWiggle(true);playSfx("rattle");setTimeout(()=>setEggWiggle(false),700);};
-  const claimDailyGift=()=>{
-    setTreats(t=>t+1);setJustEarned(1);playSfx("daily");setShowDailyGift(false);
+const claimDailyGift=()=>{
+    const newJar=jarTreats+1;
+    setJarTreats(newJar);
+    setJustEarned(1);
+    playSfx("daily");
+    setShowDailyGift(false);
     localStorage.setItem(`mpe_gift_${code}_${studentName}`,new Date().toDateString());
+    if(!isMaster) localStorage.setItem(`mpe_jar_${code}_${studentName}`,String(newJar));
     setTimeout(()=>setJustEarned(0),2500);
   };
 
@@ -740,6 +780,7 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
         @keyframes cReveal{0%{transform:scale(0) rotate(-10deg);opacity:0}70%{transform:scale(1.15) rotate(3deg);opacity:1}100%{transform:scale(1) rotate(0deg);opacity:1}}
         @keyframes sTag{0%,100%{opacity:0.4;transform:scale(0.8)}50%{opacity:1;transform:scale(1.2)}}
         @keyframes sparkTag{0%,100%{opacity:0.4}50%{opacity:1}}
+        @keyframes cookieFloat{0%{transform:translateY(0) translateX(0) scale(1);opacity:1}25%{transform:translateY(-60px) translateX(20px) scale(1.1)}50%{transform:translateY(-120px) translateX(-15px) scale(1.05)}75%{transform:translateY(-180px) translateX(10px) scale(0.9)}100%{transform:translateY(-240px) translateX(0) scale(0.5);opacity:0}}
         .bob{animation:bobAnim 3.4s ease-in-out infinite}
         .petted{animation:pettedAnim 0.9s ease-in-out}
         .egg-idle{animation:bobAnim 4s ease-in-out infinite,eggAuto 5s ease-in-out infinite;cursor:pointer}
@@ -916,7 +957,7 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
                 filter:sad?"saturate(0.4) brightness(0.75)":"none",
                 position:"relative",
                 transition:"filter 0.5s ease"}}>
-              {isEgg&&<EggCracks treats={treats}/>}
+              {isEgg&&<EggCracks treats={fedTreats}/>}
               <img src={creatureImg} alt={isEgg?"Turtle egg":"Sea turtle"}
                 style={{maxWidth:"100%",maxHeight:"100%",objectFit:"contain",
                   filter:sad?"none":"drop-shadow(0 8px 20px rgba(0,0,0,0.3))"}}
@@ -948,21 +989,41 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
           </div>
 
 
-          {nextStage&&!isMaster&&(
+          {nextStage&&(
             <div style={{marginTop:"1rem",padding:"0 0.5rem"}}>
-              <div style={{display:"flex",justifyContent:"space-between",
-                color:"rgba(255,255,255,0.78)",fontFamily:"Nunito,sans-serif",
-                fontSize:"0.76rem",marginBottom:"0.38rem"}}>
-                <span>{stage.name}</span>
-                <span>{treats} / {nextStage.min} treats</span>
-                <span>{nextStage.name}</span>
-              </div>
-              <div style={{background:"rgba(0,0,0,0.32)",borderRadius:"999px",height:17,
-                overflow:"hidden",border:"2px solid rgba(255,255,255,0.18)"}}>
-                <div style={{width:`${progress}%`,height:"100%",borderRadius:"999px",
+              {/* Fun progress bar */}
+              <div style={{position:"relative",height:28,
+                background:"rgba(0,0,0,0.25)",borderRadius:"999px",
+                border:"2.5px solid rgba(255,255,255,0.2)",overflow:"visible",
+                marginBottom:"0.6rem"}}>
+                <div style={{
+                  width:`${progress}%`,height:"100%",borderRadius:"999px",
                   background:"linear-gradient(to right,#fbbf24,#f97316)",
                   transition:"width 1s cubic-bezier(0.34,1.56,0.64,1)",
-                  boxShadow:"0 0 10px rgba(251,191,36,0.65)"}}/>
+                  boxShadow:"0 0 12px rgba(251,191,36,0.7)",
+                  minWidth: progress>0?"28px":"0",
+                  position:"relative"}}>
+                  {progress>0&&(
+                    <div style={{
+                      position:"absolute",right:-14,top:"50%",
+                      transform:"translateY(-50%)",
+                      fontSize:"1.4rem",
+                      filter:"drop-shadow(0 2px 4px rgba(0,0,0,0.4))",
+                      animation:"bobAnim 2s ease-in-out infinite"}}>
+                      🐢
+                    </div>
+                  )}
+                </div>
+              </div>
+              {/* "X more to Baby!" label */}
+              <div style={{
+                textAlign:"center",
+                fontFamily:"'Fredoka One',cursive",
+                fontSize:"1.1rem",
+                color:"#fbbf24",
+                textShadow:"0 2px 6px rgba(0,0,0,0.4)",
+                animation:"shimmer 2s ease-in-out infinite"}}>
+                {nextStage.min-fedTreats} more treats to {nextStage.name}!
               </div>
             </div>
           )}
@@ -973,7 +1034,27 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
             </div>
           )}
         </div>
+{/* FLOATING COOKIES */}
+        {feedingCookies.map(c=>(
+          <div key={c.id} style={{position:"fixed",left:c.x,top:c.y,zIndex:400,pointerEvents:"none",
+            animation:"cookieFloat 1s ease-out forwards"}}>
+            <FaceCookie size={32}/>
+          </div>
+        ))}
 
+        {/* FEED BUTTON */}
+        {!isMaster&&jarTreats>0&&(
+          <button onClick={handleFeed} style={{
+            width:"100%",padding:"1rem",marginBottom:"1rem",
+            background:"linear-gradient(135deg,#fbbf24,#f97316)",
+            border:"none",borderRadius:"999px",color:"white",
+            fontFamily:"'Fredoka One',cursive",fontSize:"1.3rem",
+            cursor:"pointer",
+            boxShadow:"0 6px 24px rgba(251,191,36,0.55)",
+            animation:"eF 2s ease-in-out infinite"}}>
+            Feed {petName||"your turtle"}! ({jarTreats} treat{jarTreats!==1?"s":""} ready)
+          </button>
+        )}
         {/* TREAT JAR */}
         <div className="glass" style={{padding:"1.25rem",marginBottom:"1rem",
           animation:"fadeUp 0.7s ease-out"}}>
@@ -982,7 +1063,7 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
             Feed your Sea Turtle Treats!
           </div>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"2rem"}}>
-            <TreatJar treats={treats} nextStage={nextStage}/>
+            <TreatJar treats={jarTreats} nextStage={nextStage}/>
             <div style={{textAlign:"center"}}>
               <div style={{color:"white",fontFamily:"'Fredoka One',cursive",fontSize:"2.5rem",lineHeight:1}}>
                 {stageIdx+1}<span style={{fontSize:"1.2rem",opacity:0.6}}>/4</span>
@@ -999,15 +1080,29 @@ localStorage.setItem(`mpe_levelup_${code}_${studentName}`,JSON.stringify([...lev
         </div>
 
         {isMaster&&(
-          <button onClick={()=>{setTreats(t=>t+1);playSfx("treat");}} style={{
-            width:"100%",padding:"0.9rem",
-            background:"linear-gradient(135deg,#f59e0b,#ef4444)",
-            border:"none",borderRadius:"999px",color:"white",
-            fontFamily:"'Fredoka One',cursive",fontSize:"1.1rem",
-            cursor:"pointer",marginBottom:"1rem",
-            boxShadow:"0 6px 20px rgba(245,158,11,0.5)"}}>
-            Feed +1 Treat (Master Test)
-          </button>
+          <div style={{display:"flex",gap:"0.75rem",marginBottom:"1rem"}}>
+            <button onClick={()=>{
+              const newJar=jarTreats+1;
+              setJarTreats(newJar);
+              playSfx("treat");
+            }} style={{
+              flex:1,padding:"0.9rem",
+              background:"linear-gradient(135deg,#10b981,#059669)",
+              border:"none",borderRadius:"999px",color:"white",
+              fontFamily:"'Fredoka One',cursive",fontSize:"1rem",
+              cursor:"pointer",boxShadow:"0 6px 20px rgba(16,185,129,0.5)"}}>
+              Add to Jar +1
+            </button>
+            <button onClick={handleFeed} disabled={jarTreats<=0} style={{
+              flex:1,padding:"0.9rem",
+              background:jarTreats>0?"linear-gradient(135deg,#f59e0b,#ef4444)":"rgba(255,255,255,0.1)",
+              border:"none",borderRadius:"999px",color:"white",
+              fontFamily:"'Fredoka One',cursive",fontSize:"1rem",
+              cursor:jarTreats>0?"pointer":"not-allowed",
+              boxShadow:jarTreats>0?"0 6px 20px rgba(245,158,11,0.5)":"none"}}>
+              Feed Turtle
+            </button>
+          </div>
         )}
 
         {/* EARN */}
