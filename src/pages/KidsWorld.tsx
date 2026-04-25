@@ -1048,7 +1048,7 @@ const claimDailyGift=()=>{
           {!nextStage&&(
             <div style={{color:"#fbbf24",fontFamily:"'Fredoka One',cursive",
               fontSize:"1.15rem",marginTop:"0.6rem",textShadow:"0 2px 8px rgba(0,0,0,0.4)"}}>
-              Fully Grown! You are amazing!
+              {petName?`${petName} is all grown up! 🐢`:"Your turtle is all grown up! 🐢"}
             </div>
           )}
         </div>
@@ -1061,7 +1061,7 @@ const claimDailyGift=()=>{
         ))}
 
         {/* FEED BUTTON */}
-        {!isMaster&&jarTreats>0&&(
+        {!isMaster&&(nextStage?(jarTreats>0&&(
           <button onClick={handleFeed} style={{
             width:"100%",padding:"1rem",marginBottom:"1rem",
             background:"linear-gradient(135deg,#fbbf24,#f97316)",
@@ -1072,13 +1072,25 @@ const claimDailyGift=()=>{
             animation:"eF 2s ease-in-out infinite"}}>
             Feed {petName||"your turtle"}! ({jarTreats} treat{jarTreats!==1?"s":""} ready)
           </button>
-        )}
+        )):(
+          <button onClick={()=>playSfx("chirp")} style={{
+            width:"100%",padding:"1rem",marginBottom:"1rem",
+            background:"linear-gradient(135deg,#a855f7,#7c3aed)",
+            border:"none",borderRadius:"999px",color:"white",
+            fontFamily:"'Fredoka One',cursive",fontSize:"1.3rem",
+            cursor:"pointer",
+            boxShadow:"0 6px 24px rgba(168,85,247,0.55)",
+            animation:"eF 2s ease-in-out infinite"}}>
+            I'm Full! 🌟<br/>
+            <span style={{fontSize:"1rem",opacity:0.9}}>吃飽了！</span>
+          </button>
+        ))}
         {/* TREAT JAR */}
         <div className="glass" style={{padding:"1.25rem",marginBottom:"1rem",
           animation:"fadeUp 0.7s ease-out"}}>
           <div style={{color:"white",fontFamily:"'Fredoka One',cursive",
             fontSize:"1.1rem",textAlign:"center",marginBottom:"0.75rem"}}>
-            Feed your Sea Turtle Treats!
+            {petName?`${petName} loves treats!`:"Feed your Sea Turtle Treats!"}
           </div>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"2rem"}}>
             <TreatJar treats={jarTreats} nextStage={nextStage}/>

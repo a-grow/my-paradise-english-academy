@@ -197,9 +197,13 @@ if(isMaster){
     .forEach(k=>localStorage.removeItem(k));
 }
 const todayKey = `mpe_game_claimed_${code}_${studentName}_${new Date().toDateString()}`;
+  const maxDaily = 4;
 
   useEffect(() => {
-    if (!isMaster && localStorage.getItem(todayKey)) setClaimed(true);
+    if (!isMaster) {
+      const count = parseInt(localStorage.getItem(todayKey) || "0");
+      if (count >= maxDaily) setClaimed(true);
+    }
   }, []);
 
 // Music
@@ -271,10 +275,11 @@ const todayKey = `mpe_game_claimed_${code}_${studentName}_${new Date().toDateStr
 
 const handleClaim = () => {
     if (!canClaim || claimed) return;
-    setClaimed(true);
     setShowCelebration(true);
     if (!isMaster) {
-      localStorage.setItem(todayKey, "true");
+      const count = parseInt(localStorage.getItem(todayKey) || "0");
+      localStorage.setItem(todayKey, String(count + 1));
+      if (count + 1 >= maxDaily) setClaimed(true);
       const jarKey = `mpe_jar_${code}_${studentName}`;
       const current = parseInt(localStorage.getItem(jarKey) || "0");
       localStorage.setItem(jarKey, String(current + 2));
@@ -573,25 +578,38 @@ const handleClaim = () => {
             </div>
 
             {/* CLAIM — only appears after 40s */}
-            {canClaim && (
-              <button onClick={handleClaim} disabled={claimed} style={{
+            {claimed ? (
+              <div style={{
+                width:"100%", padding:"1.25rem",
+                background:"linear-gradient(135deg,#a855f7,#7c3aed)",
+                borderRadius:"1.75rem", textAlign:"center",
+                boxShadow:"0 6px 24px rgba(168,85,247,0.5)",
+                animation:"popIn 0.4s ease-out"}}>
+                <div style={{fontSize:"2rem",marginBottom:"0.25rem"}}>🌟</div>
+                <div style={{fontFamily:"'Fredoka One',cursive",fontSize:"1.4rem",color:"white"}}>
+                  You're a champion!
+                </div>
+                <div style={{fontFamily:"Nunito,sans-serif",fontSize:"0.95rem",
+                  color:"rgba(255,255,255,0.85)",marginTop:"0.3rem"}}>
+                  You've played 4 games today!<br/>
+                  Come back tomorrow for more treats! 🐢
+                </div>
+              </div>
+            ) : canClaim ? (
+              <button onClick={handleClaim} style={{
                 width: "100%", padding: "1.15rem",
-                background: claimed
-                  ? "rgba(0,0,0,0.08)"
-                  : "linear-gradient(135deg,#fbbf24,#f97316)",
-                border: claimed
-                  ? "2px solid rgba(0,0,0,0.08)"
-                  : "2px solid rgba(255,215,0,0.5)",
+                background: "linear-gradient(135deg,#fbbf24,#f97316)",
+                border: "2px solid rgba(255,215,0,0.5)",
                 borderRadius: "999px",
-                cursor: claimed ? "not-allowed" : "pointer",
+                cursor: "pointer",
                 fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem",
-                color: claimed ? "#aaa" : "white",
-                animation: claimed ? "none" : "claimWiggle 1s ease-in-out infinite, goldGlow 1.5s ease-in-out infinite",
+                color: "white",
+                animation: "claimWiggle 1s ease-in-out infinite, goldGlow 1.5s ease-in-out infinite",
                 transition: "all 0.3s",
               }}>
-                {claimed ? "Come back tomorrow for more treats!" : "Great job! Claim your treat!"}
+                Great job! Claim your treat!
               </button>
-            )}
+            ) : null}
           </div>
         )}
       </div>
