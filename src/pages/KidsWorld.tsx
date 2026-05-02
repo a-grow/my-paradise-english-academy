@@ -433,18 +433,19 @@ const EarnButtons = ({navigate,code,studentName}:{navigate:(p:string)=>void;code
   <div style={{display:"flex",flexDirection:"column",gap:"0.85rem"}}>
     {[
       {label:"Play a Game",sub:"Fun English games!",reward:"+2 treats",color:"#f97316",glow:"rgba(249,115,22,0.5)",path:`/game/${code}/${studentName}`},
-      {label:"Read & Quiz",sub:"Read a story, answer questions!",reward:"+3 treats",color:"#a855f7",glow:"rgba(168,85,247,0.5)",path:"/quiz"},
+      {label:"Read & Quiz",sub:"Coming Soon!",reward:"🔒",color:"#a855f7",glow:"rgba(168,85,247,0.0)",path:"",disabled:true},
       {label:"Visit 5 Days!",sub:"Come back any 5 days to earn a treat!",reward:"+3 treats",color:"#10b981",glow:"rgba(16,185,129,0.5)",path:""},
     ].map((btn,i)=>(
-      <button key={i} onClick={()=>btn.path&&navigate(btn.path)} style={{
+      <button key={i} onClick={()=>!btn.disabled&&btn.path&&navigate(btn.path)} style={{
         width:"100%",padding:"1rem 1.25rem",
         background:`linear-gradient(135deg,${btn.color},${btn.color}cc)`,
-        border:"none",borderRadius:"1.4rem",cursor:"pointer",
+        border:"none",borderRadius:"1.4rem",opacity:btn.disabled?0.4:1,
+cursor:btn.disabled?"not-allowed":"pointer",
         boxShadow:`0 6px 20px ${btn.glow}`,
         display:"flex",alignItems:"center",justifyContent:"space-between",
         textAlign:"left",animation:`eF ${2.5+i*0.4}s ease-in-out infinite`}}
-        onMouseEnter={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="scale(1.04) translateY(-3px)";el.style.boxShadow=`0 12px 30px ${btn.glow}`;}}
-        onMouseLeave={e=>{const el=e.currentTarget as HTMLElement;el.style.transform="";el.style.boxShadow=`0 6px 20px ${btn.glow}`;}}
+        onMouseEnter={e=>{if(btn.disabled) return;const el=e.currentTarget as HTMLElement;el.style.transform="scale(1.04) translateY(-3px)";el.style.boxShadow=`0 12px 30px ${btn.glow}`;}}
+        onMouseLeave={e=>{if(btn.disabled) return;const el=e.currentTarget as HTMLElement;el.style.transform="";el.style.boxShadow=`0 6px 20px ${btn.glow}`;}}
       >
         <div>
           <div style={{fontFamily:"'Fredoka One',cursive",fontSize:"1.25rem",
