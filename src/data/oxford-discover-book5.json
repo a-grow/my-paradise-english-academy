@@ -1,0 +1,444 @@
+[
+  {
+    "unit": 1,
+    "topic": "Dreaming of Dodos",
+    "bigQuestion": "Why do we protect animals?",
+    "vocabulary": {
+      "topic": "Endangered Animals",
+      "words": ["dodo", "elephant bird", "quagga", "sea wolf", "woolly mammoth", "extinct", "survive", "exploit", "endangered", "habitat", "species", "sanctuary"]
+    },
+    "grammar": {
+      "point": "Present Perfect and Present Perfect Continuous",
+      "examples": [
+        "I have read books about dodos.",
+        "I have been reading this book for an hour.",
+        "They've been playing basketball since three o'clock.",
+        "I've been learning English for four years."
+      ],
+      "rules": [
+        "Use the present perfect to say what you've done in your life up to now.",
+        "Use the present perfect continuous to say that you started doing something in the past and you're still doing it now.",
+        "The present perfect continuous uses: have/has + been + verb-ing."
+      ],
+      "choices": ["have read", "has been reading", "have been playing", "haven't eaten", "have been learning"]
+    }
+  },
+  {
+    "unit": 2,
+    "topic": "Save Our Tigers!",
+    "bigQuestion": "Why do we protect animals?",
+    "vocabulary": {
+      "topic": "Conservation",
+      "words": ["diverse", "identify", "tracker", "protect", "naturalist", "poaching", "damaged", "conservation", "preservation", "inspire", "population", "reserve"]
+    },
+    "grammar": {
+      "point": "Review of Tenses",
+      "examples": [
+        "Tigers go to the river every day.",
+        "Tigers are going to the river to drink.",
+        "Tigers went to the river yesterday.",
+        "People have cleared forests to grow crops.",
+        "The animals' habitat has suffered.",
+        "Tigers have always lived in thick jungles."
+      ],
+      "rules": [
+        "Simple Present: use for habits and facts.",
+        "Present Continuous: use for actions happening now.",
+        "Simple Past: use for completed past actions.",
+        "Present Perfect: use for things that happened in the past but have an effect now, or started in the past and continue now."
+      ],
+      "choices": ["go", "are going", "went", "have cleared", "has suffered"]
+    }
+  },
+  {
+    "unit": 3,
+    "topic": "The Cavity and Have You Any Idea?",
+    "bigQuestion": "What are teeth for?",
+    "vocabulary": {
+      "topic": "Teeth",
+      "words": ["incisor", "canine", "molar", "carnivore", "herbivore", "omnivore", "slice", "grip", "crush", "cavity", "gums", "jaw"]
+    },
+    "grammar": {
+      "point": "Modals of Ability",
+      "examples": [
+        "I could read by the time I was four.",
+        "I couldn't chew after I got a cavity.",
+        "Next year, I will be able to ride my bike to school.",
+        "I won't be able to drive a car."
+      ],
+      "rules": [
+        "Use could and couldn't to say what you did or didn't know how to do in the past.",
+        "The future of can/can't is will/won't be able to.",
+        "Use will be able to for future ability."
+      ],
+      "choices": ["could", "couldn't", "will be able to", "won't be able to", "can"]
+    }
+  },
+  {
+    "unit": 4,
+    "topic": "Teeth: Not Just for Eating",
+    "bigQuestion": "What are teeth for?",
+    "vocabulary": {
+      "topic": "Predator and Prey",
+      "words": ["fang", "tusk", "venom", "shelter", "dam", "prey", "gnaw", "pierce", "fend off", "wear down", "lap up", "create"]
+    },
+    "grammar": {
+      "point": "Modals of Certainty",
+      "examples": [
+        "It must be a prosimian. It has comb-like lower teeth.",
+        "It has to be a spider. It has eight legs.",
+        "That can't be a spider! It only has four legs.",
+        "It might be a spider, but I'm not sure."
+      ],
+      "rules": [
+        "Use must or has to to say you're sure that something is true.",
+        "Use can't to say you're sure that something isn't true.",
+        "Use might if you're not sure that something is true."
+      ],
+      "choices": ["must", "has to", "can't", "might", "could"]
+    }
+  },
+  {
+    "unit": 5,
+    "topic": "A Revolution in History",
+    "bigQuestion": "Why are wheels important?",
+    "vocabulary": {
+      "topic": "Wheels and Transportation",
+      "words": ["transportation", "transfer", "haul", "axle", "rotate", "spoke", "rim", "traction", "gear", "grind", "technology", "rod"]
+    },
+    "grammar": {
+      "point": "Future with Will and Going to",
+      "examples": [
+        "The sun will rise at 6:05 tomorrow.",
+        "Wheels will always be a central part of life.",
+        "I'm going to visit my uncle next week.",
+        "Look at those big, black clouds. It's going to rain."
+      ],
+      "rules": [
+        "Use will to talk about facts in the future or to make predictions about things you believe will be true.",
+        "Use going to to talk about future plans or to make predictions about things you see.",
+        "Will is used for future facts and predictions based on belief; going to is used for future plans and predictions based on what you see."
+      ],
+      "choices": ["will rise", "will be", "am going to visit", "is going to rain", "will find"]
+    }
+  },
+  {
+    "unit": 6,
+    "topic": "Planet SinRota",
+    "bigQuestion": "Why are wheels important?",
+    "vocabulary": {
+      "topic": "Adjectives",
+      "words": ["obedient", "fortunate", "tedious", "exciting", "fragile", "determined", "daring", "foolish", "thrilling", "courageous", "risky", "fascinated"]
+    },
+    "grammar": {
+      "point": "Future with Present Continuous",
+      "examples": [
+        "We are meeting our friends at 2:00 on Friday.",
+        "The moon will rise at ten o'clock tonight.",
+        "Things will never be the same again.",
+        "I'm going to take a music class next year.",
+        "Look at those clouds. We're going to get wet."
+      ],
+      "rules": [
+        "You can use the present continuous to talk about future arrangements, especially when you mention a specific time or place.",
+        "Use will for future facts and predictions about things you believe will be true.",
+        "Use going to for future plans and predictions about things you see."
+      ],
+      "choices": ["are meeting", "will rise", "is going to snow", "are going to", "will"]
+    }
+  },
+  {
+    "unit": 7,
+    "topic": "Magdi and the Dolphin",
+    "bigQuestion": "How do animals communicate?",
+    "vocabulary": {
+      "topic": "Movement",
+      "words": ["race", "drift", "glide", "wade", "paddle", "dive", "splash", "propel", "float", "sprint", "jog", "plod"]
+    },
+    "grammar": {
+      "point": "Reported Speech with Said That",
+      "examples": [
+        "\"It's a beautiful day,\" said Magdi. → Magdi said that it was a beautiful day.",
+        "\"I'm working,\" said Tom. → Tom said that he was working.",
+        "He said that he was going fishing.",
+        "She said that she didn't like cats."
+      ],
+      "rules": [
+        "Reported speech tells what someone said by using the words said that.",
+        "If the direct speech is in the present tense, the reported speech changes to the past tense.",
+        "Add said that and change the verb to past tense when reporting what someone said."
+      ],
+      "choices": ["said that", "was", "were", "didn't", "had"]
+    }
+  },
+  {
+    "unit": 8,
+    "topic": "Chatterboxes",
+    "bigQuestion": "How do animals communicate?",
+    "vocabulary": {
+      "topic": "Animal Behavior",
+      "words": ["communicative", "locate", "collaborate", "imitate", "behave", "indicate", "attract", "threaten", "defend", "approach", "express", "produce"]
+    },
+    "grammar": {
+      "point": "Reported Speech with Told or Asked",
+      "examples": [
+        "He told us that Kanzi was learning new things every day.",
+        "A classmate asked the scientist what Kanzi was learning.",
+        "My teacher told me that Kanzi was learning 450 words.",
+        "I asked how many words Kanzi was learning."
+      ],
+      "rules": [
+        "Use said that to report what someone said.",
+        "You can also use told or asked to report speech.",
+        "After told or asked, you need to add an object pronoun or someone's name.",
+        "If the direct speech is in the present tense, the reported speech changes to past tense."
+      ],
+      "choices": ["told", "asked", "said that", "was learning", "had"]
+    }
+  },
+  {
+    "unit": 9,
+    "topic": "Journey Back in Time",
+    "bigQuestion": "What do different cultures give to the world?",
+    "vocabulary": {
+      "topic": "Culture and Custom",
+      "words": ["culture", "civilization", "contribution", "development", "achievement", "device", "process", "tradition", "custom", "benefit", "ceremony", "product"]
+    },
+    "grammar": {
+      "point": "Asking Questions",
+      "examples": [
+        "Who saw Finn?",
+        "Who did Finn see?",
+        "Finn's mom saw Finn.",
+        "Finn didn't see anybody."
+      ],
+      "rules": [
+        "Ask questions with who, where, when, why, what, which, and how.",
+        "Be careful: Who saw Finn? (Who is the subject.) vs. Who did Finn see? (Who is the object.)",
+        "When who is the subject, do not use do/does/did in the question."
+      ],
+      "choices": ["who", "where", "when", "why", "what"]
+    }
+  },
+  {
+    "unit": 10,
+    "topic": "Choco Choco Boom Boom!",
+    "bigQuestion": "What do different cultures give to the world?",
+    "vocabulary": {
+      "topic": "Food and Adjectives",
+      "words": ["delicious", "creamy", "spicy", "nutty", "ladle", "sticky", "crunchy", "runny", "smooth", "whirring", "booming", "spot"]
+    },
+    "grammar": {
+      "point": "Short Answers",
+      "examples": [
+        "Is there a chocolate shop near here? Yes, there is.",
+        "Do you like my new sneakers? Yes, I do!",
+        "Has it stopped raining? No, it hasn't.",
+        "Are you 15 years old? No, I'm not!"
+      ],
+      "rules": [
+        "Short answers include: Yes, I am; No, he didn't; Yes, they can; No, we won't; Yes, there is.",
+        "Using a short answer is more polite than answering only Yes or No.",
+        "Short answers repeat the auxiliary verb from the question."
+      ],
+      "choices": ["Yes, there is.", "Yes, I do!", "No, it hasn't.", "No, I'm not!", "Yes, they can."]
+    }
+  },
+  {
+    "unit": 11,
+    "topic": "What's So Good about Mountains?",
+    "bigQuestion": "Why are mountains important?",
+    "vocabulary": {
+      "topic": "Mountains",
+      "words": ["glacier", "mountain range", "peak", "altitude", "valley", "steep", "slope", "hill", "terrace", "effective", "water cycle", "vapor"]
+    },
+    "grammar": {
+      "point": "Passive",
+      "examples": [
+        "People find corn in the mountains. → Corn is found in the mountains.",
+        "Do people grow rice in Canada? → Is rice grown in Canada?",
+        "Pizza is eaten in many countries.",
+        "Mountains are called the water towers of the world."
+      ],
+      "rules": [
+        "We can say the same thing in two different ways by making active or passive sentences.",
+        "Using the passive is a good idea if you don't know exactly who or what does something.",
+        "Form the passive with: subject + is/are + past participle."
+      ],
+      "choices": ["is found", "is grown", "are called", "is eaten", "are made"]
+    }
+  },
+  {
+    "unit": 12,
+    "topic": "The Lost Explorer",
+    "bigQuestion": "Why are mountains important?",
+    "vocabulary": {
+      "topic": "Verbs and Adjectives",
+      "words": ["endless", "stammer", "awestruck", "jagged", "pointy", "miniature", "stern", "arch", "mutter", "squirm", "scowl", "stretch"]
+    },
+    "grammar": {
+      "point": "Past Passive",
+      "examples": [
+        "Someone broke my mom's favorite vase. → My mom's favorite vase was broken.",
+        "Someone showed the weather forecasts on TV. → The weather forecasts were shown on TV.",
+        "Mount Everest was climbed for the first time in 1953.",
+        "Last year, a big party was organized in my town."
+      ],
+      "rules": [
+        "You can use the active or the passive to say the same thing in two different ways.",
+        "You can also do this in the past tense.",
+        "Form the past passive with: subject + was/were + past participle."
+      ],
+      "choices": ["was broken", "were shown", "was climbed", "was organized", "were cooked"]
+    }
+  },
+  {
+    "unit": 13,
+    "topic": "The Sound of Money and the Smell of Soup",
+    "bigQuestion": "Why do we use money?",
+    "vocabulary": {
+      "topic": "Adjectives and Adverbs",
+      "words": ["terrifying", "nervously", "rudely", "politely", "fierce", "aggressively", "delicate", "bravely", "greedy", "shyly", "wise", "calmly"]
+    },
+    "grammar": {
+      "point": "Adjectives and Adverbs",
+      "examples": [
+        "A terrifying man with huge muscles opened the door.",
+        "\"Three gold coins!\" repeated the man aggressively.",
+        "The Hodja was reading a newspaper, as he often did.",
+        "The little boy greedily ate all the grapes."
+      ],
+      "rules": [
+        "Adjectives tell you more about nouns.",
+        "Adverbs tell you more about verbs. An adverb of manner tells you how something happens.",
+        "An adverb of frequency tells you how often something happens."
+      ],
+      "choices": ["terrifying", "aggressively", "often", "nervously", "delicate"]
+    }
+  },
+  {
+    "unit": 14,
+    "topic": "The History of Money",
+    "bigQuestion": "Why do we use money?",
+    "vocabulary": {
+      "topic": "Money",
+      "words": ["bank", "currency", "coins", "barter", "copy", "bill", "spend", "pay", "borrow", "exchange", "owe", "lend"]
+    },
+    "grammar": {
+      "point": "Unreal Conditional",
+      "examples": [
+        "If you had paper money, you wouldn't need so many coins.",
+        "If I had a bike, I would get to school quicker.",
+        "If my friend could fly a plane, we would go to the North Pole.",
+        "If I won a prize, I would be very happy."
+      ],
+      "rules": [
+        "Use the unreal conditional to talk about things that aren't possible now.",
+        "Form: If + past tense, subject + would + verb.",
+        "The situation is imaginary or unlikely in the present or future."
+      ],
+      "choices": ["had", "would need", "could fly", "would go", "won"]
+    }
+  },
+  {
+    "unit": 15,
+    "topic": "One Man's Self-Expression",
+    "bigQuestion": "How do we express ourselves?",
+    "vocabulary": {
+      "topic": "Achievement Adjectives",
+      "words": ["design", "innovative", "remarkable", "ambitious", "permanent", "settle", "emerge", "artificial", "promote", "enclose", "suitable", "beneficial"]
+    },
+    "grammar": {
+      "point": "Sense Verb + Adjective",
+      "examples": [
+        "The sculptures look bumpy and rough.",
+        "I felt sick this morning, but I'm OK now.",
+        "You look happy!",
+        "This lemon smells good, but it tastes bitter.",
+        "Your new song sounds fantastic!"
+      ],
+      "rules": [
+        "Sense verbs (look, feel, sound, smell, taste) are followed by an adjective, not an adverb.",
+        "Do not use an adverb after a sense verb.",
+        "Examples of sense verbs: look, feel, sound, smell, taste."
+      ],
+      "choices": ["look", "feel", "sound", "smell", "taste"]
+    }
+  },
+  {
+    "unit": 16,
+    "topic": "The Tempest",
+    "bigQuestion": "How do we express ourselves?",
+    "vocabulary": {
+      "topic": "Theater",
+      "words": ["cabin", "advisor", "deck", "grateful", "tempest", "save", "break up", "react", "villain", "stage", "playwright", "set"]
+    },
+    "grammar": {
+      "point": "Infinitive as Subject",
+      "examples": [
+        "It's difficult to save the passengers and crew.",
+        "It's fun to climb a tree.",
+        "It's easy to learn English if you read a lot of books.",
+        "It's fun to act in a play!"
+      ],
+      "rules": [
+        "Use it's + adjective + infinitive as subject to express an opinion.",
+        "The infinitive (to + verb) acts as the subject of the sentence.",
+        "This structure avoids starting a sentence with a verb-ing subject."
+      ],
+      "choices": ["It's difficult to", "It's fun to", "It's easy to", "It's dangerous to", "It's nice to"]
+    }
+  },
+  {
+    "unit": 17,
+    "topic": "The World's Most Extraordinary Buildings",
+    "bigQuestion": "Why do we make buildings?",
+    "vocabulary": {
+      "topic": "Buildings and Places",
+      "words": ["stadium", "lighthouse", "tower", "skyscraper", "warehouse", "palace", "courthouse", "theater", "concert hall", "office", "art gallery", "showroom"]
+    },
+    "grammar": {
+      "point": "A, An, The, and No Article",
+      "examples": [
+        "Before a building can be built, the building needs to be designed.",
+        "It's a kangaroo.",
+        "It's in the pool.",
+        "I play tennis. I saw Jim at lunch. We went to Spain. They like math."
+      ],
+      "rules": [
+        "Use a or an the first time you talk about something. Use the when you talk about it again.",
+        "Use a or an with things that aren't special (not a specific one).",
+        "Use the when the person you're talking to knows what you're talking about.",
+        "Don't use an article to talk about sports, meals, most countries, and school subjects."
+      ],
+      "choices": ["a", "an", "the", "no article", "the"]
+    }
+  },
+  {
+    "unit": 18,
+    "topic": "The Mystery of Peril Castle",
+    "bigQuestion": "Why do we make buildings?",
+    "vocabulary": {
+      "topic": "Castles",
+      "words": ["turrets", "stables", "gatehouse", "moat", "drawbridge", "hall", "courtyard", "ramparts", "mumble", "stiffen", "missing", "tremble"]
+    },
+    "grammar": {
+      "point": "Review of Tenses and Future Forms",
+      "examples": [
+        "I needed to find the coin.",
+        "They had to solve the mystery.",
+        "I like castles with turrets.",
+        "We need the other half of the coin.",
+        "Are you going to explore Peril Castle?",
+        "I will see the castles of Wales someday."
+      ],
+      "rules": [
+        "Use different tenses and future forms to describe different times.",
+        "Past: use simple past or past forms (needed, had to) for completed past actions.",
+        "Present: use simple present (like, need) for habits and facts.",
+        "Future: use going to for plans and will for predictions and facts."
+      ],
+      "choices": ["needed", "had to", "like", "are going to explore", "will see"]
+    }
+  }
+]

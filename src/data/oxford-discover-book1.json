@@ -1,0 +1,448 @@
+{
+  "book": "Oxford Discover 1",
+  "edition": "2nd",
+  "extractedBy": "Claude (April 2026)",
+  "units": [
+    {
+      "unit": 1,
+      "topic": "Families and Friends",
+      "bigQuestion": "Who are your family and friends?",
+      "vocabulary": {
+        "topic": "Family",
+        "words": ["family", "grandmother", "grandfather", "father", "mother", "brother", "sister", "friend"]
+      },
+      "grammar": {
+        "point": "Verb: Be",
+        "examples": [
+          "I'm six years old.",
+          "He's eight years old.",
+          "My family is big.",
+          "Friends are important."
+        ],
+        "rules": [
+          "I am → I'm",
+          "He is → He's",
+          "She is → She's",
+          "They are → They're"
+        ],
+        "choices": ["I'm", "He's", "She's", "is", "are"]
+      }
+    },
+    {
+      "unit": 2,
+      "topic": "Families and Friends",
+      "bigQuestion": "Who are your family and friends?",
+      "vocabulary": {
+        "topic": "Pets",
+        "words": ["hamster", "goldfish", "bird", "rabbit", "lizard", "kitten"]
+      },
+      "grammar": {
+        "point": "There is / There are",
+        "examples": [
+          "There is a black kitten.",
+          "There are white kittens.",
+          "There's a black spider.",
+          "There are brown hamsters."
+        ],
+        "rules": [
+          "There is → There's",
+          "Use 'There is' for one thing",
+          "Use 'There are' for more than one"
+        ],
+        "choices": ["There is", "There are", "There's", "is", "are"]
+      }
+    },
+    {
+      "unit": 3,
+      "topic": "Animals and Colors",
+      "bigQuestion": "What is your favorite color?",
+      "vocabulary": {
+        "topic": "Colors",
+        "words": ["yellow", "red", "blue", "green", "purple", "black", "brown", "white"]
+      },
+      "grammar": {
+        "point": "There is / There are (review)",
+        "examples": [
+          "There's a white kitten in my yard today.",
+          "There are two white kittens.",
+          "There's a black spider.",
+          "There are brown hamsters."
+        ],
+        "rules": [
+          "There is → There's (one)",
+          "There are (more than one)"
+        ],
+        "choices": ["There is", "There are", "There's", "is", "are"]
+      }
+    },
+    {
+      "unit": 4,
+      "topic": "Animals and Colors",
+      "bigQuestion": "What colors do you like?",
+      "vocabulary": {
+        "topic": "Art and the Ocean",
+        "words": ["mix", "mural", "ocean", "sand", "seaweed", "seashell", "jellyfish", "starfish"]
+      },
+      "grammar": {
+        "point": "Prepositions of Place: In, On, Under, Next to",
+        "examples": [
+          "I am in the ocean.",
+          "The seashells are on the sand.",
+          "The starfish is under the seashell.",
+          "The seaweed is next to the fish."
+        ],
+        "rules": [
+          "in = inside something",
+          "on = on top of something",
+          "under = below something",
+          "next to = beside something"
+        ],
+        "choices": ["in", "on", "under", "next to"]
+      }
+    },
+    {
+      "unit": 5,
+      "topic": "Animal Homes",
+      "bigQuestion": "Where do animals live?",
+      "vocabulary": {
+        "topic": "Animals and Animal Homes",
+        "words": ["eagle", "chick", "nest", "opossum", "tree hollow", "honeybee", "hive", "crab"]
+      },
+      "grammar": {
+        "point": "Where Questions with Verb Be",
+        "examples": [
+          "Where's the eagle? It's under the tree.",
+          "Where are the chicks? They're in the nest.",
+          "Where are the honeybees? They're in the hive.",
+          "Where is it? It's in the sky."
+        ],
+        "rules": [
+          "Where is → Where's",
+          "Answer with: It's + place",
+          "Answer with: They're + place"
+        ],
+        "choices": ["Where's", "Where are", "It's", "They're"]
+      }
+    },
+    {
+      "unit": 6,
+      "topic": "Animal Homes",
+      "bigQuestion": "Where do animals live?",
+      "vocabulary": {
+        "topic": "Animal Reserves",
+        "words": ["orangutan", "rainforest", "reserve", "teach", "take care of", "miss", "take a nap", "put out"]
+      },
+      "grammar": {
+        "point": "What and Who Questions with Verb Be",
+        "examples": [
+          "What's that? It's a tree.",
+          "Who's this? It's Anak.",
+          "What is it? It's a book.",
+          "Who is that? It's Karima."
+        ],
+        "rules": [
+          "What is → What's",
+          "Who is → Who's",
+          "Answer with: It's + name/thing"
+        ],
+        "choices": ["What's", "Who's", "It's", "What", "Who"]
+      }
+    },
+    {
+      "unit": 7,
+      "topic": "Weather and Seasons",
+      "bigQuestion": "What is the weather like?",
+      "vocabulary": {
+        "topic": "Weather and Time",
+        "words": ["warm", "hot", "cool", "cold", "rain", "snow", "long", "short"]
+      },
+      "grammar": {
+        "point": "Simple Present with It",
+        "examples": [
+          "It gets hot.",
+          "It doesn't get cold.",
+          "It snows in the winter.",
+          "It doesn't snow in the summer."
+        ],
+        "rules": [
+          "Does not → Doesn't",
+          "Use 'It' for weather",
+          "It + verb for positive",
+          "It + doesn't + verb for negative"
+        ],
+        "choices": ["It gets", "It doesn't get", "It snows", "It doesn't snow", "doesn't"]
+      }
+    },
+    {
+      "unit": 8,
+      "topic": "Weather and Seasons",
+      "bigQuestion": "What do you do in each season?",
+      "vocabulary": {
+        "topic": "Verbs (Seasons)",
+        "words": ["watch", "build a snowman", "build a tree house", "make a swing", "make apple pie", "grow", "fall", "bring"]
+      },
+      "grammar": {
+        "point": "Simple Present with I and You",
+        "examples": [
+          "I make a swing.",
+          "I don't make apple pies.",
+          "You build a snowman.",
+          "You don't build a tree house.",
+          "Do you watch honeybees? Yes, I do.",
+          "Do you watch birds? No, I don't."
+        ],
+        "rules": [
+          "Does not → Don't (with I/You)",
+          "Do you...? Yes, I do. / No, I don't."
+        ],
+        "choices": ["I make", "I don't make", "You build", "You don't build", "Do you", "don't"]
+      }
+    },
+    {
+      "unit": 9,
+      "topic": "Numbers",
+      "bigQuestion": "How do numbers help us?",
+      "vocabulary": {
+        "topic": "Math",
+        "words": ["numbers", "plus sign", "equals sign", "problem", "addition", "answer", "odd numbers", "even numbers"]
+      },
+      "grammar": {
+        "point": "Simple Present with Have (I, You, We, They)",
+        "examples": [
+          "You have a seashell.",
+          "I don't have a seashell.",
+          "They have T-shirts.",
+          "We don't have T-shirts."
+        ],
+        "rules": [
+          "I/You/We/They + have",
+          "I/You/We/They + don't have",
+          "Do you have...? Yes, I do. / No, I don't."
+        ],
+        "choices": ["have", "don't have", "do", "don't"]
+      }
+    },
+    {
+      "unit": 10,
+      "topic": "Numbers",
+      "bigQuestion": "How do numbers help us?",
+      "vocabulary": {
+        "topic": "Food",
+        "words": ["pot", "stone", "food", "sausages", "carrots", "onions", "potatoes", "soup"]
+      },
+      "grammar": {
+        "point": "Simple Present Questions with Have (I, You, We, They)",
+        "examples": [
+          "Do you have food? Yes, I do.",
+          "What do you have? I have carrots.",
+          "Do you have potatoes? No, I don't."
+        ],
+        "rules": [
+          "Do you have...?",
+          "Yes, I do. / No, I don't.",
+          "What do you have? I have..."
+        ],
+        "choices": ["Do you have", "Yes, I do", "No, I don't", "What do you have", "I have"]
+      }
+    },
+    {
+      "unit": 11,
+      "topic": "Wants and Needs",
+      "bigQuestion": "What do we need?",
+      "vocabulary": {
+        "topic": "Farms and Markets",
+        "words": ["farmer", "cow", "milk", "market", "sell", "buy", "plain", "fancy"]
+      },
+      "grammar": {
+        "point": "Simple Present with He and She",
+        "examples": [
+          "He has a cow. He doesn't have a hat.",
+          "He wants a hat. He doesn't want a cow.",
+          "She needs a cow. She doesn't need a dress."
+        ],
+        "rules": [
+          "He/She + has / wants / needs",
+          "He/She + doesn't have/want/need",
+          "Does not → Doesn't (with He/She)"
+        ],
+        "choices": ["has", "doesn't have", "wants", "doesn't want", "needs", "doesn't need"]
+      }
+    },
+    {
+      "unit": 12,
+      "topic": "Wants and Needs",
+      "bigQuestion": "What do we need?",
+      "vocabulary": {
+        "topic": "Jobs and Needs",
+        "words": ["job", "doctor", "police officer", "teacher", "help", "money", "clothes", "water"]
+      },
+      "grammar": {
+        "point": "Simple Present Questions with He and She",
+        "examples": [
+          "Does Maria have a kitten? No, she doesn't.",
+          "What does Akif want? He wants a bicycle.",
+          "Does she want games? No, she doesn't.",
+          "What does he have? He has a big, yellow bus."
+        ],
+        "rules": [
+          "Does he/she have/want...?",
+          "Yes, he/she does. / No, he/she doesn't.",
+          "What does he/she want? He/She wants..."
+        ],
+        "choices": ["Does", "doesn't", "What does", "he wants", "she wants", "Yes, she does", "No, she doesn't"]
+      }
+    },
+    {
+      "unit": 13,
+      "topic": "Where We Live",
+      "bigQuestion": "Where do we live?",
+      "vocabulary": {
+        "topic": "Places",
+        "words": ["street", "neighborhood", "town", "city", "the country", "apartment", "building", "world"]
+      },
+      "grammar": {
+        "point": "Possessive 's",
+        "examples": [
+          "Mason's address is 19 Main Street, Rivertown.",
+          "Is this Jenna's house? Yes, it is.",
+          "Jenna's house is in the country.",
+          "Billy's house is in the city."
+        ],
+        "rules": [
+          "Name + 's = belongs to that person",
+          "Jenna's = belonging to Jenna",
+          "Mason's = belonging to Mason"
+        ],
+        "choices": ["'s", "Is this...?", "Yes, it is.", "No, it isn't."]
+      }
+    },
+    {
+      "unit": 14,
+      "topic": "Where We Live",
+      "bigQuestion": "Where do we live?",
+      "vocabulary": {
+        "topic": "City and Country Places",
+        "words": ["department store", "restaurant", "movie theater", "hotel", "cornfield", "orchard", "new", "old"]
+      },
+      "grammar": {
+        "point": "Possessive Adjectives (My, Your, His, Her, Our)",
+        "examples": [
+          "His home is in the city.",
+          "Her neighborhood isn't quiet.",
+          "Is your apartment small? No, it isn't.",
+          "We play in her cornfield."
+        ],
+        "rules": [
+          "My = belonging to me",
+          "Your = belonging to you",
+          "His = belonging to him",
+          "Her = belonging to her",
+          "Our = belonging to us"
+        ],
+        "choices": ["my", "your", "his", "her", "our", "their"]
+      }
+    },
+    {
+      "unit": 15,
+      "topic": "Making Music",
+      "bigQuestion": "How can we make music?",
+      "vocabulary": {
+        "topic": "Percussion Instruments",
+        "words": ["instruments", "cymbals", "tambourine", "xylophone", "drum", "triangle", "shake", "strike"]
+      },
+      "grammar": {
+        "point": "Present Continuous (I'm / You're / She's / He's / We're / They're ... ing)",
+        "examples": [
+          "You're playing the drums.",
+          "You aren't playing the xylophone.",
+          "I'm shaking the tambourine.",
+          "I'm not striking it.",
+          "Gus is playing the xylophone.",
+          "He isn't playing the drum."
+        ],
+        "rules": [
+          "I am → I'm + verb-ing",
+          "You are → You're + verb-ing",
+          "He/She is → He's/She's + verb-ing",
+          "We/They are → We're/They're + verb-ing",
+          "Negative: aren't / isn't + verb-ing"
+        ],
+        "choices": ["I'm playing", "You're playing", "She's playing", "He's playing", "aren't playing", "isn't playing"]
+      }
+    },
+    {
+      "unit": 16,
+      "topic": "Making Music",
+      "bigQuestion": "How can we make music?",
+      "vocabulary": {
+        "topic": "Performance Verbs",
+        "words": ["dance", "sing", "get an idea", "practice an instrument", "buy tickets", "give money", "clap", "take pictures"]
+      },
+      "grammar": {
+        "point": "Present Continuous Questions",
+        "examples": [
+          "Are you singing? Yes, I am.",
+          "Is she dancing? No, she isn't.",
+          "Are they playing instruments? Yes, they are.",
+          "Are we having fun? Yes, we are!"
+        ],
+        "rules": [
+          "Are you...? Yes, I am. / No, I'm not.",
+          "Is he/she...? Yes, he/she is. / No, he/she isn't.",
+          "Are they...? Yes, they are. / No, they aren't."
+        ],
+        "choices": ["Are you", "Is she", "Is he", "Yes, I am", "No, she isn't", "Yes, they are"]
+      }
+    },
+    {
+      "unit": 17,
+      "topic": "Living Things",
+      "bigQuestion": "What are living things?",
+      "vocabulary": {
+        "topic": "Living Things",
+        "words": ["living", "nonliving", "breathe", "move", "change", "air", "people", "plant"]
+      },
+      "grammar": {
+        "point": "Can and Can't",
+        "examples": [
+          "An animal can grow. A toy can't grow.",
+          "People can breathe. Sneakers can't breathe.",
+          "A tree can grow.",
+          "A doll can't grow.",
+          "A house can't move."
+        ],
+        "rules": [
+          "Can = is able to",
+          "Can't = cannot / is not able to",
+          "Can/Can't + base verb (no -s, no -ing)"
+        ],
+        "choices": ["can", "can't", "can grow", "can't grow", "can breathe", "can't breathe"]
+      }
+    },
+    {
+      "unit": 18,
+      "topic": "Living Things",
+      "bigQuestion": "What are living things?",
+      "vocabulary": {
+        "topic": "Verbs (Actions)",
+        "words": ["run away", "chase", "catch", "stop", "cross", "bake", "smell", "open"]
+      },
+      "grammar": {
+        "point": "Should and Shouldn't",
+        "examples": [
+          "You should run away!",
+          "You shouldn't stay here.",
+          "She should close the door.",
+          "You shouldn't run in the classroom.",
+          "You should walk!"
+        ],
+        "rules": [
+          "Should = it's a good idea to",
+          "Shouldn't = it's not a good idea to",
+          "Should/Shouldn't + base verb"
+        ],
+        "choices": ["should", "shouldn't", "should run", "shouldn't stay", "should walk"]
+      }
+    }
+  ]
+}

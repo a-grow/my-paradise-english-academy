@@ -1,0 +1,418 @@
+[
+  {
+    "unit": 1,
+    "topic": "Amazing Animals",
+    "bigQuestion": "How are animals different from one another?",
+    "vocabulary": {
+      "topic": "Animals and Animal Body Parts",
+      "words": ["skin", "mammals", "eggs", "amphibians", "scales", "gills", "feathers", "wings", "fur"]
+    },
+    "grammar": {
+      "point": "Subject and Object Pronouns",
+      "examples": [
+        "Fish have gills. They have gills. Gills help them breathe.",
+        "Do gills help fish breathe? Yes, gills help them breathe.",
+        "How do gills help fish? Gills help them breathe."
+      ],
+      "rules": [
+        "Use subject pronouns (I, you, he, she, it, we, they) as the subject of a sentence.",
+        "Use object pronouns (me, you, him, her, it, us, them) as the object of a verb.",
+        "Subject pronouns replace the noun doing the action; object pronouns replace the noun receiving the action."
+      ],
+      "choices": ["I / me", "he / him", "she / her", "we / us", "they / them"]
+    }
+  },
+  {
+    "unit": 2,
+    "topic": "Leo and Lily's Adventure",
+    "bigQuestion": "How are animals different from one another?",
+    "vocabulary": {
+      "topic": "Animal Words and Verbs",
+      "words": ["worm", "berries", "hunt", "escape", "creep", "fight", "peck", "pinecone", "squawk"]
+    },
+    "grammar": {
+      "point": "Adverbs of Frequency",
+      "examples": [
+        "Lily always escapes.",
+        "Lily is usually very nervous.",
+        "Leo sometimes tries to catch Lily.",
+        "Leo hardly ever tries to catch Lily now.",
+        "Leo and Lily never fight now."
+      ],
+      "rules": [
+        "Adverbs of frequency tell how often something happens.",
+        "always = 100%, usually = ~75%, sometimes = ~50%, hardly ever = ~10%, never = 0%",
+        "Adverbs of frequency go before the main verb but after the verb 'to be'."
+      ],
+      "choices": ["always", "usually", "sometimes", "hardly ever", "never"]
+    }
+  },
+  {
+    "unit": 3,
+    "topic": "What Is Our World Made Of?",
+    "bigQuestion": "How do things change?",
+    "vocabulary": {
+      "topic": "Forms and States of Matter",
+      "words": ["flow", "solid", "liquid", "gas", "heat", "steam", "ice", "freeze", "melt"]
+    },
+    "grammar": {
+      "point": "Simple Past of Verb To Be (Statements)",
+      "examples": [
+        "It was a liquid. Now it's a gas.",
+        "They were hard. Now they're soft.",
+        "It wasn't small, it was very tall.",
+        "Those were his black eyes."
+      ],
+      "rules": [
+        "Use 'was' with I, he, she, it for simple past of 'to be'.",
+        "Use 'were' with you, we, they for simple past of 'to be'.",
+        "For negatives, use wasn't (was not) or weren't (were not)."
+      ],
+      "choices": ["was", "were", "wasn't", "weren't"]
+    }
+  },
+  {
+    "unit": 4,
+    "topic": "Let's Make Ice Cream!",
+    "bigQuestion": "How do things change?",
+    "vocabulary": {
+      "topic": "Foods and Mixtures",
+      "words": ["cream", "sugar", "salt", "pour", "plastic bags", "mixture", "open", "closed", "freezer"]
+    },
+    "grammar": {
+      "point": "Simple Past of Verb To Be (Questions)",
+      "examples": [
+        "Was the freezer door open? Yes, it was.",
+        "Were the students happy? No, they weren't.",
+        "Where was the ice cream? It was in the freezer."
+      ],
+      "rules": [
+        "To make a yes/no question, put 'was' or 'were' before the subject.",
+        "To make a Wh- question, put the question word before 'was' or 'were'.",
+        "Short answers: Yes, it was. / No, it wasn't. Yes, they were. / No, they weren't."
+      ],
+      "choices": ["Was", "Were", "Where was", "Where were"]
+    }
+  },
+  {
+    "unit": 5,
+    "topic": "Then and Now",
+    "bigQuestion": "How are things different now from long ago?",
+    "vocabulary": {
+      "topic": "Travel, Communication, and News",
+      "words": ["travel", "communication", "airplane", "news", "letter", "text message", "e-mail", "radio", "Internet"]
+    },
+    "grammar": {
+      "point": "Simple Past Regular Verbs (Statements)",
+      "examples": [
+        "People listened to the news on the radio.",
+        "They didn't watch the news on TV.",
+        "People traveled by horse and cart.",
+        "They didn't travel by airplane."
+      ],
+      "rules": [
+        "Add -ed to regular verbs to make the simple past: listen → listened, travel → traveled.",
+        "For negatives, use didn't + base form of the verb.",
+        "The base form stays the same for all subjects with didn't."
+      ],
+      "choices": ["listened", "watched", "traveled", "walked", "cleaned", "talked"]
+    }
+  },
+  {
+    "unit": 6,
+    "topic": "Tell Me a Story, Grandpa",
+    "bigQuestion": "How are things different now from long ago?",
+    "vocabulary": {
+      "topic": "Travel Nouns and Verbs",
+      "words": ["arrive", "ask", "check", "enter", "poor", "crowded", "clerk", "visit", "sick"]
+    },
+    "grammar": {
+      "point": "Simple Past Regular Verbs (Questions)",
+      "examples": [
+        "Did they travel by ship? Yes, they did.",
+        "Did they arrive in two days? No, they didn't.",
+        "What did they do? They lived with Carlo's uncle."
+      ],
+      "rules": [
+        "To make a yes/no question in simple past, use did + subject + base form.",
+        "To make a Wh- question, use the question word + did + subject + base form.",
+        "Short answers: Yes, they did. / No, they didn't."
+      ],
+      "choices": ["Did", "didn't", "What did", "Where did", "How did"]
+    }
+  },
+  {
+    "unit": 7,
+    "topic": "Subtraction",
+    "bigQuestion": "When do we use subtraction?",
+    "vocabulary": {
+      "topic": "Math Vocabulary",
+      "words": ["minus sign", "subtraction", "take away", "column", "row", "test score", "single-digit number", "double-digit number", "left"]
+    },
+    "grammar": {
+      "point": "Simple Past Irregular Verbs (Negative Statements)",
+      "examples": [
+        "Alma bought five cookies. She didn't buy four.",
+        "Olivia gave her sister twenty stickers.",
+        "She didn't give her twenty-six."
+      ],
+      "rules": [
+        "Some verbs have irregular past forms: eat → ate, see → saw, buy → bought, give → gave.",
+        "For negatives with irregular verbs, use didn't + the base form (not the irregular form).",
+        "You must memorize irregular past tense forms — they don't follow a pattern."
+      ],
+      "choices": ["eat / ate", "see / saw", "buy / bought", "give / gave", "take / took"]
+    }
+  },
+  {
+    "unit": 8,
+    "topic": "Bandar, the Greedy Monkey",
+    "bigQuestion": "When do we use subtraction?",
+    "vocabulary": {
+      "topic": "People Nouns and Verbs",
+      "words": ["let go", "steal", "dig up", "hide", "jar", "greedy", "bored", "baker", "cook"]
+    },
+    "grammar": {
+      "point": "Simple Past Irregular Verbs (Questions)",
+      "examples": [
+        "Did Bandar go to a candy store? Yes, he did.",
+        "Did he let go of the candy? No, he didn't.",
+        "What did Bandar do with the cookies? He ate them."
+      ],
+      "rules": [
+        "To make yes/no questions with irregular past verbs, use did + subject + base form.",
+        "To make Wh- questions, use question word + did + subject + base form.",
+        "Key irregular verbs: make → made, buy → bought, take → took, sell → sold, go → went."
+      ],
+      "choices": ["make / made", "buy / bought", "take / took", "sell / sold", "go / went"]
+    }
+  },
+  {
+    "unit": 9,
+    "topic": "Following Rules",
+    "bigQuestion": "How do people get along with each other?",
+    "vocabulary": {
+      "topic": "Rules and People",
+      "words": ["traffic light", "take turns", "polite", "clean up", "litter", "librarian", "crossing guard", "principal", "lifeguard"]
+    },
+    "grammar": {
+      "point": "Possessive Pronouns",
+      "examples": [
+        "Those are your things. Those things are yours.",
+        "They aren't my toys. They aren't mine.",
+        "Whose book is this? It's hers.",
+        "Whose pencils are these? They're his."
+      ],
+      "rules": [
+        "Possessive pronouns replace a possessive adjective + noun: my book → mine, your book → yours.",
+        "Possessive pronouns: mine, yours, his, hers, ours, theirs.",
+        "Use 'Whose' to ask who something belongs to."
+      ],
+      "choices": ["mine", "yours", "his", "hers", "ours", "theirs"]
+    }
+  },
+  {
+    "unit": 10,
+    "topic": "The Please and Thank You Book of Poems",
+    "bigQuestion": "How do people get along with each other?",
+    "vocabulary": {
+      "topic": "Getting Along",
+      "words": ["knock", "thoughtful", "rude", "grab", "pass", "put away", "invite", "wash", "share"]
+    },
+    "grammar": {
+      "point": "Can and May",
+      "examples": [
+        "Can I play? Yes, you can. / No, you can't.",
+        "May I come in? Yes, you may. / No, you may not."
+      ],
+      "rules": [
+        "Use 'can' to ask if something is possible or to ask for permission informally.",
+        "Use 'may' to ask for permission more formally and politely.",
+        "Negative: can't / cannot; may not."
+      ],
+      "choices": ["Can I...?", "May I...?", "Yes, you can.", "No, you can't.", "Yes, you may.", "No, you may not."]
+    }
+  },
+  {
+    "unit": 11,
+    "topic": "Natural Resources",
+    "bigQuestion": "Why should we take care of the Earth?",
+    "vocabulary": {
+      "topic": "Land and Resources",
+      "words": ["resources", "wood", "landfill", "land", "trash", "smoke", "sunlight", "reduce", "reuse"]
+    },
+    "grammar": {
+      "point": "Prepositions of Place",
+      "examples": [
+        "There's smoke in the air above the city.",
+        "The landfill is across from the park.",
+        "The trash can is behind the tree.",
+        "The tree is in front of the trash can."
+      ],
+      "rules": [
+        "Use 'above' to mean higher than something.",
+        "Use 'across from' to mean on the other side.",
+        "Use 'behind' to mean at the back of, and 'in front of' to mean at the front of."
+      ],
+      "choices": ["above", "across from", "behind", "in front of", "between", "next to"]
+    }
+  },
+  {
+    "unit": 12,
+    "topic": "A Juice Carton's Diary",
+    "bigQuestion": "Why should we take care of the Earth?",
+    "vocabulary": {
+      "topic": "Recycling",
+      "words": ["carton", "diary", "paper", "blow", "shelf", "recycling plant", "machine", "stationery store", "rescue"]
+    },
+    "grammar": {
+      "point": "Prepositions of Place (Questions)",
+      "examples": [
+        "Where's the fountain? It's across from the statue.",
+        "Is there a trash can behind the tree? Yes, there is."
+      ],
+      "rules": [
+        "Use 'Where' + is/are to ask about location.",
+        "Use 'Is there / Are there' + preposition phrase to ask yes/no location questions.",
+        "Short answers: Yes, there is. / No, there isn't. Yes, there are. / No, there aren't."
+      ],
+      "choices": ["Where's...?", "Is there...?", "Are there...?", "Yes, there is.", "No, there isn't."]
+    }
+  },
+  {
+    "unit": 13,
+    "topic": "How Music Makes Us Feel",
+    "bigQuestion": "How does music make us feel?",
+    "vocabulary": {
+      "topic": "Music and Feelings",
+      "words": ["high", "low", "excited", "sleepy", "wolf", "feelings", "right", "wrong", "trumpet"]
+    },
+    "grammar": {
+      "point": "Prepositions of Time",
+      "examples": [
+        "Pedro listens to slow music at night.",
+        "When does Amanda listen to slow music? She listens in the morning."
+      ],
+      "rules": [
+        "Use 'at' with specific times: at night, at 7 o'clock, at noon.",
+        "Use 'in' with parts of the day (except night): in the morning, in the afternoon, in the evening.",
+        "Use 'on' with days: on Monday, on Saturday."
+      ],
+      "choices": ["at night", "in the morning", "in the afternoon", "in the evening", "on Monday"]
+    }
+  },
+  {
+    "unit": 14,
+    "topic": "Olga's Flute",
+    "bigQuestion": "How does music make us feel?",
+    "vocabulary": {
+      "topic": "Music and Feelings (Extended)",
+      "words": ["notes", "wait", "worried", "the flu", "tears", "solo", "hummingbird", "record", "musician"]
+    },
+    "grammar": {
+      "point": "Adverbs of Time",
+      "examples": [
+        "This morning, Olga goes to school early for extra practice.",
+        "When did Mark go to music class? He went yesterday morning."
+      ],
+      "rules": [
+        "Adverbs of time tell when an action happens: this morning, yesterday, last week, last night.",
+        "Adverbs of time can go at the beginning or end of a sentence.",
+        "Use 'When' to ask about the time of an action."
+      ],
+      "choices": ["this morning", "yesterday morning", "yesterday afternoon", "last week", "last night"]
+    }
+  },
+  {
+    "unit": 15,
+    "topic": "Forces and Movement",
+    "bigQuestion": "What makes things move?",
+    "vocabulary": {
+      "topic": "Forces",
+      "words": ["push", "pull", "movement", "ground", "throw", "speed", "heavy", "light", "easy"]
+    },
+    "grammar": {
+      "point": "Comparative Adjectives",
+      "examples": [
+        "A ball is lighter than a desk.",
+        "Is a desk heavier than a ball? Yes, it is.",
+        "What's slower than an airplane? A train is slower than an airplane."
+      ],
+      "rules": [
+        "Add -er to short adjectives to compare two things: fast → faster, slow → slower.",
+        "For adjectives ending in consonant + vowel + consonant, double the final consonant: big → bigger.",
+        "For adjectives ending in -y, change y to i and add -er: heavy → heavier."
+      ],
+      "choices": ["fast / faster", "slow / slower", "big / bigger", "small / smaller", "heavy / heavier", "light / lighter"]
+    }
+  },
+  {
+    "unit": 16,
+    "topic": "Two Stubborn Little Goats",
+    "bigQuestion": "What makes things move?",
+    "vocabulary": {
+      "topic": "Descriptions of Place and Feelings",
+      "words": ["stubborn", "angry", "goat", "mountain", "west", "east", "forward", "horns", "wet"]
+    },
+    "grammar": {
+      "point": "Superlative Adjectives",
+      "examples": [
+        "I'm the youngest person in my family.",
+        "Is the juiciest grass on East Mountain? Yes, it is."
+      ],
+      "rules": [
+        "Add -est to short adjectives to make the superlative: young → youngest, loud → loudest.",
+        "For adjectives ending in -y, change y to i and add -est: juicy → juiciest.",
+        "Use 'the' before superlative adjectives."
+      ],
+      "choices": ["young / younger / youngest", "loud / louder / loudest", "quiet / quieter / quietest", "big / bigger / biggest", "juicy / juicier / juiciest"]
+    }
+  },
+  {
+    "unit": 17,
+    "topic": "Shapes in Art",
+    "bigQuestion": "How do we make art?",
+    "vocabulary": {
+      "topic": "Art and Shapes",
+      "words": ["crescent", "star", "spiral", "oval", "straight", "nature", "collage", "sculpture", "pattern"]
+    },
+    "grammar": {
+      "point": "Quantifiers (Statements)",
+      "examples": [
+        "There are a lot of shapes.",
+        "There aren't any triangles.",
+        "There is a lot of paper.",
+        "There isn't any red paint."
+      ],
+      "rules": [
+        "Use 'a lot of' with both countable and uncountable nouns in positive sentences.",
+        "Use 'any' with countable and uncountable nouns in negative sentences.",
+        "Use 'are' with plural countable nouns; use 'is' with uncountable nouns."
+      ],
+      "choices": ["a lot of", "any", "There are a lot of...", "There aren't any...", "There is a lot of...", "There isn't any..."]
+    }
+  },
+  {
+    "unit": 18,
+    "topic": "Origami",
+    "bigQuestion": "How do we make art?",
+    "vocabulary": {
+      "topic": "Art Materials and Actions",
+      "words": ["shiny", "fold", "edge", "crane", "seal", "crumple", "waves", "climb", "golden"]
+    },
+    "grammar": {
+      "point": "Quantifiers (Questions)",
+      "examples": [
+        "Did Maki have any pencils? No, she didn't.",
+        "How many seals were there? There was one seal.",
+        "How much paper was there? There was a lot of paper."
+      ],
+      "rules": [
+        "Use 'any' in questions with both countable and uncountable nouns.",
+        "Use 'How many' to ask about countable nouns.",
+        "Use 'How much' to ask about uncountable nouns."
+      ],
+      "choices": ["any", "How many...?", "How much...?", "There was one...", "There was a lot of..."]
+    }
+  }
+]

@@ -1,0 +1,435 @@
+[
+  {
+    "unit": 1,
+    "topic": "The Universe",
+    "bigQuestion": "Where are we in the universe?",
+    "vocabulary": {
+      "topic": "The Universe",
+      "words": ["moon", "asteroid", "comet", "meteorite", "solar system", "stars", "galaxy", "universe", "spacecraft", "telescope", "observatory"]
+    },
+    "grammar": {
+      "point": "Predictions with Will",
+      "examples": [
+        "I will visit those places again, Bella thought.",
+        "Scientists will find new solar systems in our galaxy.",
+        "Scientists will send a person to Mars someday.",
+        "She will become an astronaut when she grows up."
+      ],
+      "rules": [
+        "Use will to make a prediction.",
+        "A prediction is something you believe about the future.",
+        "A prediction is not a fact."
+      ],
+      "choices": ["will", "won't", "is going to", "might", "could"]
+    }
+  },
+  {
+    "unit": 2,
+    "topic": "The Universe",
+    "bigQuestion": "Where are we in the universe?",
+    "vocabulary": {
+      "topic": "The Universe",
+      "words": ["astronomer", "space probe", "core", "gravity", "orbit", "matter", "distance", "diameter", "surface", "craters", "unique"]
+    },
+    "grammar": {
+      "point": "Future Real Conditional",
+      "examples": [
+        "If technology continues to grow, we will travel to these places ourselves.",
+        "We will travel to these places ourselves if technology continues to grow.",
+        "If I become an astronaut, I will walk on the surface of Mars.",
+        "If I study hard, I will get good grades."
+      ],
+      "rules": [
+        "Use the future real conditional to talk about a future possibility and what will happen as a result of it.",
+        "Use the word if with a future possibility.",
+        "The if clause can come first or second in the sentence."
+      ],
+      "choices": ["if", "will", "when", "unless", "until"]
+    }
+  },
+  {
+    "unit": 3,
+    "topic": "Discovering the Past",
+    "bigQuestion": "How do we know what happened long ago?",
+    "vocabulary": {
+      "topic": "Discovering the Past",
+      "words": ["army", "soldiers", "uniform", "emperor", "armor", "treasure", "archaeologist", "tomb", "jade", "clay", "peasant"]
+    },
+    "grammar": {
+      "point": "Verbs Followed by Infinitives",
+      "examples": [
+        "The Chinese government plans to keep it closed for now.",
+        "All the students promised to find more terracotta soldiers.",
+        "The archaeologists tried to build the clay army.",
+        "I forgot to pack my lunch."
+      ],
+      "rules": [
+        "Some verbs are often followed by an infinitive.",
+        "An infinitive is a verb with the word to in front of it.",
+        "Common verbs followed by infinitives include: plan, promise, try, forget, want, decide, need."
+      ],
+      "choices": ["plan", "promise", "try", "forget", "decide"]
+    }
+  },
+  {
+    "unit": 4,
+    "topic": "Discovering the Past",
+    "bigQuestion": "How do we know what happened long ago?",
+    "vocabulary": {
+      "topic": "Discovering the Past",
+      "words": ["dinosaur", "skull", "ravine", "examine", "discover", "excavate", "layers", "paleontologist", "ash", "sedimentary rock", "pastime"]
+    },
+    "grammar": {
+      "point": "Verbs Followed by Gerunds",
+      "examples": [
+        "Javier enjoyed playing with his friends.",
+        "When it began raining, the excavation team went inside.",
+        "The museum staff finished cleaning the dinosaur bones.",
+        "I enjoy swimming in a pool on a hot day."
+      ],
+      "rules": [
+        "Gerunds are verbs that end in -ing.",
+        "Gerunds can act like nouns.",
+        "Verbs like enjoy, finish, and practice are often followed by gerunds."
+      ],
+      "choices": ["enjoy", "finish", "practice", "begin", "like"]
+    }
+  },
+  {
+    "unit": 5,
+    "topic": "Food: The World Around Us",
+    "bigQuestion": "Where does our food come from?",
+    "vocabulary": {
+      "topic": "Food: The World Around Us",
+      "words": ["sugar cane", "wheat", "cinnamon", "butter", "vanilla", "ingredients", "bark", "plantation", "steamship", "spoil", "leopard"]
+    },
+    "grammar": {
+      "point": "Present Continuous for Future Plans",
+      "examples": [
+        "I'm making a special breakfast today.",
+        "We're playing soccer after school today.",
+        "My parents are having dinner at a French restaurant tomorrow.",
+        "I'm cleaning my bedroom on Saturday morning."
+      ],
+      "rules": [
+        "The present continuous tense can tell about future actions that someone plans.",
+        "Include the future time when you use this tense.",
+        "Use am/is/are + verb-ing to form the present continuous."
+      ],
+      "choices": ["am making", "is going", "are having", "am meeting", "are baking"]
+    }
+  },
+  {
+    "unit": 6,
+    "topic": "Food and Farming: The World Around Us",
+    "bigQuestion": "Where does our food come from?",
+    "vocabulary": {
+      "topic": "Food and Farming",
+      "words": ["convenient", "export", "local", "process", "package", "farmer's market", "agriculture", "corporate farm", "decrease", "century", "chemical"]
+    },
+    "grammar": {
+      "point": "Polite Offers",
+      "examples": [
+        "Would you like to know where your food comes from?",
+        "Would you like a delicious apple from South Africa?",
+        "Would you like to bake a cake with me?",
+        "Would you like a piece of apple pie?"
+      ],
+      "rules": [
+        "Use Would you like ... ? to make a polite offer.",
+        "You can use this phrase to offer an action or a thing.",
+        "Would you like + to + verb (action) or Would you like + noun (thing)."
+      ],
+      "choices": ["Would you like to", "Would you like a", "Do you want to", "Can I offer you", "Shall I get you"]
+    }
+  },
+  {
+    "unit": 7,
+    "topic": "Art and Artists",
+    "bigQuestion": "Why do we make art?",
+    "vocabulary": {
+      "topic": "Art and Artists",
+      "words": ["sketch", "pastels", "canvas", "paintbrushes", "shapes", "string", "three-dimensional", "prodigy", "street painter", "carpenter", "sculptor"]
+    },
+    "grammar": {
+      "point": "Indefinite Pronouns",
+      "examples": [
+        "Can anyone make art?",
+        "I want to paint something in this room.",
+        "Everyone worked on the sculpture.",
+        "There is something I like about this sculpture."
+      ],
+      "rules": [
+        "Use indefinite pronouns to talk about unnamed people or things.",
+        "Anyone means any of the people.",
+        "Something means one of the things.",
+        "Everyone means all of the people."
+      ],
+      "choices": ["anyone", "someone", "everyone", "something", "nothing"]
+    }
+  },
+  {
+    "unit": 8,
+    "topic": "Art",
+    "bigQuestion": "Why do we make art?",
+    "vocabulary": {
+      "topic": "Art",
+      "words": ["exhibition", "frame", "landscape", "texture", "shading", "perspective", "contrast", "space", "stained", "brilliant", "pale"]
+    },
+    "grammar": {
+      "point": "Offers with Shall and Will",
+      "examples": [
+        "\"Shall I show you some more sketches?\" he asks.",
+        "\"I will sign you up for something,\" his mother offers.",
+        "Shall I bring you a cold drink?",
+        "I'll carry that for you."
+      ],
+      "rules": [
+        "Use shall to make an offer with a question.",
+        "Use will to make an offer with a statement.",
+        "Shall I ...? is used to offer to do something for someone."
+      ],
+      "choices": ["Shall I", "I will", "I'll", "Should I", "Can I"]
+    }
+  },
+  {
+    "unit": 9,
+    "topic": "Cities: The World Around Us",
+    "bigQuestion": "What is a city?",
+    "vocabulary": {
+      "topic": "Cities: The World Around Us",
+      "words": ["canal", "port", "architecture", "rickshaw", "street vendor", "antiques", "souvenirs", "batik", "exotic fruits", "tuna", "shrimp"]
+    },
+    "grammar": {
+      "point": "Negative Indefinite Pronouns",
+      "examples": [
+        "Do you have nothing to do?",
+        "No one could see everything.",
+        "Nobody is in the museum.",
+        "There is nothing in my pocket."
+      ],
+      "rules": [
+        "Indefinite pronouns refer to people or objects that we don't name or know.",
+        "Negative indefinite pronouns begin with no-.",
+        "Nothing means not anything; no one and nobody mean no person."
+      ],
+      "choices": ["nothing", "no one", "nobody", "nowhere", "neither"]
+    }
+  },
+  {
+    "unit": 10,
+    "topic": "Life in a City",
+    "bigQuestion": "What is a city?",
+    "vocabulary": {
+      "topic": "Life in a City",
+      "words": ["citizens", "volunteers", "mayor", "assistant", "city council", "city hall", "president", "garbage collectors", "equipment", "news conference", "playground"]
+    },
+    "grammar": {
+      "point": "Tag Questions",
+      "examples": [
+        "You'll work hard, won't you?",
+        "Marcy wasn't nervous, was she?",
+        "Ann is the youngest student, isn't she?",
+        "You're ready for the test, aren't you?"
+      ],
+      "rules": [
+        "In a tag question, a statement is turned into a question by adding a tag at the end.",
+        "A tag question always has a yes or no answer.",
+        "Tag questions are often used to say things that we think are true, but that we don't know for sure."
+      ],
+      "choices": ["won't you", "isn't she", "aren't they", "didn't he", "wasn't it"]
+    }
+  },
+  {
+    "unit": 11,
+    "topic": "The Body: Health",
+    "bigQuestion": "How do our bodies work?",
+    "vocabulary": {
+      "topic": "The Body: Health",
+      "words": ["cells", "microscope", "virus", "bacteria", "disease", "influenza", "common cold", "mucus", "immune", "paralyze", "infect"]
+    },
+    "grammar": {
+      "point": "Order of Adjectives",
+      "examples": [
+        "Max Axiom studies these fascinating, tiny visitors.",
+        "The doctor washed his white, new lab coat.",
+        "Max saw round, red, large viruses.",
+        "There is a long, white, plastic ruler on my desk."
+      ],
+      "rules": [
+        "You can use more than one adjective to describe a noun.",
+        "The adjectives must go in a certain order: opinion ... size ... age ... shape ... color ... kind.",
+        "Opinion adjectives come before size adjectives."
+      ],
+      "choices": ["opinion", "size", "age", "shape", "color"]
+    }
+  },
+  {
+    "unit": 12,
+    "topic": "The Body",
+    "bigQuestion": "How do our bodies work?",
+    "vocabulary": {
+      "topic": "The Body",
+      "words": ["system", "blood", "heart", "arteries", "veins", "capillary", "lungs", "trachea", "diaphragm", "carbon dioxide", "pulse"]
+    },
+    "grammar": {
+      "point": "Used To",
+      "examples": [
+        "In ancient times, people used to think differently about the human body.",
+        "When I was young, I used to ride my bike.",
+        "My sister used to go to the swimming pool often as a child.",
+        "I used to take the bus to school."
+      ],
+      "rules": [
+        "Use used to before an action that happened often in the past, but not now.",
+        "Used to describes a past habit or state that no longer exists.",
+        "Compare with simple past: simple past describes one completed action; used to describes repeated past actions."
+      ],
+      "choices": ["used to go", "used to play", "used to eat", "used to live", "used to think"]
+    }
+  },
+  {
+    "unit": 13,
+    "topic": "Mass Media and Communication",
+    "bigQuestion": "What is the mass media?",
+    "vocabulary": {
+      "topic": "Mass Media and Communication",
+      "words": ["mass media", "newspaper", "magazine", "printing press", "publisher", "advertising", "broadcast", "the Web", "smartphone", "blog", "social network"]
+    },
+    "grammar": {
+      "point": "Must, Mustn't, Have To, Don't Have To",
+      "examples": [
+        "You must pay for the Internet to use it at home.",
+        "You mustn't take a newspaper without paying for it.",
+        "You don't have to carry a computer to check the news.",
+        "You must walk quietly in the halls."
+      ],
+      "rules": [
+        "Use must and have to to talk about what a person needs to do.",
+        "Use mustn't to talk about what a person shouldn't do.",
+        "Use don't have to to talk about what a person doesn't need to do."
+      ],
+      "choices": ["must", "mustn't", "have to", "don't have to", "has to"]
+    }
+  },
+  {
+    "unit": 14,
+    "topic": "Mass Media and Communication",
+    "bigQuestion": "What is the mass media?",
+    "vocabulary": {
+      "topic": "Mass Media and Communication",
+      "words": ["reporter", "editor", "interview", "headline", "hero", "website", "mistake", "decide", "discuss", "investigate", "search"]
+    },
+    "grammar": {
+      "point": "Present Perfect",
+      "examples": [
+        "I have decided to keep a blog.",
+        "He hasn't written a blog before.",
+        "The reporter has done many interviews.",
+        "I haven't met a reporter before."
+      ],
+      "rules": [
+        "Use the present perfect tense to tell what happened in the past, but did not happen at a specific time.",
+        "Use the past participle form of the main verb with has or have.",
+        "Use hasn't / haven't for negative sentences."
+      ],
+      "choices": ["have decided", "has written", "have done", "hasn't met", "have changed"]
+    }
+  },
+  {
+    "unit": 15,
+    "topic": "Natural Forces",
+    "bigQuestion": "What can we learn from nature's power?",
+    "vocabulary": {
+      "topic": "Natural Forces",
+      "words": ["flood", "earthquake", "tsunami", "hurricane", "tornado", "blizzard", "thunderstorm", "rescue worker", "victim", "power lines", "collapse"]
+    },
+    "grammar": {
+      "point": "Present Perfect with Ever and Never",
+      "examples": [
+        "Have you ever seen a real tornado?",
+        "Yes, I have. / No, I haven't. I've never seen a real tornado.",
+        "Have you ever experienced an earthquake?",
+        "I've never felt an earthquake."
+      ],
+      "rules": [
+        "Use the present perfect with ever and never to ask and answer questions about life experiences.",
+        "Use ever in questions to ask about any time up to now.",
+        "Use never in statements to say something has not happened at any time."
+      ],
+      "choices": ["Have you ever", "I've never", "Has she ever", "have you ever seen", "I have never"]
+    }
+  },
+  {
+    "unit": 16,
+    "topic": "Safety and Supplies",
+    "bigQuestion": "What can we learn from nature's power?",
+    "vocabulary": {
+      "topic": "Safety and Supplies",
+      "words": ["emergency", "storm shelter", "first-aid kit", "cash", "storm shutters", "sleeping bag", "flashlight", "batteries", "supplies", "bottled water", "canned food"]
+    },
+    "grammar": {
+      "point": "Present Perfect with Already, Just, and Yet",
+      "examples": [
+        "I've already packed everything.",
+        "I've just eaten dinner.",
+        "Have you cleaned your room yet? No, I haven't cleaned it yet.",
+        "I've already made twelve sandwiches and four pizzas."
+      ],
+      "rules": [
+        "You can use the present perfect with the adverbs already, just, and yet.",
+        "These adverbs tell when something happened or didn't happen.",
+        "Already and just are used in positive statements; yet is used in questions and negative statements."
+      ],
+      "choices": ["already", "just", "yet", "still", "recently"]
+    }
+  },
+  {
+    "unit": 17,
+    "topic": "Biomes: The World Around Us",
+    "bigQuestion": "Why are biomes important?",
+    "vocabulary": {
+      "topic": "Biomes: The World Around Us",
+      "words": ["biome", "desert", "grassland", "tropical rainforest", "temperate forest", "taiga", "tundra", "freshwater", "equator", "sloth", "cactus"]
+    },
+    "grammar": {
+      "point": "Present Perfect with For and Since",
+      "examples": [
+        "These biomes have provided a home for animals for a long time.",
+        "I have studied biomes since February.",
+        "My dad has studied mammals for twenty years.",
+        "The government has protected this forest since 1998."
+      ],
+      "rules": [
+        "Use the present perfect with for and since to show that something began in the past and is still happening now.",
+        "Use for to talk about an amount of time.",
+        "Use since to talk about a specific point of time in the past."
+      ],
+      "choices": ["for", "since", "for a long time", "since last year", "for many years"]
+    }
+  },
+  {
+    "unit": 18,
+    "topic": "Animals: The World Around Us",
+    "bigQuestion": "Why are biomes important?",
+    "vocabulary": {
+      "topic": "Animals: The World Around Us",
+      "words": ["parrot fish", "seahorse", "manta ray", "sea turtle", "marine park", "snorkel", "speedboat", "border", "petition", "law", "astonish"]
+    },
+    "grammar": {
+      "point": "Present Perfect and Simple Past",
+      "examples": [
+        "Camila has created a petition.",
+        "When she got home, Camila created a petition.",
+        "I have run in a race. I ran in a race last summer.",
+        "They have snorkeled this morning."
+      ],
+      "rules": [
+        "Use the present perfect for past experiences, past actions that continue to the present, or actions that happened at an unspecific time.",
+        "Use the simple past for completed actions that happened at a specific time.",
+        "The simple past is used when we know when something happened."
+      ],
+      "choices": ["has created", "created", "have snorkeled", "snorkeled", "has gone"]
+    }
+  }
+]

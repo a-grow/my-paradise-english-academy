@@ -1,3 +1,4 @@
+import GameTest from "./pages/GameTest";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/portal" element={<Portal />} />
               <Route path="/world/:code/:studentName" element={<KidsWorld />} />
 <Route path="/game/:code/:studentName" element={<GamePage />} />
+<Route path="/gametest" element={<GameTest />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

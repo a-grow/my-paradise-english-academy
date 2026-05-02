@@ -1,0 +1,415 @@
+[
+  {
+    "unit": 1,
+    "topic": "Sports and Leisure",
+    "bigQuestion": "How do people have fun?",
+    "vocabulary": {
+      "topic": "Sports and Leisure",
+      "words": ["festival", "folk dance", "wedding", "family reunion", "fair", "race", "team", "winner", "score", "player"]
+    },
+    "grammar": {
+      "point": "Adjectives with -ed and -ing",
+      "examples": [
+        "The people are excited. The game is exciting.",
+        "That race was really tiring.",
+        "Races are boring. Pizza is more interesting.",
+        "He's always interested in pizza."
+      ],
+      "rules": [
+        "Adjectives that end in -ed tell about how we feel.",
+        "Adjectives that end in -ing usually tell about a thing, such as a game or a movie."
+      ],
+      "choices": ["bored", "boring", "interested", "interesting", "excited", "exciting"]
+    }
+  },
+  {
+    "unit": 2,
+    "topic": "Sports and Leisure, The World Around Us",
+    "bigQuestion": "How do people have fun?",
+    "vocabulary": {
+      "topic": "Sports and Leisure, The World Around Us",
+      "words": ["kick", "tag", "skip", "bounce", "drop", "plain", "lake", "canyon", "cliff", "stream"]
+    },
+    "grammar": {
+      "point": "Gerunds",
+      "examples": [
+        "Ashanti's friends like skipping.",
+        "Maria likes landing on one foot.",
+        "Running and jumping are lots of fun!",
+        "Dancing to music is definitely fun!"
+      ],
+      "rules": [
+        "When you add -ing to a verb, it can act like a noun. It's called a gerund."
+      ],
+      "choices": ["skipping", "landing", "running", "jumping", "bouncing", "kicking", "dancing"]
+    }
+  },
+  {
+    "unit": 3,
+    "topic": "Sports and Leisure, Moving",
+    "bigQuestion": "Why do people move?",
+    "vocabulary": {
+      "topic": "Sports and Leisure, Moving",
+      "words": ["packing", "moving", "meeting neighbors", "shopping", "ice skating", "fishing", "raking leaves", "dancing", "throwing snowballs", "sledding"]
+    },
+    "grammar": {
+      "point": "Can and Could",
+      "examples": [
+        "Sati can ice skate.",
+        "Sati can't play with Nisha.",
+        "Sati couldn't ice skate.",
+        "Sati could play with Nisha."
+      ],
+      "rules": [
+        "Can tells us what someone knows how to do now, in the present.",
+        "Could tells us what someone knew how to do before, in the past."
+      ],
+      "choices": ["can", "can't", "could", "couldn't"]
+    }
+  },
+  {
+    "unit": 4,
+    "topic": "Places",
+    "bigQuestion": "Why do people move?",
+    "vocabulary": {
+      "topic": "Places",
+      "words": ["country", "suburb", "rural area", "urban area", "shopping mall", "university", "hospital", "factory", "clinic", "zoo"]
+    },
+    "grammar": {
+      "point": "Present Real Conditional",
+      "examples": [
+        "If I'm sleepy, I run to the park.",
+        "When another city has good services, people want to move there.",
+        "If ice gets warm, it melts.",
+        "When I'm hungry, I have a snack."
+      ],
+      "rules": [
+        "Something that happens can cause something else to happen.",
+        "Use if or when to describe an event that causes a second event."
+      ],
+      "choices": ["if", "when"]
+    }
+  },
+  {
+    "unit": 5,
+    "topic": "Insects, The World Around Us",
+    "bigQuestion": "Why do people write poems?",
+    "vocabulary": {
+      "topic": "Insects, The World Around Us",
+      "words": ["ladybug", "cricket", "grasshopper", "beetle", "katydid", "bee", "butterfly", "thicket", "kangaroo", "raisin"]
+    },
+    "grammar": {
+      "point": "Past Continuous",
+      "examples": [
+        "What were they doing last night? They were watching television.",
+        "The birds were singing, and the sun was shining.",
+        "My dad was frying eggs in the kitchen.",
+        "I was eating breakfast with my mom."
+      ],
+      "rules": [
+        "The past continuous tells what was going on at a certain time in the past.",
+        "Use was or were plus a verb ending in -ing."
+      ],
+      "choices": ["was playing", "were watching", "was riding", "was reading", "was eating"]
+    }
+  },
+  {
+    "unit": 6,
+    "topic": "Animals, Language Terms",
+    "bigQuestion": "Why do people write poems?",
+    "vocabulary": {
+      "topic": "Animals, Language Terms",
+      "words": ["sentence", "rhyming words", "verb", "noun", "adjective", "syllable", "letter", "robin", "angelfish", "snowflakes"]
+    },
+    "grammar": {
+      "point": "Past Continuous and Simple Past",
+      "examples": [
+        "I was walking to school this morning when I saw an orange butterfly.",
+        "I was dreaming of the ocean when the rain came down.",
+        "I was walking to the circus when I met a funny clown.",
+        "I was searching for my sock when I saw my shoe."
+      ],
+      "rules": [
+        "You can use the past continuous and the simple past in the same sentence.",
+        "The simple past tells us about something that happened. The past continuous tells us what was going on when it happened."
+      ],
+      "choices": ["was running", "was going", "was reading", "when", "while"]
+    }
+  },
+  {
+    "unit": 7,
+    "topic": "Time, The World Around Us",
+    "bigQuestion": "How do we measure time?",
+    "vocabulary": {
+      "topic": "Time, The World Around Us",
+      "words": ["second", "minute", "hour", "month", "year", "noon", "spin", "orbit", "time zone", "multiply"]
+    },
+    "grammar": {
+      "point": "Future Facts with Will",
+      "examples": [
+        "In two hours, it will be noon where you live.",
+        "On the other side of the world it won't be noon. It will be 12:00 at night!",
+        "In four hours, it will be two o'clock and I will be in Spain!",
+        "We'll go to the beach and swim in the sea."
+      ],
+      "rules": [
+        "Use will to talk about future facts.",
+        "Remember, a fact is something that is true."
+      ],
+      "choices": ["will", "won't", "will be", "won't be"]
+    }
+  },
+  {
+    "unit": 8,
+    "topic": "The World Around Us, Health",
+    "bigQuestion": "How do we measure time?",
+    "vocabulary": {
+      "topic": "The World Around Us, Health",
+      "words": ["airport", "passenger", "passport", "destination", "sick", "earache", "headache", "fever", "doctor", "medicine"]
+    },
+    "grammar": {
+      "point": "Future Plans with Going to",
+      "examples": [
+        "My mom is going to give me a present.",
+        "I'm going to take care of you all day.",
+        "She's going to play again today.",
+        "My mom is going to cook tomorrow."
+      ],
+      "rules": [
+        "You can use going to to talk about a plan for the future.",
+        "The plan was made before the speaker talks about it."
+      ],
+      "choices": ["is going to", "are going to", "am going to", "going to"]
+    }
+  },
+  {
+    "unit": 9,
+    "topic": "The World Around Us",
+    "bigQuestion": "Where does energy come from?",
+    "vocabulary": {
+      "topic": "The World Around Us",
+      "words": ["windmill", "sailboat", "wind turbine", "wind farm", "coal", "oil", "natural gas", "pollution", "power plant", "electricity"]
+    },
+    "grammar": {
+      "point": "May and Might",
+      "examples": [
+        "We may find other sources of green energy in the future.",
+        "Renewable energy might also reduce our need for fossil fuels.",
+        "You might see solar panels in your area.",
+        "I may get up early and go jogging."
+      ],
+      "rules": [
+        "You can use may or might to talk about something when you are not sure it will happen."
+      ],
+      "choices": ["may", "might", "may not", "might not"]
+    }
+  },
+  {
+    "unit": 10,
+    "topic": "Transportation",
+    "bigQuestion": "Where does energy come from?",
+    "vocabulary": {
+      "topic": "Transportation",
+      "words": ["subway", "fire engine", "carpool", "ambulance", "escalator", "train", "taxi", "elevator", "helicopter", "traffic jam"]
+    },
+    "grammar": {
+      "point": "Quantifiers",
+      "examples": [
+        "Hector uses a little energy.",
+        "There were only a few cars on the road.",
+        "Mr. Big uses a lot of energy.",
+        "There were lots of cars in the traffic jam."
+      ],
+      "rules": [
+        "Use a little to describe a small amount of something you cannot count, such as energy.",
+        "Use a few to describe a small amount of something you can count, such as cars.",
+        "Use a lot of or lots of to describe a big amount of something we can or cannot count."
+      ],
+      "choices": ["a little", "a few", "a lot of", "lots of"]
+    }
+  },
+  {
+    "unit": 11,
+    "topic": "Musical Instruments, Work",
+    "bigQuestion": "How do people make music?",
+    "vocabulary": {
+      "topic": "Musical Instruments, Work",
+      "words": ["cello", "timpani", "trombone", "bassoon", "orchestra", "conductor", "baton", "astronaut", "circus trainer", "scientist"]
+    },
+    "grammar": {
+      "point": "Comparative and Superlative Adjectives",
+      "examples": [
+        "This elephant is louder than that one.",
+        "That elephant is the loudest of the three elephants.",
+        "Being a good friend is more important than those things.",
+        "I am the most wonderful friend in the world!"
+      ],
+      "rules": [
+        "Use comparative adjectives to talk about two things.",
+        "Use superlative adjectives to talk about three or more things.",
+        "Add -er/-est for short adjectives; use more/most for longer adjectives."
+      ],
+      "choices": ["louder", "the loudest", "more talented", "more important", "the most wonderful"]
+    }
+  },
+  {
+    "unit": 12,
+    "topic": "Musical Instruments",
+    "bigQuestion": "How do people make music?",
+    "vocabulary": {
+      "topic": "Musical Instruments",
+      "words": ["zummara", "flute", "djembe", "tuba", "panpipes", "violin", "didgeridoo", "snare drum", "erhu", "clarinet"]
+    },
+    "grammar": {
+      "point": "Comparative Adjectives with As",
+      "examples": [
+        "The sound of the didgeridoo is as low as the tuba's sound.",
+        "The didgeridoo is not as curved as the tuba.",
+        "The drum is as loud as the falling rain.",
+        "My pencil isn't as long as yours."
+      ],
+      "rules": [
+        "Use as + adjective + as to compare things that are the same in one way.",
+        "Use not + as + adjective + as to compare things that are different in one way."
+      ],
+      "choices": ["as loud as", "as long as", "as low as", "not as curved as", "not as long as"]
+    }
+  },
+  {
+    "unit": 13,
+    "topic": "Tools, Inventions",
+    "bigQuestion": "How do inventions change our lives?",
+    "vocabulary": {
+      "topic": "Tools, Inventions",
+      "words": ["lever", "ramp", "wedge", "screw", "wheel and axle", "light bulb", "doorknob", "slide", "axe", "seesaw"]
+    },
+    "grammar": {
+      "point": "Too and Either",
+      "examples": [
+        "A hammer is a lever. A seesaw is a lever, too.",
+        "The wedge isn't a new invention. The ramp isn't, either.",
+        "Harry is careful and Jay is, too.",
+        "Harry doesn't fall off and Jay doesn't, either."
+      ],
+      "rules": [
+        "Use too to agree with something positive (for example, with is).",
+        "Use either to agree with something negative (for example, with isn't)."
+      ],
+      "choices": ["too", "either"]
+    }
+  },
+  {
+    "unit": 14,
+    "topic": "Materials, Work",
+    "bigQuestion": "How do inventions change our lives?",
+    "vocabulary": {
+      "topic": "Materials, Work",
+      "words": ["eyeglasses", "vase", "furnace", "wire", "workshop", "frames", "glass", "glassblower", "glassware", "pitcher"]
+    },
+    "grammar": {
+      "point": "Comparative and Superlative Adverbs",
+      "examples": [
+        "Antonio made his glassware faster than before.",
+        "He ran faster than / the fastest in the race.",
+        "Our class walked more quietly than their class.",
+        "I get up later than you in the morning."
+      ],
+      "rules": [
+        "Use comparative and superlative adverbs to compare the same action.",
+        "An adverb describes an action.",
+        "Add -er/-est for short adverbs; use more/most for longer adverbs."
+      ],
+      "choices": ["faster than", "the fastest", "more carefully than", "the most carefully", "later than"]
+    }
+  },
+  {
+    "unit": 15,
+    "topic": "Plants, The World Around Us",
+    "bigQuestion": "Why do we need plants?",
+    "vocabulary": {
+      "topic": "Plants, The World Around Us",
+      "words": ["soil", "seeds", "roots", "stem", "leaves", "petals", "nectar", "pollen", "oxygen", "humans"]
+    },
+    "grammar": {
+      "point": "Measure Words",
+      "examples": [
+        "Fill a pot with a bag of soil. Moisten the soil with a cup of water.",
+        "I bought a box of seeds and a kilogram of apples.",
+        "I have a big loaf of bread.",
+        "A jar of strawberry jam."
+      ],
+      "rules": [
+        "Use measure words to count things that we can't count, such as soil and water.",
+        "Use measure words to count larger numbers of things we can count, such as seeds and apples."
+      ],
+      "choices": ["bag", "cup", "box", "jar", "loaf", "bottle", "kilogram"]
+    }
+  },
+  {
+    "unit": 16,
+    "topic": "Places, The World Around Us",
+    "bigQuestion": "Why do we need plants?",
+    "vocabulary": {
+      "topic": "Places, The World Around Us",
+      "words": ["gardener", "sweet potato", "beans", "vines", "garden", "haze", "teenagers", "community", "crowd", "shopping cart"]
+    },
+    "grammar": {
+      "point": "Adjectives with Prepositions",
+      "examples": [
+        "Marisol is curious about her plant.",
+        "She was surprised at the big sunflower.",
+        "She was very happy with the mural.",
+        "I'm curious about rain forests."
+      ],
+      "rules": [
+        "Adjectives with prepositions tell how we feel about something."
+      ],
+      "choices": ["curious about", "surprised at", "happy with", "excited about", "good at"]
+    }
+  },
+  {
+    "unit": 17,
+    "topic": "Weather, The World Around Us",
+    "bigQuestion": "Why do we explore?",
+    "vocabulary": {
+      "topic": "Weather, The World Around Us",
+      "words": ["island", "windy", "waterfall", "clouds", "hail", "coast", "fog", "storm", "lightning", "river"]
+    },
+    "grammar": {
+      "point": "Prepositions of Movement",
+      "examples": [
+        "Go up to the deck and check the sails.",
+        "We sailed down the coast of South America.",
+        "Walk down this street, through the park, and around the pond.",
+        "He went out of bed and into the kitchen."
+      ],
+      "rules": [
+        "Use prepositions of movement to give directions."
+      ],
+      "choices": ["up", "down", "into", "out of", "to", "around", "through"]
+    }
+  },
+  {
+    "unit": 18,
+    "topic": "Animals, The World Around Us",
+    "bigQuestion": "Why do we explore?",
+    "vocabulary": {
+      "topic": "Animals, The World Around Us",
+      "words": ["goggles", "kelp", "penguin", "squid", "otter", "coral", "humpback whale", "dolphin", "leafy sea dragon", "octopus"]
+    },
+    "grammar": {
+      "point": "Want to / Need to / Have to",
+      "examples": [
+        "Cousteau wanted to stay underwater longer.",
+        "He needed to (had to) use the Aqua-Lung to stay underwater.",
+        "I want to swim at a penguin's side.",
+        "I need to breathe."
+      ],
+      "rules": [
+        "Use want to when you have a choice to do something.",
+        "Use need to or have to when you don't have a choice. You must do it."
+      ],
+      "choices": ["want to", "wants to", "need to", "needs to", "have to", "has to"]
+    }
+  }
+]
