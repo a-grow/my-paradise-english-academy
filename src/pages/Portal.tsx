@@ -5,13 +5,13 @@ import { Sparkles, Star, BookOpen, Calendar, LogOut, Trophy, X, ChevronDown, Che
 
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 
-const ZH = ({ children, size = "0.88em" }: { children: React.ReactNode; size?: string }) => (
+const ZH = ({ children, size = "0.95em" }: { children: React.ReactNode; size?: string }) => (
   <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: size, color: "rgba(0,0,0,0.45)", marginTop: "0.15rem", lineHeight: 1.3 }}>
     {children}
   </div>
 );
 
-const ZHwhite = ({ children, size = "0.88em" }: { children: React.ReactNode; size?: string }) => (
+const ZHwhite = ({ children, size = "0.95em" }: { children: React.ReactNode; size?: string }) => (
   <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: size, color: "rgba(255,255,255,0.65)", marginTop: "0.15rem", lineHeight: 1.3 }}>
     {children}
   </div>
@@ -179,8 +179,6 @@ const Dashboard = () => {
   const [hwText, setHwText] = useState("");
   const [hwSent, setHwSent] = useState(false);
   const [hwLoading, setHwLoading] = useState(false);
-  const [request, setRequest] = useState("");
-  const [requestSent, setRequestSent] = useState(false);
   // evals: map of studentName -> sorted array of eval entries (newest first)
   const [evals, setEvals] = useState<Record<string, EvalEntry[]>>({});
   const [modalStudent, setModalStudent] = useState<string | null>(null);
@@ -228,18 +226,6 @@ const Dashboard = () => {
     setHwLoading(false);
   };
 
-  const submitRequest = async () => {
-    if (!request.trim()) return;
-    try {
-      await fetch(`${SHEETDB_URL}?sheet=Requests`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: [{ familyCode: family.code, familyName: family.familyName, request, date: new Date().toLocaleDateString("en-US"), status: "New" }] })
-      });
-      setRequestSent(true); setRequest("");
-    } catch { alert("Couldn't send — please try again."); }
-  };
-
   const studentEvalsForModal = modalStudent ? (evals[modalStudent] || []) : [];
   const [expandedEvals, setExpandedEvals] = useState<Record<string, boolean>>({});
 
@@ -263,11 +249,11 @@ const Dashboard = () => {
           <span className="font-display font-bold text-xl text-white drop-shadow-md">My Paradise English</span>
         </div>
         <button onClick={() => { logout(); navigate("/portal"); }}
-          className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white font-body font-semibold text-sm px-4 py-2 rounded-full transition-all duration-200">
+          className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white font-body font-semibold text-base px-4 py-2 rounded-full transition-all duration-200">
           <LogOut className="w-4 h-4" />
           <div>
             <div>Sign Out</div>
-            <div style={{ fontSize: "0.65em", opacity: 0.8 }}>登出</div>
+            <div style={{ fontSize: "0.75em", opacity: 0.8 }}>登出</div>
           </div>
         </button>
       </nav>
@@ -285,8 +271,8 @@ const Dashboard = () => {
         <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.8)", marginBottom: "0.25rem" }}>
           歡迎，{family.familyName}家！
         </div>
-        <p className="font-body text-white/80 text-sm relative z-10">My Paradise English Academy — Family Portal</p>
-        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.8rem", color: "rgba(255,255,255,0.6)" }}>
+        <p className="font-body text-white/80 text-base relative z-10">My Paradise English Academy — Family Portal</p>
+        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(255,255,255,0.6)" }}>
           天堂英語學院 — 家庭入口
         </div>
       </div>
@@ -304,7 +290,7 @@ const Dashboard = () => {
                 <Trophy className="w-5 h-5 text-paradise-yellow" />
                 <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Latest Evaluation</span>
               </div>
-              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>最新評估</div>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>最新評估</div>
               <h3 className="font-display font-bold text-xl text-paradise-coral mb-3">📋 {student.name}</h3>
 
               {latestEval ? (
@@ -322,8 +308,8 @@ const Dashboard = () => {
                     {expandedEvals[student.name] ? "Show less ↑ · 收起" : "Read more ↓ · 繼續閱讀"}
                   </button>
 
-                  <p className="font-body text-sm text-muted-foreground mt-3">Received: {latestEval.date}</p>
-                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.35)" }}>收到日期：{latestEval.date}</div>
+                  <p className="font-body text-base text-muted-foreground mt-3">Received: {latestEval.date}</p>
+                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.35)" }}>收到日期：{latestEval.date}</div>
 
                   {studentEvals.length > 0 && (
                     <button
@@ -353,7 +339,7 @@ const Dashboard = () => {
               <Star className="w-5 h-5 text-paradise-yellow fill-paradise-yellow" />
               <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Student World</span>
             </div>
-            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.4)", marginLeft: "1.75rem" }}>學生世界</div>
+            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.4)", marginLeft: "1.75rem" }}>學生世界</div>
           </div>
           {family.students.map((student) => (
             <div key={student.name} className="text-center w-full">
@@ -367,7 +353,7 @@ const Dashboard = () => {
                 <span className="absolute -top-2 right-3 text-lg" style={{ animation: "sparkleAnim 2s ease-in-out infinite 0.7s" }}>✨</span>
               </button>
               <p className="font-body text-sm text-muted-foreground mt-1">Click to visit {student.name}'s creature world!</p>
-              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.35)" }}>點擊進入{student.name}的動物世界！</div>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.35)" }}>點擊進入{student.name}的動物世界！</div>
             </div>
           ))}
         </div>
@@ -378,21 +364,21 @@ const Dashboard = () => {
             <BookOpen className="w-5 h-5 text-paradise-sky" />
             <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Homework</span>
           </div>
-          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>作業</div>
-          <h3 className="font-display font-bold text-xl text-paradise-purple mb-1">📚 Submit Homework</h3>
-          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>提交作業</div>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>作業</div>
+          <h3 className="font-display font-bold text-2xl text-paradise-purple mb-1">📚 Submit Homework</h3>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>提交作業</div>
           <textarea
-            className="w-full min-h-28 px-4 py-3 rounded-2xl font-body text-sm outline-none transition-all duration-200 resize-y mb-3"
+            className="w-full min-h-28 px-4 py-3 rounded-2xl font-body text-base outline-none transition-all duration-200 resize-y mb-3"
             style={{ border: "2px solid hsl(var(--paradise-sky)/0.4)" }}
             placeholder="Paste or type your child's homework here... / 在這裡輸入孩子的作業..."
             value={hwText}
             onChange={(e) => { setHwText(e.target.value); setHwSent(false); }}
           />
           <button onClick={submitHomework} disabled={hwLoading || !hwText.trim()}
-            className="py-3 px-6 rounded-2xl font-display font-bold text-white text-sm transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
+            className="py-3 px-6 rounded-2xl font-display font-bold text-white text-base transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, hsl(var(--paradise-sky)), hsl(var(--paradise-purple)))" }}>
             {hwLoading ? "Sending... ✨" : "Send to Teacher →"}
-            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.7em", opacity: 0.85 }}>{hwLoading ? "傳送中..." : "傳給老師"}</div>
+            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.8em", opacity: 0.85 }}>{hwLoading ? "傳送中..." : "傳給老師"}</div>
           </button>
           {hwSent && (
             <>
@@ -402,35 +388,21 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Schedule change */}
+        {/* Schedule */}
         <div className="card-fun p-6 md:col-span-2">
           <div className="flex items-center gap-2 mb-1">
             <Calendar className="w-5 h-5 text-paradise-coral" />
             <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Schedule</span>
           </div>
-          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>課程時間</div>
-          <h3 className="font-display font-bold text-xl text-paradise-coral mb-1">📆 Request a Schedule Change</h3>
-          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>請求更改課程時間</div>
-          <input
-            className="w-full px-4 py-3 rounded-2xl font-body text-sm outline-none transition-all duration-200 mb-3"
-            style={{ border: "2px solid hsl(var(--paradise-coral)/0.4)" }}
-            type="text"
-            placeholder="e.g. Can we move Tuesday's class to Thursday? / 可以把週二的課改到週四嗎？"
-            value={request}
-            onChange={(e) => { setRequest(e.target.value); setRequestSent(false); }}
-          />
-          <button onClick={submitRequest} disabled={!request.trim()}
-            className="py-3 px-6 rounded-2xl font-display font-bold text-white text-sm transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg, hsl(var(--paradise-coral)), hsl(var(--paradise-pink)))" }}>
-            Send Request →
-            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.7em", opacity: 0.85 }}>送出請求</div>
-          </button>
-          {requestSent && (
-            <>
-              <p className="font-body text-base mt-3 text-paradise-teal">✅ Request sent! We'll get back to you on Line. 💬</p>
-              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.88rem", color: "rgba(0,0,0,0.45)", marginTop: "0.2rem" }}>✅ 請求已送出！我們會在Line上回覆你。</div>
-            </>
-          )}
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>課程時間</div>
+          <h3 className="font-display font-bold text-2xl text-paradise-coral mb-1">📆 Time Off or Schedule Changes</h3>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>請假或更改課程時間</div>
+          <p className="font-body text-base text-foreground/75 leading-relaxed">
+            Need to request time off or make a schedule change? Message Teacher Shirley directly on LINE! 💬
+          </p>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(0,0,0,0.5)", marginTop: "0.5rem", lineHeight: 1.6 }}>
+            需要請假或更改課程時間嗎？直接在LINE上傳訊息給Shirley老師！💬
+          </div>
         </div>
 
       </div>
