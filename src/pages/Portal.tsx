@@ -1,21 +1,105 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, Star, BookOpen, Calendar, LogOut, Trophy } from "lucide-react";
+import { Sparkles, Star, BookOpen, Calendar, LogOut, Trophy, X, ChevronDown, ChevronUp } from "lucide-react";
 
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 
-const ZH = ({children, size="0.78em"}:{children:React.ReactNode;size?:string}) => (
-  <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:size, color:"rgba(0,0,0,0.45)", marginTop:"0.15rem", lineHeight:1.3}}>
+const ZH = ({ children, size = "0.78em" }: { children: React.ReactNode; size?: string }) => (
+  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: size, color: "rgba(0,0,0,0.45)", marginTop: "0.15rem", lineHeight: 1.3 }}>
     {children}
   </div>
 );
 
-const ZHwhite = ({children, size="0.78em"}:{children:React.ReactNode;size?:string}) => (
-  <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:size, color:"rgba(255,255,255,0.65)", marginTop:"0.15rem", lineHeight:1.3}}>
+const ZHwhite = ({ children, size = "0.78em" }: { children: React.ReactNode; size?: string }) => (
+  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: size, color: "rgba(255,255,255,0.65)", marginTop: "0.15rem", lineHeight: 1.3 }}>
     {children}
   </div>
 );
+
+// ---- EVALS MODAL ----
+type EvalEntry = { student: string; units: string; date: string; eval_text: string };
+
+const EvalsModal = ({ student, evals, onClose }: { student: string; evals: EvalEntry[]; onClose: () => void }) => {
+  const [openIdx, setOpenIdx] = useState<number>(0); // first one open by default
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col"
+        style={{ border: "3px solid hsl(var(--paradise-sky)/0.3)" }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Modal header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div>
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-paradise-yellow" />
+              <span className="font-display font-bold text-lg text-paradise-coral">{student}'s Evaluations</span>
+            </div>
+            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.4)", marginLeft: "1.75rem" }}>
+              {student}的評估記錄
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+
+        {/* Eval list */}
+        <div className="overflow-y-auto flex-1 px-6 py-4 flex flex-col gap-3">
+          {evals.map((ev, idx) => (
+            <div
+              key={idx}
+              className="rounded-2xl border cursor-pointer transition-all duration-200"
+              style={{
+                border: openIdx === idx ? "2px solid hsl(var(--paradise-sky)/0.6)" : "2px solid #f1f5f9",
+                background: openIdx === idx ? "hsl(var(--paradise-sky)/0.05)" : "white"
+              }}
+              onClick={() => setOpenIdx(openIdx === idx ? -1 : idx)}
+            >
+              {/* Eval header row */}
+              <div className="flex items-center justify-between px-4 py-3">
+                <div>
+                  <div className="font-body font-semibold text-sm text-foreground">{ev.units}</div>
+                  <div className="font-body text-xs text-muted-foreground mt-0.5">{ev.date}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {idx === 0 && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
+                      style={{ background: "linear-gradient(135deg, hsl(var(--paradise-coral)), hsl(var(--paradise-pink)))" }}>
+                      Latest
+                    </span>
+                  )}
+                  {openIdx === idx
+                    ? <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                    : <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  }
+                </div>
+              </div>
+
+              {/* Eval body */}
+              {openIdx === idx && (
+                <div className="px-4 pb-4 pt-1 border-t border-gray-100">
+                  <p className="font-body text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap">
+                    {ev.eval_text}
+                  </p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const LoginScreen = () => {
   const { login } = useAuth();
@@ -97,18 +181,35 @@ const Dashboard = () => {
   const [hwLoading, setHwLoading] = useState(false);
   const [request, setRequest] = useState("");
   const [requestSent, setRequestSent] = useState(false);
-  const [evals, setEvals] = useState<Record<string, { text: string; date: string }>>({});
+  // evals: map of studentName -> sorted array of eval entries (newest first)
+  const [evals, setEvals] = useState<Record<string, EvalEntry[]>>({});
+  const [modalStudent, setModalStudent] = useState<string | null>(null);
 
   useEffect(() => {
     if (!family) return;
     fetch(`${SHEETDB_URL}?sheet=Evals`)
       .then(r => r.json())
       .then(data => {
-        const map: Record<string, { text: string; date: string }> = {};
-        data.filter((row: any) => row.familyCode === family.code)
-            .forEach((row: any) => { map[row.studentName] = { text: row.evalText, date: row.date }; });
+        const map: Record<string, EvalEntry[]> = {};
+        // Column names match the Evals tab: code, student, class, units, date, eval_text
+        data
+          .filter((row: any) => row.code === family.code)
+          .forEach((row: any) => {
+            const name = row.student;
+            if (!map[name]) map[name] = [];
+            map[name].push({
+              student: row.student,
+              units: row.units || "",
+              date: row.date || "",
+              eval_text: row.eval_text || ""
+            });
+          });
+        // Sort each student's evals newest first
+        Object.keys(map).forEach(name => {
+          map[name].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        });
         setEvals(map);
-      }).catch(() => {});
+      }).catch(() => { });
   }, [family?.code]);
 
   if (!family) return null;
@@ -139,8 +240,20 @@ const Dashboard = () => {
     } catch { alert("Couldn't send — please try again."); }
   };
 
+  const studentEvalsForModal = modalStudent ? (evals[modalStudent] || []) : [];
+
   return (
     <div className="min-h-screen" style={{ background: "hsl(45 100% 98%)" }}>
+
+      {/* Evals Modal */}
+      {modalStudent && (
+        <EvalsModal
+          student={modalStudent}
+          evals={studentEvalsForModal}
+          onClose={() => setModalStudent(null)}
+        />
+      )}
+
       {/* Nav */}
       <nav className="sticky top-0 z-50 backdrop-blur-md shadow-lg px-6 py-3 flex items-center justify-between"
         style={{ background: "linear-gradient(to right, hsl(var(--paradise-purple)/0.92), hsl(var(--paradise-sky)/0.92))" }}>
@@ -153,7 +266,7 @@ const Dashboard = () => {
           <LogOut className="w-4 h-4" />
           <div>
             <div>Sign Out</div>
-            <div style={{fontSize:"0.65em", opacity:0.8}}>登出</div>
+            <div style={{ fontSize: "0.65em", opacity: 0.8 }}>登出</div>
           </div>
         </button>
       </nav>
@@ -168,11 +281,11 @@ const Dashboard = () => {
         <h1 className="font-display font-bold text-4xl text-white drop-shadow-lg mb-1 relative z-10">
           Welcome, {family.familyName} family! 👋
         </h1>
-        <div className="relative z-10" style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"1.1rem", color:"rgba(255,255,255,0.8)", marginBottom:"0.25rem"}}>
+        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.8)", marginBottom: "0.25rem" }}>
           歡迎，{family.familyName}家！
         </div>
         <p className="font-body text-white/80 text-sm relative z-10">My Paradise English Academy — Family Portal</p>
-        <div className="relative z-10" style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.8rem", color:"rgba(255,255,255,0.6)"}}>
+        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.8rem", color: "rgba(255,255,255,0.6)" }}>
           天堂英語學院 — 家庭入口
         </div>
       </div>
@@ -180,28 +293,49 @@ const Dashboard = () => {
       {/* Cards */}
       <div className="max-w-4xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-5">
 
-        {family.students.map((student) => (
-          <div key={student.name} className="card-fun p-6">
-            <div className="flex items-center gap-2 mb-1">
-              <Trophy className="w-5 h-5 text-paradise-yellow" />
-              <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Latest Evaluation</span>
+        {family.students.map((student) => {
+          const studentEvals = evals[student.name] || [];
+          const latestEval = studentEvals[0] || null;
+
+          return (
+            <div key={student.name} className="card-fun p-6">
+              <div className="flex items-center gap-2 mb-1">
+                <Trophy className="w-5 h-5 text-paradise-yellow" />
+                <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Latest Evaluation</span>
+              </div>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>最新評估</div>
+              <h3 className="font-display font-bold text-xl text-paradise-coral mb-3">📋 {student.name}</h3>
+
+              {latestEval ? (
+                <>
+                  <div className="font-body text-xs font-semibold text-paradise-purple mb-2">{latestEval.units}</div>
+                  <p className="font-body text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap line-clamp-6">
+                    {latestEval.eval_text}
+                  </p>
+                  <p className="font-body text-xs text-muted-foreground mt-3">Received: {latestEval.date}</p>
+                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.7rem", color: "rgba(0,0,0,0.35)" }}>收到日期：{latestEval.date}</div>
+
+                  {/* See All button */}
+                  {studentEvals.length > 0 && (
+                    <button
+                      onClick={() => setModalStudent(student.name)}
+                      className="mt-4 w-full py-2 rounded-xl font-body font-semibold text-sm transition-all duration-200 hover:-translate-y-0.5"
+                      style={{ background: "hsl(var(--paradise-sky)/0.12)", color: "hsl(var(--paradise-sky))", border: "1.5px solid hsl(var(--paradise-sky)/0.3)" }}
+                    >
+                      See All Evals ({studentEvals.length}) →
+                      <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72em", opacity: 0.8 }}>查看所有評估</div>
+                    </button>
+                  )}
+                </>
+              ) : (
+                <>
+                  <p className="font-body text-sm text-muted-foreground italic">No evaluation yet — check back after your next milestone! 🌟</p>
+                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.35)", marginTop: "0.25rem" }}>還沒有評估 — 下次里程碑後再來看看！</div>
+                </>
+              )}
             </div>
-            <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.4)", marginBottom:"0.5rem"}}>最新評估</div>
-            <h3 className="font-display font-bold text-xl text-paradise-coral mb-3">📋 {student.name}</h3>
-            {evals[student.name] ? (
-              <>
-                <p className="font-body text-sm leading-relaxed text-foreground/80">{evals[student.name].text}</p>
-                <p className="font-body text-xs text-muted-foreground mt-3">Received: {evals[student.name].date}</p>
-                <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.7rem", color:"rgba(0,0,0,0.35)"}}>收到日期：{evals[student.name].date}</div>
-              </>
-            ) : (
-              <>
-                <p className="font-body text-sm text-muted-foreground italic">No evaluation yet — check back after your next milestone! 🌟</p>
-                <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.35)", marginTop:"0.25rem"}}>還沒有評估 — 下次里程碑後再來看看！</div>
-              </>
-            )}
-          </div>
-        ))}
+          );
+        })}
 
         {/* World buttons */}
         <div className="card-fun p-6 flex flex-col items-center justify-center gap-5">
@@ -210,7 +344,7 @@ const Dashboard = () => {
               <Star className="w-5 h-5 text-paradise-yellow fill-paradise-yellow" />
               <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Student World</span>
             </div>
-            <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.4)", marginLeft:"1.75rem"}}>學生世界</div>
+            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.4)", marginLeft: "1.75rem" }}>學生世界</div>
           </div>
           {family.students.map((student) => (
             <div key={student.name} className="text-center w-full">
@@ -224,7 +358,7 @@ const Dashboard = () => {
                 <span className="absolute -top-2 right-3 text-lg" style={{ animation: "sparkleAnim 2s ease-in-out infinite 0.7s" }}>✨</span>
               </button>
               <p className="font-body text-xs text-muted-foreground mt-1">Click to visit {student.name}'s creature world!</p>
-              <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.35)"}}>點擊進入{student.name}的動物世界！</div>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.35)" }}>點擊進入{student.name}的動物世界！</div>
             </div>
           ))}
         </div>
@@ -235,9 +369,9 @@ const Dashboard = () => {
             <BookOpen className="w-5 h-5 text-paradise-sky" />
             <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Homework</span>
           </div>
-          <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.4)", marginBottom:"0.5rem"}}>作業</div>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>作業</div>
           <h3 className="font-display font-bold text-xl text-paradise-purple mb-1">📚 Submit Homework</h3>
-          <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.85rem", color:"rgba(0,0,0,0.45)", marginBottom:"1rem"}}>提交作業</div>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>提交作業</div>
           <textarea
             className="w-full min-h-28 px-4 py-3 rounded-2xl font-body text-sm outline-none transition-all duration-200 resize-y mb-3"
             style={{ border: "2px solid hsl(var(--paradise-sky)/0.4)" }}
@@ -249,12 +383,12 @@ const Dashboard = () => {
             className="py-3 px-6 rounded-2xl font-display font-bold text-white text-sm transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, hsl(var(--paradise-sky)), hsl(var(--paradise-purple)))" }}>
             {hwLoading ? "Sending... ✨" : "Send to Teacher →"}
-            <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.7em", opacity:0.85}}>{hwLoading ? "傳送中..." : "傳給老師"}</div>
+            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.7em", opacity: 0.85 }}>{hwLoading ? "傳送中..." : "傳給老師"}</div>
           </button>
           {hwSent && (
             <>
               <p className="font-body text-sm mt-3 text-paradise-teal">✅ Homework sent! We'll review it soon.</p>
-              <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.75rem", color:"rgba(0,0,0,0.45)", marginTop:"0.2rem"}}>✅ 作業已送出！我們很快會看。</div>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.75rem", color: "rgba(0,0,0,0.45)", marginTop: "0.2rem" }}>✅ 作業已送出！我們很快會看。</div>
             </>
           )}
         </div>
@@ -265,9 +399,9 @@ const Dashboard = () => {
             <Calendar className="w-5 h-5 text-paradise-coral" />
             <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Schedule</span>
           </div>
-          <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.4)", marginBottom:"0.5rem"}}>課程時間</div>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>課程時間</div>
           <h3 className="font-display font-bold text-xl text-paradise-coral mb-1">📆 Request a Schedule Change</h3>
-          <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.85rem", color:"rgba(0,0,0,0.45)", marginBottom:"1rem"}}>請求更改課程時間</div>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>請求更改課程時間</div>
           <input
             className="w-full px-4 py-3 rounded-2xl font-body text-sm outline-none transition-all duration-200 mb-3"
             style={{ border: "2px solid hsl(var(--paradise-coral)/0.4)" }}
@@ -280,12 +414,12 @@ const Dashboard = () => {
             className="py-3 px-6 rounded-2xl font-display font-bold text-white text-sm transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, hsl(var(--paradise-coral)), hsl(var(--paradise-pink)))" }}>
             Send Request →
-            <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.7em", opacity:0.85}}>送出請求</div>
+            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.7em", opacity: 0.85 }}>送出請求</div>
           </button>
           {requestSent && (
             <>
               <p className="font-body text-sm mt-3 text-paradise-teal">✅ Request sent! We'll get back to you on Line. 💬</p>
-              <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.75rem", color:"rgba(0,0,0,0.45)", marginTop:"0.2rem"}}>✅ 請求已送出！我們會在Line上回覆你。</div>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.75rem", color: "rgba(0,0,0,0.45)", marginTop: "0.2rem" }}>✅ 請求已送出！我們會在Line上回覆你。</div>
             </>
           )}
         </div>
@@ -294,7 +428,7 @@ const Dashboard = () => {
 
       <div className="text-center py-6 font-body text-xs text-muted-foreground">
         🌴 My Paradise English Academy · Learning is an Adventure!
-        <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.9em", marginTop:"0.2rem"}}>天堂英語學院 · 學習是一場冒險！</div>
+        <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.9em", marginTop: "0.2rem" }}>天堂英語學院 · 學習是一場冒險！</div>
       </div>
 
       <style>{`
