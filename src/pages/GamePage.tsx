@@ -4,7 +4,8 @@ import GameTest from "./GameTest";
 
 const MASTER_CODE = "1006";
 const TREATS_PER_CLEAR = 3;
-const DAILY_TREAT_CAP = 9;
+// const DAILY_TREAT_CAP = 9; // commented out for testing
+const DAILY_TREAT_CAP = 999999;
 
 const GamePage = () => {
   const { code, studentName } = useParams<{ code: string; studentName: string }>();
@@ -45,7 +46,7 @@ const GamePage = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
 
-  const treatsCappedToday = !isMaster && treatsEarnedToday >= DAILY_TREAT_CAP;
+  const treatsCappedToday = false; // cap disabled for testing
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -99,7 +100,7 @@ const GamePage = () => {
     // Guards
     if (localStorage.getItem(key)) return;
     const earnedSoFar = getTreatsEarnedToday();
-    if (earnedSoFar >= DAILY_TREAT_CAP) return;
+    // if (earnedSoFar >= DAILY_TREAT_CAP) return; // cap disabled for testing
 
     // Write to localStorage
     localStorage.setItem(key, "1");
