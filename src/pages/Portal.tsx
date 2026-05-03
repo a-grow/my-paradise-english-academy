@@ -5,13 +5,13 @@ import { Sparkles, Star, BookOpen, Calendar, LogOut, Trophy, X, ChevronDown, Che
 
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 
-const ZH = ({ children, size = "0.78em" }: { children: React.ReactNode; size?: string }) => (
+const ZH = ({ children, size = "0.88em" }: { children: React.ReactNode; size?: string }) => (
   <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: size, color: "rgba(0,0,0,0.45)", marginTop: "0.15rem", lineHeight: 1.3 }}>
     {children}
   </div>
 );
 
-const ZHwhite = ({ children, size = "0.78em" }: { children: React.ReactNode; size?: string }) => (
+const ZHwhite = ({ children, size = "0.88em" }: { children: React.ReactNode; size?: string }) => (
   <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: size, color: "rgba(255,255,255,0.65)", marginTop: "0.15rem", lineHeight: 1.3 }}>
     {children}
   </div>
@@ -304,26 +304,26 @@ const Dashboard = () => {
                 <Trophy className="w-5 h-5 text-paradise-yellow" />
                 <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Latest Evaluation</span>
               </div>
-              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>最新評估</div>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>最新評估</div>
               <h3 className="font-display font-bold text-xl text-paradise-coral mb-3">📋 {student.name}</h3>
 
               {latestEval ? (
                 <>
                   <div className="font-body text-xs font-semibold text-paradise-purple mb-2">{latestEval.units}</div>
 
-                  <p className={`font-body text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap ${expandedEvals[student.name] ? "" : "line-clamp-4"}`}>
+                  <p className={`font-body text-base leading-relaxed text-foreground/80 whitespace-pre-wrap ${expandedEvals[student.name] ? "" : "line-clamp-4"}`}>
                     {latestEval.eval_text}
                   </p>
                   <button
                     onClick={() => setExpandedEvals(prev => ({ ...prev, [student.name]: !prev[student.name] }))}
-                    className="mt-1 font-body text-xs font-semibold transition-colors duration-200"
-                    style={{ color: "hsl(var(--paradise-coral))" }}
+                    className="mt-1 font-body text-sm font-semibold transition-colors duration-200"
+                    style={{ color: "hsl(var(--paradise-teal))" }}
                   >
                     {expandedEvals[student.name] ? "Show less ↑ · 收起" : "Read more ↓ · 繼續閱讀"}
                   </button>
 
-                  <p className="font-body text-xs text-muted-foreground mt-3">Received: {latestEval.date}</p>
-                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.7rem", color: "rgba(0,0,0,0.35)" }}>收到日期：{latestEval.date}</div>
+                  <p className="font-body text-sm text-muted-foreground mt-3">Received: {latestEval.date}</p>
+                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.35)" }}>收到日期：{latestEval.date}</div>
 
                   {studentEvals.length > 0 && (
                     <button
@@ -338,8 +338,8 @@ const Dashboard = () => {
                 </>
               ) : (
                 <>
-                  <p className="font-body text-sm text-muted-foreground italic">No evaluation yet — check back after your next milestone! 🌟</p>
-                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.35)", marginTop: "0.25rem" }}>還沒有評估 — 下次里程碑後再來看看！</div>
+                  <p className="font-body text-base text-muted-foreground italic">No evaluation yet — check back after your next milestone! 🌟</p>
+                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.88rem", color: "rgba(0,0,0,0.35)", marginTop: "0.25rem" }}>還沒有評估 — 下次里程碑後再來看看！</div>
                 </>
               )}
             </div>
@@ -353,7 +353,7 @@ const Dashboard = () => {
               <Star className="w-5 h-5 text-paradise-yellow fill-paradise-yellow" />
               <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Student World</span>
             </div>
-            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.4)", marginLeft: "1.75rem" }}>學生世界</div>
+            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.4)", marginLeft: "1.75rem" }}>學生世界</div>
           </div>
           {family.students.map((student) => (
             <div key={student.name} className="text-center w-full">
@@ -366,8 +366,8 @@ const Dashboard = () => {
                 🌴 {student.name}'s World
                 <span className="absolute -top-2 right-3 text-lg" style={{ animation: "sparkleAnim 2s ease-in-out infinite 0.7s" }}>✨</span>
               </button>
-              <p className="font-body text-xs text-muted-foreground mt-1">Click to visit {student.name}'s creature world!</p>
-              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.35)" }}>點擊進入{student.name}的動物世界！</div>
+              <p className="font-body text-sm text-muted-foreground mt-1">Click to visit {student.name}'s creature world!</p>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.35)" }}>點擊進入{student.name}的動物世界！</div>
             </div>
           ))}
         </div>
@@ -378,7 +378,7 @@ const Dashboard = () => {
             <BookOpen className="w-5 h-5 text-paradise-sky" />
             <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Homework</span>
           </div>
-          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>作業</div>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>作業</div>
           <h3 className="font-display font-bold text-xl text-paradise-purple mb-1">📚 Submit Homework</h3>
           <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>提交作業</div>
           <textarea
@@ -396,8 +396,8 @@ const Dashboard = () => {
           </button>
           {hwSent && (
             <>
-              <p className="font-body text-sm mt-3 text-paradise-teal">✅ Homework sent! We'll review it soon.</p>
-              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.75rem", color: "rgba(0,0,0,0.45)", marginTop: "0.2rem" }}>✅ 作業已送出！我們很快會看。</div>
+              <p className="font-body text-base mt-3 text-paradise-teal">✅ Homework sent! We'll review it soon.</p>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.88rem", color: "rgba(0,0,0,0.45)", marginTop: "0.2rem" }}>✅ 作業已送出！我們很快會看。</div>
             </>
           )}
         </div>
@@ -408,7 +408,7 @@ const Dashboard = () => {
             <Calendar className="w-5 h-5 text-paradise-coral" />
             <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Schedule</span>
           </div>
-          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.72rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>課程時間</div>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.82rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>課程時間</div>
           <h3 className="font-display font-bold text-xl text-paradise-coral mb-1">📆 Request a Schedule Change</h3>
           <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>請求更改課程時間</div>
           <input
@@ -427,8 +427,8 @@ const Dashboard = () => {
           </button>
           {requestSent && (
             <>
-              <p className="font-body text-sm mt-3 text-paradise-teal">✅ Request sent! We'll get back to you on Line. 💬</p>
-              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.75rem", color: "rgba(0,0,0,0.45)", marginTop: "0.2rem" }}>✅ 請求已送出！我們會在Line上回覆你。</div>
+              <p className="font-body text-base mt-3 text-paradise-teal">✅ Request sent! We'll get back to you on Line. 💬</p>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.88rem", color: "rgba(0,0,0,0.45)", marginTop: "0.2rem" }}>✅ 請求已送出！我們會在Line上回覆你。</div>
             </>
           )}
         </div>
