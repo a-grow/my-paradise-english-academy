@@ -241,6 +241,7 @@ const Dashboard = () => {
   };
 
   const studentEvalsForModal = modalStudent ? (evals[modalStudent] || []) : [];
+  const [expandedEvals, setExpandedEvals] = useState<Record<string, boolean>>({});
 
   return (
     <div className="min-h-screen" style={{ background: "hsl(45 100% 98%)" }}>
@@ -309,13 +310,21 @@ const Dashboard = () => {
               {latestEval ? (
                 <>
                   <div className="font-body text-xs font-semibold text-paradise-purple mb-2">{latestEval.units}</div>
-                  <p className="font-body text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap line-clamp-6">
+
+                  <p className={`font-body text-sm leading-relaxed text-foreground/80 whitespace-pre-wrap ${expandedEvals[student.name] ? "" : "line-clamp-4"}`}>
                     {latestEval.eval_text}
                   </p>
+                  <button
+                    onClick={() => setExpandedEvals(prev => ({ ...prev, [student.name]: !prev[student.name] }))}
+                    className="mt-1 font-body text-xs font-semibold transition-colors duration-200"
+                    style={{ color: "hsl(var(--paradise-coral))" }}
+                  >
+                    {expandedEvals[student.name] ? "Show less ↑ · 收起" : "Read more ↓ · 繼續閱讀"}
+                  </button>
+
                   <p className="font-body text-xs text-muted-foreground mt-3">Received: {latestEval.date}</p>
                   <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.7rem", color: "rgba(0,0,0,0.35)" }}>收到日期：{latestEval.date}</div>
 
-                  {/* See All button */}
                   {studentEvals.length > 0 && (
                     <button
                       onClick={() => setModalStudent(student.name)}
