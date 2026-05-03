@@ -177,8 +177,6 @@ const Dashboard = () => {
   const { family, logout } = useAuth();
   const navigate = useNavigate();
   const [hwText, setHwText] = useState("");
-  const [hwSent, setHwSent] = useState(false);
-  const [hwLoading, setHwLoading] = useState(false);
   // evals: map of studentName -> sorted array of eval entries (newest first)
   const [evals, setEvals] = useState<Record<string, EvalEntry[]>>({});
   const [modalStudent, setModalStudent] = useState<string | null>(null);
@@ -211,20 +209,6 @@ const Dashboard = () => {
   }, [family?.code]);
 
   if (!family) return null;
-
-  const submitHomework = async () => {
-    if (!hwText.trim()) return;
-    setHwLoading(true);
-    try {
-      await fetch(`${SHEETDB_URL}?sheet=Homework`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: [{ familyCode: family.code, familyName: family.familyName, hwText, date: new Date().toLocaleDateString("en-US"), status: "New" }] })
-      });
-      setHwSent(true); setHwText("");
-    } catch { alert("Couldn't send — please try again."); }
-    setHwLoading(false);
-  };
 
   const studentEvalsForModal = modalStudent ? (evals[modalStudent] || []) : [];
   const [expandedEvals, setExpandedEvals] = useState<Record<string, boolean>>({});
@@ -358,8 +342,21 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Homework */}
-        <div className="card-fun p-6 md:col-span-2">
+        {/* Homework — Coming Soon */}
+        <div className="card-fun p-6 md:col-span-2" style={{ opacity: 0.5, position: "relative", pointerEvents: "none" }}>
+          {/* Coming Soon badge */}
+          <div style={{
+            position: "absolute", top: "1.25rem", right: "1.25rem",
+            background: "linear-gradient(135deg, #f59e0b, #fbbf24)",
+            color: "white", fontFamily: "Noto Sans TC, sans-serif",
+            fontSize: "0.85rem", fontWeight: 700,
+            padding: "0.3rem 0.9rem", borderRadius: "999px",
+            boxShadow: "0 2px 10px rgba(245,158,11,0.5)",
+            letterSpacing: "0.04em", zIndex: 10
+          }}>
+            ⏳ Coming Soon · 即將推出
+          </div>
+
           <div className="flex items-center gap-2 mb-1">
             <BookOpen className="w-5 h-5 text-paradise-sky" />
             <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Homework</span>
@@ -368,24 +365,17 @@ const Dashboard = () => {
           <h3 className="font-display font-bold text-2xl text-paradise-purple mb-1">📚 Submit Homework</h3>
           <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>提交作業</div>
           <textarea
-            className="w-full min-h-28 px-4 py-3 rounded-2xl font-body text-base outline-none transition-all duration-200 resize-y mb-3"
-            style={{ border: "2px solid hsl(var(--paradise-sky)/0.4)" }}
-            placeholder="Paste or type your child's homework here... / 在這裡輸入孩子的作業..."
-            value={hwText}
-            onChange={(e) => { setHwText(e.target.value); setHwSent(false); }}
+            className="w-full min-h-28 px-4 py-3 rounded-2xl font-body text-base outline-none resize-y mb-3"
+            style={{ border: "2px solid hsl(var(--paradise-sky)/0.4)", background: "#f1f5f9", cursor: "not-allowed" }}
+            placeholder="Photo upload coming soon! · 照片上傳即將推出！"
+            disabled
           />
-          <button onClick={submitHomework} disabled={hwLoading || !hwText.trim()}
-            className="py-3 px-6 rounded-2xl font-display font-bold text-white text-base transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
+          <button disabled
+            className="py-3 px-6 rounded-2xl font-display font-bold text-white text-base disabled:opacity-50 cursor-not-allowed"
             style={{ background: "linear-gradient(135deg, hsl(var(--paradise-sky)), hsl(var(--paradise-purple)))" }}>
-            {hwLoading ? "Sending... ✨" : "Send to Teacher →"}
-            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.8em", opacity: 0.85 }}>{hwLoading ? "傳送中..." : "傳給老師"}</div>
+            Send to Teacher →
+            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.8em", opacity: 0.85 }}>傳給老師</div>
           </button>
-          {hwSent && (
-            <>
-              <p className="font-body text-base mt-3 text-paradise-teal">✅ Homework sent! We'll review it soon.</p>
-              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.88rem", color: "rgba(0,0,0,0.45)", marginTop: "0.2rem" }}>✅ 作業已送出！我們很快會看。</div>
-            </>
-          )}
         </div>
 
         {/* Schedule */}
