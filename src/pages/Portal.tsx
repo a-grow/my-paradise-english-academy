@@ -343,18 +343,33 @@ const Dashboard = () => {
         </div>
 
         {/* Homework — Coming Soon */}
-        <div className="card-fun p-6 md:col-span-2" style={{ opacity: 0.5, position: "relative", pointerEvents: "none" }}>
-          {/* Coming Soon badge */}
+        <div className="card-fun p-6 md:col-span-2" style={{ opacity: 0.7, position: "relative", pointerEvents: "none" }}>
+
+          {/* Gray overlay */}
           <div style={{
-            position: "absolute", top: "1.25rem", right: "1.25rem",
-            background: "linear-gradient(135deg, #f59e0b, #fbbf24)",
-            color: "white", fontFamily: "Noto Sans TC, sans-serif",
-            fontSize: "0.85rem", fontWeight: 700,
-            padding: "0.3rem 0.9rem", borderRadius: "999px",
-            boxShadow: "0 2px 10px rgba(245,158,11,0.5)",
-            letterSpacing: "0.04em", zIndex: 10
+            position: "absolute", inset: 0, borderRadius: "inherit",
+            background: "rgba(150,150,150,0.30)", zIndex: 5
+          }} />
+
+          {/* Coming Soon stamp — centered */}
+          <div style={{
+            position: "absolute", inset: 0, zIndex: 10,
+            display: "flex", alignItems: "center", justifyContent: "center"
           }}>
-            ⏳ Coming Soon · 即將推出
+            <div style={{
+              background: "linear-gradient(135deg, #b45309, #d97706)",
+              color: "white",
+              fontFamily: "'Noto Sans TC', sans-serif",
+              fontSize: "1.6rem", fontWeight: 900,
+              padding: "0.75rem 2.25rem",
+              borderRadius: "1.25rem",
+              boxShadow: "0 6px 24px rgba(0,0,0,0.25)",
+              textAlign: "center",
+              lineHeight: 1.4,
+              letterSpacing: "0.03em"
+            }}>
+              Coming Soon!<br />即將推出！
+            </div>
           </div>
 
           <div className="flex items-center gap-2 mb-1">
