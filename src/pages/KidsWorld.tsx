@@ -430,7 +430,7 @@ const UnderwaterBg = ({sad}:{sad:boolean}) => (
 
 // ── EARN BUTTONS ──────────────────────────────────────────────────────────────
 const EarnButtons = ({navigate,code,studentName}:{navigate:(p:string)=>void;code:string;studentName:string}) => (
-  <div style={{display:"flex",flexDirection:"column",gap:"0.85rem"}}>
+  <div style={{display:"flex",flexDirection:"column",gap:"1rem"}}>
     {[
       {label:"Play a Game",sub:"打敗遊戲，得3個餅乾！",reward:"+3 treats",color:"#f97316",glow:"rgba(249,115,22,0.5)",path:`/game/${code}/${studentName}`},
       {label:"Read & Quiz",sub:"Coming Soon!",reward:"🔒",color:"#a855f7",glow:"rgba(168,85,247,0.0)",path:"",disabled:true},
@@ -451,7 +451,7 @@ cursor:btn.disabled?"not-allowed":"pointer",
           <div style={{fontFamily:"'Fredoka One',cursive",fontSize:"1.25rem",
             color:"white",lineHeight:1.2}}>{btn.label}</div>
           <div style={{fontFamily:"Nunito,sans-serif",fontSize:"0.8rem",
-            color:"rgba(255,255,255,0.85)",marginTop:"0.1rem"}}>{btn.sub}</div>
+            color:"rgba(255,255,255,0.85)",marginTop:"0.1rem",fontSize:"1rem"}}>{btn.sub}</div>
         </div>
         <div style={{background:"rgba(255,255,255,0.25)",borderRadius:"999px",
           padding:"0.3rem 0.85rem",flexShrink:0,marginLeft:"0.5rem",
@@ -1092,7 +1092,7 @@ const claimDailyGift=()=>{
           <div style={{color:"white",fontFamily:"'Fredoka One',cursive",
             fontSize:"1.1rem",textAlign:"center",marginBottom:"0.75rem"}}>
             {petName?`${petName} loves treats!`:"Feed your Sea Turtle Treats!"}<br/>
-          <span style={{fontFamily:"Nunito,sans-serif",fontSize:"0.85rem",opacity:0.75}}>餵你的海龜餅乾！</span>
+          <span style={{fontFamily:"Nunito,sans-serif",fontSize:"1rem",opacity:0.75}}>餵你的海龜餅乾！</span>
           </div>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"2rem"}}>
             <TreatJar treats={jarTreats} nextStage={nextStage}/>
@@ -1142,7 +1142,7 @@ const claimDailyGift=()=>{
           <div style={{color:"white",fontFamily:"'Fredoka One',cursive",
             fontSize:"1.4rem",marginBottom:"1rem",textAlign:"center"}}>
             Earn Treats!<br/>
-            <span style={{fontFamily:"Nunito,sans-serif",fontSize:"0.85rem",opacity:0.75}}>賺餅乾！</span>
+            <span style={{fontFamily:"Nunito,sans-serif",fontSize:"1rem",opacity:0.75}}>賺餅乾！</span>
           </div>
           <EarnButtons navigate={navigate} code={code??""} studentName={studentName??""}/>
         </div>

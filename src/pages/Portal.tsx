@@ -5,6 +5,18 @@ import { Sparkles, Star, BookOpen, Calendar, LogOut, Trophy } from "lucide-react
 
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 
+const ZH = ({children, size="0.78em"}:{children:React.ReactNode;size?:string}) => (
+  <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:size, color:"rgba(0,0,0,0.45)", marginTop:"0.15rem", lineHeight:1.3}}>
+    {children}
+  </div>
+);
+
+const ZHwhite = ({children, size="0.78em"}:{children:React.ReactNode;size?:string}) => (
+  <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:size, color:"rgba(255,255,255,0.65)", marginTop:"0.15rem", lineHeight:1.3}}>
+    {children}
+  </div>
+);
+
 const LoginScreen = () => {
   const { login } = useAuth();
   const [code, setCode] = useState("");
@@ -43,10 +55,12 @@ const LoginScreen = () => {
         </div>
         <div className="text-5xl mb-2">🌴</div>
         <h1 className="font-display font-bold text-3xl text-paradise-coral mb-1">Family Portal</h1>
-        <p className="font-body text-muted-foreground mb-6 text-sm">Enter your family code to continue!</p>
+        <ZH size="1em">家庭入口</ZH>
+        <p className="font-body text-muted-foreground mt-3 mb-1 text-sm">Enter your family code to continue!</p>
+        <ZH>請輸入你的家庭密碼！</ZH>
 
         <input
-          className="w-full px-5 py-4 rounded-2xl font-display font-bold text-xl text-center tracking-widest uppercase outline-none transition-all duration-200 mb-4"
+          className="w-full px-5 py-4 rounded-2xl font-display font-bold text-xl text-center tracking-widest uppercase outline-none transition-all duration-200 mb-4 mt-5"
           style={{ border: error ? "3px solid #f87171" : "3px solid hsl(var(--paradise-sky)/0.5)", background: error ? "#fef2f2" : "hsl(var(--paradise-sky)/0.07)" }}
           type="text"
           placeholder="e.g. ELSA123"
@@ -64,10 +78,12 @@ const LoginScreen = () => {
           style={{ background: "linear-gradient(135deg, hsl(var(--paradise-coral)), hsl(var(--paradise-pink)), hsl(var(--paradise-purple)))", boxShadow: "0 8px 25px rgba(0,0,0,0.15)" }}
         >
           {loading ? "Checking... ✨" : "Enter Portal →"}
+          {!loading && <ZHwhite size="0.7em">進入入口</ZHwhite>}
         </button>
 
         {error && <p className="mt-4 text-red-500 font-body text-sm">{error}</p>}
         <p className="mt-6 text-xs text-muted-foreground font-body">Don't know your code? Message us on Line! 💬</p>
+        <ZH size="0.75em">不知道密碼嗎？在Line上傳訊息給我們！</ZH>
       </div>
     </div>
   );
@@ -134,7 +150,11 @@ const Dashboard = () => {
         </div>
         <button onClick={() => { logout(); navigate("/portal"); }}
           className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white font-body font-semibold text-sm px-4 py-2 rounded-full transition-all duration-200">
-          <LogOut className="w-4 h-4" /> Sign Out
+          <LogOut className="w-4 h-4" />
+          <div>
+            <div>Sign Out</div>
+            <div style={{fontSize:"0.65em", opacity:0.8}}>登出</div>
+          </div>
         </button>
       </nav>
 
@@ -148,7 +168,13 @@ const Dashboard = () => {
         <h1 className="font-display font-bold text-4xl text-white drop-shadow-lg mb-1 relative z-10">
           Welcome, {family.familyName} family! 👋
         </h1>
+        <div className="relative z-10" style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"1.1rem", color:"rgba(255,255,255,0.8)", marginBottom:"0.25rem"}}>
+          歡迎，{family.familyName}家！
+        </div>
         <p className="font-body text-white/80 text-sm relative z-10">My Paradise English Academy — Family Portal</p>
+        <div className="relative z-10" style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.8rem", color:"rgba(255,255,255,0.6)"}}>
+          天堂英語學院 — 家庭入口
+        </div>
       </div>
 
       {/* Cards */}
@@ -156,27 +182,35 @@ const Dashboard = () => {
 
         {family.students.map((student) => (
           <div key={student.name} className="card-fun p-6">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-1">
               <Trophy className="w-5 h-5 text-paradise-yellow" />
               <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Latest Evaluation</span>
             </div>
+            <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.4)", marginBottom:"0.5rem"}}>最新評估</div>
             <h3 className="font-display font-bold text-xl text-paradise-coral mb-3">📋 {student.name}</h3>
             {evals[student.name] ? (
               <>
                 <p className="font-body text-sm leading-relaxed text-foreground/80">{evals[student.name].text}</p>
                 <p className="font-body text-xs text-muted-foreground mt-3">Received: {evals[student.name].date}</p>
+                <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.7rem", color:"rgba(0,0,0,0.35)"}}>收到日期：{evals[student.name].date}</div>
               </>
             ) : (
-              <p className="font-body text-sm text-muted-foreground italic">No evaluation yet — check back after your next milestone! 🌟</p>
+              <>
+                <p className="font-body text-sm text-muted-foreground italic">No evaluation yet — check back after your next milestone! 🌟</p>
+                <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.35)", marginTop:"0.25rem"}}>還沒有評估 — 下次里程碑後再來看看！</div>
+              </>
             )}
           </div>
         ))}
 
         {/* World buttons */}
         <div className="card-fun p-6 flex flex-col items-center justify-center gap-5">
-          <div className="flex items-center gap-2 self-start">
-            <Star className="w-5 h-5 text-paradise-yellow fill-paradise-yellow" />
-            <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Student World</span>
+          <div className="flex flex-col items-start self-start gap-0.5">
+            <div className="flex items-center gap-2">
+              <Star className="w-5 h-5 text-paradise-yellow fill-paradise-yellow" />
+              <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Student World</span>
+            </div>
+            <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.4)", marginLeft:"1.75rem"}}>學生世界</div>
           </div>
           {family.students.map((student) => (
             <div key={student.name} className="text-center w-full">
@@ -189,22 +223,25 @@ const Dashboard = () => {
                 🌴 {student.name}'s World
                 <span className="absolute -top-2 right-3 text-lg" style={{ animation: "sparkleAnim 2s ease-in-out infinite 0.7s" }}>✨</span>
               </button>
-              <p className="font-body text-xs text-muted-foreground mt-2">Click to visit {student.name}'s creature world!</p>
+              <p className="font-body text-xs text-muted-foreground mt-1">Click to visit {student.name}'s creature world!</p>
+              <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.35)"}}>點擊進入{student.name}的動物世界！</div>
             </div>
           ))}
         </div>
 
         {/* Homework */}
         <div className="card-fun p-6 md:col-span-2">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-1">
             <BookOpen className="w-5 h-5 text-paradise-sky" />
             <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Homework</span>
           </div>
-          <h3 className="font-display font-bold text-xl text-paradise-purple mb-4">📚 Submit Homework</h3>
+          <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.4)", marginBottom:"0.5rem"}}>作業</div>
+          <h3 className="font-display font-bold text-xl text-paradise-purple mb-1">📚 Submit Homework</h3>
+          <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.85rem", color:"rgba(0,0,0,0.45)", marginBottom:"1rem"}}>提交作業</div>
           <textarea
             className="w-full min-h-28 px-4 py-3 rounded-2xl font-body text-sm outline-none transition-all duration-200 resize-y mb-3"
             style={{ border: "2px solid hsl(var(--paradise-sky)/0.4)" }}
-            placeholder="Paste or type your child's homework here..."
+            placeholder="Paste or type your child's homework here... / 在這裡輸入孩子的作業..."
             value={hwText}
             onChange={(e) => { setHwText(e.target.value); setHwSent(false); }}
           />
@@ -212,22 +249,30 @@ const Dashboard = () => {
             className="py-3 px-6 rounded-2xl font-display font-bold text-white text-sm transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, hsl(var(--paradise-sky)), hsl(var(--paradise-purple)))" }}>
             {hwLoading ? "Sending... ✨" : "Send to Teacher →"}
+            <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.7em", opacity:0.85}}>{hwLoading ? "傳送中..." : "傳給老師"}</div>
           </button>
-          {hwSent && <p className="font-body text-sm mt-3 text-paradise-teal">✅ Homework sent! We'll review it soon.</p>}
+          {hwSent && (
+            <>
+              <p className="font-body text-sm mt-3 text-paradise-teal">✅ Homework sent! We'll review it soon.</p>
+              <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.75rem", color:"rgba(0,0,0,0.45)", marginTop:"0.2rem"}}>✅ 作業已送出！我們很快會看。</div>
+            </>
+          )}
         </div>
 
         {/* Schedule change */}
         <div className="card-fun p-6 md:col-span-2">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-1">
             <Calendar className="w-5 h-5 text-paradise-coral" />
             <span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Schedule</span>
           </div>
-          <h3 className="font-display font-bold text-xl text-paradise-coral mb-4">📆 Request a Schedule Change</h3>
+          <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.72rem", color:"rgba(0,0,0,0.4)", marginBottom:"0.5rem"}}>課程時間</div>
+          <h3 className="font-display font-bold text-xl text-paradise-coral mb-1">📆 Request a Schedule Change</h3>
+          <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.85rem", color:"rgba(0,0,0,0.45)", marginBottom:"1rem"}}>請求更改課程時間</div>
           <input
             className="w-full px-4 py-3 rounded-2xl font-body text-sm outline-none transition-all duration-200 mb-3"
             style={{ border: "2px solid hsl(var(--paradise-coral)/0.4)" }}
             type="text"
-            placeholder="e.g. Can we move Tuesday's class to Thursday this week?"
+            placeholder="e.g. Can we move Tuesday's class to Thursday? / 可以把週二的課改到週四嗎？"
             value={request}
             onChange={(e) => { setRequest(e.target.value); setRequestSent(false); }}
           />
@@ -235,14 +280,21 @@ const Dashboard = () => {
             className="py-3 px-6 rounded-2xl font-display font-bold text-white text-sm transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
             style={{ background: "linear-gradient(135deg, hsl(var(--paradise-coral)), hsl(var(--paradise-pink)))" }}>
             Send Request →
+            <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.7em", opacity:0.85}}>送出請求</div>
           </button>
-          {requestSent && <p className="font-body text-sm mt-3 text-paradise-teal">✅ Request sent! We'll get back to you on Line. 💬</p>}
+          {requestSent && (
+            <>
+              <p className="font-body text-sm mt-3 text-paradise-teal">✅ Request sent! We'll get back to you on Line. 💬</p>
+              <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.75rem", color:"rgba(0,0,0,0.45)", marginTop:"0.2rem"}}>✅ 請求已送出！我們會在Line上回覆你。</div>
+            </>
+          )}
         </div>
 
       </div>
 
       <div className="text-center py-6 font-body text-xs text-muted-foreground">
         🌴 My Paradise English Academy · Learning is an Adventure!
+        <div style={{fontFamily:"Noto Sans TC, sans-serif", fontSize:"0.9em", marginTop:"0.2rem"}}>天堂英語學院 · 學習是一場冒險！</div>
       </div>
 
       <style>{`
