@@ -11,12 +11,11 @@ export interface Family {
   code: string;
   familyName: string;
   students: Student[];
-  book: number;
 }
 
 interface AuthContextType {
   family: Family | null;
-  login: (code: string, familiesData: any[]) => boolean;
+  login: (code: string, familiesData: Family[]) => boolean;
   logout: () => void;
   isLoggedIn: boolean;
 }
@@ -36,27 +35,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const login = (code: string, familiesData: any[]): boolean => {
-    const rows = familiesData.filter(
-      (f) => f.code.toUpperCase() === code.toUpperCase().trim()
-    );
-    if (rows.length > 0) {
-      const family: Family = {
-        code: rows[0].code,
-        familyName: rows[0].familyName,
-        book: parseInt(rows[0].book, 10) || 1,
-        students: rows.map((r) => ({
-          name: r.students,
-          unit: r.unit || "",
-          treats: 0,
-          badges: []
-        }))
-      };
-      setFamily(family);
-      sessionStorage.setItem("mpe_family", JSON.stringify(family));
-      return true;
-    }
-    return false;
-  };
+  const rows = familiesData.filter(
+    (f) => f.code.toUpperCase() === code.toUpperCase().trim()
+  );
+  if (rows.length > 0) {
+    const family: Family = {
+      code: rows[0].code,
+      familyName: rows[0].familyName,
+      students: rows.map((r) => ({
+        name: r.students,
+        unit: r.unit || "",
+        treats: 0,
+        badges: []
+      }))
+    };
+    setFamily(family);
+    sessionStorage.setItem("mpe_family", JSON.stringify(family));
+    return true;
+  }
+  return false;
+};
 
   const logout = () => {
     setFamily(null);

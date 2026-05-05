@@ -5,7 +5,68 @@
     "bigQuestion": "How do people have fun?",
     "vocabulary": {
       "topic": "Sports and Leisure",
-      "words": ["festival", "folk dance", "wedding", "family reunion", "fair", "race", "team", "winner", "score", "player"]
+      "words": [
+        {
+          "word": "festival",
+          "definition_en": "A special celebration with fun activities.",
+          "definition_zh": "節日",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "folk dance",
+          "definition_en": "Traditional dancing by groups of people.",
+          "definition_zh": "民族舞蹈",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "wedding",
+          "definition_en": "When two people get married ceremony.",
+          "definition_zh": "婚禮",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "family reunion",
+          "definition_en": "When family members gather together again.",
+          "definition_zh": "家庭團聚",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "fair",
+          "definition_en": "Outdoor event with games and food.",
+          "definition_zh": "園遊會",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "race",
+          "definition_en": "Competition to see who is fastest.",
+          "definition_zh": "競賽",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "team",
+          "definition_en": "Group of people working together.",
+          "definition_zh": "隊伍",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "winner",
+          "definition_en": "Person who comes first in competition.",
+          "definition_zh": "贏家",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "score",
+          "definition_en": "Points earned in game or competition.",
+          "definition_zh": "分數",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "player",
+          "definition_en": "Person who plays game or sport.",
+          "definition_zh": "運動員",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Adjectives with -ed and -ing",
@@ -19,7 +80,14 @@
         "Adjectives that end in -ed tell about how we feel.",
         "Adjectives that end in -ing usually tell about a thing, such as a game or a movie."
       ],
-      "choices": ["bored", "boring", "interested", "interesting", "excited", "exciting"]
+      "choices": [
+        "bored",
+        "boring",
+        "interested",
+        "interesting",
+        "excited",
+        "exciting"
+      ]
     }
   },
   {
@@ -28,7 +96,68 @@
     "bigQuestion": "How do people have fun?",
     "vocabulary": {
       "topic": "Sports and Leisure, The World Around Us",
-      "words": ["kick", "tag", "skip", "bounce", "drop", "plain", "lake", "canyon", "cliff", "stream"]
+      "words": [
+        {
+          "word": "kick",
+          "definition_en": "Hit something with your foot.",
+          "definition_zh": "用腳踢某東西",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "tag",
+          "definition_en": "A game where one person chases others.",
+          "definition_zh": "捉迷藏遊戲",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "skip",
+          "definition_en": "Jump over a rope going round and round.",
+          "definition_zh": "跳過轉動的繩子",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "bounce",
+          "definition_en": "Jump up and down repeatedly quickly.",
+          "definition_zh": "重複快速上下跳動",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "drop",
+          "definition_en": "Let something fall to the ground.",
+          "definition_zh": "讓某東西掉到地上",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "plain",
+          "definition_en": "A large flat area with few trees.",
+          "definition_zh": "有很少樹的大平坦地區",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "lake",
+          "definition_en": "A large body of water surrounded by land.",
+          "definition_zh": "被陸地包圍的大水體",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "canyon",
+          "definition_en": "A deep valley with high rocky sides.",
+          "definition_zh": "有高岩石兩側的深山谷",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "cliff",
+          "definition_en": "A very steep high face of rock.",
+          "definition_zh": "非常陡峭的高岩石面",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "stream",
+          "definition_en": "A small river that flows through land.",
+          "definition_zh": "流過陸地的小河",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Gerunds",
@@ -41,7 +170,15 @@
       "rules": [
         "When you add -ing to a verb, it can act like a noun. It's called a gerund."
       ],
-      "choices": ["skipping", "landing", "running", "jumping", "bouncing", "kicking", "dancing"]
+      "choices": [
+        "skipping",
+        "landing",
+        "running",
+        "jumping",
+        "bouncing",
+        "kicking",
+        "dancing"
+      ]
     }
   },
   {
@@ -50,7 +187,68 @@
     "bigQuestion": "Why do people move?",
     "vocabulary": {
       "topic": "Sports and Leisure, Moving",
-      "words": ["packing", "moving", "meeting neighbors", "shopping", "ice skating", "fishing", "raking leaves", "dancing", "throwing snowballs", "sledding"]
+      "words": [
+        {
+          "word": "packing",
+          "definition_en": "Putting things into bags or boxes.",
+          "definition_zh": "把东西放进袋子或盒子里",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "moving",
+          "definition_en": "Going to live in a new house.",
+          "definition_zh": "搬到一个新房子住",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "meeting neighbors",
+          "definition_en": "Saying hello to people who live near you.",
+          "definition_zh": "和住在你附近的人打招呼",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "shopping",
+          "definition_en": "Buying things you need at a store.",
+          "definition_zh": "在商店购买你需要的东西",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "ice skating",
+          "definition_en": "Sliding on ice wearing special shoes.",
+          "definition_zh": "穿着特殊鞋子在冰上滑行",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "fishing",
+          "definition_en": "Trying to catch fish in water.",
+          "definition_zh": "试图在水中抓鱼",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "raking leaves",
+          "definition_en": "Gathering fallen leaves with a rake tool.",
+          "definition_zh": "用耙子把落下的叶子聚集起来",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "dancing",
+          "definition_en": "Moving your body to music in rhythm.",
+          "definition_zh": "随着音乐有节奏地移动你的身体",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "throwing snowballs",
+          "definition_en": "Tossing balls of snow at people playfully.",
+          "definition_zh": "好玩地把雪球扔向别人",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "sledding",
+          "definition_en": "Sliding down snowy hills on a sled.",
+          "definition_zh": "坐在雪橇上滑下雪山",
+          "part_of_speech": "v."
+        }
+      ]
     },
     "grammar": {
       "point": "Can and Could",
@@ -64,7 +262,12 @@
         "Can tells us what someone knows how to do now, in the present.",
         "Could tells us what someone knew how to do before, in the past."
       ],
-      "choices": ["can", "can't", "could", "couldn't"]
+      "choices": [
+        "can",
+        "can't",
+        "could",
+        "couldn't"
+      ]
     }
   },
   {
@@ -73,7 +276,68 @@
     "bigQuestion": "Why do people move?",
     "vocabulary": {
       "topic": "Places",
-      "words": ["country", "suburb", "rural area", "urban area", "shopping mall", "university", "hospital", "factory", "clinic", "zoo"]
+      "words": [
+        {
+          "word": "country",
+          "definition_en": "A large land with its own government.",
+          "definition_zh": "國家",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "suburb",
+          "definition_en": "Quiet area near a big city with houses.",
+          "definition_zh": "郊區",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "rural area",
+          "definition_en": "Countryside with farms and very few people.",
+          "definition_zh": "鄉村地區",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "urban area",
+          "definition_en": "Busy city with many buildings and people.",
+          "definition_zh": "城市地區",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "shopping mall",
+          "definition_en": "Big building with many stores inside.",
+          "definition_zh": "購物商場",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "university",
+          "definition_en": "School for adults to learn and study.",
+          "definition_zh": "大學",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "hospital",
+          "definition_en": "Place where sick people get medical help.",
+          "definition_zh": "醫院",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "factory",
+          "definition_en": "Building where machines make products.",
+          "definition_zh": "工廠",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "clinic",
+          "definition_en": "Small place where doctors treat sick people.",
+          "definition_zh": "診所",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "zoo",
+          "definition_en": "Place where wild animals live and people visit.",
+          "definition_zh": "動物園",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Present Real Conditional",
@@ -87,7 +351,10 @@
         "Something that happens can cause something else to happen.",
         "Use if or when to describe an event that causes a second event."
       ],
-      "choices": ["if", "when"]
+      "choices": [
+        "if",
+        "when"
+      ]
     }
   },
   {
@@ -96,7 +363,68 @@
     "bigQuestion": "Why do people write poems?",
     "vocabulary": {
       "topic": "Insects, The World Around Us",
-      "words": ["ladybug", "cricket", "grasshopper", "beetle", "katydid", "bee", "butterfly", "thicket", "kangaroo", "raisin"]
+      "words": [
+        {
+          "word": "ladybug",
+          "definition_en": "Small red insect with black spots.",
+          "definition_zh": "瓢蟲",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "cricket",
+          "definition_en": "Jumping insect that makes chirping sounds.",
+          "definition_zh": "蟋蟀",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "grasshopper",
+          "definition_en": "Green jumping insect that eats plants.",
+          "definition_zh": "蝗蟲",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "beetle",
+          "definition_en": "Hard-bodied insect with shiny shell.",
+          "definition_zh": "甲蟲",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "katydid",
+          "definition_en": "Green insect that looks like grasshopper.",
+          "definition_zh": "螽斯",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "bee",
+          "definition_en": "Insect that makes honey and pollinates flowers.",
+          "definition_zh": "蜜蜂",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "butterfly",
+          "definition_en": "Colorful insect with four large wings.",
+          "definition_zh": "蝴蝶",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "thicket",
+          "definition_en": "Dense group of bushes and small trees.",
+          "definition_zh": "灌木叢",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "kangaroo",
+          "definition_en": "Large jumping animal from Australia.",
+          "definition_zh": "袋鼠",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "raisin",
+          "definition_en": "Small dried grape that is sweet.",
+          "definition_zh": "葡萄乾",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Past Continuous",
@@ -110,7 +438,13 @@
         "The past continuous tells what was going on at a certain time in the past.",
         "Use was or were plus a verb ending in -ing."
       ],
-      "choices": ["was playing", "were watching", "was riding", "was reading", "was eating"]
+      "choices": [
+        "was playing",
+        "were watching",
+        "was riding",
+        "was reading",
+        "was eating"
+      ]
     }
   },
   {
@@ -119,7 +453,68 @@
     "bigQuestion": "Why do people write poems?",
     "vocabulary": {
       "topic": "Animals, Language Terms",
-      "words": ["sentence", "rhyming words", "verb", "noun", "adjective", "syllable", "letter", "robin", "angelfish", "snowflakes"]
+      "words": [
+        {
+          "word": "sentence",
+          "definition_en": "A group of words that tells complete thought.",
+          "definition_zh": "句子",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "rhyming words",
+          "definition_en": "Words that sound the same at the end.",
+          "definition_zh": "押韻的詞",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "verb",
+          "definition_en": "A word that shows an action or movement.",
+          "definition_zh": "動詞",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "noun",
+          "definition_en": "A word that names a person or thing.",
+          "definition_zh": "名詞",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "adjective",
+          "definition_en": "A word that describes how something looks.",
+          "definition_zh": "形容詞",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "syllable",
+          "definition_en": "One part of a word when you say it.",
+          "definition_zh": "音節",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "letter",
+          "definition_en": "A symbol we use to write words and sounds.",
+          "definition_zh": "字母",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "robin",
+          "definition_en": "A small bird with a red breast.",
+          "definition_zh": "知更鳥",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "angelfish",
+          "definition_en": "A colorful flat fish that lives in water.",
+          "definition_zh": "神仙魚",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "snowflakes",
+          "definition_en": "Tiny crystals of ice that fall from sky.",
+          "definition_zh": "雪花",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Past Continuous and Simple Past",
@@ -133,7 +528,13 @@
         "You can use the past continuous and the simple past in the same sentence.",
         "The simple past tells us about something that happened. The past continuous tells us what was going on when it happened."
       ],
-      "choices": ["was running", "was going", "was reading", "when", "while"]
+      "choices": [
+        "was running",
+        "was going",
+        "was reading",
+        "when",
+        "while"
+      ]
     }
   },
   {
@@ -142,7 +543,68 @@
     "bigQuestion": "How do we measure time?",
     "vocabulary": {
       "topic": "Time, The World Around Us",
-      "words": ["second", "minute", "hour", "month", "year", "noon", "spin", "orbit", "time zone", "multiply"]
+      "words": [
+        {
+          "word": "second",
+          "definition_en": "A very short amount of time.",
+          "definition_zh": "秒",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "minute",
+          "definition_en": "Sixty seconds of time passing.",
+          "definition_zh": "分鐘",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "hour",
+          "definition_en": "Sixty minutes of time passing.",
+          "definition_zh": "小時",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "month",
+          "definition_en": "About four weeks of time.",
+          "definition_zh": "月份",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "year",
+          "definition_en": "Twelve months or 365 days.",
+          "definition_zh": "年",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "noon",
+          "definition_en": "Twelve o'clock in the daytime.",
+          "definition_zh": "正午",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "spin",
+          "definition_en": "To turn around and around quickly.",
+          "definition_zh": "旋轉",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "orbit",
+          "definition_en": "To travel in a circle around something.",
+          "definition_zh": "軌道",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "time zone",
+          "definition_en": "Areas where clocks show different times.",
+          "definition_zh": "時區",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "multiply",
+          "definition_en": "To add a number many times together.",
+          "definition_zh": "乘法",
+          "part_of_speech": "v."
+        }
+      ]
     },
     "grammar": {
       "point": "Future Facts with Will",
@@ -156,7 +618,12 @@
         "Use will to talk about future facts.",
         "Remember, a fact is something that is true."
       ],
-      "choices": ["will", "won't", "will be", "won't be"]
+      "choices": [
+        "will",
+        "won't",
+        "will be",
+        "won't be"
+      ]
     }
   },
   {
@@ -165,7 +632,68 @@
     "bigQuestion": "How do we measure time?",
     "vocabulary": {
       "topic": "The World Around Us, Health",
-      "words": ["airport", "passenger", "passport", "destination", "sick", "earache", "headache", "fever", "doctor", "medicine"]
+      "words": [
+        {
+          "word": "airport",
+          "definition_en": "Place where airplanes take off and land.",
+          "definition_zh": "機場",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "passenger",
+          "definition_en": "Person traveling on a plane or vehicle.",
+          "definition_zh": "乘客",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "passport",
+          "definition_en": "Special book needed to travel to countries.",
+          "definition_zh": "護照",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "destination",
+          "definition_en": "The place you are going to visit.",
+          "definition_zh": "目的地",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sick",
+          "definition_en": "Not feeling well or healthy in body.",
+          "definition_zh": "生病",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "earache",
+          "definition_en": "Pain or hurt inside your ear area.",
+          "definition_zh": "耳痛",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "headache",
+          "definition_en": "Pain or hurt in your head area.",
+          "definition_zh": "頭痛",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "fever",
+          "definition_en": "When your body temperature gets too hot.",
+          "definition_zh": "發燒",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "doctor",
+          "definition_en": "Person who helps sick people feel better.",
+          "definition_zh": "醫生",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "medicine",
+          "definition_en": "Special liquid or pills to make you healthy.",
+          "definition_zh": "藥物",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Future Plans with Going to",
@@ -179,7 +707,12 @@
         "You can use going to to talk about a plan for the future.",
         "The plan was made before the speaker talks about it."
       ],
-      "choices": ["is going to", "are going to", "am going to", "going to"]
+      "choices": [
+        "is going to",
+        "are going to",
+        "am going to",
+        "going to"
+      ]
     }
   },
   {
@@ -188,7 +721,68 @@
     "bigQuestion": "Where does energy come from?",
     "vocabulary": {
       "topic": "The World Around Us",
-      "words": ["windmill", "sailboat", "wind turbine", "wind farm", "coal", "oil", "natural gas", "pollution", "power plant", "electricity"]
+      "words": [
+        {
+          "word": "windmill",
+          "definition_en": "Machine with blades that spin in the wind.",
+          "definition_zh": "風車",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sailboat",
+          "definition_en": "Boat that uses wind to push it forward.",
+          "definition_zh": "帆船",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wind turbine",
+          "definition_en": "Tall machine that catches wind to make power.",
+          "definition_zh": "風力渦輪機",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wind farm",
+          "definition_en": "Many wind turbines together making electricity.",
+          "definition_zh": "風力發電場",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "coal",
+          "definition_en": "Black rock from ground we burn for energy.",
+          "definition_zh": "煤",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "oil",
+          "definition_en": "Thick liquid from ground we use for fuel.",
+          "definition_zh": "石油",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "natural gas",
+          "definition_en": "Invisible fuel from ground we burn for heat.",
+          "definition_zh": "天然氣",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "pollution",
+          "definition_en": "Dirty air, water, or soil that harms nature.",
+          "definition_zh": "污染",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "power plant",
+          "definition_en": "Big factory that makes electricity for cities.",
+          "definition_zh": "發電廠",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "electricity",
+          "definition_en": "Power that lights our homes and runs machines.",
+          "definition_zh": "電力",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "May and Might",
@@ -201,7 +795,12 @@
       "rules": [
         "You can use may or might to talk about something when you are not sure it will happen."
       ],
-      "choices": ["may", "might", "may not", "might not"]
+      "choices": [
+        "may",
+        "might",
+        "may not",
+        "might not"
+      ]
     }
   },
   {
@@ -210,7 +809,68 @@
     "bigQuestion": "Where does energy come from?",
     "vocabulary": {
       "topic": "Transportation",
-      "words": ["subway", "fire engine", "carpool", "ambulance", "escalator", "train", "taxi", "elevator", "helicopter", "traffic jam"]
+      "words": [
+        {
+          "word": "subway",
+          "definition_en": "Underground train that moves people around cities.",
+          "definition_zh": "地下鐵路運送城市裡的人",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "fire engine",
+          "definition_en": "Big red truck that puts out fires.",
+          "definition_zh": "大紅車用水滅火",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "carpool",
+          "definition_en": "Group shares one car to same place.",
+          "definition_zh": "一群人共用一輛車去同一地方",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "ambulance",
+          "definition_en": "Special vehicle that helps sick or hurt people.",
+          "definition_zh": "幫助生病或受傷的人的車",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "escalator",
+          "definition_en": "Moving stairs that go up and down.",
+          "definition_zh": "會動上下的樓梯",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "train",
+          "definition_en": "Long vehicle on tracks carrying many people.",
+          "definition_zh": "在軌道上運送很多人的長車",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "taxi",
+          "definition_en": "Car you pay to ride to different places.",
+          "definition_zh": "付錢乘坐去不同地方的車",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "elevator",
+          "definition_en": "Machine that moves people up and down buildings.",
+          "definition_zh": "在建築物上下移動人的機器",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "helicopter",
+          "definition_en": "Aircraft with spinning blades that flies high.",
+          "definition_zh": "有旋轉葉片會飛的飛行器",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "traffic jam",
+          "definition_en": "Lots of cars stuck and moving very slowly.",
+          "definition_zh": "很多車卡住動得很慢",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Quantifiers",
@@ -225,7 +885,12 @@
         "Use a few to describe a small amount of something you can count, such as cars.",
         "Use a lot of or lots of to describe a big amount of something we can or cannot count."
       ],
-      "choices": ["a little", "a few", "a lot of", "lots of"]
+      "choices": [
+        "a little",
+        "a few",
+        "a lot of",
+        "lots of"
+      ]
     }
   },
   {
@@ -234,7 +899,68 @@
     "bigQuestion": "How do people make music?",
     "vocabulary": {
       "topic": "Musical Instruments, Work",
-      "words": ["cello", "timpani", "trombone", "bassoon", "orchestra", "conductor", "baton", "astronaut", "circus trainer", "scientist"]
+      "words": [
+        {
+          "word": "cello",
+          "definition_en": "Large stringed instrument played with a bow.",
+          "definition_zh": "大提琴",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "timpani",
+          "definition_en": "Large drums played with special sticks.",
+          "definition_zh": "定音鼓",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "trombone",
+          "definition_en": "Brass instrument with sliding tube sound.",
+          "definition_zh": "長號",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "bassoon",
+          "definition_en": "Tall wooden instrument with deep sound.",
+          "definition_zh": "低音管",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "orchestra",
+          "definition_en": "Large group of musicians playing together.",
+          "definition_zh": "管弦樂團",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "conductor",
+          "definition_en": "Person who leads musicians with baton.",
+          "definition_zh": "指揮家",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "baton",
+          "definition_en": "Thin stick used to lead musicians.",
+          "definition_zh": "指揮棒",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "astronaut",
+          "definition_en": "Person who travels and works in space.",
+          "definition_zh": "太空人",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "circus trainer",
+          "definition_en": "Person who teaches animals circus tricks.",
+          "definition_zh": "馬戲團訓練員",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "scientist",
+          "definition_en": "Person who studies and discovers new things.",
+          "definition_zh": "科學家",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Comparative and Superlative Adjectives",
@@ -249,7 +975,13 @@
         "Use superlative adjectives to talk about three or more things.",
         "Add -er/-est for short adjectives; use more/most for longer adjectives."
       ],
-      "choices": ["louder", "the loudest", "more talented", "more important", "the most wonderful"]
+      "choices": [
+        "louder",
+        "the loudest",
+        "more talented",
+        "more important",
+        "the most wonderful"
+      ]
     }
   },
   {
@@ -258,7 +990,68 @@
     "bigQuestion": "How do people make music?",
     "vocabulary": {
       "topic": "Musical Instruments",
-      "words": ["zummara", "flute", "djembe", "tuba", "panpipes", "violin", "didgeridoo", "snare drum", "erhu", "clarinet"]
+      "words": [
+        {
+          "word": "zummara",
+          "definition_en": "Double pipe wind instrument from Middle East.",
+          "definition_zh": "中東雙管樂器",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "flute",
+          "definition_en": "Long thin instrument you blow into.",
+          "definition_zh": "長笛",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "djembe",
+          "definition_en": "African drum shaped like a goblet.",
+          "definition_zh": "非洲鼓",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "tuba",
+          "definition_en": "Big brass instrument that sounds low.",
+          "definition_zh": "大號",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "panpipes",
+          "definition_en": "Instrument made of pipes tied together.",
+          "definition_zh": "排簫",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "violin",
+          "definition_en": "Small stringed instrument played with bow.",
+          "definition_zh": "小提琴",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "didgeridoo",
+          "definition_en": "Long wooden instrument from Australia.",
+          "definition_zh": "迪吉里杜管",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "snare drum",
+          "definition_en": "Drum with wires that makes sharp sound.",
+          "definition_zh": "小鼓",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "erhu",
+          "definition_en": "Chinese stringed instrument played with bow.",
+          "definition_zh": "二胡",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "clarinet",
+          "definition_en": "Wooden instrument you blow into gently.",
+          "definition_zh": "單簧管",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Comparative Adjectives with As",
@@ -272,7 +1065,13 @@
         "Use as + adjective + as to compare things that are the same in one way.",
         "Use not + as + adjective + as to compare things that are different in one way."
       ],
-      "choices": ["as loud as", "as long as", "as low as", "not as curved as", "not as long as"]
+      "choices": [
+        "as loud as",
+        "as long as",
+        "as low as",
+        "not as curved as",
+        "not as long as"
+      ]
     }
   },
   {
@@ -281,7 +1080,68 @@
     "bigQuestion": "How do inventions change our lives?",
     "vocabulary": {
       "topic": "Tools, Inventions",
-      "words": ["lever", "ramp", "wedge", "screw", "wheel and axle", "light bulb", "doorknob", "slide", "axe", "seesaw"]
+      "words": [
+        {
+          "word": "lever",
+          "definition_en": "A bar that helps lift heavy things.",
+          "definition_zh": "幫助舉起重物的棒子",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "ramp",
+          "definition_en": "A sloped surface for moving things up.",
+          "definition_zh": "用來上升移動物品的斜面",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wedge",
+          "definition_en": "A triangle shape that splits things apart.",
+          "definition_zh": "三角形物體用來分開東西",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "screw",
+          "definition_en": "A twisty fastener that holds things together.",
+          "definition_zh": "旋轉的螺釘用來固定東西",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wheel and axle",
+          "definition_en": "A round wheel that spins on a rod.",
+          "definition_zh": "圓形車輪在軸上旋轉",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "light bulb",
+          "definition_en": "A glass bulb that makes light when on.",
+          "definition_zh": "打開時發光的玻璃球",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "doorknob",
+          "definition_en": "A round handle you turn to open doors.",
+          "definition_zh": "轉動打開門的圓形把手",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "slide",
+          "definition_en": "A smooth slope you slide down for fun.",
+          "definition_zh": "光滑的斜坡可以滑下來玩",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "axe",
+          "definition_en": "A tool with sharp blade for chopping wood.",
+          "definition_zh": "用來砍木頭的銳刀工具",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "seesaw",
+          "definition_en": "A plank that goes up and down with two people.",
+          "definition_zh": "兩個人可以上下搖動的木板",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Too and Either",
@@ -295,7 +1155,10 @@
         "Use too to agree with something positive (for example, with is).",
         "Use either to agree with something negative (for example, with isn't)."
       ],
-      "choices": ["too", "either"]
+      "choices": [
+        "too",
+        "either"
+      ]
     }
   },
   {
@@ -304,7 +1167,68 @@
     "bigQuestion": "How do inventions change our lives?",
     "vocabulary": {
       "topic": "Materials, Work",
-      "words": ["eyeglasses", "vase", "furnace", "wire", "workshop", "frames", "glass", "glassblower", "glassware", "pitcher"]
+      "words": [
+        {
+          "word": "eyeglasses",
+          "definition_en": "Special frames with glass to help you see.",
+          "definition_zh": "眼鏡",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "vase",
+          "definition_en": "A container used for holding flowers.",
+          "definition_zh": "花瓶",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "furnace",
+          "definition_en": "A very hot machine that heats things.",
+          "definition_zh": "熔爐",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wire",
+          "definition_en": "A thin metal thread that conducts electricity.",
+          "definition_zh": "電線",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "workshop",
+          "definition_en": "A place where people make things with tools.",
+          "definition_zh": "工作坊",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "frames",
+          "definition_en": "The outer part that holds eyeglass lenses.",
+          "definition_zh": "眼鏡框",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "glass",
+          "definition_en": "Clear hard material used in windows.",
+          "definition_zh": "玻璃",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "glassblower",
+          "definition_en": "A person who makes things from hot glass.",
+          "definition_zh": "玻璃吹製工人",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "glassware",
+          "definition_en": "Dishes and cups made of glass material.",
+          "definition_zh": "玻璃製品",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "pitcher",
+          "definition_en": "A container with a handle for pouring liquids.",
+          "definition_zh": "水罐",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Comparative and Superlative Adverbs",
@@ -319,7 +1243,13 @@
         "An adverb describes an action.",
         "Add -er/-est for short adverbs; use more/most for longer adverbs."
       ],
-      "choices": ["faster than", "the fastest", "more carefully than", "the most carefully", "later than"]
+      "choices": [
+        "faster than",
+        "the fastest",
+        "more carefully than",
+        "the most carefully",
+        "later than"
+      ]
     }
   },
   {
@@ -328,7 +1258,68 @@
     "bigQuestion": "Why do we need plants?",
     "vocabulary": {
       "topic": "Plants, The World Around Us",
-      "words": ["soil", "seeds", "roots", "stem", "leaves", "petals", "nectar", "pollen", "oxygen", "humans"]
+      "words": [
+        {
+          "word": "soil",
+          "definition_en": "Dirt where plants grow their roots.",
+          "definition_zh": "植物生長的土壤",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "seeds",
+          "definition_en": "Tiny objects that grow into plants.",
+          "definition_zh": "種子",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "roots",
+          "definition_en": "Plant parts underground that drink water.",
+          "definition_zh": "根",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "stem",
+          "definition_en": "The main stalk holding up the plant.",
+          "definition_zh": "莖",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "leaves",
+          "definition_en": "Flat green parts that make plant food.",
+          "definition_zh": "葉子",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "petals",
+          "definition_en": "Colorful parts that make flowers pretty.",
+          "definition_zh": "花瓣",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "nectar",
+          "definition_en": "Sweet juice inside flowers that bees drink.",
+          "definition_zh": "花蜜",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "pollen",
+          "definition_en": "Yellow dust that helps make new seeds.",
+          "definition_zh": "花粉",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "oxygen",
+          "definition_en": "Air gas that all living things need.",
+          "definition_zh": "氧氣",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "humans",
+          "definition_en": "People like you and your family.",
+          "definition_zh": "人類",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Measure Words",
@@ -342,7 +1333,15 @@
         "Use measure words to count things that we can't count, such as soil and water.",
         "Use measure words to count larger numbers of things we can count, such as seeds and apples."
       ],
-      "choices": ["bag", "cup", "box", "jar", "loaf", "bottle", "kilogram"]
+      "choices": [
+        "bag",
+        "cup",
+        "box",
+        "jar",
+        "loaf",
+        "bottle",
+        "kilogram"
+      ]
     }
   },
   {
@@ -351,7 +1350,68 @@
     "bigQuestion": "Why do we need plants?",
     "vocabulary": {
       "topic": "Places, The World Around Us",
-      "words": ["gardener", "sweet potato", "beans", "vines", "garden", "haze", "teenagers", "community", "crowd", "shopping cart"]
+      "words": [
+        {
+          "word": "gardener",
+          "definition_en": "Person who grows plants and flowers.",
+          "definition_zh": "園丁",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sweet potato",
+          "definition_en": "Orange root vegetable that tastes sweet.",
+          "definition_zh": "番薯",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "beans",
+          "definition_en": "Small seeds we eat as healthy food.",
+          "definition_zh": "豆類",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "vines",
+          "definition_en": "Plants with long stems that climb up.",
+          "definition_zh": "藤蔓",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "garden",
+          "definition_en": "Area where people grow plants and vegetables.",
+          "definition_zh": "花園",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "haze",
+          "definition_en": "Thick air that makes it hard to see.",
+          "definition_zh": "霧霾",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "teenagers",
+          "definition_en": "Young people between thirteen and nineteen.",
+          "definition_zh": "青少年",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "community",
+          "definition_en": "Group of people living in same area.",
+          "definition_zh": "社區",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "crowd",
+          "definition_en": "Large group of people standing together.",
+          "definition_zh": "人群",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "shopping cart",
+          "definition_en": "Wheeled basket for carrying store items.",
+          "definition_zh": "購物車",
+          "part_of_speech": "phrase"
+        }
+      ]
     },
     "grammar": {
       "point": "Adjectives with Prepositions",
@@ -364,7 +1424,13 @@
       "rules": [
         "Adjectives with prepositions tell how we feel about something."
       ],
-      "choices": ["curious about", "surprised at", "happy with", "excited about", "good at"]
+      "choices": [
+        "curious about",
+        "surprised at",
+        "happy with",
+        "excited about",
+        "good at"
+      ]
     }
   },
   {
@@ -373,7 +1439,68 @@
     "bigQuestion": "Why do we explore?",
     "vocabulary": {
       "topic": "Weather, The World Around Us",
-      "words": ["island", "windy", "waterfall", "clouds", "hail", "coast", "fog", "storm", "lightning", "river"]
+      "words": [
+        {
+          "word": "island",
+          "definition_en": "Land surrounded by water on all sides.",
+          "definition_zh": "島",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "windy",
+          "definition_en": "When air moves fast around you.",
+          "definition_zh": "有風的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "waterfall",
+          "definition_en": "Water falling down from high place.",
+          "definition_zh": "瀑布",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "clouds",
+          "definition_en": "White fluffy things floating in sky.",
+          "definition_zh": "雲",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "hail",
+          "definition_en": "Small balls of ice falling from sky.",
+          "definition_zh": "冰雹",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "coast",
+          "definition_en": "Place where land meets the ocean.",
+          "definition_zh": "海岸",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "fog",
+          "definition_en": "Thick cloud near ground making hard to see.",
+          "definition_zh": "霧",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "storm",
+          "definition_en": "Very bad weather with wind and rain.",
+          "definition_zh": "暴風雨",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "lightning",
+          "definition_en": "Bright flash of light during thunderstorm.",
+          "definition_zh": "閃電",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "river",
+          "definition_en": "Long stream of water flowing to ocean.",
+          "definition_zh": "河",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Prepositions of Movement",
@@ -386,7 +1513,15 @@
       "rules": [
         "Use prepositions of movement to give directions."
       ],
-      "choices": ["up", "down", "into", "out of", "to", "around", "through"]
+      "choices": [
+        "up",
+        "down",
+        "into",
+        "out of",
+        "to",
+        "around",
+        "through"
+      ]
     }
   },
   {
@@ -395,7 +1530,68 @@
     "bigQuestion": "Why do we explore?",
     "vocabulary": {
       "topic": "Animals, The World Around Us",
-      "words": ["goggles", "kelp", "penguin", "squid", "otter", "coral", "humpback whale", "dolphin", "leafy sea dragon", "octopus"]
+      "words": [
+        {
+          "word": "goggles",
+          "definition_en": "Special glasses that protect your eyes.",
+          "definition_zh": "護目鏡",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "kelp",
+          "definition_en": "Big seaweed that grows in the ocean.",
+          "definition_zh": "海帶",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "penguin",
+          "definition_en": "Black and white bird that swims very well.",
+          "definition_zh": "企鵝",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "squid",
+          "definition_en": "Ocean animal with ten long arms.",
+          "definition_zh": "魷魚",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "otter",
+          "definition_en": "Furry animal that swims in water.",
+          "definition_zh": "水獺",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "coral",
+          "definition_en": "Colorful rock-like animal in the ocean.",
+          "definition_zh": "珊瑚",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "humpback whale",
+          "definition_en": "Huge ocean animal with a bumpy back.",
+          "definition_zh": "座頭鯨",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "dolphin",
+          "definition_en": "Smart ocean animal that jumps high.",
+          "definition_zh": "海豚",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "leafy sea dragon",
+          "definition_en": "Ocean animal with leaf-like body parts.",
+          "definition_zh": "葉海龍",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "octopus",
+          "definition_en": "Sea creature with eight arms and no bones.",
+          "definition_zh": "章魚",
+          "part_of_speech": "n."
+        }
+      ]
     },
     "grammar": {
       "point": "Want to / Need to / Have to",
@@ -409,7 +1605,14 @@
         "Use want to when you have a choice to do something.",
         "Use need to or have to when you don't have a choice. You must do it."
       ],
-      "choices": ["want to", "wants to", "need to", "needs to", "have to", "has to"]
+      "choices": [
+        "want to",
+        "wants to",
+        "need to",
+        "needs to",
+        "have to",
+        "has to"
+      ]
     }
   }
 ]

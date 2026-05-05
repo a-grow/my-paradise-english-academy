@@ -1,0 +1,620 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+
+// ── tiny helpers ────────────────────────────────────────────────────────────
+const SHEETDB_FAMILIES_URL = "YOUR_SHEETDB_URL_HERE"; // replace with your SheetDB API URL for Families tab
+
+// sparkle + wobble style injected once
+const injectStyles = () => {
+  if (document.getElementById("mpe-portal-styles")) return;
+  const style = document.createElement("style");
+  style.id = "mpe-portal-styles";
+  style.textContent = `
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lora:wght@400;600&display=swap');
+
+    .portal-root {
+      font-family: 'Lora', Georgia, serif;
+      min-height: 100vh;
+      background: #fdf8f3;
+      color: #2d2a26;
+    }
+
+    .portal-nav {
+      background: white;
+      border-bottom: 1px solid #e8e0d4;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .portal-logo {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #4a7c59;
+      text-decoration: none;
+    }
+
+    .portal-logout {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.85rem;
+      color: #888;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      background: transparent;
+      transition: all 0.2s;
+    }
+    .portal-logout:hover { background: #f0ebe4; color: #555; }
+
+    /* ── LOGIN ── */
+    .login-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      padding: 2rem;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 3rem 2.5rem;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .login-palm {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-title {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.6rem;
+      color: #2d2a26;
+      margin-bottom: 0.25rem;
+    }
+
+    .login-sub {
+      color: #888;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 0.85rem 1.25rem;
+      border: 2px solid #e0d8ce;
+      border-radius: 0.75rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-align: center;
+      text-transform: uppercase;
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+      margin-bottom: 1rem;
+    }
+    .login-input:focus { border-color: #4a7c59; }
+    .login-input.error { border-color: #e05c5c; }
+
+    .login-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: #4a7c59;
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .login-btn:hover { background: #3d6b4a; transform: translateY(-1px); }
+    .login-btn:active { transform: translateY(0); }
+    .login-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    .login-error {
+      color: #e05c5c;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      margin-top: 0.75rem;
+    }
+
+    /* ── DASHBOARD ── */
+    .dashboard {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .dashboard-greeting {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.75rem;
+      color: #2d2a26;
+      margin-bottom: 0.25rem;
+    }
+
+    .dashboard-sub {
+      color: #888;
+      font-size: 0.95rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    @media (max-width: 600px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: white;
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+    }
+
+    .card-full { grid-column: 1 / -1; }
+
+    .card-label {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #aaa;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #2d2a26;
+      margin-bottom: 0.5rem;
+    }
+
+    .eval-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #555;
+      white-space: pre-wrap;
+    }
+
+    .eval-empty {
+      color: #bbb;
+      font-style: italic;
+      font-size: 0.95rem;
+    }
+
+    .eval-date {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.8rem;
+      color: #bbb;
+      margin-top: 0.75rem;
+    }
+
+    /* hw submission */
+    .hw-textarea {
+      width: 100%;
+      min-height: 120px;
+      border: 2px solid #e0d8ce;
+      border-radius: 0.75rem;
+      padding: 0.85rem 1rem;
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+      margin-bottom: 0.75rem;
+    }
+    .hw-textarea:focus { border-color: #4a7c59; }
+
+    .hw-btn {
+      padding: 0.7rem 1.5rem;
+      background: #4a7c59;
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .hw-btn:hover { background: #3d6b4a; }
+    .hw-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    .hw-success {
+      color: #4a7c59;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    /* schedule */
+    .schedule-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f0ebe4;
+      font-size: 0.9rem;
+    }
+    .schedule-item:last-child { border-bottom: none; }
+    .schedule-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4a7c59;
+      flex-shrink: 0;
+    }
+
+    /* request */
+    .request-input {
+      width: 100%;
+      border: 2px solid #e0d8ce;
+      border-radius: 0.75rem;
+      padding: 0.85rem 1rem;
+      font-family: 'Lora', serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+      margin-bottom: 0.75rem;
+    }
+    .request-input:focus { border-color: #4a7c59; }
+
+    /* ── SPARKLE WORLD BUTTON ── */
+    .world-btn-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 0.5rem 0;
+    }
+
+    .world-btn {
+      position: relative;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #7ec8a4, #4a7c59);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(74,124,89,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+      animation: wobble 3s ease-in-out infinite;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .world-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 8px 30px rgba(74,124,89,0.4);
+      animation: none;
+    }
+
+    .world-btn::before,
+    .world-btn::after {
+      content: '✨';
+      position: absolute;
+      top: -8px;
+      font-size: 1rem;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+    .world-btn::before { left: 8px; animation-delay: 0s; }
+    .world-btn::after  { right: 8px; animation-delay: 0.7s; }
+
+    @keyframes wobble {
+      0%, 100% { transform: rotate(-1deg) scale(1); }
+      25%       { transform: rotate(1.5deg) scale(1.02); }
+      50%       { transform: rotate(-1deg) scale(1); }
+      75%       { transform: rotate(1deg) scale(1.01); }
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+      50%       { opacity: 0.4; transform: scale(1.4) rotate(20deg); }
+    }
+
+    .world-btn-name {
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.8rem;
+      color: #bbb;
+      text-align: center;
+    }
+  `;
+  document.head.appendChild(style);
+};
+
+// ── Login Screen ─────────────────────────────────────────────────────────────
+const LoginScreen = () => {
+  const { login } = useAuth();
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    if (!code.trim()) return;
+    setLoading(true);
+    setError("");
+    try {
+      // Fetch families from your Google Sheet via SheetDB
+      const res = await fetch(`${SHEETDB_FAMILIES_URL}`);
+      const data = await res.json();
+      const success = login(code, data);
+      if (success) {
+        navigate("/portal");
+      } else {
+        setError("That code doesn't match any family. Please try again!");
+      }
+    } catch {
+      setError("Connection problem. Please try again.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="login-wrap">
+      <div className="login-card">
+        <div className="login-palm">🌴</div>
+        <div className="login-title">Family Portal</div>
+        <div className="login-sub">Enter your family code to continue</div>
+        <input
+          className={`login-input${error ? " error" : ""}`}
+          type="text"
+          placeholder="e.g. STARFISH42"
+          value={code}
+          onChange={(e) => { setCode(e.target.value); setError(""); }}
+          onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+          maxLength={20}
+          autoFocus
+        />
+        <button
+          className="login-btn"
+          onClick={handleLogin}
+          disabled={loading || !code.trim()}
+        >
+          {loading ? "Checking..." : "Enter Portal →"}
+        </button>
+        {error && <div className="login-error">{error}</div>}
+      </div>
+    </div>
+  );
+};
+
+// ── Dashboard ────────────────────────────────────────────────────────────────
+const Dashboard = () => {
+  const { family, logout } = useAuth();
+  const navigate = useNavigate();
+  const [hwText, setHwText] = useState("");
+  const [hwSent, setHwSent] = useState(false);
+  const [hwLoading, setHwLoading] = useState(false);
+  const [request, setRequest] = useState("");
+  const [requestSent, setRequestSent] = useState(false);
+  const [evals, setEvals] = useState<Record<string, { text: string; date: string }>>({});
+  const [schedule, setSchedule] = useState<string[]>([]);
+
+  if (!family) return null;
+
+  // Fetch evals + schedule on mount
+  useEffect(() => {
+    // Fetch evals for this family's students
+    fetch(`${SHEETDB_FAMILIES_URL.replace("/sheets/Families", "/sheets/Evals")}?familyCode=${family.code}`)
+      .then(r => r.json())
+      .then(data => {
+        const map: Record<string, { text: string; date: string }> = {};
+        data.forEach((row: any) => {
+          map[row.studentName] = { text: row.evalText, date: row.date };
+        });
+        setEvals(map);
+      })
+      .catch(() => {});
+
+    // Fetch schedule
+    fetch(`${SHEETDB_FAMILIES_URL.replace("/sheets/Families", "/sheets/Classes")}`)
+      .then(r => r.json())
+      .then(data => {
+        const items = data
+          .filter((row: any) => row.familyCode === family.code || row.familyCode === "ALL")
+          .map((row: any) => row.schedule);
+        setSchedule(items);
+      })
+      .catch(() => {});
+  }, [family.code]);
+
+  const submitHomework = async () => {
+    if (!hwText.trim()) return;
+    setHwLoading(true);
+    try {
+      await fetch(SHEETDB_FAMILIES_URL.replace("/sheets/Families", "/sheets/Homework"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          data: [{
+            familyCode: family.code,
+            familyName: family.familyName,
+            hwText,
+            date: new Date().toLocaleDateString("en-US"),
+            status: "New"
+          }]
+        })
+      });
+      setHwSent(true);
+      setHwText("");
+    } catch {
+      alert("Couldn't send — please try again.");
+    }
+    setHwLoading(false);
+  };
+
+  const submitRequest = async () => {
+    if (!request.trim()) return;
+    try {
+      await fetch(SHEETDB_FAMILIES_URL.replace("/sheets/Families", "/sheets/Requests"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          data: [{
+            familyCode: family.code,
+            familyName: family.familyName,
+            request,
+            date: new Date().toLocaleDateString("en-US"),
+            status: "New"
+          }]
+        })
+      });
+      setRequestSent(true);
+      setRequest("");
+    } catch {
+      alert("Couldn't send — please try again.");
+    }
+  };
+
+  return (
+    <div className="dashboard">
+      <div className="dashboard-greeting">Welcome, {family.familyName} family! 👋</div>
+      <div className="dashboard-sub">My Paradise English Academy — Family Portal</div>
+
+      <div className="dashboard-grid">
+
+        {/* Latest Evals */}
+        {family.students.map((student) => (
+          <div className="card" key={student.name}>
+            <div className="card-label">Latest Evaluation</div>
+            <div className="card-title">📋 {student.name}</div>
+            {evals[student.name] ? (
+              <>
+                <div className="eval-text">{evals[student.name].text}</div>
+                <div className="eval-date">Received: {evals[student.name].date}</div>
+              </>
+            ) : (
+              <div className="eval-empty">No evaluation yet — check back after your next milestone! 🌟</div>
+            )}
+          </div>
+        ))}
+
+        {/* Kid's World Buttons */}
+        <div className="card">
+          <div className="card-label">Student World</div>
+          <div className="world-btn-wrap">
+            {family.students.map((student) => (
+              <div key={student.name} style={{ textAlign: "center" }}>
+                <button
+                  className="world-btn"
+                  onClick={() => navigate(`/world/${family.code}/${student.name.toLowerCase()}`)}
+                >
+                  🌴 {student.name}'s World
+                </button>
+                <div className="world-btn-name">Click to visit {student.name}'s creature world!</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Schedule */}
+        <div className="card">
+          <div className="card-label">Class Schedule</div>
+          <div className="card-title">📅 Upcoming Classes</div>
+          {schedule.length > 0 ? (
+            schedule.map((item, i) => (
+              <div className="schedule-item" key={i}>
+                <div className="schedule-dot" />
+                <span>{item}</span>
+              </div>
+            ))
+          ) : (
+            <div className="eval-empty">Schedule coming soon!</div>
+          )}
+        </div>
+
+        {/* Homework Submission */}
+        <div className="card card-full">
+          <div className="card-label">Homework</div>
+          <div className="card-title">📚 Submit Homework</div>
+          <textarea
+            className="hw-textarea"
+            placeholder="Paste or type your child's homework here..."
+            value={hwText}
+            onChange={(e) => { setHwText(e.target.value); setHwSent(false); }}
+          />
+          <button className="hw-btn" onClick={submitHomework} disabled={hwLoading || !hwText.trim()}>
+            {hwLoading ? "Sending..." : "Send to Teacher →"}
+          </button>
+          {hwSent && <div className="hw-success">✅ Homework sent! We'll review it soon.</div>}
+        </div>
+
+        {/* Schedule Change Request */}
+        <div className="card card-full">
+          <div className="card-label">Schedule</div>
+          <div className="card-title">📆 Request a Schedule Change</div>
+          <input
+            className="request-input"
+            type="text"
+            placeholder="e.g. Can we move Tuesday's class to Thursday this week?"
+            value={request}
+            onChange={(e) => { setRequest(e.target.value); setRequestSent(false); }}
+          />
+          <button className="hw-btn" onClick={submitRequest} disabled={!request.trim()}>
+            Send Request →
+          </button>
+          {requestSent && <div className="hw-success">✅ Request sent! We'll get back to you on Line.</div>}
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+// ── Main Portal Page ──────────────────────────────────────────────────────────
+const Portal = () => {
+  const { isLoggedIn } = useAuth();
+
+  useEffect(() => { injectStyles(); }, []);
+
+  return (
+    <div className="portal-root">
+      <nav className="portal-nav">
+        <a href="/" className="portal-logo">🌴 My Paradise English</a>
+        {isLoggedIn && (
+          <LogoutButton />
+        )}
+      </nav>
+      {isLoggedIn ? <Dashboard /> : <LoginScreen />}
+    </div>
+  );
+};
+
+const LogoutButton = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  return (
+    <button className="portal-logout" onClick={() => { logout(); navigate("/portal"); }}>
+      Sign Out
+    </button>
+  );
+};
+
+export default Portal;
