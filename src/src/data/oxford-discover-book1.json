@@ -1,0 +1,1430 @@
+{
+  "book": "Oxford Discover 1",
+  "edition": "2nd",
+  "extractedBy": "Claude (April 2026)",
+  "units": [
+    {
+      "unit": 1,
+      "topic": "Families and Friends",
+      "bigQuestion": "Who are your family and friends?",
+      "vocabulary": {
+        "topic": "Family",
+        "words": [
+          {
+            "word": "family",
+            "definition_en": "People who live and love together.",
+            "definition_zh": "家人",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "grandmother",
+            "definition_en": "Your mother's or father's mother.",
+            "definition_zh": "祖母",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "grandfather",
+            "definition_en": "Your mother's or father's father.",
+            "definition_zh": "祖父",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "father",
+            "definition_en": "A man parent who takes care of you.",
+            "definition_zh": "父親",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "mother",
+            "definition_en": "A woman parent who takes care of you.",
+            "definition_zh": "母親",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "brother",
+            "definition_en": "A boy who has the same parents.",
+            "definition_zh": "哥哥或弟弟",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "sister",
+            "definition_en": "A girl who has the same parents.",
+            "definition_zh": "姐姐或妹妹",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "friend",
+            "definition_en": "A person you like and spend time with.",
+            "definition_zh": "朋友",
+            "part_of_speech": "n."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Verb: Be",
+        "examples": [
+          "I'm six years old.",
+          "He's eight years old.",
+          "My family is big.",
+          "Friends are important."
+        ],
+        "rules": [
+          "I am → I'm",
+          "He is → He's",
+          "She is → She's",
+          "They are → They're"
+        ],
+        "choices": [
+          "I'm",
+          "He's",
+          "She's",
+          "is",
+          "are"
+        ]
+      }
+    },
+    {
+      "unit": 2,
+      "topic": "Families and Friends",
+      "bigQuestion": "Who are your family and friends?",
+      "vocabulary": {
+        "topic": "Pets",
+        "words": [
+          {
+            "word": "hamster",
+            "definition_en": "Small furry pet that runs on wheels.",
+            "definition_zh": "小毛茸茸的寵物，喜歡跑滾輪",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "goldfish",
+            "definition_en": "Orange or gold fish kept in bowls.",
+            "definition_zh": "金色或橙色的魚，養在魚缸裡",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "bird",
+            "definition_en": "Animal with feathers, wings, and beak.",
+            "definition_zh": "有羽毛、翅膀和喙的動物",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "rabbit",
+            "definition_en": "Fluffy pet with long ears and soft fur.",
+            "definition_zh": "毛茸茸的寵物，有長耳朵和軟毛",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "lizard",
+            "definition_en": "Small scaly animal with a long tail.",
+            "definition_zh": "有鱗片和長尾巴的小動物",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "kitten",
+            "definition_en": "Young cat that is small and playful.",
+            "definition_zh": "小貓，年幼、愛玩耍的貓咪",
+            "part_of_speech": "n."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "There is / There are",
+        "examples": [
+          "There is a black kitten.",
+          "There are white kittens.",
+          "There's a black spider.",
+          "There are brown hamsters."
+        ],
+        "rules": [
+          "There is → There's",
+          "Use 'There is' for one thing",
+          "Use 'There are' for more than one"
+        ],
+        "choices": [
+          "There is",
+          "There are",
+          "There's",
+          "is",
+          "are"
+        ]
+      }
+    },
+    {
+      "unit": 3,
+      "topic": "Animals and Colors",
+      "bigQuestion": "What is your favorite color?",
+      "vocabulary": {
+        "topic": "Colors",
+        "words": [
+          {
+            "word": "yellow",
+            "definition_en": "A bright color like the sun.",
+            "definition_zh": "黃色",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "red",
+            "definition_en": "A bright color like fire or blood.",
+            "definition_zh": "紅色",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "blue",
+            "definition_en": "A cool color like the sky.",
+            "definition_zh": "藍色",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "green",
+            "definition_en": "A color like grass and leaves.",
+            "definition_zh": "綠色",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "purple",
+            "definition_en": "A color made from red and blue.",
+            "definition_zh": "紫色",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "black",
+            "definition_en": "The darkest color with no light.",
+            "definition_zh": "黑色",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "brown",
+            "definition_en": "A dark color like chocolate or dirt.",
+            "definition_zh": "棕色",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "white",
+            "definition_en": "A bright color like snow or milk.",
+            "definition_zh": "白色",
+            "part_of_speech": "adj."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "There is / There are (review)",
+        "examples": [
+          "There's a white kitten in my yard today.",
+          "There are two white kittens.",
+          "There's a black spider.",
+          "There are brown hamsters."
+        ],
+        "rules": [
+          "There is → There's (one)",
+          "There are (more than one)"
+        ],
+        "choices": [
+          "There is",
+          "There are",
+          "There's",
+          "is",
+          "are"
+        ]
+      }
+    },
+    {
+      "unit": 4,
+      "topic": "Animals and Colors",
+      "bigQuestion": "What colors do you like?",
+      "vocabulary": {
+        "topic": "Art and the Ocean",
+        "words": [
+          {
+            "word": "mix",
+            "definition_en": "To stir things together to combine them.",
+            "definition_zh": "攪拌東西使其混合在一起",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "mural",
+            "definition_en": "A large picture painted on a wall.",
+            "definition_zh": "畫在牆上的大幅圖畫",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "ocean",
+            "definition_en": "A very large body of salty water.",
+            "definition_zh": "非常大的鹹水體",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "sand",
+            "definition_en": "Tiny grains of rock found on beaches.",
+            "definition_zh": "在海灘上找到的微小石粒",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "seaweed",
+            "definition_en": "A plant that grows in the ocean.",
+            "definition_zh": "在海洋中生長的植物",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "seashell",
+            "definition_en": "A hard covering of sea animals.",
+            "definition_zh": "海洋動物的硬殼外殼",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "jellyfish",
+            "definition_en": "A soft ocean animal with long tentacles.",
+            "definition_zh": "有長觸手的軟海洋動物",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "starfish",
+            "definition_en": "A star-shaped sea animal with five arms.",
+            "definition_zh": "有五隻手臂的星形海洋動物",
+            "part_of_speech": "n."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Prepositions of Place: In, On, Under, Next to",
+        "examples": [
+          "I am in the ocean.",
+          "The seashells are on the sand.",
+          "The starfish is under the seashell.",
+          "The seaweed is next to the fish."
+        ],
+        "rules": [
+          "in = inside something",
+          "on = on top of something",
+          "under = below something",
+          "next to = beside something"
+        ],
+        "choices": [
+          "in",
+          "on",
+          "under",
+          "next to"
+        ]
+      }
+    },
+    {
+      "unit": 5,
+      "topic": "Animal Homes",
+      "bigQuestion": "Where do animals live?",
+      "vocabulary": {
+        "topic": "Animals and Animal Homes",
+        "words": [
+          {
+            "word": "eagle",
+            "definition_en": "A large bird that hunts other animals.",
+            "definition_zh": "鷹",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "chick",
+            "definition_en": "A baby chicken just hatched from egg.",
+            "definition_zh": "小雞",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "nest",
+            "definition_en": "A home birds build to lay their eggs.",
+            "definition_zh": "巢",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "opossum",
+            "definition_en": "A furry animal that plays dead when scared.",
+            "definition_zh": "負鼠",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "tree hollow",
+            "definition_en": "An empty space inside a tree trunk.",
+            "definition_zh": "樹洞",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "honeybee",
+            "definition_en": "An insect that makes honey and lives together.",
+            "definition_zh": "蜜蜂",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "hive",
+            "definition_en": "A home where many bees live and work.",
+            "definition_zh": "蜂巢",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "crab",
+            "definition_en": "A sea animal with ten legs and big claws.",
+            "definition_zh": "螃蟹",
+            "part_of_speech": "n."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Where Questions with Verb Be",
+        "examples": [
+          "Where's the eagle? It's under the tree.",
+          "Where are the chicks? They're in the nest.",
+          "Where are the honeybees? They're in the hive.",
+          "Where is it? It's in the sky."
+        ],
+        "rules": [
+          "Where is → Where's",
+          "Answer with: It's + place",
+          "Answer with: They're + place"
+        ],
+        "choices": [
+          "Where's",
+          "Where are",
+          "It's",
+          "They're"
+        ]
+      }
+    },
+    {
+      "unit": 6,
+      "topic": "Animal Homes",
+      "bigQuestion": "Where do animals live?",
+      "vocabulary": {
+        "topic": "Animal Reserves",
+        "words": [
+          {
+            "word": "orangutan",
+            "definition_en": "Large red ape living in trees.",
+            "definition_zh": "紅毛猩猩",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "rainforest",
+            "definition_en": "Thick forest with lots of rain.",
+            "definition_zh": "雨林",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "reserve",
+            "definition_en": "Protected land for animals to live.",
+            "definition_zh": "保護區",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "teach",
+            "definition_en": "Show someone how to do something.",
+            "definition_zh": "教",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "take care of",
+            "definition_en": "Help and look after someone or something.",
+            "definition_zh": "照顧",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "miss",
+            "definition_en": "Feel sad when someone is gone.",
+            "definition_zh": "想念",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "take a nap",
+            "definition_en": "Sleep for a short time during day.",
+            "definition_zh": "打盹",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "put out",
+            "definition_en": "Stop a fire from burning.",
+            "definition_zh": "撲滅",
+            "part_of_speech": "phrase"
+          }
+        ]
+      },
+      "grammar": {
+        "point": "What and Who Questions with Verb Be",
+        "examples": [
+          "What's that? It's a tree.",
+          "Who's this? It's Anak.",
+          "What is it? It's a book.",
+          "Who is that? It's Karima."
+        ],
+        "rules": [
+          "What is → What's",
+          "Who is → Who's",
+          "Answer with: It's + name/thing"
+        ],
+        "choices": [
+          "What's",
+          "Who's",
+          "It's",
+          "What",
+          "Who"
+        ]
+      }
+    },
+    {
+      "unit": 7,
+      "topic": "Weather and Seasons",
+      "bigQuestion": "What is the weather like?",
+      "vocabulary": {
+        "topic": "Weather and Time",
+        "words": [
+          {
+            "word": "warm",
+            "definition_en": "Pleasantly hot, not cold or hot.",
+            "definition_zh": "溫暖",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "hot",
+            "definition_en": "Very high temperature, burns your skin.",
+            "definition_zh": "熱",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "cool",
+            "definition_en": "A little bit cold, nice temperature.",
+            "definition_zh": "涼爽",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "cold",
+            "definition_en": "Very low temperature, makes you shiver.",
+            "definition_zh": "冷",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "rain",
+            "definition_en": "Water falling from clouds to earth.",
+            "definition_zh": "下雨",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "snow",
+            "definition_en": "Frozen water falling from cold clouds.",
+            "definition_zh": "雪",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "long",
+            "definition_en": "Measuring big distance from end to end.",
+            "definition_zh": "長",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "short",
+            "definition_en": "Measuring small distance from end to end.",
+            "definition_zh": "短",
+            "part_of_speech": "adj."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Simple Present with It",
+        "examples": [
+          "It gets hot.",
+          "It doesn't get cold.",
+          "It snows in the winter.",
+          "It doesn't snow in the summer."
+        ],
+        "rules": [
+          "Does not → Doesn't",
+          "Use 'It' for weather",
+          "It + verb for positive",
+          "It + doesn't + verb for negative"
+        ],
+        "choices": [
+          "It gets",
+          "It doesn't get",
+          "It snows",
+          "It doesn't snow",
+          "doesn't"
+        ]
+      }
+    },
+    {
+      "unit": 8,
+      "topic": "Weather and Seasons",
+      "bigQuestion": "What do you do in each season?",
+      "vocabulary": {
+        "topic": "Verbs (Seasons)",
+        "words": [
+          {
+            "word": "watch",
+            "definition_en": "Look carefully at something happening.",
+            "definition_zh": "仔細看著某件事",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "build a snowman",
+            "definition_en": "Stack snow balls to make a person.",
+            "definition_zh": "堆雪球做成一個人",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "build a tree house",
+            "definition_en": "Make a small house in a tree.",
+            "definition_zh": "在樹上蓋一個小房子",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "make a swing",
+            "definition_en": "Create a seat that moves back forth.",
+            "definition_zh": "製作一個搖來搖去的座位",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "make apple pie",
+            "definition_en": "Bake a dessert with apples inside.",
+            "definition_zh": "烤一個裡面有蘋果的甜點",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "grow",
+            "definition_en": "Get bigger and taller over time.",
+            "definition_zh": "隨著時間變得更大更高",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "fall",
+            "definition_en": "Drop down to the ground quickly.",
+            "definition_zh": "快速掉到地上",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "bring",
+            "definition_en": "Carry something with you to somewhere.",
+            "definition_zh": "帶著東西去某個地方",
+            "part_of_speech": "v."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Simple Present with I and You",
+        "examples": [
+          "I make a swing.",
+          "I don't make apple pies.",
+          "You build a snowman.",
+          "You don't build a tree house.",
+          "Do you watch honeybees? Yes, I do.",
+          "Do you watch birds? No, I don't."
+        ],
+        "rules": [
+          "Does not → Don't (with I/You)",
+          "Do you...? Yes, I do. / No, I don't."
+        ],
+        "choices": [
+          "I make",
+          "I don't make",
+          "You build",
+          "You don't build",
+          "Do you",
+          "don't"
+        ]
+      }
+    },
+    {
+      "unit": 9,
+      "topic": "Numbers",
+      "bigQuestion": "How do numbers help us?",
+      "vocabulary": {
+        "topic": "Math",
+        "words": [
+          {
+            "word": "numbers",
+            "definition_en": "Symbols used to show how many things.",
+            "definition_zh": "數字",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "plus sign",
+            "definition_en": "Symbol that means add or put together.",
+            "definition_zh": "加號",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "equals sign",
+            "definition_en": "Symbol that shows two things are the same.",
+            "definition_zh": "等號",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "problem",
+            "definition_en": "A question you need to solve or figure out.",
+            "definition_zh": "問題",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "addition",
+            "definition_en": "Putting two groups together to count all.",
+            "definition_zh": "加法",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "answer",
+            "definition_en": "The correct result you get from solving.",
+            "definition_zh": "答案",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "odd numbers",
+            "definition_en": "Numbers that cannot split into two equal groups.",
+            "definition_zh": "奇數",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "even numbers",
+            "definition_en": "Numbers that can split into two equal groups.",
+            "definition_zh": "偶數",
+            "part_of_speech": "phrase"
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Simple Present with Have (I, You, We, They)",
+        "examples": [
+          "You have a seashell.",
+          "I don't have a seashell.",
+          "They have T-shirts.",
+          "We don't have T-shirts."
+        ],
+        "rules": [
+          "I/You/We/They + have",
+          "I/You/We/They + don't have",
+          "Do you have...? Yes, I do. / No, I don't."
+        ],
+        "choices": [
+          "have",
+          "don't have",
+          "do",
+          "don't"
+        ]
+      }
+    },
+    {
+      "unit": 10,
+      "topic": "Numbers",
+      "bigQuestion": "How do numbers help us?",
+      "vocabulary": {
+        "topic": "Food",
+        "words": [
+          {
+            "word": "pot",
+            "definition_en": "Round metal container for cooking food.",
+            "definition_zh": "鍋",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "stone",
+            "definition_en": "Hard rock you find on the ground.",
+            "definition_zh": "石頭",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "food",
+            "definition_en": "Things we eat to stay healthy.",
+            "definition_zh": "食物",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "sausages",
+            "definition_en": "Long tube of meat we cook and eat.",
+            "definition_zh": "香腸",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "carrots",
+            "definition_en": "Orange vegetable that grows underground.",
+            "definition_zh": "紅蘿蔔",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "onions",
+            "definition_en": "Round vegetable that makes you cry.",
+            "definition_zh": "洋蔥",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "potatoes",
+            "definition_en": "Round white vegetable that grows below ground.",
+            "definition_zh": "馬鈴薯",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "soup",
+            "definition_en": "Hot liquid food with meat and vegetables.",
+            "definition_zh": "湯",
+            "part_of_speech": "n."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Simple Present Questions with Have (I, You, We, They)",
+        "examples": [
+          "Do you have food? Yes, I do.",
+          "What do you have? I have carrots.",
+          "Do you have potatoes? No, I don't."
+        ],
+        "rules": [
+          "Do you have...?",
+          "Yes, I do. / No, I don't.",
+          "What do you have? I have..."
+        ],
+        "choices": [
+          "Do you have",
+          "Yes, I do",
+          "No, I don't",
+          "What do you have",
+          "I have"
+        ]
+      }
+    },
+    {
+      "unit": 11,
+      "topic": "Wants and Needs",
+      "bigQuestion": "What do we need?",
+      "vocabulary": {
+        "topic": "Farms and Markets",
+        "words": [
+          {
+            "word": "farmer",
+            "definition_en": "Person who grows food and raises animals.",
+            "definition_zh": "農夫",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "cow",
+            "definition_en": "Large farm animal that gives us milk.",
+            "definition_zh": "牛",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "milk",
+            "definition_en": "White liquid that comes from cows.",
+            "definition_zh": "牛奶",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "market",
+            "definition_en": "Place where people buy and sell things.",
+            "definition_zh": "市場",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "sell",
+            "definition_en": "Give something to someone for money.",
+            "definition_zh": "賣",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "buy",
+            "definition_en": "Give money to get something you want.",
+            "definition_zh": "買",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "plain",
+            "definition_en": "Simple and not decorated or fancy.",
+            "definition_zh": "樸素",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "fancy",
+            "definition_en": "Decorated nicely with special details.",
+            "definition_zh": "華麗",
+            "part_of_speech": "adj."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Simple Present with He and She",
+        "examples": [
+          "He has a cow. He doesn't have a hat.",
+          "He wants a hat. He doesn't want a cow.",
+          "She needs a cow. She doesn't need a dress."
+        ],
+        "rules": [
+          "He/She + has / wants / needs",
+          "He/She + doesn't have/want/need",
+          "Does not → Doesn't (with He/She)"
+        ],
+        "choices": [
+          "has",
+          "doesn't have",
+          "wants",
+          "doesn't want",
+          "needs",
+          "doesn't need"
+        ]
+      }
+    },
+    {
+      "unit": 12,
+      "topic": "Wants and Needs",
+      "bigQuestion": "What do we need?",
+      "vocabulary": {
+        "topic": "Jobs and Needs",
+        "words": [
+          {
+            "word": "job",
+            "definition_en": "Work that you do to earn money.",
+            "definition_zh": "工作",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "doctor",
+            "definition_en": "Person who helps sick people feel better.",
+            "definition_zh": "醫生",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "police officer",
+            "definition_en": "Person who keeps people safe and follows laws.",
+            "definition_zh": "警察",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "teacher",
+            "definition_en": "Person who helps you learn new things.",
+            "definition_zh": "老師",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "help",
+            "definition_en": "To do something good for someone else.",
+            "definition_zh": "幫助",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "money",
+            "definition_en": "Paper and coins you use to buy things.",
+            "definition_zh": "金錢",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "clothes",
+            "definition_en": "Things you wear to cover your body.",
+            "definition_zh": "衣服",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "water",
+            "definition_en": "Clear liquid you drink to stay healthy.",
+            "definition_zh": "水",
+            "part_of_speech": "n."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Simple Present Questions with He and She",
+        "examples": [
+          "Does Maria have a kitten? No, she doesn't.",
+          "What does Akif want? He wants a bicycle.",
+          "Does she want games? No, she doesn't.",
+          "What does he have? He has a big, yellow bus."
+        ],
+        "rules": [
+          "Does he/she have/want...?",
+          "Yes, he/she does. / No, he/she doesn't.",
+          "What does he/she want? He/She wants..."
+        ],
+        "choices": [
+          "Does",
+          "doesn't",
+          "What does",
+          "he wants",
+          "she wants",
+          "Yes, she does",
+          "No, she doesn't"
+        ]
+      }
+    },
+    {
+      "unit": 13,
+      "topic": "Where We Live",
+      "bigQuestion": "Where do we live?",
+      "vocabulary": {
+        "topic": "Places",
+        "words": [
+          {
+            "word": "street",
+            "definition_en": "A road where cars and people travel.",
+            "definition_zh": "街道",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "neighborhood",
+            "definition_en": "An area where many people live together.",
+            "definition_zh": "鄰近地區",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "town",
+            "definition_en": "A place smaller than a city with homes.",
+            "definition_zh": "鎮",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "city",
+            "definition_en": "A very large place with many buildings.",
+            "definition_zh": "城市",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "the country",
+            "definition_en": "Land with farms and nature, not cities.",
+            "definition_zh": "鄉村",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "apartment",
+            "definition_en": "A home inside a large building with others.",
+            "definition_zh": "公寓",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "building",
+            "definition_en": "A large structure where people work or live.",
+            "definition_zh": "建築物",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "world",
+            "definition_en": "All the land, oceans, and people on earth.",
+            "definition_zh": "世界",
+            "part_of_speech": "n."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Possessive 's",
+        "examples": [
+          "Mason's address is 19 Main Street, Rivertown.",
+          "Is this Jenna's house? Yes, it is.",
+          "Jenna's house is in the country.",
+          "Billy's house is in the city."
+        ],
+        "rules": [
+          "Name + 's = belongs to that person",
+          "Jenna's = belonging to Jenna",
+          "Mason's = belonging to Mason"
+        ],
+        "choices": [
+          "'s",
+          "Is this...?",
+          "Yes, it is.",
+          "No, it isn't."
+        ]
+      }
+    },
+    {
+      "unit": 14,
+      "topic": "Where We Live",
+      "bigQuestion": "Where do we live?",
+      "vocabulary": {
+        "topic": "City and Country Places",
+        "words": [
+          {
+            "word": "department store",
+            "definition_en": "Big shop selling many different things.",
+            "definition_zh": "百貨公司",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "restaurant",
+            "definition_en": "Place where you buy and eat food.",
+            "definition_zh": "餐廳",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "movie theater",
+            "definition_en": "Place where you watch big screen films.",
+            "definition_zh": "電影院",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "hotel",
+            "definition_en": "Place where travelers sleep and stay.",
+            "definition_zh": "酒店",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "cornfield",
+            "definition_en": "Large area of land growing corn plants.",
+            "definition_zh": "玉米田",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "orchard",
+            "definition_en": "Farm area with many fruit bearing trees.",
+            "definition_zh": "果園",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "new",
+            "definition_en": "Recently made or not used before.",
+            "definition_zh": "新的",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "old",
+            "definition_en": "Used for a long time or very aged.",
+            "definition_zh": "舊的",
+            "part_of_speech": "adj."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Possessive Adjectives (My, Your, His, Her, Our)",
+        "examples": [
+          "His home is in the city.",
+          "Her neighborhood isn't quiet.",
+          "Is your apartment small? No, it isn't.",
+          "We play in her cornfield."
+        ],
+        "rules": [
+          "My = belonging to me",
+          "Your = belonging to you",
+          "His = belonging to him",
+          "Her = belonging to her",
+          "Our = belonging to us"
+        ],
+        "choices": [
+          "my",
+          "your",
+          "his",
+          "her",
+          "our",
+          "their"
+        ]
+      }
+    },
+    {
+      "unit": 15,
+      "topic": "Making Music",
+      "bigQuestion": "How can we make music?",
+      "vocabulary": {
+        "topic": "Percussion Instruments",
+        "words": [
+          {
+            "word": "instruments",
+            "definition_en": "Tools that make music when played.",
+            "definition_zh": "樂器",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "cymbals",
+            "definition_en": "Two metal plates that crash together loudly.",
+            "definition_zh": "鐃鈸",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "tambourine",
+            "definition_en": "Round drum with metal jingles around edge.",
+            "definition_zh": "鈴鼓",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "xylophone",
+            "definition_en": "Wooden bars you hit with sticks to make music.",
+            "definition_zh": "木琴",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "drum",
+            "definition_en": "Round container you tap to make sound.",
+            "definition_zh": "鼓",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "triangle",
+            "definition_en": "Metal shape you hit with stick to ring.",
+            "definition_zh": "三角鐵",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "shake",
+            "definition_en": "Move something back and forth quickly.",
+            "definition_zh": "搖動",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "strike",
+            "definition_en": "Hit something hard with force.",
+            "definition_zh": "敲擊",
+            "part_of_speech": "v."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Present Continuous (I'm / You're / She's / He's / We're / They're ... ing)",
+        "examples": [
+          "You're playing the drums.",
+          "You aren't playing the xylophone.",
+          "I'm shaking the tambourine.",
+          "I'm not striking it.",
+          "Gus is playing the xylophone.",
+          "He isn't playing the drum."
+        ],
+        "rules": [
+          "I am → I'm + verb-ing",
+          "You are → You're + verb-ing",
+          "He/She is → He's/She's + verb-ing",
+          "We/They are → We're/They're + verb-ing",
+          "Negative: aren't / isn't + verb-ing"
+        ],
+        "choices": [
+          "I'm playing",
+          "You're playing",
+          "She's playing",
+          "He's playing",
+          "aren't playing",
+          "isn't playing"
+        ]
+      }
+    },
+    {
+      "unit": 16,
+      "topic": "Making Music",
+      "bigQuestion": "How can we make music?",
+      "vocabulary": {
+        "topic": "Performance Verbs",
+        "words": [
+          {
+            "word": "dance",
+            "definition_en": "Move your body to music rhythmically.",
+            "definition_zh": "跳舞",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "sing",
+            "definition_en": "Make musical sounds with your voice.",
+            "definition_zh": "唱歌",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "get an idea",
+            "definition_en": "Think of something new suddenly.",
+            "definition_zh": "想到主意",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "practice an instrument",
+            "definition_en": "Play music repeatedly to get better.",
+            "definition_zh": "練習樂器",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "buy tickets",
+            "definition_en": "Pay money for passes to an event.",
+            "definition_zh": "買票",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "give money",
+            "definition_en": "Hand over cash to someone else.",
+            "definition_zh": "給錢",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "clap",
+            "definition_en": "Hit your hands together to show praise.",
+            "definition_zh": "拍手",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "take pictures",
+            "definition_en": "Use a camera to capture images.",
+            "definition_zh": "拍照",
+            "part_of_speech": "phrase"
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Present Continuous Questions",
+        "examples": [
+          "Are you singing? Yes, I am.",
+          "Is she dancing? No, she isn't.",
+          "Are they playing instruments? Yes, they are.",
+          "Are we having fun? Yes, we are!"
+        ],
+        "rules": [
+          "Are you...? Yes, I am. / No, I'm not.",
+          "Is he/she...? Yes, he/she is. / No, he/she isn't.",
+          "Are they...? Yes, they are. / No, they aren't."
+        ],
+        "choices": [
+          "Are you",
+          "Is she",
+          "Is he",
+          "Yes, I am",
+          "No, she isn't",
+          "Yes, they are"
+        ]
+      }
+    },
+    {
+      "unit": 17,
+      "topic": "Living Things",
+      "bigQuestion": "What are living things?",
+      "vocabulary": {
+        "topic": "Living Things",
+        "words": [
+          {
+            "word": "living",
+            "definition_en": "Able to grow and need food.",
+            "definition_zh": "活著的",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "nonliving",
+            "definition_en": "Not alive, made of materials.",
+            "definition_zh": "沒有生命的",
+            "part_of_speech": "adj."
+          },
+          {
+            "word": "breathe",
+            "definition_en": "Take air in and push it out.",
+            "definition_zh": "呼吸",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "move",
+            "definition_en": "Change place or position from here.",
+            "definition_zh": "移動",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "change",
+            "definition_en": "Become different from how it was.",
+            "definition_zh": "改變",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "air",
+            "definition_en": "Invisible gas all around us to breathe.",
+            "definition_zh": "空氣",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "people",
+            "definition_en": "Human beings, women men and children.",
+            "definition_zh": "人類",
+            "part_of_speech": "n."
+          },
+          {
+            "word": "plant",
+            "definition_en": "Living thing with leaves and roots growing.",
+            "definition_zh": "植物",
+            "part_of_speech": "n."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Can and Can't",
+        "examples": [
+          "An animal can grow. A toy can't grow.",
+          "People can breathe. Sneakers can't breathe.",
+          "A tree can grow.",
+          "A doll can't grow.",
+          "A house can't move."
+        ],
+        "rules": [
+          "Can = is able to",
+          "Can't = cannot / is not able to",
+          "Can/Can't + base verb (no -s, no -ing)"
+        ],
+        "choices": [
+          "can",
+          "can't",
+          "can grow",
+          "can't grow",
+          "can breathe",
+          "can't breathe"
+        ]
+      }
+    },
+    {
+      "unit": 18,
+      "topic": "Living Things",
+      "bigQuestion": "What are living things?",
+      "vocabulary": {
+        "topic": "Verbs (Actions)",
+        "words": [
+          {
+            "word": "run away",
+            "definition_en": "To move fast to escape from someone.",
+            "definition_zh": "逃跑",
+            "part_of_speech": "phrase"
+          },
+          {
+            "word": "chase",
+            "definition_en": "To run after someone or something.",
+            "definition_zh": "追趕",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "catch",
+            "definition_en": "To grab or hold something moving.",
+            "definition_zh": "抓住",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "stop",
+            "definition_en": "To not move or not continue doing.",
+            "definition_zh": "停止",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "cross",
+            "definition_en": "To go from one side to the other.",
+            "definition_zh": "穿過",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "bake",
+            "definition_en": "To cook food using heat in an oven.",
+            "definition_zh": "烘焙",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "smell",
+            "definition_en": "To sense scents with your nose.",
+            "definition_zh": "聞",
+            "part_of_speech": "v."
+          },
+          {
+            "word": "open",
+            "definition_en": "To make something no longer closed.",
+            "definition_zh": "打開",
+            "part_of_speech": "v."
+          }
+        ]
+      },
+      "grammar": {
+        "point": "Should and Shouldn't",
+        "examples": [
+          "You should run away!",
+          "You shouldn't stay here.",
+          "She should close the door.",
+          "You shouldn't run in the classroom.",
+          "You should walk!"
+        ],
+        "rules": [
+          "Should = it's a good idea to",
+          "Shouldn't = it's not a good idea to",
+          "Should/Shouldn't + base verb"
+        ],
+        "choices": [
+          "should",
+          "shouldn't",
+          "should run",
+          "shouldn't stay",
+          "should walk"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,1749 @@
+[
+  {
+    "unit": 1,
+    "topic": "The Universe",
+    "bigQuestion": "Where are we in the universe?",
+    "vocabulary": {
+      "topic": "The Universe",
+      "words": [
+        {
+          "word": "moon",
+          "definition_en": "Bright object that orbits around Earth.",
+          "definition_zh": "繞地球運轉的明亮天體",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "asteroid",
+          "definition_en": "Small rocky object floating in space.",
+          "definition_zh": "漂浮在太空中的小岩石",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "comet",
+          "definition_en": "Icy space object with a long bright tail.",
+          "definition_zh": "有長尾巴的冰凍太空物體",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "meteorite",
+          "definition_en": "Rock from space that falls to Earth.",
+          "definition_zh": "從太空掉落到地球的岩石",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "solar system",
+          "definition_en": "The sun and all planets around it.",
+          "definition_zh": "太陽和圍繞它的所有行星",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "stars",
+          "definition_en": "Huge balls of hot glowing gas in space.",
+          "definition_zh": "太空中閃閃發光的巨大熾熱氣體球",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "galaxy",
+          "definition_en": "Huge group of stars and space dust.",
+          "definition_zh": "由許多星星和塵埃組成的龐大星系",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "universe",
+          "definition_en": "Everything in space including all galaxies.",
+          "definition_zh": "包括所有星系的整個太空",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "spacecraft",
+          "definition_en": "Vehicle that travels through outer space.",
+          "definition_zh": "在外太空中旅行的交通工具",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "telescope",
+          "definition_en": "Tool to see far away stars clearly.",
+          "definition_zh": "用來清楚看遠方星星的工具",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "observatory",
+          "definition_en": "Building with telescope for studying space.",
+          "definition_zh": "用望遠鏡研究太空的建築物",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Predictions with Will",
+      "examples": [
+        "I will visit those places again, Bella thought.",
+        "Scientists will find new solar systems in our galaxy.",
+        "Scientists will send a person to Mars someday.",
+        "She will become an astronaut when she grows up."
+      ],
+      "rules": [
+        "Use will to make a prediction.",
+        "A prediction is something you believe about the future.",
+        "A prediction is not a fact."
+      ],
+      "choices": [
+        "will",
+        "won't",
+        "is going to",
+        "might",
+        "could"
+      ]
+    }
+  },
+  {
+    "unit": 2,
+    "topic": "The Universe",
+    "bigQuestion": "Where are we in the universe?",
+    "vocabulary": {
+      "topic": "The Universe",
+      "words": [
+        {
+          "word": "astronomer",
+          "definition_en": "Scientist who studies stars and planets.",
+          "definition_zh": "天文學家",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "space probe",
+          "definition_en": "Robot spacecraft that explores outer space.",
+          "definition_zh": "太空探測器",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "core",
+          "definition_en": "The very center part of something.",
+          "definition_zh": "核心",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "gravity",
+          "definition_en": "Force that pulls things down to Earth.",
+          "definition_zh": "重力",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "orbit",
+          "definition_en": "Path that planets take around the sun.",
+          "definition_zh": "軌道",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "matter",
+          "definition_en": "Anything that takes up space and has weight.",
+          "definition_zh": "物質",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "distance",
+          "definition_en": "How far apart two things are from each other.",
+          "definition_zh": "距離",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "diameter",
+          "definition_en": "Straight line across the middle of a circle.",
+          "definition_zh": "直徑",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "surface",
+          "definition_en": "The outside or top layer of something.",
+          "definition_zh": "表面",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "craters",
+          "definition_en": "Large round holes made by impacts or explosions.",
+          "definition_zh": "隕石坑",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "unique",
+          "definition_en": "One of a kind and different from everything else.",
+          "definition_zh": "獨特的",
+          "part_of_speech": "adj."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Future Real Conditional",
+      "examples": [
+        "If technology continues to grow, we will travel to these places ourselves.",
+        "We will travel to these places ourselves if technology continues to grow.",
+        "If I become an astronaut, I will walk on the surface of Mars.",
+        "If I study hard, I will get good grades."
+      ],
+      "rules": [
+        "Use the future real conditional to talk about a future possibility and what will happen as a result of it.",
+        "Use the word if with a future possibility.",
+        "The if clause can come first or second in the sentence."
+      ],
+      "choices": [
+        "if",
+        "will",
+        "when",
+        "unless",
+        "until"
+      ]
+    }
+  },
+  {
+    "unit": 3,
+    "topic": "Discovering the Past",
+    "bigQuestion": "How do we know what happened long ago?",
+    "vocabulary": {
+      "topic": "Discovering the Past",
+      "words": [
+        {
+          "word": "army",
+          "definition_en": "Large group of soldiers fighting together.",
+          "definition_zh": "軍隊",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "soldiers",
+          "definition_en": "People trained to fight and protect.",
+          "definition_zh": "士兵",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "uniform",
+          "definition_en": "Special clothes soldiers wear alike.",
+          "definition_zh": "制服",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "emperor",
+          "definition_en": "Powerful ruler of a country.",
+          "definition_zh": "皇帝",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "armor",
+          "definition_en": "Metal protection clothing worn in battle.",
+          "definition_zh": "盔甲",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "treasure",
+          "definition_en": "Valuable things like gold and jewels.",
+          "definition_zh": "寶藏",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "archaeologist",
+          "definition_en": "Scientist who studies old things underground.",
+          "definition_zh": "考古學家",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "tomb",
+          "definition_en": "Underground place where dead people buried.",
+          "definition_zh": "墓葬",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "jade",
+          "definition_en": "Hard green stone used for jewelry.",
+          "definition_zh": "玉",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "clay",
+          "definition_en": "Wet dirt used to make pottery.",
+          "definition_zh": "黏土",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "peasant",
+          "definition_en": "Poor person working on farms long ago.",
+          "definition_zh": "農民",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Verbs Followed by Infinitives",
+      "examples": [
+        "The Chinese government plans to keep it closed for now.",
+        "All the students promised to find more terracotta soldiers.",
+        "The archaeologists tried to build the clay army.",
+        "I forgot to pack my lunch."
+      ],
+      "rules": [
+        "Some verbs are often followed by an infinitive.",
+        "An infinitive is a verb with the word to in front of it.",
+        "Common verbs followed by infinitives include: plan, promise, try, forget, want, decide, need."
+      ],
+      "choices": [
+        "plan",
+        "promise",
+        "try",
+        "forget",
+        "decide"
+      ]
+    }
+  },
+  {
+    "unit": 4,
+    "topic": "Discovering the Past",
+    "bigQuestion": "How do we know what happened long ago?",
+    "vocabulary": {
+      "topic": "Discovering the Past",
+      "words": [
+        {
+          "word": "dinosaur",
+          "definition_en": "Huge extinct reptiles that lived long ago.",
+          "definition_zh": "恐龍",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "skull",
+          "definition_en": "The hard bone that protects your brain.",
+          "definition_zh": "頭骨",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "ravine",
+          "definition_en": "A deep narrow valley with steep sides.",
+          "definition_zh": "峽谷",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "examine",
+          "definition_en": "To look at something very carefully.",
+          "definition_zh": "檢查",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "discover",
+          "definition_en": "To find something that was hidden or unknown.",
+          "definition_zh": "發現",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "excavate",
+          "definition_en": "To dig carefully in the ground for artifacts.",
+          "definition_zh": "挖掘",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "layers",
+          "definition_en": "Sheets of material stacked on top of each other.",
+          "definition_zh": "層",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "paleontologist",
+          "definition_en": "Scientist who studies ancient fossils and dinosaurs.",
+          "definition_zh": "古生物學家",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "ash",
+          "definition_en": "Gray powder left after something burns completely.",
+          "definition_zh": "灰燼",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sedimentary rock",
+          "definition_en": "Rock formed from compressed layers of sediment.",
+          "definition_zh": "沉積岩",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "pastime",
+          "definition_en": "Activity you do for fun in your spare time.",
+          "definition_zh": "消遣",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Verbs Followed by Gerunds",
+      "examples": [
+        "Javier enjoyed playing with his friends.",
+        "When it began raining, the excavation team went inside.",
+        "The museum staff finished cleaning the dinosaur bones.",
+        "I enjoy swimming in a pool on a hot day."
+      ],
+      "rules": [
+        "Gerunds are verbs that end in -ing.",
+        "Gerunds can act like nouns.",
+        "Verbs like enjoy, finish, and practice are often followed by gerunds."
+      ],
+      "choices": [
+        "enjoy",
+        "finish",
+        "practice",
+        "begin",
+        "like"
+      ]
+    }
+  },
+  {
+    "unit": 5,
+    "topic": "Food: The World Around Us",
+    "bigQuestion": "Where does our food come from?",
+    "vocabulary": {
+      "topic": "Food: The World Around Us",
+      "words": [
+        {
+          "word": "sugar cane",
+          "definition_en": "Tall plant that makes sweet sugar.",
+          "definition_zh": "甘蔗",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wheat",
+          "definition_en": "Grain crop used to make bread.",
+          "definition_zh": "小麥",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "cinnamon",
+          "definition_en": "Brown spice that smells warm and sweet.",
+          "definition_zh": "肉桂",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "butter",
+          "definition_en": "Soft yellow food made from milk cream.",
+          "definition_zh": "黃油",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "vanilla",
+          "definition_en": "Sweet flavor used in cakes and ice cream.",
+          "definition_zh": "香草",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "ingredients",
+          "definition_en": "Things you mix together to make food.",
+          "definition_zh": "材料",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "bark",
+          "definition_en": "Hard outer covering of a tree trunk.",
+          "definition_zh": "樹皮",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "plantation",
+          "definition_en": "Large farm where one crop is grown.",
+          "definition_zh": "種植園",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "steamship",
+          "definition_en": "Big boat powered by steam engine.",
+          "definition_zh": "蒸汽船",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "spoil",
+          "definition_en": "To go bad and not be good anymore.",
+          "definition_zh": "變壞",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "leopard",
+          "definition_en": "Wild spotted cat from Africa and Asia.",
+          "definition_zh": "豹",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Present Continuous for Future Plans",
+      "examples": [
+        "I'm making a special breakfast today.",
+        "We're playing soccer after school today.",
+        "My parents are having dinner at a French restaurant tomorrow.",
+        "I'm cleaning my bedroom on Saturday morning."
+      ],
+      "rules": [
+        "The present continuous tense can tell about future actions that someone plans.",
+        "Include the future time when you use this tense.",
+        "Use am/is/are + verb-ing to form the present continuous."
+      ],
+      "choices": [
+        "am making",
+        "is going",
+        "are having",
+        "am meeting",
+        "are baking"
+      ]
+    }
+  },
+  {
+    "unit": 6,
+    "topic": "Food and Farming: The World Around Us",
+    "bigQuestion": "Where does our food come from?",
+    "vocabulary": {
+      "topic": "Food and Farming",
+      "words": [
+        {
+          "word": "convenient",
+          "definition_en": "Easy and quick to do or use.",
+          "definition_zh": "方便的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "export",
+          "definition_en": "Send goods to another country to sell.",
+          "definition_zh": "出口",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "local",
+          "definition_en": "From or near your own town.",
+          "definition_zh": "本地的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "process",
+          "definition_en": "Steps to make or do something.",
+          "definition_zh": "過程",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "package",
+          "definition_en": "A box or wrapper around something.",
+          "definition_zh": "包裝",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "farmer's market",
+          "definition_en": "Place where farmers sell fresh food.",
+          "definition_zh": "農民市集",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "agriculture",
+          "definition_en": "Growing crops and raising animals for food.",
+          "definition_zh": "農業",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "corporate farm",
+          "definition_en": "Large farm owned by big companies.",
+          "definition_zh": "企業農場",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "decrease",
+          "definition_en": "Become smaller or less in amount.",
+          "definition_zh": "減少",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "century",
+          "definition_en": "One hundred years of time.",
+          "definition_zh": "世紀",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "chemical",
+          "definition_en": "Substance used to clean, treat, or mix.",
+          "definition_zh": "化學物質",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Polite Offers",
+      "examples": [
+        "Would you like to know where your food comes from?",
+        "Would you like a delicious apple from South Africa?",
+        "Would you like to bake a cake with me?",
+        "Would you like a piece of apple pie?"
+      ],
+      "rules": [
+        "Use Would you like ... ? to make a polite offer.",
+        "You can use this phrase to offer an action or a thing.",
+        "Would you like + to + verb (action) or Would you like + noun (thing)."
+      ],
+      "choices": [
+        "Would you like to",
+        "Would you like a",
+        "Do you want to",
+        "Can I offer you",
+        "Shall I get you"
+      ]
+    }
+  },
+  {
+    "unit": 7,
+    "topic": "Art and Artists",
+    "bigQuestion": "Why do we make art?",
+    "vocabulary": {
+      "topic": "Art and Artists",
+      "words": [
+        {
+          "word": "sketch",
+          "definition_en": "A quick, simple drawing done with pencil.",
+          "definition_zh": "快速簡單的鉛筆畫",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "pastels",
+          "definition_en": "Soft colored sticks used for drawing and coloring.",
+          "definition_zh": "用來畫畫和著色的軟色棒",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "canvas",
+          "definition_en": "Thick cloth used for painting pictures on.",
+          "definition_zh": "用來畫畫的厚布料",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "paintbrushes",
+          "definition_en": "Tools with bristles for putting paint on surfaces.",
+          "definition_zh": "用來塗油漆的刷子工具",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "shapes",
+          "definition_en": "The outline or form of an object or thing.",
+          "definition_zh": "物體或東西的輪廓或形式",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "string",
+          "definition_en": "Thin cord made by twisting fibers together.",
+          "definition_zh": "由纖維擰在一起製成的細繩",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "three-dimensional",
+          "definition_en": "Having length, width, and height or depth.",
+          "definition_zh": "有長、寬和高或深度的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "prodigy",
+          "definition_en": "A young person with amazing talent or ability.",
+          "definition_zh": "有驚人才能或能力的年輕人",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "street painter",
+          "definition_en": "An artist who creates paintings on sidewalks outside.",
+          "definition_zh": "在街道上創作繪畫的藝術家",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "carpenter",
+          "definition_en": "A person who builds and repairs things from wood.",
+          "definition_zh": "用木頭製造和修理東西的人",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sculptor",
+          "definition_en": "An artist who carves shapes from stone or clay.",
+          "definition_zh": "從石頭或黏土中雕刻形狀的藝術家",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Indefinite Pronouns",
+      "examples": [
+        "Can anyone make art?",
+        "I want to paint something in this room.",
+        "Everyone worked on the sculpture.",
+        "There is something I like about this sculpture."
+      ],
+      "rules": [
+        "Use indefinite pronouns to talk about unnamed people or things.",
+        "Anyone means any of the people.",
+        "Something means one of the things.",
+        "Everyone means all of the people."
+      ],
+      "choices": [
+        "anyone",
+        "someone",
+        "everyone",
+        "something",
+        "nothing"
+      ]
+    }
+  },
+  {
+    "unit": 8,
+    "topic": "Art",
+    "bigQuestion": "Why do we make art?",
+    "vocabulary": {
+      "topic": "Art",
+      "words": [
+        {
+          "word": "exhibition",
+          "definition_en": "A show of artwork for people to see.",
+          "definition_zh": "展覽",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "frame",
+          "definition_en": "A border that holds and displays a picture.",
+          "definition_zh": "畫框",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "landscape",
+          "definition_en": "A picture or view of nature and outdoors.",
+          "definition_zh": "風景",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "texture",
+          "definition_en": "How something feels when you touch it.",
+          "definition_zh": "質地",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "shading",
+          "definition_en": "Using darker colors to show shadows in art.",
+          "definition_zh": "陰影",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "perspective",
+          "definition_en": "How things look from where you stand.",
+          "definition_zh": "透視",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "contrast",
+          "definition_en": "Big differences between light and dark colors.",
+          "definition_zh": "對比",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "space",
+          "definition_en": "The empty area around objects in artwork.",
+          "definition_zh": "空間",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "stained",
+          "definition_en": "Marked or colored by something spilled on it.",
+          "definition_zh": "染色的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "brilliant",
+          "definition_en": "Very bright and shining with lots of light.",
+          "definition_zh": "光彩的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "pale",
+          "definition_en": "Very light in color, not bright or dark.",
+          "definition_zh": "蒼白的",
+          "part_of_speech": "adj."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Offers with Shall and Will",
+      "examples": [
+        "\"Shall I show you some more sketches?\" he asks.",
+        "\"I will sign you up for something,\" his mother offers.",
+        "Shall I bring you a cold drink?",
+        "I'll carry that for you."
+      ],
+      "rules": [
+        "Use shall to make an offer with a question.",
+        "Use will to make an offer with a statement.",
+        "Shall I ...? is used to offer to do something for someone."
+      ],
+      "choices": [
+        "Shall I",
+        "I will",
+        "I'll",
+        "Should I",
+        "Can I"
+      ]
+    }
+  },
+  {
+    "unit": 9,
+    "topic": "Cities: The World Around Us",
+    "bigQuestion": "What is a city?",
+    "vocabulary": {
+      "topic": "Cities: The World Around Us",
+      "words": [
+        {
+          "word": "canal",
+          "definition_en": "Water pathway built for boats to travel.",
+          "definition_zh": "運河",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "port",
+          "definition_en": "Place where ships load and unload cargo.",
+          "definition_zh": "港口",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "architecture",
+          "definition_en": "The style and design of buildings.",
+          "definition_zh": "建築",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "rickshaw",
+          "definition_en": "Small vehicle pulled by a person or bike.",
+          "definition_zh": "人力車",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "street vendor",
+          "definition_en": "Person selling things on the street.",
+          "definition_zh": "街邊小販",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "antiques",
+          "definition_en": "Very old valuable objects from long ago.",
+          "definition_zh": "古董",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "souvenirs",
+          "definition_en": "Small gifts to remember a special place.",
+          "definition_zh": "紀念品",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "batik",
+          "definition_en": "Colorful cloth made with wax and dye.",
+          "definition_zh": "蠟染布",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "exotic fruits",
+          "definition_en": "Unusual fruits from faraway tropical places.",
+          "definition_zh": "異國水果",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "tuna",
+          "definition_en": "Large fish often used for food.",
+          "definition_zh": "金槍魚",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "shrimp",
+          "definition_en": "Small sea creature with a curved tail.",
+          "definition_zh": "蝦",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Negative Indefinite Pronouns",
+      "examples": [
+        "Do you have nothing to do?",
+        "No one could see everything.",
+        "Nobody is in the museum.",
+        "There is nothing in my pocket."
+      ],
+      "rules": [
+        "Indefinite pronouns refer to people or objects that we don't name or know.",
+        "Negative indefinite pronouns begin with no-.",
+        "Nothing means not anything; no one and nobody mean no person."
+      ],
+      "choices": [
+        "nothing",
+        "no one",
+        "nobody",
+        "nowhere",
+        "neither"
+      ]
+    }
+  },
+  {
+    "unit": 10,
+    "topic": "Life in a City",
+    "bigQuestion": "What is a city?",
+    "vocabulary": {
+      "topic": "Life in a City",
+      "words": [
+        {
+          "word": "citizens",
+          "definition_en": "People who live in a city or country.",
+          "definition_zh": "市民",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "volunteers",
+          "definition_en": "People who help others without getting paid.",
+          "definition_zh": "志願者",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "mayor",
+          "definition_en": "The leader in charge of a city.",
+          "definition_zh": "市長",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "assistant",
+          "definition_en": "Someone who helps another person do their job.",
+          "definition_zh": "助理",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "city council",
+          "definition_en": "Group of people who make rules for a city.",
+          "definition_zh": "市議會",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "city hall",
+          "definition_en": "The main building where city government works.",
+          "definition_zh": "市政廳",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "president",
+          "definition_en": "The leader chosen to run a country.",
+          "definition_zh": "總統",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "garbage collectors",
+          "definition_en": "People who pick up trash from streets.",
+          "definition_zh": "垃圾清潔工",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "equipment",
+          "definition_en": "Tools and machines needed to do something.",
+          "definition_zh": "設備",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "news conference",
+          "definition_en": "When leaders tell reporters important information.",
+          "definition_zh": "新聞發佈會",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "playground",
+          "definition_en": "A safe outdoor place where kids can play.",
+          "definition_zh": "遊樂場",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Tag Questions",
+      "examples": [
+        "You'll work hard, won't you?",
+        "Marcy wasn't nervous, was she?",
+        "Ann is the youngest student, isn't she?",
+        "You're ready for the test, aren't you?"
+      ],
+      "rules": [
+        "In a tag question, a statement is turned into a question by adding a tag at the end.",
+        "A tag question always has a yes or no answer.",
+        "Tag questions are often used to say things that we think are true, but that we don't know for sure."
+      ],
+      "choices": [
+        "won't you",
+        "isn't she",
+        "aren't they",
+        "didn't he",
+        "wasn't it"
+      ]
+    }
+  },
+  {
+    "unit": 11,
+    "topic": "The Body: Health",
+    "bigQuestion": "How do our bodies work?",
+    "vocabulary": {
+      "topic": "The Body: Health",
+      "words": [
+        {
+          "word": "cells",
+          "definition_en": "Tiny living parts that make up bodies.",
+          "definition_zh": "細胞",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "microscope",
+          "definition_en": "Tool that makes tiny things look big.",
+          "definition_zh": "顯微鏡",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "virus",
+          "definition_en": "Super tiny germ that makes you sick.",
+          "definition_zh": "病毒",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "bacteria",
+          "definition_en": "Tiny living things that can cause illness.",
+          "definition_zh": "細菌",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "disease",
+          "definition_en": "Sickness that makes your body not work right.",
+          "definition_zh": "疾病",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "influenza",
+          "definition_en": "Serious flu illness with fever and body aches.",
+          "definition_zh": "流感",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "common cold",
+          "definition_en": "Mild illness with stuffy nose and cough.",
+          "definition_zh": "普通感冒",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "mucus",
+          "definition_en": "Sticky wet stuff from nose when sick.",
+          "definition_zh": "黏液",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "immune",
+          "definition_en": "Your body's ability to fight off germs.",
+          "definition_zh": "免疫",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "paralyze",
+          "definition_en": "When body parts cannot move or work.",
+          "definition_zh": "癱瘓",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "infect",
+          "definition_en": "When germs enter and make you sick.",
+          "definition_zh": "感染",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Order of Adjectives",
+      "examples": [
+        "Max Axiom studies these fascinating, tiny visitors.",
+        "The doctor washed his white, new lab coat.",
+        "Max saw round, red, large viruses.",
+        "There is a long, white, plastic ruler on my desk."
+      ],
+      "rules": [
+        "You can use more than one adjective to describe a noun.",
+        "The adjectives must go in a certain order: opinion ... size ... age ... shape ... color ... kind.",
+        "Opinion adjectives come before size adjectives."
+      ],
+      "choices": [
+        "opinion",
+        "size",
+        "age",
+        "shape",
+        "color"
+      ]
+    }
+  },
+  {
+    "unit": 12,
+    "topic": "The Body",
+    "bigQuestion": "How do our bodies work?",
+    "vocabulary": {
+      "topic": "The Body",
+      "words": [
+        {
+          "word": "system",
+          "definition_en": "Group of parts working together.",
+          "definition_zh": "一起工作的部分組群",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "blood",
+          "definition_en": "Red liquid that flows in body.",
+          "definition_zh": "在身體裡流動的紅色液體",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "heart",
+          "definition_en": "Muscle that pumps blood around body.",
+          "definition_zh": "將血液泵送全身的肌肉",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "arteries",
+          "definition_en": "Tubes that carry blood from heart.",
+          "definition_zh": "從心臟運送血液的管子",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "veins",
+          "definition_en": "Tubes that bring blood back to heart.",
+          "definition_zh": "將血液送回心臟的管子",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "capillary",
+          "definition_en": "Tiny blood vessels connecting arteries veins.",
+          "definition_zh": "連接動脈和靜脈的微小血管",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "lungs",
+          "definition_en": "Organs that help us breathe air.",
+          "definition_zh": "幫助我們呼吸的器官",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "trachea",
+          "definition_en": "Tube that carries air to lungs.",
+          "definition_zh": "將空氣運送到肺的管子",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "diaphragm",
+          "definition_en": "Muscle below lungs that helps breathing.",
+          "definition_zh": "肺下方幫助呼吸的肌肉",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "carbon dioxide",
+          "definition_en": "Waste gas our body breathes out.",
+          "definition_zh": "我們身體呼出的廢氣",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "pulse",
+          "definition_en": "Heartbeat you can feel in wrist.",
+          "definition_zh": "你在手腕感受到的心跳",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Used To",
+      "examples": [
+        "In ancient times, people used to think differently about the human body.",
+        "When I was young, I used to ride my bike.",
+        "My sister used to go to the swimming pool often as a child.",
+        "I used to take the bus to school."
+      ],
+      "rules": [
+        "Use used to before an action that happened often in the past, but not now.",
+        "Used to describes a past habit or state that no longer exists.",
+        "Compare with simple past: simple past describes one completed action; used to describes repeated past actions."
+      ],
+      "choices": [
+        "used to go",
+        "used to play",
+        "used to eat",
+        "used to live",
+        "used to think"
+      ]
+    }
+  },
+  {
+    "unit": 13,
+    "topic": "Mass Media and Communication",
+    "bigQuestion": "What is the mass media?",
+    "vocabulary": {
+      "topic": "Mass Media and Communication",
+      "words": [
+        {
+          "word": "mass media",
+          "definition_en": "Ways to share information with many people.",
+          "definition_zh": "大眾傳媒",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "newspaper",
+          "definition_en": "Paper with news and stories printed daily.",
+          "definition_zh": "報紙",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "magazine",
+          "definition_en": "Colorful booklet with stories and pictures.",
+          "definition_zh": "雜誌",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "printing press",
+          "definition_en": "Machine that copies words onto paper.",
+          "definition_zh": "印刷機",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "publisher",
+          "definition_en": "Company that makes and sells books.",
+          "definition_zh": "出版社",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "advertising",
+          "definition_en": "Showing products to get people to buy.",
+          "definition_zh": "廣告",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "broadcast",
+          "definition_en": "Send show on radio or television.",
+          "definition_zh": "廣播",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "the Web",
+          "definition_en": "Connected network of information online.",
+          "definition_zh": "網路",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "smartphone",
+          "definition_en": "Small computer you carry in pocket.",
+          "definition_zh": "智能手機",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "blog",
+          "definition_en": "Online diary where people share thoughts.",
+          "definition_zh": "博客",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "social network",
+          "definition_en": "Website where people connect and talk.",
+          "definition_zh": "社交網絡",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Must, Mustn't, Have To, Don't Have To",
+      "examples": [
+        "You must pay for the Internet to use it at home.",
+        "You mustn't take a newspaper without paying for it.",
+        "You don't have to carry a computer to check the news.",
+        "You must walk quietly in the halls."
+      ],
+      "rules": [
+        "Use must and have to to talk about what a person needs to do.",
+        "Use mustn't to talk about what a person shouldn't do.",
+        "Use don't have to to talk about what a person doesn't need to do."
+      ],
+      "choices": [
+        "must",
+        "mustn't",
+        "have to",
+        "don't have to",
+        "has to"
+      ]
+    }
+  },
+  {
+    "unit": 14,
+    "topic": "Mass Media and Communication",
+    "bigQuestion": "What is the mass media?",
+    "vocabulary": {
+      "topic": "Mass Media and Communication",
+      "words": [
+        {
+          "word": "reporter",
+          "definition_en": "Person who finds and tells news stories.",
+          "definition_zh": "記者",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "editor",
+          "definition_en": "Person who checks and fixes writing work.",
+          "definition_zh": "編輯",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "interview",
+          "definition_en": "When you ask someone questions to learn.",
+          "definition_zh": "訪問",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "headline",
+          "definition_en": "Big title words at top of story.",
+          "definition_zh": "標題",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "hero",
+          "definition_en": "Brave person who helps others and does good.",
+          "definition_zh": "英雄",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "website",
+          "definition_en": "Place on internet where you find information.",
+          "definition_zh": "網站",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "mistake",
+          "definition_en": "Something you did wrong by accident.",
+          "definition_zh": "錯誤",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "decide",
+          "definition_en": "Choose what you want to do next.",
+          "definition_zh": "決定",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "discuss",
+          "definition_en": "Talk together about ideas and thoughts.",
+          "definition_zh": "討論",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "investigate",
+          "definition_en": "Look carefully to find out the truth.",
+          "definition_zh": "調查",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "search",
+          "definition_en": "Look hard for something you cannot find.",
+          "definition_zh": "搜尋",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Present Perfect",
+      "examples": [
+        "I have decided to keep a blog.",
+        "He hasn't written a blog before.",
+        "The reporter has done many interviews.",
+        "I haven't met a reporter before."
+      ],
+      "rules": [
+        "Use the present perfect tense to tell what happened in the past, but did not happen at a specific time.",
+        "Use the past participle form of the main verb with has or have.",
+        "Use hasn't / haven't for negative sentences."
+      ],
+      "choices": [
+        "have decided",
+        "has written",
+        "have done",
+        "hasn't met",
+        "have changed"
+      ]
+    }
+  },
+  {
+    "unit": 15,
+    "topic": "Natural Forces",
+    "bigQuestion": "What can we learn from nature's power?",
+    "vocabulary": {
+      "topic": "Natural Forces",
+      "words": [
+        {
+          "word": "flood",
+          "definition_en": "When water covers land after heavy rain.",
+          "definition_zh": "洪水",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "earthquake",
+          "definition_en": "When the ground shakes and moves violently.",
+          "definition_zh": "地震",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "tsunami",
+          "definition_en": "Huge ocean waves caused by earthquakes underwater.",
+          "definition_zh": "海嘯",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "hurricane",
+          "definition_en": "Very strong spinning storm with powerful winds.",
+          "definition_zh": "颶風",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "tornado",
+          "definition_en": "Spinning funnel cloud that destroys things below.",
+          "definition_zh": "龍捲風",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "blizzard",
+          "definition_en": "Heavy snowstorm with very strong cold winds.",
+          "definition_zh": "暴雪",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "thunderstorm",
+          "definition_en": "Storm with lightning, thunder, and heavy rain.",
+          "definition_zh": "雷暴",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "rescue worker",
+          "definition_en": "Person who helps save people from danger.",
+          "definition_zh": "救援人員",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "victim",
+          "definition_en": "Person hurt or harmed by something bad.",
+          "definition_zh": "受害者",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "power lines",
+          "definition_en": "Wires that bring electricity to homes and buildings.",
+          "definition_zh": "電力線",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "collapse",
+          "definition_en": "When a building falls down suddenly.",
+          "definition_zh": "倒塌",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Present Perfect with Ever and Never",
+      "examples": [
+        "Have you ever seen a real tornado?",
+        "Yes, I have. / No, I haven't. I've never seen a real tornado.",
+        "Have you ever experienced an earthquake?",
+        "I've never felt an earthquake."
+      ],
+      "rules": [
+        "Use the present perfect with ever and never to ask and answer questions about life experiences.",
+        "Use ever in questions to ask about any time up to now.",
+        "Use never in statements to say something has not happened at any time."
+      ],
+      "choices": [
+        "Have you ever",
+        "I've never",
+        "Has she ever",
+        "have you ever seen",
+        "I have never"
+      ]
+    }
+  },
+  {
+    "unit": 16,
+    "topic": "Safety and Supplies",
+    "bigQuestion": "What can we learn from nature's power?",
+    "vocabulary": {
+      "topic": "Safety and Supplies",
+      "words": [
+        {
+          "word": "emergency",
+          "definition_en": "A sudden dangerous situation needing quick help.",
+          "definition_zh": "緊急情況",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "storm shelter",
+          "definition_en": "Safe place to go during bad storms.",
+          "definition_zh": "風暴避難所",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "first-aid kit",
+          "definition_en": "Box with supplies to help injured people.",
+          "definition_zh": "急救箱",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "cash",
+          "definition_en": "Paper money and coins you can spend.",
+          "definition_zh": "現金",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "storm shutters",
+          "definition_en": "Strong covers that protect windows from storms.",
+          "definition_zh": "風暴百葉窗",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "sleeping bag",
+          "definition_en": "Warm bag you zip up to sleep inside.",
+          "definition_zh": "睡袋",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "flashlight",
+          "definition_en": "Handheld light that works with batteries.",
+          "definition_zh": "手電筒",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "batteries",
+          "definition_en": "Small power sources that make things work.",
+          "definition_zh": "電池",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "supplies",
+          "definition_en": "Things you need and keep for emergencies.",
+          "definition_zh": "物資",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "bottled water",
+          "definition_en": "Clean drinking water in sealed plastic bottles.",
+          "definition_zh": "瓶裝水",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "canned food",
+          "definition_en": "Food in metal containers that lasts long.",
+          "definition_zh": "罐頭食品",
+          "part_of_speech": "phrase"
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Present Perfect with Already, Just, and Yet",
+      "examples": [
+        "I've already packed everything.",
+        "I've just eaten dinner.",
+        "Have you cleaned your room yet? No, I haven't cleaned it yet.",
+        "I've already made twelve sandwiches and four pizzas."
+      ],
+      "rules": [
+        "You can use the present perfect with the adverbs already, just, and yet.",
+        "These adverbs tell when something happened or didn't happen.",
+        "Already and just are used in positive statements; yet is used in questions and negative statements."
+      ],
+      "choices": [
+        "already",
+        "just",
+        "yet",
+        "still",
+        "recently"
+      ]
+    }
+  },
+  {
+    "unit": 17,
+    "topic": "Biomes: The World Around Us",
+    "bigQuestion": "Why are biomes important?",
+    "vocabulary": {
+      "topic": "Biomes: The World Around Us",
+      "words": [
+        {
+          "word": "biome",
+          "definition_en": "A large area with similar plants and animals.",
+          "definition_zh": "生物群系",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "desert",
+          "definition_en": "A very dry place with little rain.",
+          "definition_zh": "沙漠",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "grassland",
+          "definition_en": "A large area covered mostly with grass.",
+          "definition_zh": "草地",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "tropical rainforest",
+          "definition_en": "A warm wet forest with many plants.",
+          "definition_zh": "熱帶雨林",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "temperate forest",
+          "definition_en": "A forest with four seasons and mild weather.",
+          "definition_zh": "溫帶森林",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "taiga",
+          "definition_en": "A cold forest with many evergreen trees.",
+          "definition_zh": "泰加林",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "tundra",
+          "definition_en": "A very cold place with frozen ground.",
+          "definition_zh": "凍原",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "freshwater",
+          "definition_en": "Water that has no salt in it.",
+          "definition_zh": "淡水",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "equator",
+          "definition_en": "An imaginary line around the middle of Earth.",
+          "definition_zh": "赤道",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sloth",
+          "definition_en": "A slow-moving animal that lives in trees.",
+          "definition_zh": "樹懶",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "cactus",
+          "definition_en": "A plant with spines that lives in deserts.",
+          "definition_zh": "仙人掌",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Present Perfect with For and Since",
+      "examples": [
+        "These biomes have provided a home for animals for a long time.",
+        "I have studied biomes since February.",
+        "My dad has studied mammals for twenty years.",
+        "The government has protected this forest since 1998."
+      ],
+      "rules": [
+        "Use the present perfect with for and since to show that something began in the past and is still happening now.",
+        "Use for to talk about an amount of time.",
+        "Use since to talk about a specific point of time in the past."
+      ],
+      "choices": [
+        "for",
+        "since",
+        "for a long time",
+        "since last year",
+        "for many years"
+      ]
+    }
+  },
+  {
+    "unit": 18,
+    "topic": "Animals: The World Around Us",
+    "bigQuestion": "Why are biomes important?",
+    "vocabulary": {
+      "topic": "Animals: The World Around Us",
+      "words": [
+        {
+          "word": "parrot fish",
+          "definition_en": "Colorful fish that eats coral.",
+          "definition_zh": "鸚鵡魚",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "seahorse",
+          "definition_en": "Tiny horse-shaped sea animal.",
+          "definition_zh": "海馬",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "manta ray",
+          "definition_en": "Huge flat fish with wide wings.",
+          "definition_zh": "魔鬼魚",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sea turtle",
+          "definition_en": "Ancient reptile with shell living in ocean.",
+          "definition_zh": "海龜",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "marine park",
+          "definition_en": "Place to see ocean animals and plants.",
+          "definition_zh": "海洋公園",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "snorkel",
+          "definition_en": "Tube to breathe while swimming underwater.",
+          "definition_zh": "浮潛",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "speedboat",
+          "definition_en": "Very fast boat that goes on water.",
+          "definition_zh": "快艇",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "border",
+          "definition_en": "Line between two different countries.",
+          "definition_zh": "邊界",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "petition",
+          "definition_en": "Written request signed by many people.",
+          "definition_zh": "請願書",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "law",
+          "definition_en": "Official rule everyone must follow.",
+          "definition_zh": "法律",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "astonish",
+          "definition_en": "To surprise someone very much.",
+          "definition_zh": "使驚訝",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Present Perfect and Simple Past",
+      "examples": [
+        "Camila has created a petition.",
+        "When she got home, Camila created a petition.",
+        "I have run in a race. I ran in a race last summer.",
+        "They have snorkeled this morning."
+      ],
+      "rules": [
+        "Use the present perfect for past experiences, past actions that continue to the present, or actions that happened at an unspecific time.",
+        "Use the simple past for completed actions that happened at a specific time.",
+        "The simple past is used when we know when something happened."
+      ],
+      "choices": [
+        "has created",
+        "created",
+        "have snorkeled",
+        "snorkeled",
+        "has gone"
+      ]
+    }
+  }
+]

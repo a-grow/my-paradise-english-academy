@@ -104,9 +104,7 @@ const CountdownOverlay = ({onDone}:{onDone:()=>void}) => {
 
 // ── UNIT CLEAR / WINNER SCREEN ────────────────────────────────────────────────
 // Three zones only: celebration → reward → buttons. No stars, no points.
-const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
-const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState,diff}:{unit:UnitData;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";diff?:string}) => {
-  const treatCount = TREATS_BY_DIFF[diff??""] ?? 2;
+const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState}:{unit:UnitData;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped"}) => {
   const play=useAudio();
   useEffect(()=>{play("win");},[]);
   return (
@@ -134,13 +132,13 @@ const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState,diff}:{unit:Unit
           <div style={{marginBottom:"1.25rem"}}>
             {claimState==="available" && (
               <button onClick={onClaim} style={{width:"100%",padding:"1.1rem",background:"linear-gradient(135deg,#fbbf24,#f97316)",border:"none",borderRadius:"1.5rem",color:"white",fontFamily:F,fontWeight:900,fontSize:"1.35rem",cursor:"pointer",animation:"claimPulse 1.4s ease-in-out infinite",display:"flex",alignItems:"center",justifyContent:"center",gap:"0.5rem"}}>
-                <svg width="36" height="36" viewBox="0 0 36 36" style={{animation:"cookiePop 0.5s ease-out both",flexShrink:0}}><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
-                <span>+{treatCount} {treatCount === 1 ? "Treat" : "Treats"}!</span>
+                <span style={{fontSize:"1.8rem",animation:"cookiePop 0.5s ease-out both"}}>🍪</span>
+                <span>+3 Treats!</span>
               </button>
             )}
             {claimState==="claimed" && (
               <div style={{background:"rgba(74,222,128,0.15)",border:"2px solid rgba(74,222,128,0.4)",borderRadius:"1.25rem",padding:"0.85rem 1rem"}}>
-                <div style={{fontFamily:F,fontWeight:800,fontSize:"1.1rem",color:"#4ade80",display:"flex",alignItems:"center",gap:"0.4rem"}}><svg width="22" height="22" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg> Treats added!</div>
+                <div style={{fontFamily:F,fontWeight:800,fontSize:"1.1rem",color:"#4ade80"}}>🍪 Treats added!</div>
                 <div style={{fontFamily:F,fontWeight:700,fontSize:"0.82rem",color:"rgba(255,255,255,0.5)",marginTop:"0.2rem"}}>Go feed your turtle! 🐢</div>
               </div>
             )}
@@ -155,8 +153,8 @@ const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState,diff}:{unit:Unit
 
         {/* ZONE 3 — Buttons */}
         <div style={{display:"flex",flexDirection:"column",gap:"0.65rem"}}>
-          <button onClick={onPlay} disabled={claimState==="available"} style={{padding:"0.9rem",background:claimState==="available"?"rgba(255,255,255,0.15)":`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:claimState==="available"?"rgba(255,255,255,0.35)":"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:claimState==="available"?"not-allowed":"pointer",boxShadow:claimState==="available"?"none":`0 0 20px ${unit.glow}`,transition:"all 0.3s"}}>Play Again!</button>
-          <button onClick={onBack} disabled={claimState==="available"} style={{padding:"0.9rem",background:claimState==="available"?"rgba(255,255,255,0.1)":"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:claimState==="available"?"rgba(255,255,255,0.35)":"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:claimState==="available"?"not-allowed":"pointer",transition:"all 0.3s"}}>Choose Game</button>
+          <button onClick={onPlay} style={{padding:"0.9rem",background:`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:"pointer",boxShadow:`0 0 20px ${unit.glow}`}}>Play Again!</button>
+          <button onClick={onBack} style={{padding:"0.9rem",background:"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:"pointer"}}>Choose Game</button>
         </div>
       </div>
     </div>
@@ -387,9 +385,9 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
   const [score,setScore]=useState(0);
   const [round,setRound]=useState(0);
   const [wordsCleared,setWordsCleared]=useState<Set<string>>(new Set());
+  const [timeLeft,setTimeLeft]=useState(cfg.timerSec);
   const [done,setDone]=useState(false);
   const [doneReason,setDoneReason]=useState<"timeout"|"lives">("timeout");
-  const [timeLeft,setTimeLeft]=useState(cfg.timerSec);
   const [unitClear,setUnitClear]=useState(false);
   const [lives,setLives]=useState(5);
   const [ouch,setOuch]=useState(false);
@@ -530,7 +528,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
     nextTarget(new Set());
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState}/>;
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
@@ -552,6 +550,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
         <div style={{display:"flex",gap:"0.4rem",alignItems:"center",flexShrink:0}}>
           <Pill>⭐{score}</Pill>
           <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
+          <Pill red={timeLeft<=10}>⏱{timeLeft}s</Pill>
           <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
           <RestartBtn onRestart={doRestart}/>
         </div>
@@ -604,10 +603,10 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
   const [score,setScore]=useState(0);
   const [round,setRound]=useState(0);
   const [wordsCleared,setWordsCleared]=useState<Set<string>>(new Set());
+  const [timeLeft,setTimeLeft]=useState(cfg.timerSec);
   const [lives,setLives]=useState(5);
   const [done,setDone]=useState(false);
   const [doneReason,setDoneReason]=useState<"timeout"|"lives">("timeout");
-  const [timeLeft,setTimeLeft]=useState(cfg.timerSec);
   const [unitClear,setUnitClear]=useState(false);
   const [hitIdx,setHitIdx]=useState<number|null>(null);
   const [missIdx,setMissIdx]=useState<number|null>(null);
@@ -684,7 +683,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
     setMoles(Array(HOLES).fill(null));const t=pickTarget(new Set());setTimeout(()=>spawnMoles(t,new Set()),400);
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState}/>;
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
@@ -704,7 +703,8 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
           <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
             <Pill>⭐{score}</Pill>
             <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
-              <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
+            <Pill red={timeLeft<=10}>⏱{timeLeft}s</Pill>
+            <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
             <RestartBtn onRestart={doRestart}/>
           </div>
         </div>
@@ -761,10 +761,11 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
   const [score,setScore]=useState(0);
   const [lives,setLives]=useState(5);
   const [done,setDone]=useState(false);
-  const [doneReason,setDoneReason]=useState<"lives">("lives");
+  const [doneReason,setDoneReason]=useState<"timeout"|"lives">("timeout");
   const [unitClear,setUnitClear]=useState(false);
   const [flash,setFlash]=useState<"good"|"bad"|null>(null);
   const [round,setRound]=useState(0);
+  const [timeLeft,setTimeLeft]=useState(cfg.timerSec);
   const [wordsCleared,setWordsCleared]=useState<Set<string>>(new Set());
   const [ouchSnake,setOuchSnake]=useState(false);
 
@@ -788,9 +789,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
 
   const buildLetters=(w:string,sn:Seg[]):Letter[]=>{
     const chars=w.split("");
-    const head=sn[0];const d=sn.length>1?{x:sn[0].x-sn[1].x,y:sn[0].y-sn[1].y}:{x:1,y:0};
-    const safeZone=[1,2,3].map(i=>({x:(head.x+d.x*i+COLS)%COLS,y:(head.y+d.y*i+ROWS)%ROWS}));
-    const placed:{x:number;y:number}[]=[...safeZone];
+    const placed:{x:number;y:number}[]=[];
     const positions:Letter[]=[];
     for(let li=0;li<chars.length;li++){
       let pos=null,tries=0;
@@ -820,6 +819,12 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
   },[unit]);
 
   useEffect(()=>{newWord(INIT_SNAKE,new Set());return()=>{};},[]);
+
+  useEffect(()=>{
+    if(done) return;
+    const t=setInterval(()=>setTimeLeft(tl=>{if(tl<=1){clearInterval(t);setDoneReason("timeout");setDone(true);return 0;}return tl-1;}),1000);
+    return()=>clearInterval(t);
+  },[done]);
 
   useEffect(()=>{
     const k=(e:KeyboardEvent)=>{
@@ -865,7 +870,6 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
             const next=[...col,hit.char];
             setCollected(next);
             setLetters(ls=>ls.filter(l=>l.id!==hit.id));
-            setSnake(sn=>[...sn,{x:sn[sn.length-1].x,y:sn[sn.length-1].y}]);
             if(next.length===tw.length){
               completingWordRef.current=true;
               play("correct");setFlash("good");setTimeout(()=>setFlash(null),600);
@@ -873,7 +877,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
               const newCleared=new Set([...wordsClearedRef.current,tw]);
               wordsClearedRef.current=newCleared;setWordsCleared(newCleared);
               if(newCleared.size>=TOTAL){setTimeout(()=>setUnitClear(true),700);}
-              else setTimeout(()=>newWord(snakeRef.current,newCleared),700);
+              else setTimeout(()=>newWord([head,...prev.slice(0,-1)],newCleared),700);
             }
           } else if(hit.isWord&&!completingWordRef.current){
             triggerSnakeOuch();
@@ -892,13 +896,13 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
   };
 
   const doRestart=()=>{
-    setScore(0);setLives(5);setRound(0);setDone(false);setUnitClear(false);
+    setScore(0);setLives(5);setRound(0);setDone(false);setUnitClear(false);setTimeLeft(cfg.timerSec);
     wordsClearedRef.current=new Set();setWordsCleared(new Set());currentWordRef.current="";completingWordRef.current=false;ouchSnakeRef.current=false;setOuchSnake(false);
     const sn=[{x:4,y:4},{x:3,y:4},{x:2,y:4}];
     setSnake(sn);setDir({x:1,y:0});newWord(sn,new Set());
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState}/>;
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
   const flashBg=flash==="good"?"rgba(74,222,128,0.22)":flash==="bad"?"rgba(239,68,68,0.22)":"transparent";
 
@@ -918,6 +922,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
         <div style={{display:"flex",gap:"0.4rem",alignItems:"center"}}>
           <Pill>⭐{score}</Pill>
           <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
+          <Pill red={timeLeft<=10}>⏱{timeLeft}s</Pill>
           <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
           <RestartBtn onRestart={doRestart}/>
         </div>
@@ -993,9 +998,9 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
   const [target,setTarget]=useState(unit.vocab[0]);
   const [score,setScore]=useState(0);
   const [lives,setLives]=useState(5);
+  const [timeLeft,setTimeLeft]=useState(cfg.timerSec);
   const [done,setDone]=useState(false);
   const [doneReason,setDoneReason]=useState<"timeout"|"lives">("timeout");
-  const [timeLeft,setTimeLeft]=useState(cfg.timerSec);
   const [unitClear,setUnitClear]=useState(false);
   const [round,setRound]=useState(0);
   const [wordsCleared,setWordsCleared]=useState<Set<string>>(new Set());
@@ -1168,7 +1173,7 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
     wordsClearedRef.current=new Set();setWordsCleared(new Set());nextTarget(new Set());
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState}/>;
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
@@ -1289,7 +1294,7 @@ const GAMES=[
 type Screen="books"|"units"|"games"|"diff"|"play";
 
 interface GameTestProps {
-  onClaim?: (unitId: number, gameId: string, diff: Diff) => void;
+  onClaim?: (unitId: number, gameId: string) => void;
   claimedCombos?: Set<string>;
   treatsCappedToday?: boolean;
 }
@@ -1311,13 +1316,13 @@ const GameTest = ({onClaim, claimedCombos, treatsCappedToday}: GameTestProps) =>
   // Compute claimState fresh every render so it's never stale
   const claimState: "available"|"claimed"|"capped"|undefined = (() => {
     if(!onClaim || !unit || !game) return undefined;
-    if(claimedCombos?.has(`u${unit.unit}_${game.id}_${diff}`)) return "claimed";
+    if(claimedCombos?.has(`u${unit.unit}_${game.id}`)) return "claimed";
     if(treatsCappedToday) return "capped";
     return "available";
   })();
 
   const handleClaim = (onClaim && unit && game && claimState==="available")
-    ? () => onClaim(unit.unit, game.id, diff)
+    ? () => onClaim(unit.unit, game.id)
     : undefined;
 
   if(screen==="diff"&&unit&&game) return <DiffPicker game={game} unit={unit} onPick={(d)=>{setDiff(d);setScreen("play");}} onBack={()=>setScreen("games")}/>;

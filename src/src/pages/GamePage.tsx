@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import GameTest from "./GameTest";
 
 const MASTER_CODE = "1006";
-const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
+const TREATS_PER_CLEAR = 3;
 // const DAILY_TREAT_CAP = 9; // commented out for testing
 const DAILY_TREAT_CAP = 999999;
 
@@ -15,8 +15,8 @@ const GamePage = () => {
 
   const jarKey = `mpe_jar_${code}_${studentName}`;
   const capKey = `mpe_arcade_cap_${code}_${studentName}_${today}`;
-  const comboKey = (unitId: number, gameId: string, diff: string) =>
-    `mpe_arcade_${code}_${studentName}_u${unitId}_${gameId}_${diff}_${today}`;
+  const comboKey = (unitId: number, gameId: string) =>
+    `mpe_arcade_${code}_${studentName}_u${unitId}_${gameId}_${today}`;
 
   const getTreatsEarnedToday = () =>
     parseInt(localStorage.getItem(capKey) || "0");
@@ -40,7 +40,6 @@ const GamePage = () => {
   const [claimedCombos, setClaimedCombos] = useState<Set<string>>(getClaimedCombos);
   const [treatsEarnedToday, setTreatsEarnedToday] = useState(getTreatsEarnedToday);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [lastTreats, setLastTreats] = useState(1);
   const [musicOn, setMusicOn] = useState(() => localStorage.getItem("mpe_music") !== "off");
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.18"));
 
@@ -88,16 +87,15 @@ const GamePage = () => {
     } catch {}
   }, []);
 
-  const handleClaim = useCallback((unitId: number, gameId: string, diff: string = "medium") => {
+  const handleClaim = useCallback((unitId: number, gameId: string) => {
     if (isMaster) {
-      setLastTreats(TREATS_BY_DIFF[diff] ?? 2);
       playCelebrate();
       setShowCelebration(true);
       return;
     }
 
-    const key = comboKey(unitId, gameId, diff);
-    const comboId = `u${unitId}_${gameId}_${diff}`;
+    const key = comboKey(unitId, gameId);
+    const comboId = `u${unitId}_${gameId}`;
 
     // Guards
     if (localStorage.getItem(key)) return;
@@ -106,17 +104,15 @@ const GamePage = () => {
 
     // Write to localStorage
     localStorage.setItem(key, "1");
-    const treats = TREATS_BY_DIFF[diff] ?? 2;
-    const newTotal = earnedSoFar + treats;
+    const newTotal = earnedSoFar + TREATS_PER_CLEAR;
     localStorage.setItem(capKey, String(newTotal));
     const current = parseInt(localStorage.getItem(jarKey) || "0");
-    localStorage.setItem(jarKey, String(current + treats));
+    localStorage.setItem(jarKey, String(current + TREATS_PER_CLEAR));
 
     // Update state — both updates trigger GameTest re-render with fresh claimState
     setClaimedCombos(prev => new Set([...prev, comboId]));
     setTreatsEarnedToday(newTotal);
 
-    setLastTreats(treats);
     playCelebrate();
     setShowCelebration(true);
   }, [isMaster, capKey, jarKey, playCelebrate]);
@@ -189,11 +185,11 @@ const GamePage = () => {
             animation: "celebPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both"
           }}>
             <style>{`@keyframes celebPop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:1}}`}</style>
-            <div style={{ marginBottom: "0.25rem" }}><svg width="64" height="64" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg></div>
+            <div style={{ fontSize: "4rem", marginBottom: "0.25rem" }}>🍪</div>
             <div style={{
               fontFamily: "'Nunito',sans-serif", fontWeight: 900,
               fontSize: "2.2rem", color: "#f97316", lineHeight: 1
-            }}>+{lastTreats} {lastTreats === 1 ? "Treat" : "Treats"}!</div>
+            }}>+3 Treats!</div>
             <div style={{
               fontFamily: "'Nunito',sans-serif", fontWeight: 700,
               fontSize: "0.95rem", color: "#888", margin: "0.5rem 0 1.5rem"

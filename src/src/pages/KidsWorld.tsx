@@ -345,7 +345,7 @@ const UnderwaterBg = ({ sad }: { sad: boolean }) => (
 const EarnButtons = ({ navigate, code, studentName }: { navigate: (p: string) => void; code: string; studentName: string }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
     {[
-      { label: "Play a Game", sub: "打敗遊戲，得1~3個餅乾！", reward: "+1~3 treats", color: "#f97316", glow: "rgba(249,115,22,0.5)", path: `/game/${code}/${studentName}` },
+      { label: "Play a Game", sub: "打敗遊戲，得3個餅乾！", reward: "+3 treats", color: "#f97316", glow: "rgba(249,115,22,0.5)", path: `/game/${code}/${studentName}` },
       { label: "Read & Quiz", sub: "即將推出！Coming Soon!", reward: "🔒", color: "#a855f7", glow: "rgba(168,85,247,0.0)", path: "", disabled: true },
       { label: "Visit 5 Days!", sub: "連續來5天！", reward: "+3 treats", color: "#10b981", glow: "rgba(16,185,129,0.5)", path: "" },
     ].map((btn, i) => (
@@ -734,7 +734,7 @@ const KidsWorld = () => {
             </div>
             <div style={{ color: "rgba(255,255,255,0.75)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginBottom: "0.25rem" }}>每日禮物！</div>
             <div style={{ color: "rgba(255,255,255,0.8)", fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
-              {displayName} gets 1 treat today! <br />
+              {displayName} gets 1 treat today! 🍪<br />
               <span style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.95rem" }}>{displayName}今天得到1個餅乾！</span><br />
               <span style={{ fontSize: "0.85rem", opacity: 0.65 }}>Come back tomorrow for more! · 明天再來拿更多！</span>
             </div>
@@ -854,7 +854,7 @@ const KidsWorld = () => {
         {/* FEED BUTTON */}
         {!isMaster && (nextStage ? (jarTreats > 0 && (
           <button onClick={handleFeed} style={{ width: "100%", padding: "1.1rem", marginBottom: "1rem", background: "linear-gradient(135deg,#fbbf24,#f97316)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(251,191,36,0.55)", animation: "eF 2s ease-in-out infinite" }}>
-            Feed {petName || "your turtle"}!  ({jarTreats} treat{jarTreats !== 1 ? "s" : ""} ready)<br />
+            Feed {petName || "your turtle"}! 🍪 ({jarTreats} treat{jarTreats !== 1 ? "s" : ""} ready)<br />
             <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.9 }}>餵{petName || "你的海龜"}！（{jarTreats}個餅乾準備好了）</span>
           </button>
         )) : (
@@ -866,7 +866,7 @@ const KidsWorld = () => {
         {/* TREAT JAR */}
         <div className="glass" style={{ padding: "1.5rem", marginBottom: "1rem", animation: "fadeUp 0.7s ease-out" }}>
           <div style={{ color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.25rem", textAlign: "center", marginBottom: "0.85rem" }}>
-            {petName ? `${petName} loves treats! ` : "Feed your Sea Turtle Treats! "}<br />
+            {petName ? `${petName} loves treats! 🍪` : "Feed your Sea Turtle Treats! 🍪"}<br />
             <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>餵你的海龜餅乾！每次餵食讓牠更快長大！</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
@@ -880,7 +880,7 @@ const KidsWorld = () => {
               </div>
               <div style={{ marginTop: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem", justifyContent: "center" }}>
                 <FaceCookie size={24} />
-
+                <span style={{ color: "rgba(255,255,255,0.7)", fontFamily: "Nunito,sans-serif", fontSize: "0.85rem" }}> = 1 treat · 一個餅乾</span>
               </div>
             </div>
           </div>
@@ -900,7 +900,7 @@ const KidsWorld = () => {
         {/* EARN */}
         <div className="glass" style={{ padding: "1.5rem", marginBottom: "1rem", animation: "fadeUp 0.8s ease-out" }}>
           <div style={{ color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", marginBottom: "1rem", textAlign: "center" }}>
-            Earn Treats! <br />
+            Earn Treats! 🍪<br />
             <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>賺餅乾！完成挑戰得到獎勵！</span>
           </div>
           <EarnButtons navigate={navigate} code={code ?? ""} studentName={studentName ?? ""} />

@@ -1,0 +1,1520 @@
+[
+  {
+    "unit": 1,
+    "topic": "Amazing Animals",
+    "bigQuestion": "How are animals different from one another?",
+    "vocabulary": {
+      "topic": "Animals and Animal Body Parts",
+      "words": [
+        {
+          "word": "skin",
+          "definition_en": "Outer layer covering your whole body.",
+          "definition_zh": "皮膚",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "mammals",
+          "definition_en": "Animals that have fur and feed milk.",
+          "definition_zh": "哺乳動物",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "eggs",
+          "definition_en": "Round or oval object babies grow inside.",
+          "definition_zh": "蛋",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "amphibians",
+          "definition_en": "Animals that live in water and land.",
+          "definition_zh": "兩棲動物",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "scales",
+          "definition_en": "Small hard flat pieces covering fish bodies.",
+          "definition_zh": "鱗片",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "gills",
+          "definition_en": "Body parts fish use to breathe underwater.",
+          "definition_zh": "鰓",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "feathers",
+          "definition_en": "Light fluffy pieces covering bird bodies.",
+          "definition_zh": "羽毛",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wings",
+          "definition_en": "Body parts birds use to fly high.",
+          "definition_zh": "翅膀",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "fur",
+          "definition_en": "Soft thick hair covering some animals.",
+          "definition_zh": "毛皮",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Subject and Object Pronouns",
+      "examples": [
+        "Fish have gills. They have gills. Gills help them breathe.",
+        "Do gills help fish breathe? Yes, gills help them breathe.",
+        "How do gills help fish? Gills help them breathe."
+      ],
+      "rules": [
+        "Use subject pronouns (I, you, he, she, it, we, they) as the subject of a sentence.",
+        "Use object pronouns (me, you, him, her, it, us, them) as the object of a verb.",
+        "Subject pronouns replace the noun doing the action; object pronouns replace the noun receiving the action."
+      ],
+      "choices": [
+        "I / me",
+        "he / him",
+        "she / her",
+        "we / us",
+        "they / them"
+      ]
+    }
+  },
+  {
+    "unit": 2,
+    "topic": "Leo and Lily's Adventure",
+    "bigQuestion": "How are animals different from one another?",
+    "vocabulary": {
+      "topic": "Animal Words and Verbs",
+      "words": [
+        {
+          "word": "worm",
+          "definition_en": "Small animal that lives in soil.",
+          "definition_zh": "蟲",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "berries",
+          "definition_en": "Small sweet fruits that grow on plants.",
+          "definition_zh": "漿果",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "hunt",
+          "definition_en": "To search for and catch animals.",
+          "definition_zh": "狩獵",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "escape",
+          "definition_en": "To get away from a dangerous place.",
+          "definition_zh": "逃脫",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "creep",
+          "definition_en": "To move slowly and quietly along ground.",
+          "definition_zh": "爬行",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "fight",
+          "definition_en": "To struggle against someone or something.",
+          "definition_zh": "打鬥",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "peck",
+          "definition_en": "When birds hit with their sharp beaks.",
+          "definition_zh": "啄",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "pinecone",
+          "definition_en": "Brown seed container from pine trees.",
+          "definition_zh": "松果",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "squawk",
+          "definition_en": "Loud harsh cry that birds make.",
+          "definition_zh": "刺耳叫聲",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Adverbs of Frequency",
+      "examples": [
+        "Lily always escapes.",
+        "Lily is usually very nervous.",
+        "Leo sometimes tries to catch Lily.",
+        "Leo hardly ever tries to catch Lily now.",
+        "Leo and Lily never fight now."
+      ],
+      "rules": [
+        "Adverbs of frequency tell how often something happens.",
+        "always = 100%, usually = ~75%, sometimes = ~50%, hardly ever = ~10%, never = 0%",
+        "Adverbs of frequency go before the main verb but after the verb 'to be'."
+      ],
+      "choices": [
+        "always",
+        "usually",
+        "sometimes",
+        "hardly ever",
+        "never"
+      ]
+    }
+  },
+  {
+    "unit": 3,
+    "topic": "What Is Our World Made Of?",
+    "bigQuestion": "How do things change?",
+    "vocabulary": {
+      "topic": "Forms and States of Matter",
+      "words": [
+        {
+          "word": "flow",
+          "definition_en": "To move smoothly like water.",
+          "definition_zh": "流動",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "solid",
+          "definition_en": "Hard material that keeps its shape.",
+          "definition_zh": "固體",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "liquid",
+          "definition_en": "Wet substance that pours and flows.",
+          "definition_zh": "液體",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "gas",
+          "definition_en": "Invisible air that floats around.",
+          "definition_zh": "氣體",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "heat",
+          "definition_en": "Warmth that makes things hot.",
+          "definition_zh": "熱",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "steam",
+          "definition_en": "Hot invisible gas from boiling water.",
+          "definition_zh": "蒸汽",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "ice",
+          "definition_en": "Frozen water that is hard and cold.",
+          "definition_zh": "冰",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "freeze",
+          "definition_en": "To turn liquid into hard ice.",
+          "definition_zh": "結凍",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "melt",
+          "definition_en": "To turn solid ice into liquid water.",
+          "definition_zh": "融化",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Simple Past of Verb To Be (Statements)",
+      "examples": [
+        "It was a liquid. Now it's a gas.",
+        "They were hard. Now they're soft.",
+        "It wasn't small, it was very tall.",
+        "Those were his black eyes."
+      ],
+      "rules": [
+        "Use 'was' with I, he, she, it for simple past of 'to be'.",
+        "Use 'were' with you, we, they for simple past of 'to be'.",
+        "For negatives, use wasn't (was not) or weren't (were not)."
+      ],
+      "choices": [
+        "was",
+        "were",
+        "wasn't",
+        "weren't"
+      ]
+    }
+  },
+  {
+    "unit": 4,
+    "topic": "Let's Make Ice Cream!",
+    "bigQuestion": "How do things change?",
+    "vocabulary": {
+      "topic": "Foods and Mixtures",
+      "words": [
+        {
+          "word": "cream",
+          "definition_en": "Thick white liquid from milk.",
+          "definition_zh": "奶油",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sugar",
+          "definition_en": "Sweet white crystals that taste good.",
+          "definition_zh": "糖",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "salt",
+          "definition_en": "White crystals that make food salty.",
+          "definition_zh": "鹽",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "pour",
+          "definition_en": "Let liquid flow from container.",
+          "definition_zh": "倒",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "plastic bags",
+          "definition_en": "Thin containers made from plastic material.",
+          "definition_zh": "塑膠袋",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "mixture",
+          "definition_en": "Things stirred together in one bowl.",
+          "definition_zh": "混合物",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "open",
+          "definition_en": "Not closed, you can go inside.",
+          "definition_zh": "打開",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "closed",
+          "definition_en": "Shut tight, nothing can go in.",
+          "definition_zh": "關閉",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "freezer",
+          "definition_en": "Very cold box that keeps food frozen.",
+          "definition_zh": "冷凍庫",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Simple Past of Verb To Be (Questions)",
+      "examples": [
+        "Was the freezer door open? Yes, it was.",
+        "Were the students happy? No, they weren't.",
+        "Where was the ice cream? It was in the freezer."
+      ],
+      "rules": [
+        "To make a yes/no question, put 'was' or 'were' before the subject.",
+        "To make a Wh- question, put the question word before 'was' or 'were'.",
+        "Short answers: Yes, it was. / No, it wasn't. Yes, they were. / No, they weren't."
+      ],
+      "choices": [
+        "Was",
+        "Were",
+        "Where was",
+        "Where were"
+      ]
+    }
+  },
+  {
+    "unit": 5,
+    "topic": "Then and Now",
+    "bigQuestion": "How are things different now from long ago?",
+    "vocabulary": {
+      "topic": "Travel, Communication, and News",
+      "words": [
+        {
+          "word": "travel",
+          "definition_en": "Going from one place to another place.",
+          "definition_zh": "從一個地方去另一個地方",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "communication",
+          "definition_en": "Sharing information and ideas with other people.",
+          "definition_zh": "與他人分享信息和想法",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "airplane",
+          "definition_en": "A big machine that flies through the sky.",
+          "definition_zh": "在天空中飛行的大機器",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "news",
+          "definition_en": "Information about things that happened recently.",
+          "definition_zh": "最近發生的事情的信息",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "letter",
+          "definition_en": "Words written on paper and sent by mail.",
+          "definition_zh": "寫在紙上通過郵件寄送的文字",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "text message",
+          "definition_en": "A short written message sent on a phone.",
+          "definition_zh": "用手機發送的短文字信息",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "e-mail",
+          "definition_en": "Messages sent through a computer or phone.",
+          "definition_zh": "通過電腦或手機發送的信息",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "radio",
+          "definition_en": "A machine that plays music and news sounds.",
+          "definition_zh": "播放音樂和新聞聲音的機器",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "Internet",
+          "definition_en": "A system connecting computers around the world.",
+          "definition_zh": "連接世界各地電腦的系統",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Simple Past Regular Verbs (Statements)",
+      "examples": [
+        "People listened to the news on the radio.",
+        "They didn't watch the news on TV.",
+        "People traveled by horse and cart.",
+        "They didn't travel by airplane."
+      ],
+      "rules": [
+        "Add -ed to regular verbs to make the simple past: listen → listened, travel → traveled.",
+        "For negatives, use didn't + base form of the verb.",
+        "The base form stays the same for all subjects with didn't."
+      ],
+      "choices": [
+        "listened",
+        "watched",
+        "traveled",
+        "walked",
+        "cleaned",
+        "talked"
+      ]
+    }
+  },
+  {
+    "unit": 6,
+    "topic": "Tell Me a Story, Grandpa",
+    "bigQuestion": "How are things different now from long ago?",
+    "vocabulary": {
+      "topic": "Travel Nouns and Verbs",
+      "words": [
+        {
+          "word": "arrive",
+          "definition_en": "Come to a place at last.",
+          "definition_zh": "到達",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "ask",
+          "definition_en": "Question someone to get answer.",
+          "definition_zh": "問",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "check",
+          "definition_en": "Look at something carefully.",
+          "definition_zh": "檢查",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "enter",
+          "definition_en": "Go into a place or room.",
+          "definition_zh": "進入",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "poor",
+          "definition_en": "Not having much money or things.",
+          "definition_zh": "貧窮",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "crowded",
+          "definition_en": "Too many people in one place.",
+          "definition_zh": "擁擠",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "clerk",
+          "definition_en": "Person who helps customers in store.",
+          "definition_zh": "職員",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "visit",
+          "definition_en": "Go to see someone or somewhere.",
+          "definition_zh": "拜訪",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "sick",
+          "definition_en": "Not feeling well in your body.",
+          "definition_zh": "生病",
+          "part_of_speech": "adj."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Simple Past Regular Verbs (Questions)",
+      "examples": [
+        "Did they travel by ship? Yes, they did.",
+        "Did they arrive in two days? No, they didn't.",
+        "What did they do? They lived with Carlo's uncle."
+      ],
+      "rules": [
+        "To make a yes/no question in simple past, use did + subject + base form.",
+        "To make a Wh- question, use the question word + did + subject + base form.",
+        "Short answers: Yes, they did. / No, they didn't."
+      ],
+      "choices": [
+        "Did",
+        "didn't",
+        "What did",
+        "Where did",
+        "How did"
+      ]
+    }
+  },
+  {
+    "unit": 7,
+    "topic": "Subtraction",
+    "bigQuestion": "When do we use subtraction?",
+    "vocabulary": {
+      "topic": "Math Vocabulary",
+      "words": [
+        {
+          "word": "minus sign",
+          "definition_en": "A symbol that means take away or subtract.",
+          "definition_zh": "減號",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "subtraction",
+          "definition_en": "Taking away numbers to find the answer.",
+          "definition_zh": "減法",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "take away",
+          "definition_en": "To remove or subtract one number from another.",
+          "definition_zh": "拿走",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "column",
+          "definition_en": "Numbers or things arranged up and down.",
+          "definition_zh": "列",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "row",
+          "definition_en": "Numbers or things arranged left to right.",
+          "definition_zh": "行",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "test score",
+          "definition_en": "The number of points you get on a test.",
+          "definition_zh": "考試成績",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "single-digit number",
+          "definition_en": "A number from zero to nine only.",
+          "definition_zh": "個位數",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "double-digit number",
+          "definition_en": "A number from ten to ninety-nine.",
+          "definition_zh": "兩位數",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "left",
+          "definition_en": "The direction opposite from your right.",
+          "definition_zh": "左邊",
+          "part_of_speech": "adj."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Simple Past Irregular Verbs (Negative Statements)",
+      "examples": [
+        "Alma bought five cookies. She didn't buy four.",
+        "Olivia gave her sister twenty stickers.",
+        "She didn't give her twenty-six."
+      ],
+      "rules": [
+        "Some verbs have irregular past forms: eat → ate, see → saw, buy → bought, give → gave.",
+        "For negatives with irregular verbs, use didn't + the base form (not the irregular form).",
+        "You must memorize irregular past tense forms — they don't follow a pattern."
+      ],
+      "choices": [
+        "eat / ate",
+        "see / saw",
+        "buy / bought",
+        "give / gave",
+        "take / took"
+      ]
+    }
+  },
+  {
+    "unit": 8,
+    "topic": "Bandar, the Greedy Monkey",
+    "bigQuestion": "When do we use subtraction?",
+    "vocabulary": {
+      "topic": "People Nouns and Verbs",
+      "words": [
+        {
+          "word": "let go",
+          "definition_en": "Release something you are holding.",
+          "definition_zh": "放開",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "steal",
+          "definition_en": "Take something that is not yours.",
+          "definition_zh": "偷竊",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "dig up",
+          "definition_en": "Remove something from under ground.",
+          "definition_zh": "挖出",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "hide",
+          "definition_en": "Put something where no one can see.",
+          "definition_zh": "隱藏",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "jar",
+          "definition_en": "Container with a wide mouth and lid.",
+          "definition_zh": "罐子",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "greedy",
+          "definition_en": "Wanting more than you really need.",
+          "definition_zh": "貪心",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "bored",
+          "definition_en": "Not interested or feeling tired and dull.",
+          "definition_zh": "無聊",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "baker",
+          "definition_en": "Person who makes bread and cakes.",
+          "definition_zh": "麵包師傅",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "cook",
+          "definition_en": "Prepare food using heat for eating.",
+          "definition_zh": "烹飪",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Simple Past Irregular Verbs (Questions)",
+      "examples": [
+        "Did Bandar go to a candy store? Yes, he did.",
+        "Did he let go of the candy? No, he didn't.",
+        "What did Bandar do with the cookies? He ate them."
+      ],
+      "rules": [
+        "To make yes/no questions with irregular past verbs, use did + subject + base form.",
+        "To make Wh- questions, use question word + did + subject + base form.",
+        "Key irregular verbs: make → made, buy → bought, take → took, sell → sold, go → went."
+      ],
+      "choices": [
+        "make / made",
+        "buy / bought",
+        "take / took",
+        "sell / sold",
+        "go / went"
+      ]
+    }
+  },
+  {
+    "unit": 9,
+    "topic": "Following Rules",
+    "bigQuestion": "How do people get along with each other?",
+    "vocabulary": {
+      "topic": "Rules and People",
+      "words": [
+        {
+          "word": "traffic light",
+          "definition_en": "Colored lights that tell cars when to stop.",
+          "definition_zh": "告訴汽車何時停止的彩色燈",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "take turns",
+          "definition_en": "Each person does something one after another.",
+          "definition_zh": "每個人輪流做某事",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "polite",
+          "definition_en": "Being kind and respectful to other people.",
+          "definition_zh": "對他人友善和尊重",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "clean up",
+          "definition_en": "To make a place neat and free of mess.",
+          "definition_zh": "整理和清潔一個地方",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "litter",
+          "definition_en": "Trash or garbage left on the ground.",
+          "definition_zh": "丟棄在地上的垃圾",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "librarian",
+          "definition_en": "Person who works in a library and helps find books.",
+          "definition_zh": "在圖書館工作幫助尋找書籍的人",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "crossing guard",
+          "definition_en": "Adult who helps children safely cross the street.",
+          "definition_zh": "幫助兒童安全過馬路的成人",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "principal",
+          "definition_en": "The leader in charge of a school.",
+          "definition_zh": "負責學校的領導者",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "lifeguard",
+          "definition_en": "Person who watches swimmers and keeps them safe.",
+          "definition_zh": "監視游泳者並保護他們安全的人",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Possessive Pronouns",
+      "examples": [
+        "Those are your things. Those things are yours.",
+        "They aren't my toys. They aren't mine.",
+        "Whose book is this? It's hers.",
+        "Whose pencils are these? They're his."
+      ],
+      "rules": [
+        "Possessive pronouns replace a possessive adjective + noun: my book → mine, your book → yours.",
+        "Possessive pronouns: mine, yours, his, hers, ours, theirs.",
+        "Use 'Whose' to ask who something belongs to."
+      ],
+      "choices": [
+        "mine",
+        "yours",
+        "his",
+        "hers",
+        "ours",
+        "theirs"
+      ]
+    }
+  },
+  {
+    "unit": 10,
+    "topic": "The Please and Thank You Book of Poems",
+    "bigQuestion": "How do people get along with each other?",
+    "vocabulary": {
+      "topic": "Getting Along",
+      "words": [
+        {
+          "word": "knock",
+          "definition_en": "Tap on door to get someone's attention.",
+          "definition_zh": "敲門",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "thoughtful",
+          "definition_en": "Thinking about how to help others.",
+          "definition_zh": "體貼的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "rude",
+          "definition_en": "Not being polite or kind to people.",
+          "definition_zh": "粗魯的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "grab",
+          "definition_en": "Quickly take something with your hand.",
+          "definition_zh": "抓住",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "pass",
+          "definition_en": "Give something to another person.",
+          "definition_zh": "傳遞",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "put away",
+          "definition_en": "Move something to its proper place.",
+          "definition_zh": "收起來",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "invite",
+          "definition_en": "Ask someone to come to event.",
+          "definition_zh": "邀請",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "wash",
+          "definition_en": "Clean something with water and soap.",
+          "definition_zh": "洗",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "share",
+          "definition_en": "Give some of yours to someone else.",
+          "definition_zh": "分享",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Can and May",
+      "examples": [
+        "Can I play? Yes, you can. / No, you can't.",
+        "May I come in? Yes, you may. / No, you may not."
+      ],
+      "rules": [
+        "Use 'can' to ask if something is possible or to ask for permission informally.",
+        "Use 'may' to ask for permission more formally and politely.",
+        "Negative: can't / cannot; may not."
+      ],
+      "choices": [
+        "Can I...?",
+        "May I...?",
+        "Yes, you can.",
+        "No, you can't.",
+        "Yes, you may.",
+        "No, you may not."
+      ]
+    }
+  },
+  {
+    "unit": 11,
+    "topic": "Natural Resources",
+    "bigQuestion": "Why should we take care of the Earth?",
+    "vocabulary": {
+      "topic": "Land and Resources",
+      "words": [
+        {
+          "word": "resources",
+          "definition_en": "Things we use that come from nature.",
+          "definition_zh": "資源",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wood",
+          "definition_en": "Hard material that comes from trees.",
+          "definition_zh": "木頭",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "landfill",
+          "definition_en": "Place where people put garbage and trash.",
+          "definition_zh": "垃圾填埋場",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "land",
+          "definition_en": "Ground and soil where things grow.",
+          "definition_zh": "土地",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "trash",
+          "definition_en": "Garbage or things we throw away.",
+          "definition_zh": "垃圾",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "smoke",
+          "definition_en": "Gray cloud that comes from fire.",
+          "definition_zh": "煙",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sunlight",
+          "definition_en": "Light and heat that comes from sun.",
+          "definition_zh": "陽光",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "reduce",
+          "definition_en": "Use less of something to help earth.",
+          "definition_zh": "減少",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "reuse",
+          "definition_en": "Use something again instead of throwing.",
+          "definition_zh": "重複使用",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Prepositions of Place",
+      "examples": [
+        "There's smoke in the air above the city.",
+        "The landfill is across from the park.",
+        "The trash can is behind the tree.",
+        "The tree is in front of the trash can."
+      ],
+      "rules": [
+        "Use 'above' to mean higher than something.",
+        "Use 'across from' to mean on the other side.",
+        "Use 'behind' to mean at the back of, and 'in front of' to mean at the front of."
+      ],
+      "choices": [
+        "above",
+        "across from",
+        "behind",
+        "in front of",
+        "between",
+        "next to"
+      ]
+    }
+  },
+  {
+    "unit": 12,
+    "topic": "A Juice Carton's Diary",
+    "bigQuestion": "Why should we take care of the Earth?",
+    "vocabulary": {
+      "topic": "Recycling",
+      "words": [
+        {
+          "word": "carton",
+          "definition_en": "A box made from thick paper.",
+          "definition_zh": "紙箱",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "diary",
+          "definition_en": "A book where you write daily thoughts.",
+          "definition_zh": "日記",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "paper",
+          "definition_en": "Thin material used for writing on.",
+          "definition_zh": "紙",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "blow",
+          "definition_en": "To push air out of your mouth hard.",
+          "definition_zh": "吹",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "shelf",
+          "definition_en": "A flat board for holding things up.",
+          "definition_zh": "架子",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "recycling plant",
+          "definition_en": "A place that turns old things into new things.",
+          "definition_zh": "回收廠",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "machine",
+          "definition_en": "A thing that does work using power.",
+          "definition_zh": "機器",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "stationery store",
+          "definition_en": "A shop that sells pens and paper.",
+          "definition_zh": "文具店",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "rescue",
+          "definition_en": "To save someone from danger or trouble.",
+          "definition_zh": "救援",
+          "part_of_speech": "v."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Prepositions of Place (Questions)",
+      "examples": [
+        "Where's the fountain? It's across from the statue.",
+        "Is there a trash can behind the tree? Yes, there is."
+      ],
+      "rules": [
+        "Use 'Where' + is/are to ask about location.",
+        "Use 'Is there / Are there' + preposition phrase to ask yes/no location questions.",
+        "Short answers: Yes, there is. / No, there isn't. Yes, there are. / No, there aren't."
+      ],
+      "choices": [
+        "Where's...?",
+        "Is there...?",
+        "Are there...?",
+        "Yes, there is.",
+        "No, there isn't."
+      ]
+    }
+  },
+  {
+    "unit": 13,
+    "topic": "How Music Makes Us Feel",
+    "bigQuestion": "How does music make us feel?",
+    "vocabulary": {
+      "topic": "Music and Feelings",
+      "words": [
+        {
+          "word": "high",
+          "definition_en": "Very far up in the air or sky.",
+          "definition_zh": "很高；在空中很远处",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "low",
+          "definition_en": "Not far up; close to the ground.",
+          "definition_zh": "很低；靠近地面",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "excited",
+          "definition_en": "Very happy and full of energy.",
+          "definition_zh": "興奮的；充滿能量和快樂",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "sleepy",
+          "definition_en": "Feeling tired and wanting to sleep.",
+          "definition_zh": "困倦的；想要睡覺",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "wolf",
+          "definition_en": "A wild animal like a big dog.",
+          "definition_zh": "狼；野生動物",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "feelings",
+          "definition_en": "Emotions you have inside your heart.",
+          "definition_zh": "感受；心裡的情感",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "right",
+          "definition_en": "Correct; the opposite of left.",
+          "definition_zh": "正確的；左邊的相反",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "wrong",
+          "definition_en": "Not correct; not the right answer.",
+          "definition_zh": "不正確的；錯誤的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "trumpet",
+          "definition_en": "A musical instrument you blow into.",
+          "definition_zh": "小號；吹奏的樂器",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Prepositions of Time",
+      "examples": [
+        "Pedro listens to slow music at night.",
+        "When does Amanda listen to slow music? She listens in the morning."
+      ],
+      "rules": [
+        "Use 'at' with specific times: at night, at 7 o'clock, at noon.",
+        "Use 'in' with parts of the day (except night): in the morning, in the afternoon, in the evening.",
+        "Use 'on' with days: on Monday, on Saturday."
+      ],
+      "choices": [
+        "at night",
+        "in the morning",
+        "in the afternoon",
+        "in the evening",
+        "on Monday"
+      ]
+    }
+  },
+  {
+    "unit": 14,
+    "topic": "Olga's Flute",
+    "bigQuestion": "How does music make us feel?",
+    "vocabulary": {
+      "topic": "Music and Feelings (Extended)",
+      "words": [
+        {
+          "word": "notes",
+          "definition_en": "Written words or musical sounds.",
+          "definition_zh": "筆記或音樂聲音",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wait",
+          "definition_en": "Stay in one place until something happens.",
+          "definition_zh": "留在一個地方直到發生某事",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "worried",
+          "definition_en": "Feeling nervous or scared about something.",
+          "definition_zh": "對某事感到緊張或害怕",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "the flu",
+          "definition_en": "A sickness that makes you feel very sick.",
+          "definition_zh": "使你感到非常生病的疾病",
+          "part_of_speech": "phrase"
+        },
+        {
+          "word": "tears",
+          "definition_en": "Water drops that fall from your eyes.",
+          "definition_zh": "從眼睛流出的水滴",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "solo",
+          "definition_en": "Performing or doing something all by yourself.",
+          "definition_zh": "獨自表演或做某事",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "hummingbird",
+          "definition_en": "Tiny bird that flies very fast and drinks nectar.",
+          "definition_zh": "飛得很快並喝花蜜的小鳥",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "record",
+          "definition_en": "Write down information to save it for later.",
+          "definition_zh": "寫下信息以便稍後保存",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "musician",
+          "definition_en": "Person who plays music or sings songs.",
+          "definition_zh": "演奏音樂或唱歌的人",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Adverbs of Time",
+      "examples": [
+        "This morning, Olga goes to school early for extra practice.",
+        "When did Mark go to music class? He went yesterday morning."
+      ],
+      "rules": [
+        "Adverbs of time tell when an action happens: this morning, yesterday, last week, last night.",
+        "Adverbs of time can go at the beginning or end of a sentence.",
+        "Use 'When' to ask about the time of an action."
+      ],
+      "choices": [
+        "this morning",
+        "yesterday morning",
+        "yesterday afternoon",
+        "last week",
+        "last night"
+      ]
+    }
+  },
+  {
+    "unit": 15,
+    "topic": "Forces and Movement",
+    "bigQuestion": "What makes things move?",
+    "vocabulary": {
+      "topic": "Forces",
+      "words": [
+        {
+          "word": "push",
+          "definition_en": "Use force to move something away.",
+          "definition_zh": "推",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "pull",
+          "definition_en": "Use force to move something toward you.",
+          "definition_zh": "拉",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "movement",
+          "definition_en": "When something changes position or location.",
+          "definition_zh": "運動",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "ground",
+          "definition_en": "The earth or surface you stand on.",
+          "definition_zh": "地面",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "throw",
+          "definition_en": "Use your arm to send something through air.",
+          "definition_zh": "拋",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "speed",
+          "definition_en": "How fast something is moving or going.",
+          "definition_zh": "速度",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "heavy",
+          "definition_en": "Weighs a lot and is hard to lift.",
+          "definition_zh": "重的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "light",
+          "definition_en": "Does not weigh very much at all.",
+          "definition_zh": "輕的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "easy",
+          "definition_en": "Not hard to do or understand well.",
+          "definition_zh": "容易的",
+          "part_of_speech": "adj."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Comparative Adjectives",
+      "examples": [
+        "A ball is lighter than a desk.",
+        "Is a desk heavier than a ball? Yes, it is.",
+        "What's slower than an airplane? A train is slower than an airplane."
+      ],
+      "rules": [
+        "Add -er to short adjectives to compare two things: fast → faster, slow → slower.",
+        "For adjectives ending in consonant + vowel + consonant, double the final consonant: big → bigger.",
+        "For adjectives ending in -y, change y to i and add -er: heavy → heavier."
+      ],
+      "choices": [
+        "fast / faster",
+        "slow / slower",
+        "big / bigger",
+        "small / smaller",
+        "heavy / heavier",
+        "light / lighter"
+      ]
+    }
+  },
+  {
+    "unit": 16,
+    "topic": "Two Stubborn Little Goats",
+    "bigQuestion": "What makes things move?",
+    "vocabulary": {
+      "topic": "Descriptions of Place and Feelings",
+      "words": [
+        {
+          "word": "stubborn",
+          "definition_en": "Refusing to change your mind or opinion.",
+          "definition_zh": "固執的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "angry",
+          "definition_en": "Feeling very upset and mad inside.",
+          "definition_zh": "生氣的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "goat",
+          "definition_en": "Farm animal with horns and a beard.",
+          "definition_zh": "山羊",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "mountain",
+          "definition_en": "Very tall natural hill made of rock.",
+          "definition_zh": "山",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "west",
+          "definition_en": "Direction where the sun goes down.",
+          "definition_zh": "西",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "east",
+          "definition_en": "Direction where the sun comes up.",
+          "definition_zh": "東",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "forward",
+          "definition_en": "Moving toward the front direction ahead.",
+          "definition_zh": "向前",
+          "part_of_speech": "adv."
+        },
+        {
+          "word": "horns",
+          "definition_en": "Hard pointed parts on animal heads.",
+          "definition_zh": "角",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "wet",
+          "definition_en": "Covered or soaked with water.",
+          "definition_zh": "濕的",
+          "part_of_speech": "adj."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Superlative Adjectives",
+      "examples": [
+        "I'm the youngest person in my family.",
+        "Is the juiciest grass on East Mountain? Yes, it is."
+      ],
+      "rules": [
+        "Add -est to short adjectives to make the superlative: young → youngest, loud → loudest.",
+        "For adjectives ending in -y, change y to i and add -est: juicy → juiciest.",
+        "Use 'the' before superlative adjectives."
+      ],
+      "choices": [
+        "young / younger / youngest",
+        "loud / louder / loudest",
+        "quiet / quieter / quietest",
+        "big / bigger / biggest",
+        "juicy / juicier / juiciest"
+      ]
+    }
+  },
+  {
+    "unit": 17,
+    "topic": "Shapes in Art",
+    "bigQuestion": "How do we make art?",
+    "vocabulary": {
+      "topic": "Art and Shapes",
+      "words": [
+        {
+          "word": "crescent",
+          "definition_en": "Curved shape like the moon.",
+          "definition_zh": "像月亮一样的弯曲形状",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "star",
+          "definition_en": "Bright light in the night sky.",
+          "definition_zh": "夜空中闪亮的光",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "spiral",
+          "definition_en": "Circular pattern that winds around.",
+          "definition_zh": "绕圈旋转的图案",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "oval",
+          "definition_en": "Shape like an egg or circle.",
+          "definition_zh": "像鸡蛋一样的形状",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "straight",
+          "definition_en": "Line that does not bend or curve.",
+          "definition_zh": "不弯曲的直线",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "nature",
+          "definition_en": "All plants, animals, and outdoors.",
+          "definition_zh": "所有植物、动物和户外",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "collage",
+          "definition_en": "Artwork made from cut pieces.",
+          "definition_zh": "用剪下的碎片制作的艺术作品",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "sculpture",
+          "definition_en": "3D artwork carved or shaped.",
+          "definition_zh": "雕刻或塑造的立体艺术作品",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "pattern",
+          "definition_en": "Design that repeats over again.",
+          "definition_zh": "重复出现的设计",
+          "part_of_speech": "n."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Quantifiers (Statements)",
+      "examples": [
+        "There are a lot of shapes.",
+        "There aren't any triangles.",
+        "There is a lot of paper.",
+        "There isn't any red paint."
+      ],
+      "rules": [
+        "Use 'a lot of' with both countable and uncountable nouns in positive sentences.",
+        "Use 'any' with countable and uncountable nouns in negative sentences.",
+        "Use 'are' with plural countable nouns; use 'is' with uncountable nouns."
+      ],
+      "choices": [
+        "a lot of",
+        "any",
+        "There are a lot of...",
+        "There aren't any...",
+        "There is a lot of...",
+        "There isn't any..."
+      ]
+    }
+  },
+  {
+    "unit": 18,
+    "topic": "Origami",
+    "bigQuestion": "How do we make art?",
+    "vocabulary": {
+      "topic": "Art Materials and Actions",
+      "words": [
+        {
+          "word": "shiny",
+          "definition_en": "Bright and reflecting light like a mirror.",
+          "definition_zh": "閃亮的",
+          "part_of_speech": "adj."
+        },
+        {
+          "word": "fold",
+          "definition_en": "Bend paper or cloth in half neatly.",
+          "definition_zh": "摺疊",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "edge",
+          "definition_en": "The outer border or side of something.",
+          "definition_zh": "邊緣",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "crane",
+          "definition_en": "A tall bird with long legs and neck.",
+          "definition_zh": "鶴",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "seal",
+          "definition_en": "A sea animal with flippers and fur.",
+          "definition_zh": "海豹",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "crumple",
+          "definition_en": "Squeeze something into wrinkles and bumps.",
+          "definition_zh": "皺縮",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "waves",
+          "definition_en": "Water moving up and down in ocean.",
+          "definition_zh": "波浪",
+          "part_of_speech": "n."
+        },
+        {
+          "word": "climb",
+          "definition_en": "Go up something using hands and feet.",
+          "definition_zh": "爬",
+          "part_of_speech": "v."
+        },
+        {
+          "word": "golden",
+          "definition_en": "Having the bright yellow color of gold.",
+          "definition_zh": "金色的",
+          "part_of_speech": "adj."
+        }
+      ]
+    },
+    "grammar": {
+      "point": "Quantifiers (Questions)",
+      "examples": [
+        "Did Maki have any pencils? No, she didn't.",
+        "How many seals were there? There was one seal.",
+        "How much paper was there? There was a lot of paper."
+      ],
+      "rules": [
+        "Use 'any' in questions with both countable and uncountable nouns.",
+        "Use 'How many' to ask about countable nouns.",
+        "Use 'How much' to ask about uncountable nouns."
+      ],
+      "choices": [
+        "any",
+        "How many...?",
+        "How much...?",
+        "There was one...",
+        "There was a lot of..."
+      ]
+    }
+  }
+]
