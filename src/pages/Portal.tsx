@@ -119,8 +119,8 @@ const VocabCard = ({ bookNum, unitsStr }: { bookNum: number; unitsStr: string })
       </div>
       <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>本單元詞彙</div>
       <h3 className="font-display font-bold text-xl text-paradise-sky mb-1">📖 Book {bookNum} · Unit {unitNum}{topicLabel ? ` — ${topicLabel}` : ""}</h3>
-      <p className="font-body text-sm text-muted-foreground mb-1">{hasDefinitions ? "Tap a word to see its definition — then quiz your child! 🌟" : "This unit\'s vocabulary words. Practice reading them together! 🌟"}</p>
-      <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.4)", marginBottom: "1.25rem" }}>{hasDefinitions ? "點擊單字查看解釋，然後考考孩子！" : "本單元的詞彙，一起練習閱讀！"}</div>
+      <p className="font-body text-sm text-muted-foreground mb-1">Practice these words with your child — then quiz them! 🌟</p>
+      <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.4)", marginBottom: "1.25rem" }}>跟孩子一起練習這些單字，然後考考他們！</div>
 
       <div className="flex flex-col divide-y divide-gray-100">
         {displayWords.map((w) => (
@@ -286,8 +286,8 @@ const Dashboard = () => {
           ))}
         </div>
         {/* Vocab Card */}
-        {family.book && latestUnitsStr && (
-          <VocabCard bookNum={family.book} unitsStr={latestUnitsStr} />
+        {family.book && (
+          <VocabCard bookNum={family.book} unitsStr={latestUnitsStr || "1"} />
         )}
 
         <div className="card-fun p-6 md:col-span-2" style={{ opacity: 0.7, position: "relative", pointerEvents: "none" }}>
