@@ -349,7 +349,7 @@ const EarnButtons = ({ navigate, code, studentName }: { navigate: (p: string) =>
       { label: "Read & Quiz", sub: "即將推出！Coming Soon!", reward: "🔒", color: "#a855f7", glow: "rgba(168,85,247,0.0)", path: "", disabled: true },
       { label: "Visit 5 Days!", sub: "連續來5天！", reward: "+3 treats", color: "#10b981", glow: "rgba(16,185,129,0.5)", path: "" },
     ].map((btn, i) => (
-      <button key={i} onClick={() => !btn.disabled && btn.path && navigate(btn.path.replace('BOOKNUM', String(family?.book ?? 1)))} style={{
+      <button key={i} onClick={() => { if(!btn.disabled && btn.path){ const f = JSON.parse(sessionStorage.getItem('mpe_family') || '{}'); navigate(btn.path.replace('BOOKNUM', String(f?.book ?? 1))); }}} style={{
         width: "100%", padding: "1.1rem 1.25rem",
         background: `linear-gradient(135deg,${btn.color},${btn.color}cc)`,
         border: "none", borderRadius: "1.4rem", opacity: btn.disabled ? 0.4 : 1,
