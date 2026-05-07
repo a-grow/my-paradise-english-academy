@@ -42,7 +42,7 @@ const CHINESE: Record<string,string> = {
 // ── DIFFICULTY ─────────────────────────────────────────────────────────────────
 type Diff = "easy"|"medium"|"hard";
 const DIFF_CONFIG: Record<Diff,{label:string;emoji:string;color:string;spawnMs:number;speedMult:number;timerSec:number;maxOnScreen:number;moleShowMs:number;desc:string}> = {
-  easy:   {label:"Easy",   emoji:"🟢", color:"#4ade80", spawnMs:2800, speedMult:0.5,  timerSec:90, maxOnScreen:3, moleShowMs:4800, desc:"Slow & relaxed"},
+  easy:   {label:"Easy",   emoji:"🟢", color:"#4ade80", spawnMs:2800, speedMult:0.65, timerSec:90, maxOnScreen:3, moleShowMs:4800, desc:"Slow & relaxed"},
   medium: {label:"Medium", emoji:"🟡", color:"#fbbf24", spawnMs:1600, speedMult:1.0,  timerSec:60, maxOnScreen:6, moleShowMs:3800, desc:"Normal pace"},
   hard:   {label:"Hard",   emoji:"🔴", color:"#ef4444", spawnMs:900,  speedMult:1.65, timerSec:40, maxOnScreen:9, moleShowMs:2400, desc:"Fast & furious"},
 };
@@ -787,7 +787,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
   };
 
   const buildLetters=(w:string,sn:Seg[]):Letter[]=>{
-    const chars=w.split("");
+    const chars=w.toUpperCase().split("");
     const head=sn[0];const d=sn.length>1?{x:sn[0].x-sn[1].x,y:sn[0].y-sn[1].y}:{x:1,y:0};
     const safeZone=[1,2,3].map(i=>({x:(head.x+d.x*i+COLS)%COLS,y:(head.y+d.y*i+ROWS)%ROWS}));
     const placed:{x:number;y:number}[]=[...safeZone];
@@ -798,8 +798,8 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
       if(pos){placed.push(pos);positions.push({id:letterIdRef.current++,x:pos.x,y:pos.y,char:chars[li],isWord:true});}
     }
     const uniqueChars=new Set(chars);
-    const dist="abcdefghijklmnopqrstuvwxyz".split("").filter(c=>!uniqueChars.has(c));
-    shuffle(dist).slice(0,6).forEach(char=>{
+    const dist="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").filter(c=>!uniqueChars.has(c.toLowerCase()));
+    shuffle(dist).slice(0,cfg.speedMult<0.7?3:6).forEach(char=>{
       const pos=emptyCell(sn,placed);
       if(pos){placed.push(pos);positions.push({id:letterIdRef.current++,x:pos.x,y:pos.y,char,isWord:false});}
     });
@@ -831,7 +831,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
     window.addEventListener("keydown",k);return()=>window.removeEventListener("keydown",k);
   },[]);
 
-  const snakeSpeed=Math.max(110,Math.round(270/cfg.speedMult));
+  const snakeSpeed=Math.max(110,Math.round(380/cfg.speedMult));
 
   const triggerSnakeOuch=()=>{
     if(ouchSnakeRef.current||completingWordRef.current) return;
@@ -860,7 +860,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
         if(hit){
           const col=collectedRef.current;
           const tw=wordRef.current;
-          if(hit.isWord&&hit.char===tw[col.length]){
+          if(hit.isWord&&hit.char===tw[col.length].toUpperCase()){
             play("chomp");
             const next=[...col,hit.char];
             setCollected(next);

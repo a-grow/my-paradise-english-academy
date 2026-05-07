@@ -557,13 +557,7 @@ const KidsWorld = () => {
 
   useEffect(() => {
     if (isMaster) return;
-    fetch(`${SHEETDB_URL}?sheet=StudentProgress`)
-      .then(r => r.json())
-      .then((data: any[]) => {
-        const row = data.find(r => r.familyCode === code && r.studentName?.toLowerCase() === studentName?.toLowerCase());
-        if (row) { setTreats(parseInt(row.treats) || 0); }
-        setLoading(false);
-      }).catch(() => setLoading(false));
+    setLoading(false);
     const lastGift = localStorage.getItem(`mpe_gift_${code}_${studentName}`);
     const shownKey = `mpe_gift_shown_${code}_${studentName}_${new Date().toDateString()}`;
     if (lastGift !== new Date().toDateString() && !localStorage.getItem(shownKey)) {
