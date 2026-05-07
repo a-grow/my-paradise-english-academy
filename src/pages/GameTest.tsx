@@ -1,30 +1,45 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import book1Data from "@/data/oxford-discover-book1.json";
+import book2Data from "@/data/oxford-discover-book2.json";
+import book3Data from "@/data/oxford-discover-book3.json";
+import book4Data from "@/data/oxford-discover-book4.json";
+import book5Data from "@/data/oxford-discover-book5.json";
 
 // ── FONT ──────────────────────────────────────────────────────────────────────
 const FONT_URL="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap";
 const F="'Nunito',sans-serif";
 
 // ── DATA ──────────────────────────────────────────────────────────────────────
-const UNITS = [
-  { unit:1, topic:"Families & Friends", emoji:"👨‍👩‍👧", color:"#f43f5e", glow:"rgba(244,63,94,0.6)",
-    vocab:["family","grandmother","grandfather","father","mother","brother","sister","friend"],
-    emojis:["👨‍👩‍👧","👵","👴","👨","👩","👦","👧","🤝"] },
-  { unit:2, topic:"Pets", emoji:"🐾", color:"#8b5cf6", glow:"rgba(139,92,246,0.6)",
-    vocab:["hamster","goldfish","bird","rabbit","lizard","kitten"],
-    emojis:["🐹","🐟","🐦","🐰","🦎","🐱"] },
-  { unit:3, topic:"Colors", emoji:"🎨", color:"#f97316", glow:"rgba(249,115,22,0.6)",
-    vocab:["yellow","red","blue","green","purple","black","brown","white"],
-    emojis:["💛","❤️","💙","💚","💜","🖤","🤎","🤍"] },
-  { unit:4, topic:"Ocean & Art", emoji:"🌊", color:"#0ea5e9", glow:"rgba(14,165,233,0.6)",
-    vocab:["mix","mural","ocean","sand","seaweed","seashell","jellyfish","starfish"],
-    emojis:["🎨","🖼️","🌊","🏖️","🌿","🐚","🪼","⭐"] },
-  { unit:5, topic:"Animal Homes", emoji:"🦅", color:"#10b981", glow:"rgba(16,185,129,0.6)",
-    vocab:["eagle","chick","nest","opossum","tree hollow","honeybee","hive","crab"],
-    emojis:["🦅","🐣","🪺","🐾","🌳","🐝","🍯","🦀"] },
-];
-type UnitData = typeof UNITS[0];
+const BOOK_COLORS = ["#f43f5e","#8b5cf6","#f97316","#0ea5e9","#10b981","#e11d48","#7c3aed","#ea580c","#0284c7","#059669","#db2777","#6d28d9","#c2410c","#0369a1","#047857","#be185d","#5b21b6","#9a3412","#075985","#065f46"];
+const BOOK_GLOWS = ["rgba(244,63,94,0.6)","rgba(139,92,246,0.6)","rgba(249,115,22,0.6)","rgba(14,165,233,0.6)","rgba(16,185,129,0.6)","rgba(225,29,72,0.6)","rgba(124,58,237,0.6)","rgba(234,88,12,0.6)","rgba(2,132,199,0.6)","rgba(5,150,105,0.6)","rgba(219,39,119,0.6)","rgba(109,40,217,0.6)","rgba(194,65,12,0.6)","rgba(3,105,161,0.6)","rgba(4,120,87,0.6)","rgba(190,24,93,0.6)","rgba(91,33,182,0.6)","rgba(154,52,18,0.6)","rgba(7,89,133,0.6)","rgba(6,95,70,0.6)"];
+function getTopicEmoji(topic: string): string {
+  const t = topic.toLowerCase();
+  if(t.includes("animal")) return "🐾";
+  if(t.includes("famil")||t.includes("friend")) return "👨‍👩‍👧";
+  if(t.includes("color")||t.includes("colour")||t.includes("art")||t.includes("paint")) return "🎨";
+  if(t.includes("ocean")||t.includes("sea")||t.includes("water")||t.includes("fish")) return "🌊";
+  if(t.includes("home")||t.includes("house")||t.includes("live")) return "🏠";
+  if(t.includes("food")||t.includes("eat")||t.includes("cook")||t.includes("cream")) return "🍎";
+  if(t.includes("weather")||t.includes("season")||t.includes("rain")||t.includes("snow")) return "⛅";
+  if(t.includes("number")||t.includes("math")||t.includes("count")||t.includes("subtract")||t.includes("addition")) return "🔢";
+  if(t.includes("music")||t.includes("instrument")||t.includes("sing")||t.includes("song")) return "🎵";
+  if(t.includes("plant")||t.includes("tree")||t.includes("forest")||t.includes("garden")) return "🌳";
+  if(t.includes("city")||t.includes("town")||t.includes("street")||t.includes("neighbor")) return "🏙️";
+  if(t.includes("travel")||t.includes("transport")||t.includes("airplane")||t.includes("communication")) return "✈️";
+  if(t.includes("body")||t.includes("health")||t.includes("doctor")) return "💪";
+  if(t.includes("school")||t.includes("class")||t.includes("learn")||t.includes("study")) return "📚";
+  if(t.includes("sport")||t.includes("game")||t.includes("play")) return "⚽";
+  if(t.includes("space")||t.includes("star")||t.includes("planet")||t.includes("moon")) return "🚀";
+  if(t.includes("story")||t.includes("adventure")||t.includes("book")||t.includes("read")) return "📖";
+  if(t.includes("world")||t.includes("earth")||t.includes("country")||t.includes("map")) return "🌍";
+  if(t.includes("science")||t.includes("made of")||t.includes("solid")||t.includes("liquid")) return "🔬";
+  if(t.includes("want")||t.includes("need")||t.includes("buy")||t.includes("market")) return "🛒";
+  return "⭐";
+}
+const BOOK_EMOJIS = ["👨‍👩‍👧","🐾","🎨","🌊","🦅","🌳","🏠","🍎","🐶","🌈","⭐","🎵","🚀","💡","🌍","🎯","🔬","📚","🎪","🌺"];
 
+type UnitData = {unit:number;topic:string;emoji:string;color:string;glow:string;vocab:string[];emojis:string[];chinese:Record<string,string>};
 // ── CHINESE TRANSLATIONS (Taiwanese Mandarin, confirmed by Shirley) ───────────
 const CHINESE: Record<string,string> = {
   family:"家人", grandmother:"奶奶 / 外婆", grandfather:"爺爺 / 外公",
@@ -38,6 +53,79 @@ const CHINESE: Record<string,string> = {
   eagle:"老鷹", chick:"小雞", nest:"鳥巢", opossum:"負鼠",
   "tree hollow":"樹洞", honeybee:"蜜蜂", hive:"蜂巢", crab:"螃蟹",
 };
+
+function buildUnits(bookData: any): UnitData[] {
+  const raw = Array.isArray(bookData) ? bookData : (bookData?.units ?? []);
+  // Build topic->emoji map first, ensuring no repeats within this book
+  const topicEmojiMap: Record<string,string> = {};
+  const usedEmojis = new Set<string>();
+  raw.forEach((u: any) => {
+    const topic = (u.topic ?? "").trim();
+    // Normalize topic for candidate lookup — strip after comma and common suffixes
+    const topicNorm = topic.toLowerCase()
+      .replace(/,.*$/,"")
+      .replace(/the world around us/,"")
+      .replace(/moving/,"")
+      .replace(/language terms/,"")
+      .replace(/health/,"")
+      .trim();
+    if(!topicEmojiMap[topicNorm] && !topicEmojiMap[topicNorm+"_2"]) {
+      const t = topicNorm;
+      const candidates = (
+        t.includes("animal")||t.includes("insect")||t.includes("bird")||t.includes("mammal") ? ["🐾","🦁","🦋","🐸","🦊","🐧","🐬","🦎","🐘"] :
+        t.includes("famil")||t.includes("friend") ? ["👨‍👩‍👧","👪","💝","🤝","😊"] :
+        t.includes("universe")||t.includes("space")||t.includes("planet")||t.includes("star")||t.includes("moon") ? ["🌌","🚀","🔭","🪐","⭐"] :
+        t.includes("color")||t.includes("colour") ? ["🌈","🎨","🖌️","🎭"] :
+        t.includes("art")||t.includes("paint")||t.includes("artist") ? ["🖼️","🎨","✏️","🖌️"] :
+        t.includes("ocean")||t.includes("sea") ? ["🌊","🐚","🐠","🦈"] :
+        t.includes("water")||t.includes("liquid")||t.includes("solid")||t.includes("made of")||t.includes("science") ? ["🔬","⚗️","🧪","💧"] :
+        t.includes("food")||t.includes("eat")||t.includes("cook")||t.includes("cream")||t.includes("farming") ? ["🍎","🥗","🍜","👨‍🍳","🌾"] :
+        t.includes("weather")||t.includes("season") ? ["⛅","🌤️","❄️","🌧️"] :
+        t.includes("number")||t.includes("math")||t.includes("subtract")||t.includes("addition")||t.includes("time") ? ["🔢","🧮","⏰","📐"] :
+        t.includes("music")||t.includes("instrument")||t.includes("sing") ? ["🎵","🎸","🎹","🥁"] :
+        t.includes("plant")||t.includes("tree")||t.includes("forest") ? ["🌳","🌿","🌱","🌻"] :
+        t.includes("city")||t.includes("town")||t.includes("place")||t.includes("neighbor") ? ["🏙️","🏘️","🗺️","🌆"] :
+        t.includes("travel")||t.includes("transport")||t.includes("airplane") ? ["✈️","🚂","🚢","🧳"] :
+        t.includes("communication") ? ["📡","📱","📻","✉️"] :
+        t.includes("health")||t.includes("doctor")||t.includes("body") ? ["🏥","💊","🩺","💪"] :
+        t.includes("school")||t.includes("learn")||t.includes("language") ? ["📚","✏️","🎓","📝"] :
+        t.includes("sport")||t.includes("leisure")||t.includes("game")||t.includes("play") ? ["⚽","🏀","🎾","🏊"] :
+        t.includes("story")||t.includes("adventure")||t.includes("read") ? ["📖","✍️","🗺️","🧭"] :
+        t.includes("world")||t.includes("earth")||t.includes("country") ? ["🌍","🌏","🌎","🗺️"] :
+        t.includes("past")||t.includes("discover")||t.includes("history") ? ["🏛️","📜","⚔️","🗿"] :
+        t.includes("want")||t.includes("need")||t.includes("buy")||t.includes("market") ? ["🛒","💰","🏪","🎁"] :
+        t.includes("natural")||t.includes("force")||t.includes("flood")||t.includes("earthquake")||t.includes("storm")||t.includes("hurricane") ? ["🌪️","⛈️","🌋","❄️","🌊"] :
+        t.includes("safety")||t.includes("suppli")||t.includes("emergency") ? ["🔦","💧","🎒","🩺","🏕️"] :
+        t.includes("home")||t.includes("house")||t.includes("live") ? ["🏠","🏡","🛖","🏘️"] :
+        ["⭐","💡","🎯","🎪","🌺","🔮","🎀","🏆"]
+      );
+      const pick1 = candidates.find(e => !usedEmojis.has(e)) ?? candidates[0];
+      usedEmojis.add(pick1);
+      const pick2 = candidates.find(e => !usedEmojis.has(e)) ?? candidates[1] ?? pick1;
+      usedEmojis.add(pick2);
+      topicEmojiMap[topicNorm] = pick1;
+      topicEmojiMap[topicNorm+"_2"] = pick2;
+    }
+  });
+  return raw.map((u: any, i: number) => {
+    const pairIndex = Math.floor(i / 2);
+    const isSecondInPair = i % 2 === 1;
+    const topic = u.topic ?? `Unit ${u.unit}`;
+    const topicKey = topic.trim().toLowerCase().replace(/,.*$/,"").replace(/\bthe world around us\b/,"").replace(/\bmoving\b/,"").replace(/\blanguage terms\b/,"").replace(/\bhealth\b/,"").trim();
+    return {
+      unit: u.unit,
+      topic: isSecondInPair ? `${topic} (continued 續)` : topic,
+      emoji: (isSecondInPair ? topicEmojiMap[topicKey+"_2"] : topicEmojiMap[topicKey]) ?? "💡",
+      color: BOOK_COLORS[pairIndex] ?? "#6b7280",
+      glow: BOOK_GLOWS[pairIndex] ?? "rgba(107,114,128,0.6)",
+      vocab: (u.vocabulary?.words ?? []).map((w: any) => w.word),
+      emojis: (u.vocabulary?.words ?? []).map(() => "📖"),
+      chinese: Object.fromEntries((u.vocabulary?.words ?? []).map((w: any) => [w.word, CHINESE[w.word] ?? w.definition_zh ?? w.word])),
+    };
+  });
+}
+
+const ALL_BOOKS: Record<number, any> = {1:book1Data,2:book2Data,3:book3Data,4:book4Data,5:book5Data};
 
 // ── DIFFICULTY ─────────────────────────────────────────────────────────────────
 type Diff = "easy"|"medium"|"hard";
@@ -547,7 +635,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
       <div style={{position:"absolute",top:12,left:0,right:0,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0 12px",zIndex:50,gap:"0.5rem"}}>
         <button onClick={onBack} style={{background:"rgba(0,0,0,0.55)",border:"2px solid rgba(255,255,255,0.25)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer",flexShrink:0}}>← Back</button>
         <div style={{background:"rgba(0,0,0,0.72)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.45rem 1.4rem",border:"2px solid rgba(255,255,255,0.25)",flex:1,textAlign:"center",minWidth:0}}>
-          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🏹 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{CHINESE[target]||target}</span></span>
+          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🏹 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span></span>
         </div>
         <div style={{display:"flex",gap:"0.4rem",alignItems:"center",flexShrink:0}}>
           <Pill>⭐{score}</Pill>
@@ -710,7 +798,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
         </div>
         <div style={{textAlign:"center"}}>
           <div style={{background:"rgba(0,0,80,0.6)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.5rem 1.75rem",display:"inline-block",border:"2px solid rgba(255,255,255,0.25)"}}>
-            <span style={{fontFamily:F,fontWeight:800,fontSize:"1.2rem",color:"white"}}>🔨 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{CHINESE[target]||target}</span></span>
+            <span style={{fontFamily:F,fontWeight:800,fontSize:"1.2rem",color:"white"}}>🔨 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span></span>
           </div>
         </div>
       </div>
@@ -1190,7 +1278,7 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
       <div style={{position:"absolute",top:12,left:0,right:0,display:"flex",justifyContent:"space-between",padding:"0 12px",zIndex:50,alignItems:"center",gap:"0.5rem"}}>
         <button onClick={(e)=>{e.stopPropagation();onBack();}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.2)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer",flexShrink:0}}>← Back</button>
         <div style={{background:"rgba(0,0,20,0.85)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.4rem 1.4rem",border:"1.5px solid rgba(0,255,255,0.25)",flex:1,textAlign:"center",minWidth:0}}>
-          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🚀 <span style={{color:"#00ffff",fontSize:"1.8rem"}}>{CHINESE[target]||target}</span></span>
+          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🚀 <span style={{color:"#00ffff",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span></span>
         </div>
         <div style={{display:"flex",gap:"0.35rem",alignItems:"center",flexShrink:0}}>
           <Pill dark>⭐{score}</Pill>
@@ -1292,14 +1380,17 @@ interface GameTestProps {
   onClaim?: (unitId: number, gameId: string, diff: Diff) => void;
   claimedCombos?: Set<string>;
   treatsCappedToday?: boolean;
+  studentBook?: number;
 }
 
-const GameTest = ({onClaim, claimedCombos, treatsCappedToday}: GameTestProps) => {
+const GameTest = ({onClaim, claimedCombos, treatsCappedToday, studentBook=1}: GameTestProps) => {
   const navigate=useNavigate();
   const [screen,setScreen]=useState<Screen>("books");
   const [unit,setUnit]=useState<UnitData|null>(null);
   const [game,setGame]=useState<typeof GAMES[0]|null>(null);
   const [diff,setDiff]=useState<Diff>("medium");
+  const [selectedBook,setSelectedBook]=useState<number>(1);
+  const UNITS = buildUnits(ALL_BOOKS[selectedBook] ?? book1Data);
 
   useEffect(()=>{
     if(!document.getElementById("mpe-fonts")){
@@ -1362,8 +1453,8 @@ const GameTest = ({onClaim, claimedCombos, treatsCappedToday}: GameTestProps) =>
               <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.5)",marginTop:"0.25rem"}}>Pick a book to start playing</div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:"1rem"}}>
-              {[{id:1,label:"Book 1",unlocked:true,color:"#f97316",desc:"Units 1–5 · Families, Pets, Colors, Ocean & Animal Homes!"},{id:2,label:"Book 2",unlocked:false,color:"#6b7280",desc:"Coming soon!"},{id:3,label:"Book 3",unlocked:false,color:"#6b7280",desc:"Coming soon!"}].map((book,i)=>(
-                <button key={book.id} disabled={!book.unlocked} onClick={()=>{if(book.unlocked)setScreen("units");}}
+              {[1,2,3,4,5].map((bookNum,i)=>{const unlocked=bookNum<=studentBook;const book={id:bookNum,label:`Book ${bookNum}`,unlocked,color:unlocked?"#f97316":"#6b7280",desc:unlocked?`Units 1–18`:"🔒 Keep studying to unlock!"};return(
+                <button key={book.id} disabled={!book.unlocked} onClick={()=>{if(book.unlocked){setSelectedBook(book.id);setScreen("units");}}}
                   style={{padding:"1.2rem 1.5rem",background:book.unlocked?`linear-gradient(135deg,${book.color}cc,${book.color}88)`:"rgba(255,255,255,0.04)",border:`2px solid ${book.unlocked?book.color:"rgba(255,255,255,0.08)"}`,borderRadius:"1.5rem",cursor:book.unlocked?"pointer":"not-allowed",display:"flex",alignItems:"center",gap:"1rem",opacity:book.unlocked?1:0.45,animation:book.unlocked?`floatUpDown ${2.5+i*0.3}s ease-in-out infinite ${i*0.2}s`:"none"}}>
                   <div style={{fontSize:"2.8rem"}}>📚</div>
                   <div style={{flex:1,textAlign:"left"}}>
@@ -1372,7 +1463,7 @@ const GameTest = ({onClaim, claimedCombos, treatsCappedToday}: GameTestProps) =>
                   </div>
                   <div style={{fontSize:"1.4rem"}}>{book.unlocked?"▶":"🔒"}</div>
                 </button>
-              ))}
+              );})}
             </div>
           </>
         )}
@@ -1380,7 +1471,7 @@ const GameTest = ({onClaim, claimedCombos, treatsCappedToday}: GameTestProps) =>
           <>
             <div style={{textAlign:"center",marginBottom:"1.5rem",animation:"slideUp 0.4s ease-out"}}>
               <div style={{fontFamily:F,fontWeight:900,fontSize:"1.8rem",color:"white",textShadow:"0 0 20px rgba(168,85,247,0.7)"}}>Choose Your Unit!</div>
-              <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.45)",marginTop:4}}>Book 1 — Units 1–5</div>
+              <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.45)",marginTop:4}}>Book {selectedBook} — Units 1–18</div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:"0.85rem"}}>
               {UNITS.map((u,i)=>(

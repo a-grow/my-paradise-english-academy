@@ -8,7 +8,8 @@ const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
 const DAILY_TREAT_CAP = 999999;
 
 const GamePage = () => {
-  const { code, studentName } = useParams<{ code: string; studentName: string }>();
+  const { code, studentName, book } = useParams<{ code: string; studentName: string; book: string }>();
+  const studentBook = parseInt(book || "1", 10);
   const navigate = useNavigate();
   const isMaster = code === MASTER_CODE;
   const today = new Date().toDateString();
@@ -170,6 +171,7 @@ const GamePage = () => {
         onClaim={handleClaim}
         claimedCombos={claimedCombos}
         treatsCappedToday={treatsCappedToday}
+        studentBook={studentBook}
       />
 
       {/* CELEBRATION OVERLAY */}
