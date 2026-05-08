@@ -345,9 +345,9 @@ const UnderwaterBg = ({ sad }: { sad: boolean }) => (
 const EarnButtons = ({ navigate, code, studentName }: { navigate: (p: string) => void; code: string; studentName: string }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
     {[
-      { label: "Play a Game", sub: "打敗遊戲，得1~3個餅乾！", reward: "+1~3 treats", color: "#0ea5e9", glow: "rgba(14,165,233,0.5)", path: `/game/${code}/${studentName}/BOOKNUM` },
-      { label: "Read & Quiz", sub: "即將推出！Coming Soon!", reward: "🔒", color: "#6366f1", glow: "rgba(0,0,0,0)", path: "", disabled: true },
-      { label: "Visit 5 Days!", sub: "連續來5天！", reward: "+3 treats", color: "#06b6d4", glow: "rgba(6,182,212,0.5)", path: "" },
+      { label: "Play a Game", sub: "打敗遊戲，得1~3個餅乾！", reward: "+1~3 treats", color: "#f97316", glow: "rgba(249,115,22,0.5)", path: `/game/${code}/${studentName}/BOOKNUM` },
+      { label: "Read & Quiz", sub: "即將推出！Coming Soon!", reward: "🔒", color: "#a855f7", glow: "rgba(168,85,247,0.0)", path: "", disabled: true },
+      { label: "Visit 5 Days!", sub: "連續來5天！", reward: "+3 treats", color: "#10b981", glow: "rgba(16,185,129,0.5)", path: "" },
     ].map((btn, i) => (
       <button key={i} onClick={() => { if(!btn.disabled && btn.path){ const f = JSON.parse(sessionStorage.getItem('mpe_family') || '{}'); navigate(btn.path.replace('BOOKNUM', String(f?.book ?? 1))); }}} style={{
         width: "100%", padding: "1.1rem 1.25rem",
