@@ -118,7 +118,7 @@ function buildUnits(bookData: any): UnitData[] {
       emoji: (isSecondInPair ? topicEmojiMap[topicKey+"_2"] : topicEmojiMap[topicKey]) ?? "💡",
       color: BOOK_COLORS[pairIndex] ?? "#6b7280",
       glow: BOOK_GLOWS[pairIndex] ?? "rgba(107,114,128,0.6)",
-      vocab: (u.vocabulary?.words ?? []).map((w: any) => w.word),
+      vocab: (u.vocabulary?.words ?? []).map((w: any) => typeof w === "string" ? w : w.word).filter(Boolean),
       emojis: (u.vocabulary?.words ?? []).map(() => "📖"),
       chinese: Object.fromEntries((u.vocabulary?.words ?? []).map((w: any) => [w.word, CHINESE[w.word] ?? w.definition_zh ?? w.word])),
     };

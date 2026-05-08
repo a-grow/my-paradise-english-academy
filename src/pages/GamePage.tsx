@@ -127,44 +127,7 @@ const GamePage = () => {
   return (
     <div style={{ position: "relative", minHeight: "100vh" }}>
 
-      {/* MUSIC TOGGLE */}
-      <div style={{
-        position: "fixed", top: 12, right: 12, zIndex: 200,
-        display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4
-      }}>
-        <button onClick={() => {
-          setMusicOn(m => {
-            localStorage.setItem("mpe_music", !m ? "on" : "off");
-            return !m;
-          });
-        }} style={{
-          background: musicOn ? "linear-gradient(135deg,#4ade80,#22d3ee)" : "rgba(0,0,0,0.45)",
-          border: "1.5px solid rgba(255,255,255,0.25)",
-          borderRadius: "999px", padding: "0.32rem 0.85rem",
-          fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: "0.85rem",
-          color: "white", cursor: "pointer",
-          boxShadow: musicOn ? "0 3px 10px rgba(74,222,128,0.4)" : "none",
-          transition: "all 0.3s"
-        }}>
-          {musicOn ? "🎵 On" : "🔇 Off"}
-        </button>
-        {musicOn && (
-          <input type="range" min="0" max="1" step="0.05" value={volume}
-            onChange={e => {
-              const v = parseFloat(e.target.value);
-              setVolume(v);
-              localStorage.setItem("mpe_volume", String(v));
-              if (audioRef.current) audioRef.current.volume = v * 0.25;
-            }}
-            style={{
-              width: 70, height: 5, borderRadius: 3,
-              WebkitAppearance: "none", appearance: "none" as any,
-              background: `linear-gradient(to right, #4ade80 ${volume * 100}%, rgba(255,255,255,0.2) ${volume * 100}%)`,
-              outline: "none", cursor: "pointer"
-            }}
-          />
-        )}
-      </div>
+
 
       {/* ARCADE */}
       <GameTest
