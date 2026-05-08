@@ -131,8 +131,8 @@ const ALL_BOOKS: Record<number, any> = {1:book1Data,2:book2Data,3:book3Data,4:bo
 type Diff = "easy"|"medium"|"hard";
 const DIFF_CONFIG: Record<Diff,{label:string;emoji:string;color:string;spawnMs:number;speedMult:number;timerSec:number;maxOnScreen:number;moleShowMs:number;desc:string}> = {
   easy:   {label:"Easy",   emoji:"🟢", color:"#4ade80", spawnMs:2800, speedMult:0.65, timerSec:90, maxOnScreen:3, moleShowMs:4800, desc:"Slow & relaxed"},
-  medium: {label:"Medium", emoji:"🟡", color:"#fbbf24", spawnMs:1600, speedMult:1.0,  timerSec:60, maxOnScreen:6, moleShowMs:3800, desc:"Normal pace"},
-  hard:   {label:"Hard",   emoji:"🔴", color:"#ef4444", spawnMs:900,  speedMult:1.65, timerSec:40, maxOnScreen:9, moleShowMs:2400, desc:"Fast & furious"},
+  medium: {label:"Medium", emoji:"🟡", color:"#fbbf24", spawnMs:1600, speedMult:1.0,  timerSec:70, maxOnScreen:6, moleShowMs:3800, desc:"Normal pace"},
+  hard:   {label:"Hard",   emoji:"🔴", color:"#ef4444", spawnMs:900,  speedMult:1.65, timerSec:55, maxOnScreen:9, moleShowMs:2400, desc:"Fast & furious"},
 };
 
 function shuffle<T>(arr: T[]): T[] { return [...arr].sort(()=>Math.random()-0.5); }
