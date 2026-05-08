@@ -451,6 +451,10 @@ const KidsWorld = () => {
   const sad = false;
   const [petName, setPetName] = useState(() => localStorage.getItem(`mpe_petname_${code}_${studentName}`) || "");
   const [levelUpStage, setLevelUpStage] = useState<typeof STAGES[0] | null>(null);
+  const [showVideo, setShowVideo] = useState(false);
+  const [videoButtonSeen, setVideoButtonSeen] = useState(() => localStorage.getItem(`mpe_videoseen_${code}_${studentName}`) === "1");
+  const [videoFadingOut, setVideoFadingOut] = useState(false);
+  const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); }, 400); };
   const [musicOn, setMusicOn] = useState(() => localStorage.getItem("mpe_music") !== "off");
   const [sfxOn, setSfxOn] = useState(() => localStorage.getItem("mpe_sfx") !== "off");
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.25"));
@@ -658,6 +662,9 @@ const KidsWorld = () => {
         @keyframes goldPulse{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:0.85;transform:scale(1.02)}}
         @keyframes gP{0%,100%{opacity:0.4}50%{opacity:0.85}}
         @keyframes sL{0%,100%{opacity:0.35}50%{opacity:0.65}}
+        @keyframes videoFadeIn{0%{opacity:0}100%{opacity:1}}
+        @keyframes overlayFadeIn{0%{opacity:0}100%{opacity:1}}
+        @keyframes videoFadeOut{0%{opacity:1}100%{opacity:0}}
         @keyframes spL{0%,100%{opacity:0.3;transform:scale(1) rotate(0deg)}50%{opacity:1;transform:scale(1.6) rotate(20deg)}}
         @keyframes jF2{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
         @keyframes sBounce{0%{transform:scale(0) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0deg);opacity:1}}
@@ -775,7 +782,7 @@ const KidsWorld = () => {
             </div>
           )}
 
-          <div ref={creatureRef} style={{ position: "relative", display: "inline-block", cursor: "pointer" }}>
+          <div ref={creatureRef} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", cursor: "pointer" }}>
             {hearts.map(h => (
               <div key={h.id} style={{ position: "absolute", left: h.x, top: h.y, pointerEvents: "none", animation: `heartFloat 1.4s ease-out ${h.delay}s forwards`, opacity: 0, zIndex: 50 }}>
                 <svg width="22" height="20" viewBox="0 0 24 22">
@@ -805,6 +812,46 @@ const KidsWorld = () => {
             {!isEgg && !sad && (
               <div style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginTop: "0.4rem", animation: "shimmer 2.2s ease-in-out infinite", textAlign: "center" }}>
                 Pet me to make me happy! · 摸摸我讓我開心！🐢
+              </div>
+            )}
+            {stageIdx === 3 && (
+              <button onClick={() => { setShowVideo(true); if(!videoButtonSeen){ setVideoButtonSeen(true); localStorage.setItem(`mpe_videoseen_${code}_${studentName}`,"1"); }}} style={{ marginTop: "1rem", padding: "0.75rem 1.5rem", background: "linear-gradient(135deg, #00b4d8, #0077b6)", border: `3px solid ${videoButtonSeen ? "rgba(255,255,255,0.4)" : "rgba(255,255,0,0.9)"}`, borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.2rem", cursor: "pointer", boxShadow: videoButtonSeen ? "0 0 20px rgba(0,180,216,0.6)" : "0 0 40px rgba(255,220,0,1), 0 0 80px rgba(0,180,216,0.8)", animation: videoButtonSeen ? "shimmer 2s ease-in-out infinite" : "claimPulse 1s ease-in-out infinite" }}>
+                🎬 Watch {petName || "Turtley"} Swim! · 看{petName || "Turtley"}游泳！
+              </button>
+            )}
+            {showVideo && (
+              <div onClick={closeVideo} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,20,40,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", opacity: videoFadingOut ? 0 : 1, transition: "opacity 0.4s ease-out" }}>
+                <div onClick={e => e.stopPropagation()} style={{ position: "relative", maxWidth: 420, width: "100%", opacity: videoFadingOut ? 0 : 1, transition: "opacity 0.4s ease-out" }}>
+                  {/* Underwater frame — seashells, fish, bubbles */}
+                  <svg viewBox="0 0 420 320" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 2 }}>
+                    {/* Corner seashells */}
+                    <text x="8" y="32" fontSize="32">🐚</text>
+                    <text x="370" y="32" fontSize="32">🐚</text>
+                    <text x="8" y="305" fontSize="32">🐚</text>
+                    <text x="370" y="305" fontSize="32">🐚</text>
+                    {/* Fish */}
+                    <text x="15" y="165" fontSize="24">🐠</text>
+                    <text x="375" y="140" fontSize="24">🐟</text>
+                    <text x="180" y="18" fontSize="22">🐡</text>
+                    {/* Bubbles */}
+                    <circle cx="40" cy="80" r="6" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"/>
+                    <circle cx="55" cy="55" r="4" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
+                    <circle cx="380" cy="200" r="5" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"/>
+                    <circle cx="365" cy="175" r="3" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
+                    <circle cx="200" cy="295" r="5" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5"/>
+                    {/* Seaweed */}
+                    <text x="0" y="290" fontSize="28">🌿</text>
+                    <text x="390" y="290" fontSize="28">🌿</text>
+                    {/* Stars */}
+                    <text x="160" y="310" fontSize="18">⭐</text>
+                    <text x="240" y="310" fontSize="18">🌟</text>
+                  </svg>
+                  {/* Video */}
+                  <video autoPlay loop controls style={{ width: "100%", borderRadius: "1rem", border: "4px solid rgba(0,180,216,0.8)", boxShadow: "0 0 40px rgba(0,180,216,0.5)", display: "block", position: "relative", zIndex: 1 }}
+                    src="/video_adult_turtle.mp4" />
+                  {/* Close button */}
+                  <button onClick={closeVideo} style={{ position: "absolute", top: -16, right: -16, zIndex: 3, background: "#ef4444", border: "none", borderRadius: "50%", width: 36, height: 36, color: "white", fontSize: "1.1rem", cursor: "pointer", fontWeight: 900 }}>✕</button>
+                </div>
               </div>
             )}
           </div>
