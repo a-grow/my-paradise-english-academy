@@ -279,10 +279,6 @@ const ResultScreen = ({score,total,onBack,onPlay,reason}:{score:number;total:num
 };
 
 // ── RESTART BUTTON ────────────────────────────────────────────────────────────
-const RestartBtn = ({onRestart,dark=false}:{onRestart:()=>void;dark?:boolean}) => (
-  <button onClick={onRestart} style={{background:dark?"rgba(0,0,20,0.7)":"rgba(0,0,0,0.5)",border:`2px solid ${dark?"rgba(255,255,255,0.2)":"rgba(255,255,255,0.25)"}`,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",padding:"0.28rem 0.65rem",borderRadius:999,cursor:"pointer",lineHeight:1}}>🔄</button>
-);
-
 // ── HUD PILL ──────────────────────────────────────────────────────────────────
 const Pill = ({children,red=false,dark=false}:{children:React.ReactNode;red?:boolean;dark?:boolean}) => (
   <div style={{background:red?"rgba(220,38,38,0.8)":dark?"rgba(0,0,20,0.85)":"rgba(0,0,0,0.55)",borderRadius:999,padding:"0.32rem 0.85rem",fontFamily:F,fontWeight:800,fontSize:"1.1rem",color:"white",display:"flex",alignItems:"center",gap:"0.3rem"}}>{children}</div>
@@ -642,7 +638,6 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
           <Pill>⭐{score}</Pill>
           <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
           <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
-          <RestartBtn onRestart={doRestart}/>
         </div>
       </div>
       <ArcherSVG ouch={ouch} svgRef={archerRef}/>
@@ -794,8 +789,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
             <Pill>⭐{score}</Pill>
             <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
               <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
-            <RestartBtn onRestart={doRestart}/>
-          </div>
+            </div>
         </div>
         <div style={{textAlign:"center"}}>
           <div style={{background:"rgba(0,0,80,0.6)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.5rem 1.75rem",display:"inline-block",border:"2px solid rgba(255,255,255,0.25)"}}>
@@ -1009,7 +1003,6 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
           <Pill>⭐{score}</Pill>
           <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
           <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
-          <RestartBtn onRestart={doRestart}/>
         </div>
       </div>
       <div style={{width:"100%",maxWidth:420,marginBottom:"0.5rem",zIndex:10,background:"rgba(0,0,0,0.7)",borderRadius:16,padding:"0.6rem 1rem",border:"3px solid rgba(74,222,128,0.5)",boxShadow:"0 0 20px rgba(74,222,128,0.3)"}}>
@@ -1287,7 +1280,6 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
           <Pill dark><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
           <Pill dark red={timeLeft<=10}>⏱{timeLeft}s</Pill>
           <Pill dark>{"❤️".repeat(Math.max(0,lives))}</Pill>
-          <RestartBtn onRestart={doRestart} dark/>
         </div>
       </div>
       {aliens.map(a=>(
