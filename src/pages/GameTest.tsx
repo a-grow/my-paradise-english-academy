@@ -638,6 +638,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
           <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🏹 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span></span>
         </div>
         <div style={{display:"flex",gap:"0.4rem",alignItems:"center",flexShrink:0}}>
+          <Pill dark red={timeLeft<=10}>⏱{timeLeft}s</Pill>
           <Pill>⭐{score}</Pill>
           <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
           <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
@@ -1004,6 +1005,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
       <div style={{display:"flex",justifyContent:"space-between",width:"100%",maxWidth:420,marginBottom:"0.5rem",zIndex:10,alignItems:"center"}}>
         <button onClick={onBack} style={{background:"rgba(255,255,255,0.15)",border:"2px solid rgba(255,255,255,0.25)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.28rem 0.8rem",borderRadius:999,cursor:"pointer"}}>← Back</button>
         <div style={{display:"flex",gap:"0.4rem",alignItems:"center"}}>
+          <Pill dark red={timeLeft<=10}>⏱{timeLeft}s</Pill>
           <Pill>⭐{score}</Pill>
           <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
           <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
