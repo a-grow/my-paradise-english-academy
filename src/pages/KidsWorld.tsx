@@ -555,9 +555,7 @@ const KidsWorld = () => {
   const [unlockSeenMap, setUnlockSeenMap] = useState<Record<string,boolean>>(() =>
     Object.fromEntries(ANIMALS.map(a => [a.id, localStorage.getItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`) === "1"]))
   );
-  const [fedTreatsMap] = useState<Record<string,number>>(() =>
-    Object.fromEntries(ANIMALS.map(a => [a.id, a.id === "turtle" ? parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") : parseInt(localStorage.getItem(`mpe_fed_${a.id}_${code}_${studentName}`) || "0")]))
-  );
+
   const [videoFadingOut, setVideoFadingOut] = useState(false);
   const [showLookBelow, setShowLookBelow] = useState(false);
   const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); if(!unlockSeenMap["dolphin"]) setTimeout(() => setShowLookBelow(true), 300); }, 400); };
@@ -1125,7 +1123,7 @@ const KidsWorld = () => {
               </div>
             </div>
           )}
-          <OceanCollection fedTreatsMap={fedTreatsMap} videoWatched={videoWatched} unlockSeenMap={unlockSeenMap} onAnimalClick={(id) => setShowUnlockFor(id)} />
+          <OceanCollection fedTreatsMap={fedTreatsState} videoWatched={videoWatched} unlockSeenMap={unlockSeenMap} onAnimalClick={(id) => setShowUnlockFor(id)} />
           <div style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", marginTop: "0.85rem", textAlign: "center" }}>
             More creatures unlocking soon! · 更多生物即將解鎖！
           </div>
