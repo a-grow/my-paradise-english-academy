@@ -533,7 +533,7 @@ const KidsWorld = () => {
     localStorage.removeItem(`mpe_levelup_${code}_Test`);
   }
 
-  const [jarTreats, setJarTreats] = useState(() => isMaster ? 0 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
+  const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
   const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
   const [treats, setTreats] = useState(0);
   const [loading, setLoading] = useState(!isMaster);
@@ -550,7 +550,7 @@ const KidsWorld = () => {
   const [levelUpStage, setLevelUpStage] = useState<{ animal: Animal; stageIdx: number } | null>(null);
   const [showVideo, setShowVideo] = useState(false);
   const [videoButtonSeen, setVideoButtonSeen] = useState(() => localStorage.getItem(`mpe_videoseen_${code}_${studentName}`) === "1");
-  const [videoWatched, setVideoWatched] = useState(() => isMaster ? true : localStorage.getItem(`mpe_videowatched_${code}_${studentName}`) === "1");
+  const [videoWatched, setVideoWatched] = useState(() => localStorage.getItem(`mpe_videowatched_${code}_${studentName}`) === "1");
   const [showUnlockFor, setShowUnlockFor] = useState<string | null>(null);
   const [unlockSeenMap, setUnlockSeenMap] = useState<Record<string,boolean>>(() =>
     Object.fromEntries(ANIMALS.map(a => [a.id, localStorage.getItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`) === "1"]))
