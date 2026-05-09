@@ -5,13 +5,76 @@ import { useAuth } from "@/contexts/AuthContext";
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 const MASTER_CODE = "1006";
 
-const STAGES = [
-  { name: "Egg", label: "Sea Turtle Egg", min: 0, max: 14 },
-  { name: "Baby", label: "Baby Sea Turtle", min: 15, max: 29 },
-  { name: "Young", label: "Young Sea Turtle", min: 30, max: 44 },
-  { name: "Grown", label: "Grown Sea Turtle", min: 45, max: 9999 },
+// ── ANIMALS — add a new animal here, nothing else needs to change ────────────
+interface AnimalStage { name: string; nameZh: string; min: number; img: string; }
+interface Animal {
+  id: string; name: string; nameZh: string; emoji: string;
+  stages: AnimalStage[];
+  unlockCondition: "default" | "turtle_grown_video_watched";
+  collectionBg: string; collectionBorder: string; collectionGlow: string;
+  video: string | null; isEggType: boolean;
+  accentColor: string; accentGlow: string;
+  btnColor: string; btnGlow: string; btn3Color: string; btn3Glow: string;
+  feedLabel: string; feedLabelZh: string;
+  levelUpMessages: { main: string; zh: string; sub: string; subZh: string }[];
+  unlockOverlay: { emoji: string; title: string; titleZh: string; eggLine: string; eggLineZh: string; feedLine: string; feedLineZh: string; btnText: string; glowColor: string; borderColor: string; bgGradient: string; };
+}
+const ANIMALS: Animal[] = [
+  {
+    id: "turtle", name: "Sea Turtle", nameZh: "海龜", emoji: "🐢",
+    stages: [
+      { name: "Egg",   nameZh: "蛋",      min: 0,  img: "/creatures/turtle-egg.png" },
+      { name: "Baby",  nameZh: "小海龜",   min: 15, img: "/creatures/turtle-baby.png" },
+      { name: "Young", nameZh: "年輕海龜", min: 30, img: "/creatures/turtle-young.png" },
+      { name: "Grown", nameZh: "成年海龜", min: 45, img: "/creatures/turtle-grown.png" },
+    ],
+    unlockCondition: "default",
+    collectionBg: "#0891b2", collectionBorder: "rgba(255,215,0,0.6)", collectionGlow: "rgba(255,215,0,0.35)",
+    video: "/video_adult_turtle.mp4", isEggType: true,
+    accentColor: "#f97316", accentGlow: "rgba(249,115,22,0.5)",
+    btnColor: "#f97316", btnGlow: "rgba(249,115,22,0.5)", btn3Color: "#10b981", btn3Glow: "rgba(16,185,129,0.5)",
+    feedLabel: "turtle", feedLabelZh: "海龜",
+    levelUpMessages: [
+      { main: "Your egg hatched!",      zh: "蛋孵化了！",          sub: "Meet your Baby Sea Turtle!",     subZh: "快來認識你的小海龜！" },
+      { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Sea Turtle!",        subZh: "現在是年輕海龜了！" },
+      { main: "Fully grown! Amazing!",  zh: "完全長大了！太棒了！", sub: "You raised a Grown Sea Turtle!", subZh: "你養大了一隻成年海龜！" },
+    ],
+    unlockOverlay: { emoji: "🐢", title: "Sea Turtle!", titleZh: "海龜！", eggLine: "A Sea Turtle Egg appeared!", eggLineZh: "出現了一顆海龜蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "Let's go! · 出發！🎉", glowColor: "rgba(255,215,0,0.6)", borderColor: "rgba(255,215,0,0.7)", bgGradient: "linear-gradient(135deg,#0c3460,#1a6e8a)" },
+  },
+  {
+    id: "dolphin", name: "Dolphin", nameZh: "海豚", emoji: "🐬",
+    stages: [
+      { name: "Baby",  nameZh: "小海豚",   min: 0,  img: "/creatures/dolphin-egg.png" },
+      { name: "Young", nameZh: "年輕海豚", min: 15, img: "/creatures/dolphin-baby.png" },
+      { name: "Teen",  nameZh: "青少海豚", min: 30, img: "/creatures/dolphin-young.png" },
+      { name: "Grown", nameZh: "成年海豚", min: 45, img: "/creatures/dolphin-grown.png" },
+    ],
+    unlockCondition: "turtle_grown_video_watched",
+    collectionBg: "#0077b6", collectionBorder: "rgba(100,200,255,0.7)", collectionGlow: "rgba(100,200,255,0.4)",
+    video: null, isEggType: false,
+    accentColor: "#f472b6", accentGlow: "rgba(244,114,182,0.5)",
+    btnColor: "#22d3ee", btnGlow: "rgba(34,211,238,0.5)", btn3Color: "#f472b6", btn3Glow: "rgba(244,114,182,0.5)",
+    feedLabel: "dolphin", feedLabelZh: "海豚",
+    levelUpMessages: [
+      { main: "Your egg hatched!",      zh: "蛋孵化了！",          sub: "Meet your Baby Dolphin!",     subZh: "快來認識你的小海豚！" },
+      { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Dolphin!",        subZh: "現在是年輕海豚了！" },
+      { main: "Fully grown! Amazing!",  zh: "完全長大了！太棒了！", sub: "You raised a Grown Dolphin!", subZh: "你養大了一隻成年海豚！" },
+    ],
+    unlockOverlay: { emoji: "🐬", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dolphin Egg appeared!", eggLineZh: "出現了一顆海豚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(100,200,255,0.6)", borderColor: "rgba(100,200,255,0.7)", bgGradient: "linear-gradient(135deg,#003d7a,#0077b6,#00b4d8)" },
+  },
+  // ── ADD NEW ANIMALS HERE — one object = one new animal ────────────────────
 ];
-const getStage = (t: number) => STAGES.findLast(s => t >= s.min) ?? STAGES[0];
+// locked placeholder slots (fills collection grid to 6 total)
+const LOCKED_SLOTS = [
+  { collectionBg: "#7c3aed", collectionBorder: "rgba(167,139,250,0.5)", collectionGlow: "rgba(124,58,237,0.25)" },
+  { collectionBg: "#0d9488", collectionBorder: "rgba(94,234,212,0.5)",  collectionGlow: "rgba(13,148,136,0.25)" },
+  { collectionBg: "#b45309", collectionBorder: "rgba(251,191,36,0.5)",  collectionGlow: "rgba(180,83,9,0.25)"  },
+  { collectionBg: "#be185d", collectionBorder: "rgba(249,168,212,0.5)", collectionGlow: "rgba(190,24,93,0.25)" },
+];
+const getAnimalStage = (animal: Animal, fed: number): AnimalStage =>
+  [...animal.stages].reverse().find(s => fed >= s.min) ?? animal.stages[0];
+const getAnimalStageIdx = (animal: Animal, fed: number): number =>
+  animal.stages.indexOf(getAnimalStage(animal, fed));
 
 // ── EGG CRACKS ───────────────────────────────────────────────────────────────
 const EggCracks = ({ treats }: { treats: number }) => {
@@ -115,11 +178,9 @@ const DisneyNameTag = ({ name }: { name: string }) => (
 );
 
 // ── TREAT JAR ─────────────────────────────────────────────────────────────────
-const TreatJar = ({ treats, nextStage }: { treats: number; nextStage: typeof STAGES[0] | undefined }) => {
-  const max = nextStage?.min ?? 50;
+const TreatJar = ({ treats, nextStage }: { treats: number; nextStage: AnimalStage | null }) => {
   const displayTreats = Math.min(treats, 9999);
-  const pct = nextStage ? Math.min((treats / max) * 100, 100) : 100;
-  const cookieCount = treats === 0 ? 0 : Math.min(Math.floor(pct / 9) + 1, 9);
+  const cookieCount = treats === 0 ? 0 : Math.min(treats, 9);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.4rem" }}>
@@ -163,7 +224,7 @@ const TreatJar = ({ treats, nextStage }: { treats: number; nextStage: typeof STA
         </svg>
       </div>
       <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1.1rem", color: "white", textShadow: "0 2px 6px rgba(0,0,0,0.4)", textAlign: "center" }}>
-        {displayTreats} treats
+        {displayTreats} treat{displayTreats !== 1 ? "s" : ""}
       </div>
       {!nextStage && (
         <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "0.85rem", color: "#fbbf24", textAlign: "center", background: "rgba(0,0,0,0.28)", borderRadius: "999px", padding: "0.2rem 0.8rem" }}>
@@ -175,7 +236,7 @@ const TreatJar = ({ treats, nextStage }: { treats: number; nextStage: typeof STA
 };
 
 // ── LEVEL UP OVERLAY ──────────────────────────────────────────────────────────
-const LevelUpOverlay = ({ newStage, newImg, onDismiss }: { newStage: typeof STAGES[0]; newImg: string; onDismiss: () => void }) => {
+const LevelUpOverlay = ({ animal, stageIdx, onDismiss }: { animal: Animal; stageIdx: number; onDismiss: () => void }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
@@ -208,13 +269,8 @@ const LevelUpOverlay = ({ newStage, newImg, onDismiss }: { newStage: typeof STAG
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  const stageIdx = STAGES.indexOf(newStage);
-  const messages = [
-    { main: "Your egg hatched!", zh: "蛋孵化了！", sub: "Meet your Baby Sea Turtle!", subZh: "快來認識你的小海龜！" },
-    { main: "Look how you've grown!", zh: "你長大了！", sub: "Now a Young Sea Turtle!", subZh: "現在是年輕海龜了！" },
-    { main: "Fully grown! Amazing!", zh: "完全長大了！太棒了！", sub: "You raised a Grown Sea Turtle!", subZh: "你養大了一隻成年海龜！" },
-  ];
-  const msg = messages[Math.min(stageIdx - 1, 2)] || messages[0];
+  const msg = animal.levelUpMessages[Math.min(stageIdx - 1, animal.levelUpMessages.length - 1)] ?? animal.levelUpMessages[0];
+  const newImg = animal.stages[stageIdx]?.img ?? animal.stages[animal.stages.length - 1].img;
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 500, background: "rgba(0,0,60,0.82)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", padding: "1rem", animation: "popIn 0.4s ease-out" }}>
@@ -342,12 +398,12 @@ const UnderwaterBg = ({ sad }: { sad: boolean }) => (
 );
 
 // ── EARN BUTTONS ──────────────────────────────────────────────────────────────
-const EarnButtons = ({ navigate, code, studentName }: { navigate: (p: string) => void; code: string; studentName: string }) => (
+const EarnButtons = ({ navigate, code, studentName, activeAnimal }: { navigate: (p: string) => void; code: string; studentName: string; activeAnimal: Animal }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
     {[
-      { label: "Play a Game", sub: "打敗遊戲，得1~3個餅乾！", reward: "+1~3 treats", color: "#f97316", glow: "rgba(249,115,22,0.5)", path: `/game/${code}/${studentName}/BOOKNUM` },
+      { label: "Play a Game", sub: "打敗遊戲，得1~3個餅乾！", reward: "+1~3 treats", color: activeAnimal.btnColor, glow: activeAnimal.btnGlow, path: `/game/${code}/${studentName}/BOOKNUM` },
       { label: "Read & Quiz", sub: "即將推出！Coming Soon!", reward: "🔒", color: "#a855f7", glow: "rgba(168,85,247,0.0)", path: "", disabled: true },
-      { label: "Visit 5 Days!", sub: "連續來5天！", reward: "+3 treats", color: "#10b981", glow: "rgba(16,185,129,0.5)", path: "" },
+      { label: "Visit 5 Days!", sub: "連續來5天！", reward: "+3 treats", color: activeAnimal.btn3Color, glow: activeAnimal.btn3Glow, path: "" },
     ].map((btn, i) => (
       <button key={i} onClick={() => { if(!btn.disabled && btn.path){ const f = JSON.parse(sessionStorage.getItem('mpe_family') || '{}'); navigate(btn.path.replace('BOOKNUM', String(f?.book ?? 1))); }}} style={{
         width: "100%", padding: "1.1rem 1.25rem",
@@ -374,56 +430,46 @@ const EarnButtons = ({ navigate, code, studentName }: { navigate: (p: string) =>
 );
 
 // ── COLLECTION ────────────────────────────────────────────────────────────────
-const COLS = [
-  { bg: "#0891b2", border: "rgba(255,215,0,0.6)", glow: "rgba(255,215,0,0.35)" },
-  { bg: "#dc2626", border: "rgba(255,120,120,0.5)", glow: "rgba(220,38,38,0.25)" },
-  { bg: "#7c3aed", border: "rgba(167,139,250,0.5)", glow: "rgba(124,58,237,0.25)" },
-  { bg: "#0d9488", border: "rgba(94,234,212,0.5)", glow: "rgba(13,148,136,0.25)" },
-  { bg: "#b45309", border: "rgba(251,191,36,0.5)", glow: "rgba(180,83,9,0.25)" },
-  { bg: "#be185d", border: "rgba(249,168,212,0.5)", glow: "rgba(190,24,93,0.25)" },
-];
-
-const OceanCollection = ({ unlockedCount, stageIdx, videoWatched, dolphinUnlockSeen, onDolphinClick }: { unlockedCount: number; stageIdx: number; videoWatched: boolean; dolphinUnlockSeen: boolean; onDolphinClick: () => void }) => {
-  const turtleImg = stageIdx === 0 ? "/creatures/turtle-egg.png" : stageIdx === 1 ? "/creatures/turtle-baby.png" : stageIdx === 2 ? "/creatures/turtle-young.png" : "/creatures/turtle-grown.png";
-  const creatures = [
-    { name: "Sea Turtle", img: turtleImg },
-    { name: "Dolphin", img: "/creatures/dolphin-egg.png" },
-    { name: "Octopus", img: "" },
-    { name: "???", img: "" },
-    { name: "Seal", img: "" },
-    { name: "Pufferfish", img: "" },
-  ];
-  const dolphinUnlocked = stageIdx === 3 && videoWatched;
+const OceanCollection = ({ fedTreatsMap, videoWatched, unlockSeenMap, onAnimalClick }: { fedTreatsMap: Record<string,number>; videoWatched: boolean; unlockSeenMap: Record<string,boolean>; onAnimalClick: (id: string) => void }) => {
+  const lockedCount = 6 - ANIMALS.length;
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "0.75rem" }}>
-      {creatures.map((c, i) => {
-        const unlocked = i < unlockedCount;
-        const isDolphin = i === 1;
-        const dolphinActive = isDolphin && dolphinUnlocked;
-        const col = COLS[i];
+      {ANIMALS.map((animal, i) => {
+        const fed = fedTreatsMap[animal.id] ?? 0;
+        const animalStageIdx = getAnimalStageIdx(animal, fed);
+        const currentImg = animal.stages[animalStageIdx].img;
+        const isUnlocked = (() => {
+          if (animal.unlockCondition === "default") return true;
+          if (animal.unlockCondition === "turtle_grown_video_watched") {
+            return getAnimalStageIdx(ANIMALS[0], fedTreatsMap["turtle"] ?? 0) === 3 && videoWatched;
+          }
+          return false;
+        })();
+        const unlockSeen = unlockSeenMap[animal.id] ?? false;
+        const isClickable = isUnlocked && !unlockSeen && animal.unlockCondition !== "default";
         return (
-          <div key={i} onClick={dolphinActive ? onDolphinClick : undefined}
+          <div key={animal.id} onClick={isClickable ? () => onAnimalClick(animal.id) : undefined}
             style={{ position: "relative", borderRadius: "1.25rem",
-              background: dolphinActive ? `${col.bg}22` : `${col.bg}${unlocked ? "33" : "18"}`,
-              border: `2px solid ${dolphinActive ? "rgba(100,200,255,0.95)" : col.border}`,
+              background: isClickable ? `${animal.collectionBg}22` : `${animal.collectionBg}${isUnlocked ? "33" : "18"}`,
+              border: `2px solid ${isClickable ? animal.collectionBorder : animal.collectionBorder}`,
               padding: "0.85rem 0.5rem",
-              boxShadow: dolphinActive ? "0 0 30px rgba(100,200,255,0.8), 0 0 60px rgba(100,200,255,0.4)" : `0 0 ${unlocked ? 20 : 10}px ${col.glow}`,
+              boxShadow: isClickable ? `0 0 30px ${animal.collectionGlow}, 0 0 60px ${animal.collectionGlow}` : `0 0 ${isUnlocked ? 20 : 10}px ${animal.collectionGlow}`,
               display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              transition: "all 0.3s", cursor: dolphinActive ? "pointer" : "default",
-              animation: dolphinActive ? "dolphinPulse 1.2s ease-in-out infinite" : undefined }}>
-            {unlocked ? (
+              transition: "all 0.3s", cursor: isClickable ? "pointer" : "default",
+              animation: isClickable ? "dolphinPulse 1.2s ease-in-out infinite" : undefined }}>
+            {isUnlocked && (unlockSeen || animal.unlockCondition === "default") ? (
               <>
-                <img src={c.img} alt={c.name} style={{ width: 62, height: 62, objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))", display: "block", margin: "0 auto" }} />
-                <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.85rem", color: "#fbbf24", marginTop: "0.35rem", textAlign: "center", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>{c.name}</div>
+                <img src={currentImg} alt={animal.name} style={{ width: 62, height: 62, objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))", display: "block", margin: "0 auto", animation: "bobAnim 3s ease-in-out infinite" }} />
+                <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.85rem", color: "#fbbf24", marginTop: "0.35rem", textAlign: "center", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>{animal.name}</div>
                 <div style={{ position: "absolute", inset: -3, borderRadius: "1.4rem", border: "2px solid rgba(255,215,0,0.4)", animation: "gP 2s ease-in-out infinite", pointerEvents: "none" }} />
               </>
-            ) : dolphinActive ? (
+            ) : isClickable ? (
               <>
-                {dolphinUnlockSeen ? (
-                  <img src="/creatures/dolphin-egg.png" alt="Dolphin egg" style={{ width: 62, height: 62, objectFit: "contain", filter: "drop-shadow(0 4px 12px rgba(100,200,255,0.8))", display: "block", margin: "0 auto", animation: "bobAnim 2s ease-in-out infinite" }} />
+                {unlockSeen ? (
+                  <img src={animal.stages[0].img} alt={animal.name} style={{ width: 62, height: 62, objectFit: "contain", filter: `drop-shadow(0 4px 12px ${animal.collectionGlow})`, display: "block", margin: "0 auto", animation: "bobAnim 2s ease-in-out infinite" }} />
                 ) : (
-                  <div style={{ width: 56, height: 52, borderRadius: "30% 40% 35% 45%", background: "rgba(100,200,255,0.55)", margin: "0 auto", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", animation: "bobAnim 2s ease-in-out infinite" }}>
-                    <div style={{ width: 34, height: 30, borderRadius: "40% 35% 45% 30%", background: "rgba(100,200,255,0.88)" }} />
+                  <div style={{ width: 56, height: 52, borderRadius: "30% 40% 35% 45%", background: animal.collectionBorder, margin: "0 auto", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", animation: "bobAnim 2s ease-in-out infinite", boxShadow: `0 0 24px ${animal.collectionBorder}` }}>
+                    <div style={{ width: 34, height: 30, borderRadius: "40% 35% 45% 30%", background: animal.collectionBg }} />
                     <div style={{ position: "absolute", top: -6, right: -5, animation: "spL 1s ease-in-out infinite" }}>
                       <svg width="16" height="16" viewBox="0 0 14 14"><path d="M7 0L8.5 5.5L14 7L8.5 8.5L7 14L5.5 8.5L0 7L5.5 5.5Z" fill="rgba(255,255,255,1)" /></svg>
                     </div>
@@ -435,18 +481,18 @@ const OceanCollection = ({ unlockedCount, stageIdx, videoWatched, dolphinUnlockS
                     </div>
                   </div>
                 )}
-                <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.82rem", color: "#4c1d95", marginTop: "0.4rem", textAlign: "center", textShadow: "0 1px 3px rgba(255,255,255,0.6)" }}>{dolphinUnlockSeen ? "Dolphin" : "???"}</div>
-                {!dolphinUnlockSeen && (
+                <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.82rem", color: "#4c1d95", marginTop: "0.4rem", textAlign: "center", textShadow: "0 1px 3px rgba(255,255,255,0.6)" }}>{unlockSeen ? animal.name : "???"}</div>
+                {!unlockSeen && (
                   <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.75rem", color: "#4c1d95", textAlign: "center", lineHeight: 1.2, textShadow: "0 1px 3px rgba(255,255,255,0.6)" }}>
                     Click Me!<br/><span style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.7rem" }}>點我！</span>
                   </div>
                 )}
-                <div style={{ position: "absolute", inset: -3, borderRadius: "1.4rem", border: "2px solid rgba(100,200,255,0.7)", animation: "gP 1s ease-in-out infinite", pointerEvents: "none" }} />
+                <div style={{ position: "absolute", inset: -3, borderRadius: "1.4rem", border: `2px solid ${animal.collectionBorder}`, animation: "gP 1s ease-in-out infinite", pointerEvents: "none" }} />
               </>
             ) : (
               <>
-                <div style={{ width: 56, height: 52, borderRadius: "30% 40% 35% 45%", background: `${col.bg}55`, margin: "0 auto", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", animation: "sL 2.5s ease-in-out infinite" }}>
-                  <div style={{ width: 34, height: 30, borderRadius: "40% 35% 45% 30%", background: `${col.bg}88` }} />
+                <div style={{ width: 56, height: 52, borderRadius: "30% 40% 35% 45%", background: `${animal.collectionBg}55`, margin: "0 auto", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", animation: "sL 2.5s ease-in-out infinite" }}>
+                  <div style={{ width: 34, height: 30, borderRadius: "40% 35% 45% 30%", background: `${animal.collectionBg}88` }} />
                   <div style={{ position: "absolute", top: -6, right: -5, animation: `spL ${1.8 + i * 0.3}s ease-in-out infinite` }}>
                     <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 0L8.5 5.5L14 7L8.5 8.5L7 14L5.5 8.5L0 7L5.5 5.5Z" fill="rgba(255,255,255,0.75)" /></svg>
                   </div>
@@ -454,9 +500,20 @@ const OceanCollection = ({ unlockedCount, stageIdx, videoWatched, dolphinUnlockS
                     <svg width="10" height="10" viewBox="0 0 14 14"><path d="M7 0L8.5 5.5L14 7L8.5 8.5L7 14L5.5 8.5L0 7L5.5 5.5Z" fill="rgba(255,255,255,0.55)" /></svg>
                   </div>
                 </div>
-                <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.82rem", color: col.border, marginTop: "0.4rem", textAlign: "center", opacity: 0.75 }}>???</div>
+                <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.82rem", color: animal.collectionBorder, marginTop: "0.4rem", textAlign: "center", opacity: 0.75 }}>???</div>
               </>
             )}
+          </div>
+        );
+      })}
+      {Array.from({ length: lockedCount }).map((_, i) => {
+        const col = LOCKED_SLOTS[i];
+        return (
+          <div key={`locked-${i}`} style={{ position: "relative", borderRadius: "1.25rem", background: `${col.collectionBg}18`, border: `2px solid ${col.collectionBorder}`, padding: "0.85rem 0.5rem", boxShadow: `0 0 10px ${col.collectionGlow}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 56, height: 52, borderRadius: "30% 40% 35% 45%", background: `${col.collectionBg}55`, margin: "0 auto", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", animation: "sL 2.5s ease-in-out infinite" }}>
+              <div style={{ width: 34, height: 30, borderRadius: "40% 35% 45% 30%", background: `${col.collectionBg}88` }} />
+            </div>
+            <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.82rem", color: col.collectionBorder, marginTop: "0.4rem", textAlign: "center", opacity: 0.75 }}>???</div>
           </div>
         );
       })}
@@ -477,7 +534,7 @@ const KidsWorld = () => {
   }
 
   const [jarTreats, setJarTreats] = useState(() => isMaster ? 0 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
-  const [fedTreats, setFedTreats] = useState(() => isMaster ? 0 : parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0"));
+  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? {} : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
   const [treats, setTreats] = useState(0);
   const [loading, setLoading] = useState(!isMaster);
   const [hearts, setHearts] = useState<{ id: number; x: number; y: number; delay: number }[]>([]);
@@ -487,16 +544,23 @@ const KidsWorld = () => {
   const [justEarned, setJustEarned] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const sad = false;
-  const [petName, setPetName] = useState(() => localStorage.getItem(`mpe_petname_${code}_${studentName}`) || "");
-  const [levelUpStage, setLevelUpStage] = useState<typeof STAGES[0] | null>(null);
+  const [petNameMap, setPetNameMap] = useState<Record<string,string>>(() =>
+    Object.fromEntries(ANIMALS.map(a => [a.id, localStorage.getItem(`mpe_petname_${a.id}_${code}_${studentName}`) || ""]))
+  );
+  const [levelUpStage, setLevelUpStage] = useState<{ animal: Animal; stageIdx: number } | null>(null);
   const [showVideo, setShowVideo] = useState(false);
   const [videoButtonSeen, setVideoButtonSeen] = useState(() => localStorage.getItem(`mpe_videoseen_${code}_${studentName}`) === "1");
   const [videoWatched, setVideoWatched] = useState(() => localStorage.getItem(`mpe_videowatched_${code}_${studentName}`) === "1");
-  const [showDolphinUnlock, setShowDolphinUnlock] = useState(false);
-  const [dolphinUnlockSeen, setDolphinUnlockSeen] = useState(() => localStorage.getItem(`mpe_dolphinseen_${code}_${studentName}`) === "1");
+  const [showUnlockFor, setShowUnlockFor] = useState<string | null>(null);
+  const [unlockSeenMap, setUnlockSeenMap] = useState<Record<string,boolean>>(() =>
+    Object.fromEntries(ANIMALS.map(a => [a.id, localStorage.getItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`) === "1"]))
+  );
+  const [fedTreatsMap] = useState<Record<string,number>>(() =>
+    Object.fromEntries(ANIMALS.map(a => [a.id, a.id === "turtle" ? parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") : parseInt(localStorage.getItem(`mpe_fed_${a.id}_${code}_${studentName}`) || "0")]))
+  );
   const [videoFadingOut, setVideoFadingOut] = useState(false);
   const [showLookBelow, setShowLookBelow] = useState(false);
-  const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); if(!dolphinUnlockSeen) setTimeout(() => setShowLookBelow(true), 300); }, 400); };
+  const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); if(!unlockSeenMap["dolphin"]) setTimeout(() => setShowLookBelow(true), 300); }, 400); };
   const [musicOn, setMusicOn] = useState(() => localStorage.getItem("mpe_music") !== "off");
   const [sfxOn, setSfxOn] = useState(() => localStorage.getItem("mpe_sfx") !== "off");
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.25"));
@@ -522,9 +586,13 @@ const KidsWorld = () => {
     return s?.name ?? (n.charAt(0).toUpperCase() + n.slice(1));
   })();
 
-  const stage = getStage(fedTreats);
-  const stageIdx = STAGES.indexOf(stage);
-  const nextStage = STAGES[stageIdx + 1];
+  const [activeAnimalId, setActiveAnimalId] = useState("turtle");
+  const activeAnimal = ANIMALS.find(a => a.id === activeAnimalId) ?? ANIMALS[0];
+  const fedTreats = fedTreatsState[activeAnimalId] ?? 0;
+  const petName = petNameMap[activeAnimalId] ?? "";
+  const stage = getAnimalStage(activeAnimal, fedTreats);
+  const stageIdx = getAnimalStageIdx(activeAnimal, fedTreats);
+  const nextStage = activeAnimal.stages[stageIdx + 1] ?? null;
   const isEgg = stageIdx === 0;
   const nearHatch = isEgg && fedTreats >= 12;
   const progress = nextStage ? Math.round(((fedTreats - stage.min) / (nextStage.min - stage.min)) * 100) : 100;
@@ -543,13 +611,13 @@ const KidsWorld = () => {
 
   // Lock scroll when dim overlay is active
   useEffect(() => {
-    if (stageIdx === 3 && !videoWatched) {
+    if ((stageIdx === 3 && !videoWatched) || showVideo || showLookBelow) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
     return () => { document.body.style.overflow = ""; };
-  }, [stageIdx, videoWatched]);
+  }, [stageIdx, videoWatched, showVideo, showLookBelow]);
 
   const getCtx = () => {
     if (!ctxRef.current) ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -595,7 +663,7 @@ const KidsWorld = () => {
     if (stageIdx > 0 && stageIdx !== prevStageRef.current && !levelUpFiredRef.current.has(stageIdx)) {
       levelUpFiredRef.current.add(stageIdx);
       localStorage.setItem(`mpe_levelup_${code}_${studentName}`, JSON.stringify([...levelUpFiredRef.current]));
-      setLevelUpStage(STAGES[stageIdx]);
+      setLevelUpStage({ animal: activeAnimal, stageIdx });
       if (!tadaRef.current) tadaRef.current = new Audio("/tada-music.mp3");
       tadaRef.current.currentTime = 0;
       tadaRef.current.volume = 0;
@@ -623,8 +691,8 @@ const KidsWorld = () => {
   }, []);
 
   const savePetName = (name: string) => {
-    setPetName(name);
-    localStorage.setItem(`mpe_petname_${code}_${studentName}`, name);
+    setPetNameMap(m => ({ ...m, [activeAnimalId]: name }));
+    localStorage.setItem(`mpe_petname_${activeAnimalId}_${code}_${studentName}`, name);
     if (!harpRef.current) harpRef.current = new Audio("/harp-music.mp3");
     harpRef.current.currentTime = 0;
     harpRef.current.volume = 0.3;
@@ -636,10 +704,11 @@ const KidsWorld = () => {
     const newJar = jarTreats - 1;
     const newFed = fedTreats + 1;
     setJarTreats(newJar);
-    setFedTreats(newFed);
+    setFedTreatsState(m => ({ ...m, [activeAnimalId]: newFed }));
     if (!isMaster) {
       localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(newJar));
-      localStorage.setItem(`mpe_fed_${code}_${studentName}`, String(newFed));
+      const lsKey = activeAnimalId === "turtle" ? `mpe_fed_${code}_${studentName}` : `mpe_fed_${activeAnimalId}_${code}_${studentName}`;
+      localStorage.setItem(lsKey, String(newFed));
     }
     playSfx("treat");
     const id = feedId.current++;
@@ -684,8 +753,8 @@ const KidsWorld = () => {
     setTimeout(() => setJustEarned(0), 2500);
   };
 
-  const creatureImg = stageIdx === 0 ? "/creatures/turtle-egg.png" : stageIdx === 1 ? "/creatures/turtle-baby.png" : stageIdx === 2 ? "/creatures/turtle-young.png" : "/creatures/turtle-grown.png";
-  const levelUpImg = levelUpStage ? (STAGES.indexOf(levelUpStage) === 1 ? "/creatures/turtle-baby.png" : STAGES.indexOf(levelUpStage) === 2 ? "/creatures/turtle-young.png" : "/creatures/turtle-grown.png") : "";
+  const creatureImg = activeAnimal.stages[stageIdx]?.img ?? activeAnimal.stages[0].img;
+
 
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg,#003d6b,#00b4a0)" }}>
@@ -742,7 +811,7 @@ const KidsWorld = () => {
       `}</style>
 
       <UnderwaterBg sad={sad} />
-      {levelUpStage && <LevelUpOverlay newStage={levelUpStage} newImg={levelUpImg} onDismiss={() => setLevelUpStage(null)} />}
+      {levelUpStage && <LevelUpOverlay animal={levelUpStage.animal} stageIdx={levelUpStage.stageIdx} onDismiss={() => setLevelUpStage(null)} />}
 
       {/* LOOK BELOW POPUP */}
       {showLookBelow && (
@@ -760,32 +829,43 @@ const KidsWorld = () => {
         </div>
       )}
 
-      {/* DOLPHIN UNLOCK OVERLAY */}
-      {showDolphinUnlock && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,10,40,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", animation: "popIn 0.4s ease-out" }}
-          onClick={() => setShowDolphinUnlock(false)}>
-          <div onClick={e => e.stopPropagation()} style={{ position: "relative", zIndex: 10, textAlign: "center", background: "linear-gradient(135deg,#003d7a,#0077b6,#00b4d8)", borderRadius: "2.5rem", padding: "2.5rem 2rem", maxWidth: 360, width: "100%", border: "3px solid rgba(100,200,255,0.7)", boxShadow: "0 0 80px rgba(100,200,255,0.6), 0 20px 60px rgba(0,0,0,0.5)" }}>
-            <div style={{ position: "absolute", inset: -8, borderRadius: "2.8rem", border: "2px solid rgba(100,200,255,0.4)", animation: "goldPulse 1.5s ease-in-out infinite", pointerEvents: "none" }} />
-            <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "2.8rem", marginBottom: "0.25rem" }}>🐬</div>
-            <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "2.2rem", color: "#64c8ff", textShadow: "0 0 20px rgba(100,200,255,0.9)", marginBottom: "0.1rem", lineHeight: 1.1 }}>New Friend!</div>
-            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1rem" }}>新朋友來了！</div>
-            <div style={{ position: "relative", display: "inline-block", animation: "cReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both" }}>
-              <div style={{ position: "absolute", inset: -20, borderRadius: "50%", background: "radial-gradient(circle,rgba(100,200,255,0.45) 0%,transparent 70%)", animation: "goldPulse 1s ease-in-out infinite" }} />
-              <img src="/creatures/dolphin-egg.png" alt="Dolphin egg" style={{ width: 150, height: 140, objectFit: "contain", filter: "drop-shadow(0 0 24px rgba(100,200,255,1))" }} />
+      {/* ANIMAL UNLOCK OVERLAY — data-driven, works for any animal */}
+      {showUnlockFor && (() => {
+        const a = ANIMALS.find(x => x.id === showUnlockFor);
+        if (!a) return null;
+        const ov = a.unlockOverlay;
+        const dismiss = () => {
+          setShowUnlockFor(null);
+          setUnlockSeenMap(m => ({ ...m, [a.id]: true }));
+          localStorage.setItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`, "1");
+          setActiveAnimalId(a.id);
+        };
+        return (
+          <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,10,40,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", animation: "popIn 0.4s ease-out" }}
+            onClick={dismiss}>
+            <div onClick={e => e.stopPropagation()} style={{ position: "relative", zIndex: 10, textAlign: "center", background: ov.bgGradient, borderRadius: "2.5rem", padding: "2.5rem 2rem", maxWidth: 360, width: "100%", border: `3px solid ${ov.borderColor}`, boxShadow: `0 0 80px ${ov.glowColor}, 0 20px 60px rgba(0,0,0,0.5)` }}>
+              <div style={{ position: "absolute", inset: -8, borderRadius: "2.8rem", border: `2px solid ${ov.borderColor}`, animation: "goldPulse 1.5s ease-in-out infinite", pointerEvents: "none" }} />
+              <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "2.8rem", marginBottom: "0.25rem" }}>{ov.emoji}</div>
+              <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "2.2rem", color: "white", textShadow: `0 0 20px ${ov.glowColor}`, marginBottom: "0.1rem", lineHeight: 1.1 }}>{ov.title}</div>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1rem" }}>{ov.titleZh}</div>
+              <div style={{ position: "relative", display: "inline-block", animation: "cReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both" }}>
+                <div style={{ position: "absolute", inset: -20, borderRadius: "50%", background: `radial-gradient(circle,${ov.glowColor} 0%,transparent 70%)`, animation: "goldPulse 1s ease-in-out infinite" }} />
+                <img src={a.stages[0].img} alt={a.name} style={{ width: 150, height: 140, objectFit: "contain", filter: `drop-shadow(0 0 24px ${ov.glowColor})` }} />
+              </div>
+              <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1.3rem", color: "white", margin: "0.75rem 0 0.2rem" }}>{ov.eggLine}</div>
+              <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1rem", color: "rgba(255,255,255,0.7)", marginBottom: "0.5rem" }}>{ov.eggLineZh}</div>
+              <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", color: "rgba(255,255,255,0.55)", marginBottom: "1.5rem" }}>{ov.feedLine} · {ov.feedLineZh}</div>
+              <button onClick={dismiss} style={{ background: `linear-gradient(135deg,${ov.borderColor},${ov.glowColor})`, border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", padding: "0.85rem 3rem", cursor: "pointer", boxShadow: `0 6px 24px ${ov.glowColor}` }}>
+                {ov.btnText}
+              </button>
             </div>
-            <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1.3rem", color: "white", margin: "0.75rem 0 0.2rem" }}>A Dolphin Egg appeared!</div>
-            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1rem", color: "rgba(255,255,255,0.7)", marginBottom: "0.5rem" }}>出現了一顆海豚蛋！</div>
-            <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", color: "rgba(255,255,255,0.55)", marginBottom: "1.5rem" }}>Feed it treats to help it grow! · 餵牠餅乾讓牠長大！</div>
-            <button onClick={() => { setShowDolphinUnlock(false); setDolphinUnlockSeen(true); localStorage.setItem(`mpe_dolphinseen_${code}_${studentName}`, "1"); }} style={{ background: "linear-gradient(135deg,#00b4d8,#0077b6)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", padding: "0.85rem 3rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(100,200,255,0.55)" }}>
-              So cool! · 太酷了！🎉
-            </button>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* DIM OVERLAY — shown when grown but video not yet watched */}
       {stageIdx === 3 && !videoWatched && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)", pointerEvents: "all", animation: "overlayFadeIn 0.6s ease-out" }} />
+        <div style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,0.65)", pointerEvents: "all", animation: "overlayFadeIn 0.6s ease-out" }} />
       )}
 
       {/* WATCH BUTTON — outside all blurred containers, always on top */}
@@ -861,7 +941,7 @@ const KidsWorld = () => {
       )}
 
       {/* MAIN */}
-      <div style={{ position: "relative", zIndex: 10, maxWidth: 520, margin: "0 auto", padding: "72px 14px 50px" }}>
+      <div style={{ position: "relative", zIndex: 10, maxWidth: 520, margin: "0 auto", padding: "72px 14px 50px", filter: (stageIdx === 3 && !videoWatched) ? "blur(4px)" : "none", transition: "filter 0.3s ease" }}>
 
         {/* Title */}
         <div style={{ textAlign: "center", marginBottom: "1rem", animation: "fadeUp 0.5s ease-out" }}>
@@ -869,7 +949,7 @@ const KidsWorld = () => {
             {displayName}'s Ocean World!
           </div>
           <div style={{ display: "inline-block", marginTop: "0.6rem", background: "linear-gradient(135deg,hsl(350,85%,60%),hsl(330,80%,65%))", color: "white", borderRadius: "999px", padding: "0.38rem 1.4rem", fontSize: "1.2rem", fontFamily: "'Fredoka One',cursive", boxShadow: "0 4px 16px rgba(0,0,0,0.3)" }}>
-            {stage.name} Stage · {stageIdx === 0 ? "蛋" : stageIdx === 1 ? "小海龜" : stageIdx === 2 ? "年輕海龜" : "成年海龜"}
+            {stage.name} Stage · {stage.nameZh}
           </div>
         </div>
 
@@ -908,8 +988,8 @@ const KidsWorld = () => {
               className={isEgg ? (eggWiggle ? "egg-wiggle" : nearHatch ? "egg-near" : "egg-idle") : (petted ? "petted" : "bob")}
               onClick={isEgg ? handleEggTap : handlePet}
               style={{ width: "min(250px,65vw)", height: "min(210px,55vw)", display: "flex", alignItems: "center", justifyContent: "center", filter: sad ? "saturate(0.4) brightness(0.75)" : "none", position: "relative", transition: "filter 0.5s ease" }}>
-              {isEgg && <EggCracks treats={fedTreats} />}
-              <img src={creatureImg} alt={isEgg ? "Turtle egg" : "Sea turtle"} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))" }} draggable={false} />
+              {isEgg && activeAnimal.isEggType && <EggCracks treats={fedTreats} />}
+              <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))" }} draggable={false} />
             </div>
 
             {/* Instructional hints — bilingual */}
@@ -929,47 +1009,11 @@ const KidsWorld = () => {
               </div>
             )}
 
-            {showVideo && (
-              <div onClick={closeVideo} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,20,40,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", opacity: videoFadingOut ? 0 : 1, transition: "opacity 0.4s ease-out" }}>
-                <div onClick={e => e.stopPropagation()} style={{ position: "relative", maxWidth: 420, width: "100%", opacity: videoFadingOut ? 0 : 1, transition: "opacity 0.4s ease-out" }}>
-                  {/* Underwater frame — seashells, fish, bubbles */}
-                  <svg viewBox="0 0 420 320" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 2 }}>
-                    {/* Corner seashells */}
-                    <text x="8" y="32" fontSize="32">🐚</text>
-                    <text x="370" y="32" fontSize="32">🐚</text>
-                    <text x="8" y="305" fontSize="32">🐚</text>
-                    <text x="370" y="305" fontSize="32">🐚</text>
-                    {/* Fish */}
-                    <text x="15" y="165" fontSize="24">🐠</text>
-                    <text x="375" y="140" fontSize="24">🐟</text>
-                    <text x="180" y="18" fontSize="22">🐡</text>
-                    {/* Bubbles */}
-                    <circle cx="40" cy="80" r="6" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"/>
-                    <circle cx="55" cy="55" r="4" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
-                    <circle cx="380" cy="200" r="5" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"/>
-                    <circle cx="365" cy="175" r="3" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
-                    <circle cx="200" cy="295" r="5" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5"/>
-                    {/* Seaweed */}
-                    <text x="0" y="290" fontSize="28">🌿</text>
-                    <text x="390" y="290" fontSize="28">🌿</text>
-                    {/* Stars */}
-                    <text x="160" y="310" fontSize="18">⭐</text>
-                    <text x="240" y="310" fontSize="18">🌟</text>
-                  </svg>
-                  {/* Video */}
-                  <video autoPlay loop controls
-                    onTimeUpdate={(e) => { if (!videoWatched && (e.target as HTMLVideoElement).currentTime >= 1) { setVideoWatched(true); localStorage.setItem(`mpe_videowatched_${code}_${studentName}`, "1"); } }}
-                    style={{ width: "100%", borderRadius: "1rem", border: "4px solid rgba(0,180,216,0.8)", boxShadow: "0 0 40px rgba(0,180,216,0.5)", display: "block", position: "relative", zIndex: 1 }}
-                    src="/video_adult_turtle.mp4" />
-                  {/* Close button */}
-                  <button onClick={closeVideo} style={{ position: "absolute", top: -16, right: -16, zIndex: 3, background: "#ef4444", border: "none", borderRadius: "50%", width: 36, height: 36, color: "white", fontSize: "1.1rem", cursor: "pointer", fontWeight: 900 }}>✕</button>
-                </div>
-              </div>
-            )}
+
           </div>
 
           <div style={{ color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.45rem", marginTop: "0.6rem", textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
-            {stage.label}{isMaster ? " (Master)" : ""}
+            {stage.name} {activeAnimal.name}{isMaster ? " (Master)" : ""}
           </div>
 
           {nextStage && (
@@ -985,14 +1029,14 @@ const KidsWorld = () => {
               </div>
               <div style={{ textAlign: "center", fontFamily: "'Fredoka One',cursive", fontSize: "1.2rem", color: "#fbbf24", textShadow: "0 2px 6px rgba(0,0,0,0.4)", animation: "shimmer 2s ease-in-out infinite" }}>
                 {nextStage.min - fedTreats} more treats to {nextStage.name}!<br />
-                <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>還需要 {nextStage.min - fedTreats} 個餅乾才能變成{nextStage.name === "Baby" ? "小海龜" : nextStage.name === "Young" ? "年輕海龜" : "成年海龜"}！</span>
+                <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>還需要 {nextStage.min - fedTreats} 個餅乾才能變成{nextStage.nameZh}！</span>
               </div>
             </div>
           )}
           {!nextStage && (
             <div style={{ color: "#fbbf24", fontFamily: "'Fredoka One',cursive", fontSize: "1.25rem", marginTop: "0.75rem", textShadow: "0 2px 8px rgba(0,0,0,0.4)" }}>
-              {petName ? `${petName} is all grown up! 🐢` : "Your turtle is all grown up! 🐢"}<br />
-              <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>你的海龜長大了！🎉</span>
+              {petName ? `${petName} is all grown up! ${activeAnimal.emoji}` : `Your ${activeAnimal.name} is all grown up! ${activeAnimal.emoji}`}<br />
+              <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>你的{activeAnimal.nameZh}長大了！🎉</span>
             </div>
           )}
         </div>
@@ -1007,8 +1051,8 @@ const KidsWorld = () => {
         {/* FEED BUTTON */}
         {!isMaster && (nextStage ? (jarTreats > 0 && (
           <button onClick={handleFeed} style={{ width: "100%", padding: "1.1rem", marginBottom: "1rem", background: "linear-gradient(135deg,#fbbf24,#f97316)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(251,191,36,0.55)", animation: "eF 2s ease-in-out infinite" }}>
-            Feed {petName || "your turtle"}!  ({jarTreats} treat{jarTreats !== 1 ? "s" : ""} ready)<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.9 }}>餵{petName || "你的海龜"}！（{jarTreats}個餅乾準備好了）</span>
+            Feed {petName || `your ${activeAnimal.feedLabel}`}! ({jarTreats} treat{jarTreats !== 1 ? "s" : ""} ready)<br />
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.9 }}>餵{petName || `你的${activeAnimal.feedLabelZh}`}！（{jarTreats}個餅乾準備好了）</span>
           </button>
         )) : (
           <button onClick={() => playSfx("chirp")} style={{ width: "100%", padding: "1.1rem", marginBottom: "1rem", background: "linear-gradient(135deg,#a855f7,#7c3aed)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(168,85,247,0.55)", animation: "eF 2s ease-in-out infinite" }}>
@@ -1019,8 +1063,8 @@ const KidsWorld = () => {
         {/* TREAT JAR */}
         <div className="glass" style={{ padding: "1.5rem", marginBottom: "1rem", animation: "fadeUp 0.7s ease-out" }}>
           <div style={{ color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.25rem", textAlign: "center", marginBottom: "0.85rem" }}>
-            {petName ? `${petName} loves treats! ` : "Feed your Sea Turtle Treats! "}<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>餵你的海龜餅乾！每次餵食讓牠更快長大！</span>
+            {petName ? `${petName} loves treats! ` : `Feed your ${activeAnimal.name} Treats! `}<br />
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>餵你的{activeAnimal.nameZh}餅乾！每次餵食讓牠更快長大！</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
             <TreatJar treats={jarTreats} nextStage={nextStage} />
@@ -1056,7 +1100,7 @@ const KidsWorld = () => {
             Earn Treats! <br />
             <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>賺餅乾！完成挑戰得到獎勵！</span>
           </div>
-          <EarnButtons navigate={navigate} code={code ?? ""} studentName={studentName ?? ""} />
+          <EarnButtons navigate={navigate} code={code ?? ""} studentName={studentName ?? ""} activeAnimal={activeAnimal} />
         </div>
 
         {/* COLLECTION */}
@@ -1066,7 +1110,7 @@ const KidsWorld = () => {
             <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>海洋收藏！收集所有生物！</span>
           </div>
           {/* Wiggle arrow pointing at turtle card when videoWatched */}
-          {stageIdx === 3 && videoWatched && (
+          {stageIdx === 3 && videoWatched && !unlockSeenMap["dolphin"] && (
             <div style={{ display: "flex", justifyContent: "center", marginBottom: "0.75rem" }}>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1rem", color: "#fbbf24", textAlign: "center", marginBottom: "0.3rem", animation: "shimmer 1s ease-in-out infinite", textShadow: "0 0 16px rgba(251,191,36,0.9)" }}>
@@ -1081,13 +1125,26 @@ const KidsWorld = () => {
               </div>
             </div>
           )}
-          <OceanCollection unlockedCount={1} stageIdx={stageIdx} videoWatched={videoWatched} dolphinUnlockSeen={dolphinUnlockSeen} onDolphinClick={() => setShowDolphinUnlock(true)} />
+          <OceanCollection fedTreatsMap={fedTreatsMap} videoWatched={videoWatched} unlockSeenMap={unlockSeenMap} onAnimalClick={(id) => setShowUnlockFor(id)} />
           <div style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", marginTop: "0.85rem", textAlign: "center" }}>
             More creatures unlocking soon! · 更多生物即將解鎖！
           </div>
         </div>
       </div>
 
+      {/* VIDEO PLAYER — outside blurred content div so it renders unblurred */}
+      {showVideo && (
+        <div onClick={closeVideo} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,20,40,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", opacity: videoFadingOut ? 0 : 1, transition: "opacity 0.4s ease-out" }}>
+          <div onClick={e => e.stopPropagation()} style={{ position: "relative", maxWidth: 420, width: "100%" }}>
+
+            <video autoPlay loop controls
+              onTimeUpdate={(e) => { if (!videoWatched && (e.target as HTMLVideoElement).currentTime >= 1) { setVideoWatched(true); localStorage.setItem(`mpe_videowatched_${code}_${studentName}`, "1"); } }}
+              style={{ width: "100%", borderRadius: "1rem", border: "4px solid rgba(0,180,216,0.8)", boxShadow: "0 0 40px rgba(0,180,216,0.5)", display: "block", position: "relative", zIndex: 1 }}
+              src="/video_adult_turtle.mp4" />
+            <button onClick={closeVideo} style={{ position: "absolute", top: -16, right: -16, zIndex: 3, background: "#ef4444", border: "none", borderRadius: "50%", width: 36, height: 36, color: "white", fontSize: "1.1rem", cursor: "pointer", fontWeight: 900 }}>✕</button>
+          </div>
+        </div>
+      )}
       {showSettings && <div style={{ position: "fixed", inset: 0, zIndex: 150 }} onClick={() => setShowSettings(false)} />}
     </div>
   );
