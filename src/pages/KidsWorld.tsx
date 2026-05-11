@@ -35,11 +35,11 @@ const ANIMALS: Animal[] = [
     btnColor: "#f97316", btnGlow: "rgba(249,115,22,0.5)", btn3Color: "#10b981", btn3Glow: "rgba(16,185,129,0.5)",
     feedLabel: "turtle", feedLabelZh: "海龜",
     levelUpMessages: [
-      { main: "Your egg hatched!",      zh: "蛋孵化了！",          sub: "Meet your Baby Sea Turtle!",     subZh: "快來認識你的小海龜！" },
+      { main: "Welcome Home!",          zh: "歡迎回家！",           sub: "Meet your Baby Sea Turtle!",     subZh: "快來認識你的小海龜！" },
       { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Sea Turtle!",        subZh: "現在是年輕海龜了！" },
       { main: "Fully grown! Amazing!",  zh: "完全長大了！太棒了！", sub: "You raised a Grown Sea Turtle!", subZh: "你養大了一隻成年海龜！" },
     ],
-    unlockOverlay: { emoji: "🐢", title: "Sea Turtle!", titleZh: "海龜！", eggLine: "A Sea Turtle Egg appeared!", eggLineZh: "出現了一顆海龜蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "Let's go! · 出發！🎉", glowColor: "rgba(255,215,0,0.6)", borderColor: "rgba(255,215,0,0.7)", bgGradient: "linear-gradient(135deg,#0c3460,#1a6e8a)" },
+    unlockOverlay: { emoji: "🐢", title: "Sea Turtle!", titleZh: "海龜！", eggLine: "A Sea Turtle appeared!", eggLineZh: "海龜出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "Let's go! · 出發！🎉", glowColor: "rgba(255,215,0,0.6)", borderColor: "rgba(255,215,0,0.7)", bgGradient: "linear-gradient(135deg,#0c3460,#1a6e8a)" },
   },
   {
     id: "dolphin", name: "Dolphin", nameZh: "海豚", emoji: "🐬",
@@ -51,12 +51,12 @@ const ANIMALS: Animal[] = [
     ],
     unlockCondition: "turtle_grown_video_watched",
     collectionBg: "#0077b6", collectionBorder: "rgba(100,200,255,0.7)", collectionGlow: "rgba(100,200,255,0.4)",
-    video: null, isEggType: false,
+    video: "/video_adult_dolphin.mp4", isEggType: false,
     accentColor: "#f472b6", accentGlow: "rgba(244,114,182,0.5)",
     btnColor: "#22d3ee", btnGlow: "rgba(34,211,238,0.5)", btn3Color: "#f472b6", btn3Glow: "rgba(244,114,182,0.5)",
     feedLabel: "dolphin", feedLabelZh: "海豚",
     levelUpMessages: [
-      { main: "Your egg hatched!",      zh: "蛋孵化了！",          sub: "Meet your Baby Dolphin!",     subZh: "快來認識你的小海豚！" },
+      { main: "Welcome Home!",          zh: "歡迎回家！",           sub: "Meet your Baby Dolphin!",     subZh: "快來認識你的小海豚！" },
       { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Dolphin!",        subZh: "現在是年輕海豚了！" },
       { main: "Fully grown! Amazing!",  zh: "完全長大了！太棒了！", sub: "You raised a Grown Dolphin!", subZh: "你養大了一隻成年海豚！" },
     ],
@@ -133,49 +133,76 @@ const FaceCookie = ({ size = 24 }: { size?: number }) => (
 );
 
 // ── DISNEY NAME TAG ───────────────────────────────────────────────────────────
-const DisneyNameTag = ({ name }: { name: string }) => (
-  <div style={{ position: "relative", display: "inline-block", marginBottom: "0.5rem" }}>
-    <svg viewBox="0 0 240 80" width="240" height="80" overflow="visible">
-      <defs>
-        <linearGradient id="tBg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ff9de2" />
-          <stop offset="50%" stopColor="#ff6ec7" />
-          <stop offset="100%" stopColor="#e040a0" />
-        </linearGradient>
-        <linearGradient id="tBrd" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ffd700" />
-          <stop offset="50%" stopColor="#ffaa00" />
-          <stop offset="100%" stopColor="#ff8800" />
-        </linearGradient>
-        <filter id="tShadow">
-          <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#c020a0" floodOpacity="0.45" />
-        </filter>
-      </defs>
-      <path d="M88,8 Q70,-5 52,2" stroke="#60b8ff" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      <path d="M152,8 Q170,-5 188,2" stroke="#60b8ff" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      <circle cx="88" cy="8" r="3.5" fill="#ffd700" stroke="#ffaa00" strokeWidth="1" />
-      <circle cx="152" cy="8" r="3.5" fill="#ffd700" stroke="#ffaa00" strokeWidth="1" />
-      <path d="M10,18 L20,10 L220,10 L230,18 L230,62 L220,70 L20,70 L10,62 Z" fill="url(#tBg)" filter="url(#tShadow)" />
-      <path d="M10,18 L20,10 L220,10 L230,18 L230,62 L220,70 L20,70 L10,62 Z" fill="none" stroke="url(#tBrd)" strokeWidth="3" />
-      <path d="M16,20 L24,14 L216,14 L224,20 L224,60 L216,66 L24,66 L16,60 Z" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
-      <path d="M30,25 L32,19 L34,25 L40,25 L35,29 L37,35 L32,31 L27,35 L29,29 L24,25 Z" fill="#ffd700" opacity="0.9" />
-      <path d="M210,25 L212,19 L214,25 L220,25 L215,29 L217,35 L212,31 L207,35 L209,29 L204,25 Z" fill="#ffd700" opacity="0.9" />
-      <path d="M22,53 L23,50 L24,53 L27,53 L25,55 L26,58 L23,56 L20,58 L21,55 L19,53 Z" fill="#ffd700" opacity="0.7" />
-      <path d="M218,53 L219,50 L220,53 L223,53 L221,55 L222,58 L219,56 L216,58 L217,55 L215,53 Z" fill="#ffd700" opacity="0.7" />
-      {[[55, 16], [125, 13], [195, 18], [50, 64], [120, 67], [192, 60]].map(([cx, cy], i) => (
-        <circle key={i} cx={cx} cy={cy} r="2.2" fill="rgba(255,255,255,0.55)" style={{ animation: `sTag ${1.5 + i * 0.3}s ease-in-out infinite ${i * 0.2}s` }} />
-      ))}
-      <path d="M24,63 Q48,58 72,63 Q96,68 120,63 Q144,58 168,63 Q192,68 216,63" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" fill="none" />
-    </svg>
-    <div style={{
-      position: "absolute", top: "50%", left: "50%",
-      transform: "translate(-50%,-50%) translateY(2px)",
-      fontFamily: "'Fredoka One',cursive", fontSize: "1.45rem",
-      color: "white", whiteSpace: "nowrap", letterSpacing: "0.06em",
-      textShadow: "0 2px 4px rgba(150,0,80,0.6), 0 0 14px rgba(255,150,220,0.5)"
-    }}>{name}</div>
-  </div>
-);
+const DisneyNameTag = ({ name, onRename }: { name: string; onRename?: () => void }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div style={{ position: "relative", display: "inline-block", marginBottom: "0.5rem" }}>
+      <svg viewBox="0 0 240 80" width="240" height="80" overflow="visible">
+        <defs>
+          <linearGradient id="tBg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#ff9de2" />
+            <stop offset="50%" stopColor="#ff6ec7" />
+            <stop offset="100%" stopColor="#e040a0" />
+          </linearGradient>
+          <linearGradient id="tBrd" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#ffd700" />
+            <stop offset="50%" stopColor="#ffaa00" />
+            <stop offset="100%" stopColor="#ff8800" />
+          </linearGradient>
+          <filter id="tShadow">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#c020a0" floodOpacity="0.45" />
+          </filter>
+        </defs>
+        <path d="M88,8 Q70,-5 52,2" stroke="#60b8ff" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d="M152,8 Q170,-5 188,2" stroke="#60b8ff" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <circle cx="88" cy="8" r="3.5" fill="#ffd700" stroke="#ffaa00" strokeWidth="1" />
+        <circle cx="152" cy="8" r="3.5" fill="#ffd700" stroke="#ffaa00" strokeWidth="1" />
+        <path d="M10,18 L20,10 L220,10 L230,18 L230,62 L220,70 L20,70 L10,62 Z" fill="url(#tBg)" filter="url(#tShadow)" />
+        <path d="M10,18 L20,10 L220,10 L230,18 L230,62 L220,70 L20,70 L10,62 Z" fill="none" stroke="url(#tBrd)" strokeWidth="3" />
+        <path d="M16,20 L24,14 L216,14 L224,20 L224,60 L216,66 L24,66 L16,60 Z" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+        <path d="M30,25 L32,19 L34,25 L40,25 L35,29 L37,35 L32,31 L27,35 L29,29 L24,25 Z" fill="#ffd700" opacity="0.9" />
+        <path d="M210,25 L212,19 L214,25 L220,25 L215,29 L217,35 L212,31 L207,35 L209,29 L204,25 Z" fill="#ffd700" opacity="0.9" />
+        <path d="M22,53 L23,50 L24,53 L27,53 L25,55 L26,58 L23,56 L20,58 L21,55 L19,53 Z" fill="#ffd700" opacity="0.7" />
+        <path d="M218,53 L219,50 L220,53 L223,53 L221,55 L222,58 L219,56 L216,58 L217,55 L215,53 Z" fill="#ffd700" opacity="0.7" />
+        {[[55, 16], [125, 13], [195, 18], [50, 64], [120, 67], [192, 60]].map(([cx, cy], i) => (
+          <circle key={i} cx={cx} cy={cy} r="2.2" fill="rgba(255,255,255,0.55)" style={{ animation: `sTag ${1.5 + i * 0.3}s ease-in-out infinite ${i * 0.2}s` }} />
+        ))}
+        <path d="M24,63 Q48,58 72,63 Q96,68 120,63 Q144,58 168,63 Q192,68 216,63" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" fill="none" />
+      </svg>
+      <div style={{
+        position: "absolute", top: "50%", left: "50%",
+        transform: "translate(-50%,-50%) translateY(2px)",
+        fontFamily: "'Fredoka One',cursive", fontSize: "1.45rem",
+        color: "white", whiteSpace: "nowrap", letterSpacing: "0.06em",
+        textShadow: "0 2px 4px rgba(150,0,80,0.6), 0 0 14px rgba(255,150,220,0.5)"
+      }}>{name}</div>
+      {onRename && (
+        <div style={{ position: "absolute", bottom: 2, right: -4 }}>
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <button
+              onClick={onRename}
+              onMouseEnter={() => setHovered(true)}
+              onMouseLeave={() => setHovered(false)}
+              style={{ background: "rgba(255,255,255,0.2)", border: "1.5px solid rgba(255,255,255,0.45)", borderRadius: "50%", width: 24, height: 24, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, transition: "background 0.2s" }}
+              onMouseDown={e => (e.currentTarget.style.background = "rgba(255,255,255,0.4)")}
+              onMouseUp={e => (e.currentTarget.style.background = "rgba(255,255,255,0.2)")}
+            >
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+                <path d="M9 1.5l2.5 2.5-7 7L2 12l.5-2.5 7-7z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M7.5 3l2.5 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+            {hovered && (
+              <div style={{ position: "absolute", bottom: 30, left: "50%", transform: "translateX(-50%)", background: "rgba(0,0,0,0.75)", color: "white", fontFamily: "Nunito,sans-serif", fontSize: "0.75rem", padding: "0.3rem 0.6rem", borderRadius: "8px", whiteSpace: "nowrap", pointerEvents: "none", zIndex: 99 }}>
+                Rename your friend! · 重新幫你的朋友取名字！
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ── TREAT JAR ─────────────────────────────────────────────────────────────────
 const TreatJar = ({ treats, nextStage }: { treats: number; nextStage: AnimalStage | null }) => {
@@ -306,24 +333,50 @@ const LevelUpOverlay = ({ animal, stageIdx, onDismiss }: { animal: Animal; stage
 };
 
 // ── PET NAMING ────────────────────────────────────────────────────────────────
-const PetNamingInput = ({ petName, onSave }: { petName: string; onSave: (n: string) => void }) => {
-  const [editing, setEditing] = useState(false);
+const PetNamingInput = ({ petName, onSave, isRenaming, onCancelRename }: { petName: string; onSave: (n: string) => void; isRenaming?: boolean; onCancelRename?: () => void }) => {
   const [val, setVal] = useState(petName);
-  if (!editing) return (
-    <button onClick={() => setEditing(true)} style={{ background: "rgba(255,255,255,0.15)", border: "1.5px dashed rgba(255,255,255,0.4)", borderRadius: "999px", color: "rgba(255,255,255,0.8)", fontFamily: "'Fredoka One',cursive", fontSize: "0.95rem", padding: "0.3rem 1rem", cursor: "pointer", marginBottom: "0.5rem" }}>
-      {petName ? "Rename your pet · 重新命名" : "Give your pet a name! · 幫你的寵物取個名字！"}
+  useEffect(() => { setVal(petName); }, [petName]);
+
+  // First-time naming: no name yet, show prompt button or input
+  const [editingFirst, setEditingFirst] = useState(false);
+
+  if (!petName && !editingFirst) return (
+    <button onClick={() => setEditingFirst(true)} style={{ background: "rgba(255,255,255,0.15)", border: "1.5px dashed rgba(255,255,255,0.4)", borderRadius: "999px", color: "rgba(255,255,255,0.8)", fontFamily: "'Fredoka One',cursive", fontSize: "0.95rem", padding: "0.3rem 1rem", cursor: "pointer", marginBottom: "0.5rem" }}>
+      Give your pet a name! · 幫你的寵物取個名字！
     </button>
   );
-  return (
+
+  if (!petName && editingFirst) return (
     <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.5rem", alignItems: "center" }}>
       <input autoFocus value={val}
         onChange={e => setVal(e.target.value)}
-        onKeyDown={e => { if (e.key === "Enter") { onSave(val); setEditing(false); } }}
-        maxLength={16} placeholder="Enter a name..."
+        onKeyDown={e => { if (e.key === "Enter" && val.trim()) { onSave(val.trim()); setEditingFirst(false); } }}
+        maxLength={16} placeholder="Enter a name."
         style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1rem", padding: "0.4rem 0.9rem", borderRadius: "999px", border: "2px solid rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.2)", color: "white", outline: "none", width: 140 }} />
-      <button onClick={() => { onSave(val); setEditing(false); }} style={{ background: "#4ade80", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "0.9rem", padding: "0.4rem 0.9rem", cursor: "pointer" }}>Save · 儲存</button>
+      <button onClick={() => { if (val.trim()) { onSave(val.trim()); setEditingFirst(false); } }} style={{ background: "#4ade80", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "0.9rem", padding: "0.4rem 0.9rem", cursor: "pointer" }}>Save · 儲存</button>
     </div>
   );
+
+  // Rename mode: inline below name tag, triggered by pen icon
+  if (isRenaming) return (
+    <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.25rem", marginBottom: "0.25rem", alignItems: "center", justifyContent: "center" }}>
+      <input autoFocus value={val}
+        onChange={e => setVal(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === "Enter" && val.trim()) { onSave(val.trim()); }
+          if (e.key === "Escape") { if (onCancelRename) onCancelRename(); }
+        }}
+        maxLength={16}
+        style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1rem", padding: "0.4rem 0.9rem", borderRadius: "999px", border: "2px solid rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.2)", color: "white", outline: "none", width: 140, textAlign: "center" }} />
+      <button onClick={() => { if (val.trim()) onSave(val.trim()); }}
+        style={{ background: "#4ade80", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem" }}>✓</button>
+      <button onClick={() => { if (onCancelRename) onCancelRename(); }}
+        style={{ background: "#f87171", border: "none", borderRadius: "50%", width: 32, height: 32, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem" }}>✗</button>
+    </div>
+  );
+
+  // Named, not renaming: render nothing (pen icon on name tag handles it)
+  return null;
 };
 
 // ── UNDERWATER BG ─────────────────────────────────────────────────────────────
@@ -544,13 +597,21 @@ const KidsWorld = () => {
   const [justEarned, setJustEarned] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const sad = false;
+  const [isRenaming, setIsRenaming] = useState(false);
   const [petNameMap, setPetNameMap] = useState<Record<string,string>>(() =>
     Object.fromEntries(ANIMALS.map(a => [a.id, localStorage.getItem(`mpe_petname_${a.id}_${code}_${studentName}`) || ""]))
   );
   const [levelUpStage, setLevelUpStage] = useState<{ animal: Animal; stageIdx: number } | null>(null);
   const [showVideo, setShowVideo] = useState(false);
   const [videoButtonSeen, setVideoButtonSeen] = useState(() => localStorage.getItem(`mpe_videoseen_${code}_${studentName}`) === "1");
-  const [videoWatched, setVideoWatched] = useState(() => localStorage.getItem(`mpe_videowatched_${code}_${studentName}`) === "1");
+  const [videoWatchedMap, setVideoWatchedMap] = useState<Record<string,boolean>>(() => {
+    const map: Record<string,boolean> = {};
+    ANIMALS.forEach(a => {
+      const key = a.id === "turtle" ? `mpe_videowatched_${code}_${studentName}` : `mpe_videowatched_${a.id}_${code}_${studentName}`;
+      map[a.id] = localStorage.getItem(key) === "1";
+    });
+    return map;
+  });
   const [showUnlockFor, setShowUnlockFor] = useState<string | null>(null);
   const [unlockSeenMap, setUnlockSeenMap] = useState<Record<string,boolean>>(() =>
     Object.fromEntries(ANIMALS.map(a => [a.id, localStorage.getItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`) === "1"]))
@@ -567,6 +628,7 @@ const KidsWorld = () => {
   const feedId = useRef(0);
   const [feedingCookies, setFeedingCookies] = useState<{ id: number; x: number; y: number }[]>([]);
   const creatureRef = useRef<HTMLDivElement>(null);
+  const collectionRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const harpRef = useRef<HTMLAudioElement | null>(null);
   const tadaRef = useRef<HTMLAudioElement | null>(null);
@@ -586,6 +648,7 @@ const KidsWorld = () => {
 
   const [activeAnimalId, setActiveAnimalId] = useState("turtle");
   const activeAnimal = ANIMALS.find(a => a.id === activeAnimalId) ?? ANIMALS[0];
+  const videoWatched = videoWatchedMap[activeAnimalId] ?? false;
   const fedTreats = fedTreatsState[activeAnimalId] ?? 0;
   const petName = petNameMap[activeAnimalId] ?? "";
   const stage = getAnimalStage(activeAnimal, fedTreats);
@@ -820,7 +883,7 @@ const KidsWorld = () => {
             <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.85)", marginBottom: "0.5rem" }}>往下看！</div>
             <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1.2rem", color: "white", marginBottom: "0.25rem" }}>A new friend is waiting!</div>
             <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1rem", color: "rgba(255,255,255,0.7)", marginBottom: "1.5rem" }}>新朋友在等你！</div>
-            <button onClick={() => setShowLookBelow(false)} style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", padding: "0.8rem 2.5rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(251,191,36,0.6)" }}>
+            <button onClick={() => { setShowLookBelow(false); setTimeout(() => collectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 100); }} style={{ background: "linear-gradient(135deg,#fbbf24,#f97316)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", padding: "0.8rem 2.5rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(251,191,36,0.6)" }}>
               Let's go! · 出發！🎉
             </button>
           </div>
@@ -962,8 +1025,8 @@ const KidsWorld = () => {
           )}
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            {petName ? <DisneyNameTag name={petName} /> : <div style={{ height: 8 }} />}
-            <PetNamingInput petName={petName} onSave={savePetName} />
+            {petName ? <DisneyNameTag name={petName} onRename={() => setIsRenaming(true)} /> : <div style={{ height: 8 }} />}
+            <PetNamingInput petName={petName} onSave={(n) => { savePetName(n); setIsRenaming(false); }} isRenaming={isRenaming} onCancelRename={() => setIsRenaming(false)} />
           </div>
 
           {nearHatch && !eggWiggle && (
@@ -983,22 +1046,22 @@ const KidsWorld = () => {
               </div>
             ))}
             <div
-              className={isEgg ? (eggWiggle ? "egg-wiggle" : nearHatch ? "egg-near" : "egg-idle") : (petted ? "petted" : "bob")}
+              className={isEgg && activeAnimal.isEggType ? (eggWiggle ? "egg-wiggle" : nearHatch ? "egg-near" : "egg-idle") : (petted ? "petted" : "bob")}
               onClick={isEgg ? handleEggTap : handlePet}
               style={{ width: "min(250px,65vw)", height: "min(210px,55vw)", display: "flex", alignItems: "center", justifyContent: "center", filter: sad ? "saturate(0.4) brightness(0.75)" : "none", position: "relative", transition: "filter 0.5s ease" }}>
               {isEgg && activeAnimal.isEggType && <EggCracks treats={fedTreats} />}
-              <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))" }} draggable={false} />
+              <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))", transform: activeAnimal.id === "dolphin" && stageIdx > 0 ? "scale(1.6)" : "none", transformOrigin: "center center" }} draggable={false} />
             </div>
 
             {/* Instructional hints — bilingual */}
             {isEgg && !nearHatch && (
               <div style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginTop: "0.4rem", animation: "shimmer 2.2s ease-in-out infinite", textAlign: "center" }}>
-                Tap the egg! · 敲敲蛋！🥚
+                Tap me & say hello! 👆 · 點我打招呼！👆
               </div>
             )}
             {nearHatch && (
               <div style={{ color: "#fbbf24", fontFamily: "'Fredoka One',cursive", fontSize: "1.05rem", marginTop: "0.4rem", animation: "shimmer 1s ease-in-out infinite", textAlign: "center" }}>
-                Almost hatching! · 快孵出來了！✨
+                Almost there! ✨ · 快到了！✨
               </div>
             )}
             {!isEgg && !sad && (
@@ -1019,8 +1082,8 @@ const KidsWorld = () => {
               <div style={{ position: "relative", height: 30, background: "rgba(0,0,0,0.25)", borderRadius: "999px", border: "2.5px solid rgba(255,255,255,0.2)", overflow: "visible", marginBottom: "0.75rem" }}>
                 <div style={{ width: `${progress}%`, height: "100%", borderRadius: "999px", background: "linear-gradient(to right,#fbbf24,#f97316)", transition: "width 1s cubic-bezier(0.34,1.56,0.64,1)", boxShadow: "0 0 12px rgba(251,191,36,0.7)", minWidth: progress > 0 ? "28px" : "0", position: "relative" }}>
                   {progress > 0 && (
-                    <div style={{ position: "absolute", right: -14, top: "50%", transform: "translateY(-50%)", fontSize: "1.4rem", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4))", animation: "bobAnim 2s ease-in-out infinite" }}>
-                      🐢
+                    <div style={{ position: "absolute", right: -14, top: "50%", transform: "translateY(-50%)", fontSize: "1.4rem", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4))" }}>
+                      ⭐
                     </div>
                   )}
                 </div>
@@ -1049,8 +1112,8 @@ const KidsWorld = () => {
         {/* FEED BUTTON */}
         {!isMaster && (nextStage ? (jarTreats > 0 && (
           <button onClick={handleFeed} style={{ width: "100%", padding: "1.1rem", marginBottom: "1rem", background: "linear-gradient(135deg,#fbbf24,#f97316)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(251,191,36,0.55)", animation: "eF 2s ease-in-out infinite" }}>
-            Feed {petName || `your ${activeAnimal.feedLabel}`}! ({jarTreats} treat{jarTreats !== 1 ? "s" : ""} ready)<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.9 }}>餵{petName || `你的${activeAnimal.feedLabelZh}`}！（{jarTreats}個餅乾準備好了）</span>
+            Feed Me! ({jarTreats} treat{jarTreats !== 1 ? "s" : ""} ready)<br />
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.9 }}>餵我！（{jarTreats}個餅乾準備好了）</span>
           </button>
         )) : (
           <button onClick={() => playSfx("chirp")} style={{ width: "100%", padding: "1.1rem", marginBottom: "1rem", background: "linear-gradient(135deg,#a855f7,#7c3aed)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(168,85,247,0.55)", animation: "eF 2s ease-in-out infinite" }}>
@@ -1123,7 +1186,7 @@ const KidsWorld = () => {
               </div>
             </div>
           )}
-          <OceanCollection fedTreatsMap={fedTreatsState} videoWatched={videoWatched} unlockSeenMap={unlockSeenMap} onAnimalClick={(id) => setShowUnlockFor(id)} />
+          <div ref={collectionRef}><OceanCollection fedTreatsMap={fedTreatsState} videoWatched={videoWatched} unlockSeenMap={unlockSeenMap} onAnimalClick={(id) => setShowUnlockFor(id)} /></div>
           <div style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", marginTop: "0.85rem", textAlign: "center" }}>
             More creatures unlocking soon! · 更多生物即將解鎖！
           </div>
@@ -1136,9 +1199,9 @@ const KidsWorld = () => {
           <div onClick={e => e.stopPropagation()} style={{ position: "relative", maxWidth: 420, width: "100%" }}>
 
             <video autoPlay loop controls
-              onTimeUpdate={(e) => { if (!videoWatched && (e.target as HTMLVideoElement).currentTime >= 1) { setVideoWatched(true); localStorage.setItem(`mpe_videowatched_${code}_${studentName}`, "1"); } }}
+              onTimeUpdate={(e) => { if (!videoWatched && (e.target as HTMLVideoElement).currentTime >= 1) { const vKey = activeAnimalId === "turtle" ? `mpe_videowatched_${code}_${studentName}` : `mpe_videowatched_${activeAnimalId}_${code}_${studentName}`; localStorage.setItem(vKey, "1"); setVideoWatchedMap(m => ({ ...m, [activeAnimalId]: true })); } }}
               style={{ width: "100%", borderRadius: "1rem", border: "4px solid rgba(0,180,216,0.8)", boxShadow: "0 0 40px rgba(0,180,216,0.5)", display: "block", position: "relative", zIndex: 1 }}
-              src="/video_adult_turtle.mp4" />
+              src={activeAnimal.video ?? ""} />
             <button onClick={closeVideo} style={{ position: "absolute", top: -16, right: -16, zIndex: 3, background: "#ef4444", border: "none", borderRadius: "50%", width: 36, height: 36, color: "white", fontSize: "1.1rem", cursor: "pointer", fontWeight: 900 }}>✕</button>
           </div>
         </div>
