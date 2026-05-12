@@ -10,7 +10,7 @@ interface AnimalStage { name: string; nameZh: string; min: number; img: string; 
 interface Animal {
   id: string; name: string; nameZh: string; emoji: string;
   stages: AnimalStage[];
-  unlockCondition: "default" | "turtle_grown_video_watched";
+  unlockCondition: "default" | "turtle_grown_video_watched" | "dolphin_grown_video_watched";
   collectionBg: string; collectionBorder: string; collectionGlow: string;
   video: string | null; isEggType: boolean;
   accentColor: string; accentGlow: string;
@@ -60,9 +60,30 @@ const ANIMALS: Animal[] = [
       { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Dolphin!",        subZh: "現在是年輕海豚了！" },
       { main: "Fully grown! Amazing!",  zh: "完全長大了！太棒了！", sub: "You raised a Grown Dolphin!", subZh: "你養大了一隻成年海豚！" },
     ],
-    unlockOverlay: { emoji: "🐬", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dolphin Egg appeared!", eggLineZh: "出現了一顆海豚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(100,200,255,0.6)", borderColor: "rgba(100,200,255,0.7)", bgGradient: "linear-gradient(135deg,#003d7a,#0077b6,#00b4d8)" },
+    unlockOverlay: { emoji: "🐬", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dolphin appeared!", eggLineZh: "海豚出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(100,200,255,0.6)", borderColor: "rgba(100,200,255,0.7)", bgGradient: "linear-gradient(135deg,#003d7a,#0077b6,#00b4d8)" },
   },
   // ── ADD NEW ANIMALS HERE — one object = one new animal ────────────────────
+  {
+    id: "octopus", name: "Octopus", nameZh: "章魚", emoji: "🐙",
+    stages: [
+      { name: "Egg",   nameZh: "章魚蛋",   min: 0,  img: "/creatures/octopus-egg.png" },
+      { name: "Baby",  nameZh: "小章魚",   min: 15, img: "/creatures/octopus-egg-baby.png" },
+      { name: "Young", nameZh: "年輕章魚", min: 30, img: "/creatures/octopus-young.png" },
+      { name: "Grown", nameZh: "成年章魚", min: 45, img: "/creatures/octopus-grown.png" },
+    ],
+    unlockCondition: "dolphin_grown_video_watched",
+    collectionBg: "#581c87", collectionBorder: "rgba(216,180,254,0.7)", collectionGlow: "rgba(168,85,247,0.5)",
+    video: "/video-adult-octopus.mp4", isEggType: true,
+    accentColor: "#e879f9", accentGlow: "rgba(232,121,249,0.5)",
+    btnColor: "#a855f7", btnGlow: "rgba(168,85,247,0.5)", btn3Color: "#e879f9", btn3Glow: "rgba(232,121,249,0.5)",
+    feedLabel: "octopus", feedLabelZh: "章魚",
+    levelUpMessages: [
+      { main: "Hello little one!",       zh: "你好小寶貝！",         sub: "A Baby Octopus appeared!",       subZh: "小章魚出現了！" },
+      { main: "Growing so fast!",        zh: "長得好快！",           sub: "Now a Young Octopus!",           subZh: "現在是年輕章魚了！" },
+      { main: "Magnificent! Amazing!",   zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Octopus!",    subZh: "你養大了一隻成年章魚！" },
+    ],
+    unlockOverlay: { emoji: "🐙", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "An Octopus Egg appeared!", eggLineZh: "出現了一顆章魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(168,85,247,0.6)", borderColor: "rgba(216,180,254,0.7)", bgGradient: "linear-gradient(135deg,#2e1065,#581c87,#7e22ce)" },
+  },
 ];
 // locked placeholder slots (fills collection grid to 6 total)
 const LOCKED_SLOTS = [
@@ -483,7 +504,7 @@ const EarnButtons = ({ navigate, code, studentName, activeAnimal }: { navigate: 
 );
 
 // ── COLLECTION ────────────────────────────────────────────────────────────────
-const OceanCollection = ({ fedTreatsMap, videoWatched, unlockSeenMap, onAnimalClick }: { fedTreatsMap: Record<string,number>; videoWatched: boolean; unlockSeenMap: Record<string,boolean>; onAnimalClick: (id: string) => void }) => {
+const OceanCollection = ({ fedTreatsMap, videoWatched, videoWatchedMap, unlockSeenMap, onAnimalClick }: { fedTreatsMap: Record<string,number>; videoWatched: boolean; videoWatchedMap: Record<string,boolean>; unlockSeenMap: Record<string,boolean>; onAnimalClick: (id: string) => void }) => {
   const lockedCount = 6 - ANIMALS.length;
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "0.75rem" }}>
@@ -494,7 +515,11 @@ const OceanCollection = ({ fedTreatsMap, videoWatched, unlockSeenMap, onAnimalCl
         const isUnlocked = (() => {
           if (animal.unlockCondition === "default") return true;
           if (animal.unlockCondition === "turtle_grown_video_watched") {
-            return getAnimalStageIdx(ANIMALS[0], fedTreatsMap["turtle"] ?? 0) === 3 && videoWatched;
+            return getAnimalStageIdx(ANIMALS[0], fedTreatsMap["turtle"] ?? 0) === 3 && (videoWatchedMap["turtle"] ?? false);
+          }
+          if (animal.unlockCondition === "dolphin_grown_video_watched") {
+            const dolphin = ANIMALS.find(a => a.id === "dolphin");
+            return dolphin ? getAnimalStageIdx(dolphin, fedTreatsMap["dolphin"] ?? 0) === 3 && (videoWatchedMap["dolphin"] ?? false) && (unlockSeenMap["dolphin"] ?? false) : false;
           }
           return false;
         })();
@@ -587,7 +612,7 @@ const KidsWorld = () => {
   }
 
   const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
-  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
+  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
   const [treats, setTreats] = useState(0);
   const [loading, setLoading] = useState(!isMaster);
   const [hearts, setHearts] = useState<{ id: number; x: number; y: number; delay: number }[]>([]);
@@ -605,6 +630,7 @@ const KidsWorld = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [videoButtonSeen, setVideoButtonSeen] = useState(() => localStorage.getItem(`mpe_videoseen_${code}_${studentName}`) === "1");
   const [videoWatchedMap, setVideoWatchedMap] = useState<Record<string,boolean>>(() => {
+    if (isMaster) return { turtle: true };
     const map: Record<string,boolean> = {};
     ANIMALS.forEach(a => {
       const key = a.id === "turtle" ? `mpe_videowatched_${code}_${studentName}` : `mpe_videowatched_${a.id}_${code}_${studentName}`;
@@ -619,7 +645,7 @@ const KidsWorld = () => {
 
   const [videoFadingOut, setVideoFadingOut] = useState(false);
   const [showLookBelow, setShowLookBelow] = useState(false);
-  const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); if(!unlockSeenMap["dolphin"]) setTimeout(() => setShowLookBelow(true), 300); }, 400); };
+  const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); if(!unlockSeenMap["dolphin"] || !unlockSeenMap["octopus"]) setTimeout(() => setShowLookBelow(true), 300); }, 400); };
   const [musicOn, setMusicOn] = useState(() => localStorage.getItem("mpe_music") !== "off");
   const [sfxOn, setSfxOn] = useState(() => localStorage.getItem("mpe_sfx") !== "off");
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.25"));
@@ -635,9 +661,11 @@ const KidsWorld = () => {
   const ctxRef = useRef<AudioContext | null>(null);
   const prevStageRef = useRef(-1);
   // ── FIX: load previously fired level-ups from localStorage on mount ──
-  const levelUpFiredRef = useRef<Set<number>>(new Set(
-    JSON.parse(localStorage.getItem(`mpe_levelup_${code}_${studentName}`) || "[]")
-  ));
+  const levelUpFiredRef = useRef<Record<string, Set<number>>>(
+    Object.fromEntries(ANIMALS.map(a => [a.id, new Set<number>(
+      JSON.parse(localStorage.getItem(`mpe_levelup_${a.id}_${code}_${studentName}`) || "[]")
+    )]))
+  );
 
   const displayName = (() => {
     if (isMaster) return "Teacher";
@@ -721,9 +749,11 @@ const KidsWorld = () => {
 
   // Level up — fire ONCE per stage transition, never repeat (persisted in localStorage)
   useEffect(() => {
-    if (stageIdx > 0 && stageIdx !== prevStageRef.current && !levelUpFiredRef.current.has(stageIdx)) {
-      levelUpFiredRef.current.add(stageIdx);
-      localStorage.setItem(`mpe_levelup_${code}_${studentName}`, JSON.stringify([...levelUpFiredRef.current]));
+    const animalFired = levelUpFiredRef.current[activeAnimalId] ?? new Set<number>();
+    if (stageIdx > 0 && stageIdx !== prevStageRef.current && !animalFired.has(stageIdx)) {
+      animalFired.add(stageIdx);
+      levelUpFiredRef.current[activeAnimalId] = animalFired;
+      localStorage.setItem(`mpe_levelup_${activeAnimalId}_${code}_${studentName}`, JSON.stringify([...animalFired]));
       setLevelUpStage({ animal: activeAnimal, stageIdx });
       if (!tadaRef.current) tadaRef.current = new Audio("/tada-music.mp3");
       tadaRef.current.currentTime = 0;
@@ -876,7 +906,7 @@ const KidsWorld = () => {
 
       {/* LOOK BELOW POPUP */}
       {showLookBelow && (
-        <div onClick={() => setShowLookBelow(false)} style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", animation: "popIn 0.35s ease-out" }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", animation: "popIn 0.35s ease-out" }}>
           <div onClick={e => e.stopPropagation()} style={{ background: "linear-gradient(135deg,#0c3460,#0077b6)", borderRadius: "2.5rem", padding: "2.5rem 2rem", textAlign: "center", maxWidth: 340, width: "100%", border: "3px solid #fbbf24", boxShadow: "0 0 60px rgba(251,191,36,0.6), 0 20px 60px rgba(0,0,0,0.5)", animation: "popIn 0.4s ease-out" }}>
             <div style={{ fontSize: "3rem", marginBottom: "0.5rem", animation: "bobAnim 1s ease-in-out infinite" }}>👇</div>
             <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "2rem", color: "#fbbf24", textShadow: "0 0 20px rgba(251,191,36,0.9)", marginBottom: "0.25rem" }}>Look below!</div>
@@ -902,8 +932,7 @@ const KidsWorld = () => {
           setActiveAnimalId(a.id);
         };
         return (
-          <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,10,40,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", animation: "popIn 0.4s ease-out" }}
-            onClick={dismiss}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,10,40,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", animation: "popIn 0.4s ease-out" }}>
             <div onClick={e => e.stopPropagation()} style={{ position: "relative", zIndex: 10, textAlign: "center", background: ov.bgGradient, borderRadius: "2.5rem", padding: "2.5rem 2rem", maxWidth: 360, width: "100%", border: `3px solid ${ov.borderColor}`, boxShadow: `0 0 80px ${ov.glowColor}, 0 20px 60px rgba(0,0,0,0.5)` }}>
               <div style={{ position: "absolute", inset: -8, borderRadius: "2.8rem", border: `2px solid ${ov.borderColor}`, animation: "goldPulse 1.5s ease-in-out infinite", pointerEvents: "none" }} />
               <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "2.8rem", marginBottom: "0.25rem" }}>{ov.emoji}</div>
@@ -938,7 +967,7 @@ const KidsWorld = () => {
             </div>
           )}
           <button onClick={() => { setShowVideo(true); if(!videoButtonSeen){ setVideoButtonSeen(true); localStorage.setItem(`mpe_videoseen_${code}_${studentName}`,"1"); }}} style={{ pointerEvents: "all", padding: "1rem 2.5rem", background: "linear-gradient(135deg, #00b4d8, #0077b6)", border: "3px solid rgba(255,255,0,0.9)", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", cursor: "pointer", animation: "watchPulse 1.2s ease-in-out infinite", display: "inline-block" }}>
-            🎬 Watch {petName || "Turtley"} Swim! · 看{petName || "Turtley"}游泳！
+            🎬 Watch {petName || activeAnimal.name}! · 看{petName || activeAnimal.nameZh}！
           </button>
         </div>
       )}
@@ -1150,7 +1179,7 @@ const KidsWorld = () => {
               Add to Jar +1
             </button>
             <button onClick={handleFeed} disabled={jarTreats <= 0} style={{ flex: 1, padding: "0.9rem", background: jarTreats > 0 ? "linear-gradient(135deg,#f59e0b,#ef4444)" : "rgba(255,255,255,0.1)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1rem", cursor: jarTreats > 0 ? "pointer" : "not-allowed", boxShadow: jarTreats > 0 ? "0 6px 20px rgba(245,158,11,0.5)" : "none" }}>
-              Feed Turtle
+              Feed {activeAnimal.name}
             </button>
           </div>
         )}
@@ -1170,23 +1199,30 @@ const KidsWorld = () => {
             Ocean Collection 🌊<br />
             <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>海洋收藏！收集所有生物！</span>
           </div>
-          {/* Wiggle arrow pointing at turtle card when videoWatched */}
-          {stageIdx === 3 && videoWatched && !unlockSeenMap["dolphin"] && (
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: "0.75rem" }}>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1rem", color: "#fbbf24", textAlign: "center", marginBottom: "0.3rem", animation: "shimmer 1s ease-in-out infinite", textShadow: "0 0 16px rgba(251,191,36,0.9)" }}>
-                  ✨ You unlocked a new friend!<br/>
-                  <span style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.9rem" }}>你解鎖了新朋友！</span>
-                </div>
-                <div style={{ animation: "arrowWiggle 0.7s ease-in-out infinite" }}>
-                  <svg width="40" height="36" viewBox="0 0 40 40" style={{ filter: "drop-shadow(0 0 10px rgba(251,191,36,1))" }}>
-                    <path d="M20 4 L20 28 M20 28 L10 18 M20 28 L30 18" stroke="#fbbf24" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-                  </svg>
+          {/* Wiggle arrow pointing at correct collection slot */}
+          {(() => {
+            const showDolphin = (fedTreatsState["turtle"] ?? 0) >= 45 && (videoWatchedMap["turtle"] ?? false) && !unlockSeenMap["dolphin"];
+            const showOctopus = (fedTreatsState["dolphin"] ?? 0) >= 45 && (videoWatchedMap["dolphin"] ?? false) && (unlockSeenMap["dolphin"] ?? false) && !unlockSeenMap["octopus"];
+            if (!showDolphin && !showOctopus) return null;
+            // 3-col grid: col1=16.7%, col2=50%, col3=83.3%
+            const leftPct = showDolphin ? "50%" : "83.3%";
+            return (
+              <div style={{ position: "relative", height: "80px", marginBottom: "0.75rem" }}>
+                <div style={{ position: "absolute", left: leftPct, transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1rem", color: "#fbbf24", textAlign: "center", marginBottom: "0.3rem", animation: "shimmer 1s ease-in-out infinite", textShadow: "0 0 16px rgba(251,191,36,0.9)", whiteSpace: "nowrap" }}>
+                    ✨ You unlocked a new friend!<br/>
+                    <span style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.9rem" }}>你解鎖了新朋友！</span>
+                  </div>
+                  <div style={{ animation: "arrowWiggle 0.7s ease-in-out infinite" }}>
+                    <svg width="40" height="36" viewBox="0 0 40 40" style={{ filter: "drop-shadow(0 0 10px rgba(251,191,36,1))" }}>
+                      <path d="M20 4 L20 28 M20 28 L10 18 M20 28 L30 18" stroke="#fbbf24" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          <div ref={collectionRef}><OceanCollection fedTreatsMap={fedTreatsState} videoWatched={videoWatched} unlockSeenMap={unlockSeenMap} onAnimalClick={(id) => setShowUnlockFor(id)} /></div>
+            );
+          })()}
+          <div ref={collectionRef}><OceanCollection fedTreatsMap={fedTreatsState} videoWatched={videoWatched} videoWatchedMap={videoWatchedMap} unlockSeenMap={unlockSeenMap} onAnimalClick={(id) => setShowUnlockFor(id)} /></div>
           <div style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", marginTop: "0.85rem", textAlign: "center" }}>
             More creatures unlocking soon! · 更多生物即將解鎖！
           </div>
@@ -1195,7 +1231,7 @@ const KidsWorld = () => {
 
       {/* VIDEO PLAYER — outside blurred content div so it renders unblurred */}
       {showVideo && (
-        <div onClick={closeVideo} style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,20,40,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", opacity: videoFadingOut ? 0 : 1, transition: "opacity 0.4s ease-out" }}>
+        <div style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,20,40,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", opacity: videoFadingOut ? 0 : 1, transition: "opacity 0.4s ease-out" }}>
           <div onClick={e => e.stopPropagation()} style={{ position: "relative", maxWidth: 420, width: "100%" }}>
 
             <video autoPlay loop controls
