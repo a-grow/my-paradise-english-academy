@@ -91,6 +91,8 @@ const GamePage = () => {
 
   const handleClaim = useCallback((unitId: number, gameId: string, diff: string = "medium") => {
     if (isMaster) {
+      const comboId = `u${unitId}_${gameId}_${diff}`;
+      setClaimedCombos(prev => new Set([...prev, comboId]));
       setLastTreats(TREATS_BY_DIFF[diff] ?? 2);
       playCelebrate();
       setShowCelebration(true);

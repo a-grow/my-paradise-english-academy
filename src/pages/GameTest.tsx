@@ -164,6 +164,16 @@ const useAudio = () => {
   },[]);
 };
 
+// ── SPEECH ───────────────────────────────────────────────────────────────────
+const speak = (text: string, lang: string) => {
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  } catch {}
+};
+
 // ── COUNTDOWN OVERLAY ─────────────────────────────────────────────────────────
 const CountdownOverlay = ({onDone}:{onDone:()=>void}) => {
   const [n,setN]=useState(3);
@@ -590,7 +600,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
     setTimeout(()=>{
       setShots(s=>s.filter(sh=>sh.id!==sid));
       if(b.word===targetRef.current){
-        play("correct");
+        play("correct");speak(b.word,"en-US");
         const pid=popId.current++;
         setPops(p=>[...p,{id:pid,x:b.x,y:(b.y/100)*window.innerHeight,color:b.color}]);
         setTimeout(()=>setPops(p=>p.filter(pp=>pp.id!==pid)),700);
@@ -631,7 +641,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
       <div style={{position:"absolute",top:12,left:0,right:0,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0 12px",zIndex:50,gap:"0.5rem"}}>
         <button onClick={onBack} style={{background:"rgba(0,0,0,0.55)",border:"2px solid rgba(255,255,255,0.25)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer",flexShrink:0}}>← Back</button>
         <div style={{background:"rgba(0,0,0,0.72)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.45rem 1.4rem",border:"2px solid rgba(255,255,255,0.25)",flex:1,textAlign:"center",minWidth:0}}>
-          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🏹 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span></span>
+          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🏹 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}>🔊</button></span>
         </div>
         <div style={{display:"flex",gap:"0.4rem",alignItems:"center",flexShrink:0}}>
           <Pill dark red={timeLeft<=10}>⏱{timeLeft}s</Pill>
@@ -742,7 +752,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
     setSlamming(true);setTimeout(()=>setSlamming(false),180);
     const mole=moles[i];if(!mole) return;
     if(mole.word===targetRef.current){
-      play("correct");setHitIdx(i);setTimeout(()=>setHitIdx(null),350);
+      play("correct");speak(mole.word,"en-US");setHitIdx(i);setTimeout(()=>setHitIdx(null),350);
       setScore(s=>s+1);setRound(r=>r+1);
       setMoles(Array(HOLES).fill(null));timers.current.forEach(clearTimeout);
       const newCleared=new Set([...wordsClearedRef.current,mole.word]);
@@ -793,7 +803,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
         </div>
         <div style={{textAlign:"center"}}>
           <div style={{background:"rgba(0,0,80,0.6)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.5rem 1.75rem",display:"inline-block",border:"2px solid rgba(255,255,255,0.25)"}}>
-            <span style={{fontFamily:F,fontWeight:800,fontSize:"1.2rem",color:"white"}}>🔨 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span></span>
+            <span style={{fontFamily:F,fontWeight:800,fontSize:"1.2rem",color:"white"}}>🔨 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}>🔊</button></span>
           </div>
         </div>
       </div>
@@ -1190,7 +1200,7 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
               const isTarget=hit.word===targetRef.current;
               setBursts(bs=>[...bs,{id:burstId.current++,x:hit.x,y:hit.y,wrong:!isTarget}]);
               if(isTarget){
-                play("laser");setScore(s=>s+1);setRound(r=>r+1);
+                play("laser");speak(hit.word,"en-US");setScore(s=>s+1);setRound(r=>r+1);
                 const newCleared=new Set([...wordsClearedRef.current,hit.word]);
                 wordsClearedRef.current=newCleared;setWordsCleared(newCleared);
                 if(newCleared.size>=TOTAL){setTimeout(()=>setUnitClear(true),500);}
@@ -1272,7 +1282,7 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
       <div style={{position:"absolute",top:12,left:0,right:0,display:"flex",justifyContent:"space-between",padding:"0 12px",zIndex:50,alignItems:"center",gap:"0.5rem"}}>
         <button onClick={(e)=>{e.stopPropagation();onBack();}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.2)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer",flexShrink:0}}>← Back</button>
         <div style={{background:"rgba(0,0,20,0.85)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.4rem 1.4rem",border:"1.5px solid rgba(0,255,255,0.25)",flex:1,textAlign:"center",minWidth:0}}>
-          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🚀 <span style={{color:"#00ffff",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span></span>
+          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🚀 <span style={{color:"#00ffff",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}>🔊</button></span>
         </div>
         <div style={{display:"flex",gap:"0.35rem",alignItems:"center",flexShrink:0}}>
           <Pill dark>⭐{score}</Pill>
