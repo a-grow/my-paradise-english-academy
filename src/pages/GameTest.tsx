@@ -709,6 +709,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
   const [slamming,setSlamming]=useState(false);
   const [countdown,setCountdown]=useState(false);
   const [paused,setPaused]=useState(false);
+  const [overUI,setOverUI]=useState(false);
   const timers=useRef<ReturnType<typeof setTimeout>[]>([]);
   const targetRef=useRef(target);targetRef.current=target;
   const wordsClearedRef=useRef<Set<string>>(new Set());
@@ -782,7 +783,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
-    <div style={{minHeight:"100vh",background:"linear-gradient(180deg,#0c4a6e 0%,#0369a1 40%,#0891b2 70%,#06b6d4 100%)",overflow:"hidden",userSelect:"none",cursor:"none",paddingBottom:36}}
+    <div style={{minHeight:"100vh",background:"linear-gradient(180deg,#0c4a6e 0%,#0369a1 40%,#0891b2 70%,#06b6d4 100%)",overflow:"hidden",userSelect:"none",cursor:overUI?"pointer":"none",paddingBottom:36}}
       onMouseMove={e=>setMousePos({x:e.clientX,y:e.clientY})} onClick={()=>setSlamming(true)}>
       <style>{`
         @keyframes moleRise{0%{transform:translateY(120%) scaleY(0.6);opacity:0}60%{transform:translateY(-8%) scaleY(1.05)}100%{transform:translateY(0) scaleY(1);opacity:1}}
@@ -794,15 +795,16 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
       ))}
       <div style={{padding:"0.75rem 1rem 0",position:"relative",zIndex:20}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.5rem"}}>
-          <button onClick={onBack} style={{background:"rgba(255,255,255,0.18)",border:"2px solid rgba(255,255,255,0.35)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer"}}>← Back</button>
+          <button onClick={onBack} onMouseEnter={()=>setOverUI(true)} onMouseLeave={()=>setOverUI(false)} style={{background:"rgba(255,255,255,0.18)",border:"2px solid rgba(255,255,255,0.35)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer"}}>← Back</button>
           <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+            <Pill dark red={timeLeft<=10}>⏱{timeLeft}s</Pill>
             <Pill>⭐{score}</Pill>
             <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
               <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
             </div>
         </div>
         <div style={{textAlign:"center"}}>
-          <div style={{background:"rgba(0,0,80,0.6)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.5rem 1.75rem",display:"inline-block",border:"2px solid rgba(255,255,255,0.25)"}}>
+          <div onMouseEnter={()=>setOverUI(true)} onMouseLeave={()=>setOverUI(false)} style={{background:"rgba(0,0,80,0.6)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.5rem 1.75rem",display:"inline-block",border:"2px solid rgba(255,255,255,0.25)"}}>
             <span style={{fontFamily:F,fontWeight:800,fontSize:"1.2rem",color:"white"}}>🔨 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}>🔊</button></span>
           </div>
         </div>
@@ -824,7 +826,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
           );
         })}
       </div>
-      <HammerSVG x={mousePos.x} y={mousePos.y} slamming={slamming}/>
+      {!overUI&&<HammerSVG x={mousePos.x} y={mousePos.y} slamming={slamming}/>}
       <svg style={{position:"fixed",bottom:36,left:0,right:0,width:"100%",height:55,zIndex:5}} viewBox="0 0 800 55" preserveAspectRatio="none">
         <path d="M0 15 Q200 3 400 13 Q600 2 800 11 L800 55 L0 55Z" fill="#b45309"/>
         <path d="M0 22 Q200 12 400 20 Q600 10 800 18 L800 55 L0 55Z" fill="#c8a96e"/>
