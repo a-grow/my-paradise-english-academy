@@ -12,7 +12,7 @@ interface Animal {
   stages: AnimalStage[];
   unlockCondition: "default" | "turtle_grown_video_watched" | "dolphin_grown_video_watched";
   collectionBg: string; collectionBorder: string; collectionGlow: string;
-  video: string | null; isEggType: boolean;
+  video: string | null; isEggType: boolean; scale?: number;
   accentColor: string; accentGlow: string;
   btnColor: string; btnGlow: string; btn3Color: string; btn3Glow: string;
   feedLabel: string; feedLabelZh: string;
@@ -30,7 +30,7 @@ const ANIMALS: Animal[] = [
     ],
     unlockCondition: "default",
     collectionBg: "#0891b2", collectionBorder: "rgba(255,215,0,0.6)", collectionGlow: "rgba(255,215,0,0.35)",
-    video: "/video_adult_turtle.mp4", isEggType: true,
+    video: "/video_adult_turtle.mp4", isEggType: true, scale: 1,
     accentColor: "#f97316", accentGlow: "rgba(249,115,22,0.5)",
     btnColor: "#f97316", btnGlow: "rgba(249,115,22,0.5)", btn3Color: "#10b981", btn3Glow: "rgba(16,185,129,0.5)",
     feedLabel: "turtle", feedLabelZh: "海龜",
@@ -51,7 +51,7 @@ const ANIMALS: Animal[] = [
     ],
     unlockCondition: "turtle_grown_video_watched",
     collectionBg: "#0077b6", collectionBorder: "rgba(100,200,255,0.7)", collectionGlow: "rgba(100,200,255,0.4)",
-    video: "/video_adult_dolphin.mp4", isEggType: false,
+    video: "/video_adult_dolphin.mp4", isEggType: false, scale: 1.6,
     accentColor: "#f472b6", accentGlow: "rgba(244,114,182,0.5)",
     btnColor: "#22d3ee", btnGlow: "rgba(34,211,238,0.5)", btn3Color: "#f472b6", btn3Glow: "rgba(244,114,182,0.5)",
     feedLabel: "dolphin", feedLabelZh: "海豚",
@@ -73,7 +73,7 @@ const ANIMALS: Animal[] = [
     ],
     unlockCondition: "dolphin_grown_video_watched",
     collectionBg: "#581c87", collectionBorder: "rgba(216,180,254,0.7)", collectionGlow: "rgba(168,85,247,0.5)",
-    video: "/video-adult-octopus.mp4", isEggType: true,
+    video: "/video-adult-octopus.mp4", isEggType: true, scale: 1.4,
     accentColor: "#e879f9", accentGlow: "rgba(232,121,249,0.5)",
     btnColor: "#a855f7", btnGlow: "rgba(168,85,247,0.5)", btn3Color: "#e879f9", btn3Glow: "rgba(232,121,249,0.5)",
     feedLabel: "octopus", feedLabelZh: "章魚",
@@ -657,6 +657,7 @@ const KidsWorld = () => {
   const collectionRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const harpRef = useRef<HTMLAudioElement | null>(null);
+  const lullabyRef = useRef<HTMLAudioElement | null>(null);
   const tadaRef = useRef<HTMLAudioElement | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
   const prevStageRef = useRef(-1);
@@ -930,6 +931,8 @@ const KidsWorld = () => {
           setUnlockSeenMap(m => ({ ...m, [a.id]: true }));
           localStorage.setItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`, "1");
           setActiveAnimalId(a.id);
+          if (lullabyRef.current) { lullabyRef.current.pause(); lullabyRef.current.currentTime = 0; }
+          if (audioRef.current) audioRef.current.volume = volume * 0.5;
         };
         return (
           <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,10,40,0.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", animation: "popIn 0.4s ease-out" }}>
@@ -1079,7 +1082,7 @@ const KidsWorld = () => {
               onClick={isEgg ? handleEggTap : handlePet}
               style={{ width: "min(250px,65vw)", height: "min(210px,55vw)", display: "flex", alignItems: "center", justifyContent: "center", filter: sad ? "saturate(0.4) brightness(0.75)" : "none", position: "relative", transition: "filter 0.5s ease" }}>
               {isEgg && activeAnimal.isEggType && <EggCracks treats={fedTreats} />}
-              <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))", transform: activeAnimal.id === "dolphin" && stageIdx > 0 ? "scale(1.6)" : "none", transformOrigin: "center center" }} draggable={false} />
+              <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))", transform: activeAnimal.scale && activeAnimal.scale !== 1 ? `scale(${activeAnimal.scale})` : "none", transformOrigin: "center center" }} draggable={false} />
             </div>
 
             {/* Instructional hints — bilingual */}
@@ -1222,7 +1225,17 @@ const KidsWorld = () => {
               </div>
             );
           })()}
-          <div ref={collectionRef}><OceanCollection fedTreatsMap={fedTreatsState} videoWatched={videoWatched} videoWatchedMap={videoWatchedMap} unlockSeenMap={unlockSeenMap} onAnimalClick={(id) => setShowUnlockFor(id)} /></div>
+          <div ref={collectionRef}><OceanCollection fedTreatsMap={fedTreatsState} videoWatched={videoWatched} videoWatchedMap={videoWatchedMap} unlockSeenMap={unlockSeenMap} onAnimalClick={(id) => {
+            setShowUnlockFor(id);
+            if (audioRef.current) audioRef.current.volume = 0.02;
+            if (!lullabyRef.current) lullabyRef.current = new Audio("/lullaby-music.mp3");
+            lullabyRef.current.currentTime = 0;
+            lullabyRef.current.volume = 0.5;
+            lullabyRef.current.play().catch(() => {});
+            lullabyRef.current.onended = () => {
+              if (audioRef.current) audioRef.current.volume = volume * 0.5;
+            };
+          }} /></div>
           <div style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", marginTop: "0.85rem", textAlign: "center" }}>
             More creatures unlocking soon! · 更多生物即將解鎖！
           </div>
