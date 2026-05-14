@@ -10,7 +10,7 @@ interface AnimalStage { name: string; nameZh: string; min: number; img: string; 
 interface Animal {
   id: string; name: string; nameZh: string; emoji: string;
   stages: AnimalStage[];
-  unlockCondition: "default" | "turtle_grown_video_watched" | "dolphin_grown_video_watched";
+  unlockCondition: "default" | "turtle_grown_video_watched" | "dolphin_grown_video_watched" | "octopus_grown_video_watched";
   collectionBg: string; collectionBorder: string; collectionGlow: string;
   video: string | null; isEggType: boolean; scale?: number;
   accentColor: string; accentGlow: string;
@@ -44,7 +44,7 @@ const ANIMALS: Animal[] = [
   {
     id: "dolphin", name: "Dolphin", nameZh: "海豚", emoji: "🐬",
     stages: [
-      { name: "Baby",  nameZh: "小海豚",   min: 0,  img: "/creatures/dolphin-egg.png" },
+      { name: "Blanket", nameZh: "裹巾",     min: 0,  img: "/creatures/dolphin-blanket.png" },
       { name: "Young", nameZh: "年輕海豚", min: 15, img: "/creatures/dolphin-baby.png" },
       { name: "Teen",  nameZh: "青少海豚", min: 30, img: "/creatures/dolphin-young.png" },
       { name: "Grown", nameZh: "成年海豚", min: 45, img: "/creatures/dolphin-grown.png" },
@@ -62,7 +62,7 @@ const ANIMALS: Animal[] = [
     ],
     unlockOverlay: { emoji: "🐬", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dolphin appeared!", eggLineZh: "海豚出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(100,200,255,0.6)", borderColor: "rgba(100,200,255,0.7)", bgGradient: "linear-gradient(135deg,#003d7a,#0077b6,#00b4d8)" },
   },
-  // ── ADD NEW ANIMALS HERE — one object = one new animal ────────────────────
+  // ── ADD NEW ANIMALS HERE — one object = one new animal (octopus before shark) ───
   {
     id: "octopus", name: "Octopus", nameZh: "章魚", emoji: "🐙",
     stages: [
@@ -83,6 +83,27 @@ const ANIMALS: Animal[] = [
       { main: "Magnificent! Amazing!",   zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Octopus!",    subZh: "你養大了一隻成年章魚！" },
     ],
     unlockOverlay: { emoji: "🐙", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "An Octopus Egg appeared!", eggLineZh: "出現了一顆章魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(168,85,247,0.6)", borderColor: "rgba(216,180,254,0.7)", bgGradient: "linear-gradient(135deg,#2e1065,#581c87,#7e22ce)" },
+  },
+  {
+    id: "shark", name: "Great White Shark", nameZh: "大白鯊", emoji: "🦈",
+    stages: [
+      { name: "Blanket", nameZh: "裹巾",     min: 0,  img: "/creatures/shark-blanket.png" },
+      { name: "Baby",  nameZh: "小鯊魚",   min: 15, img: "/creatures/shark-baby.png" },
+      { name: "Young", nameZh: "年輕鯊魚", min: 30, img: "/creatures/shark-young.png" },
+      { name: "Grown", nameZh: "成年鯊魚", min: 45, img: "/creatures/shark-grown.png" },
+    ],
+    unlockCondition: "octopus_grown_video_watched",
+    collectionBg: "#1e3a5f", collectionBorder: "rgba(200,220,255,0.7)", collectionGlow: "rgba(96,165,250,0.4)",
+    video: "/video_adult_shark.mp4", isEggType: false, scale: 1.6,
+    accentColor: "#60a5fa", accentGlow: "rgba(96,165,250,0.5)",
+    btnColor: "#60a5fa", btnGlow: "rgba(96,165,250,0.5)", btn3Color: "#3b82f6", btn3Glow: "rgba(59,130,246,0.5)",
+    feedLabel: "shark", feedLabelZh: "鯊魚",
+    levelUpMessages: [
+      { main: "Hello little one!",      zh: "你好小寶貝！",       sub: "A Baby Shark appeared!",        subZh: "小鯊魚出現了！" },
+      { main: "Growing so fast!",       zh: "長得好快！",         sub: "Now a Young Shark!",            subZh: "現在是年輕鯊魚了！" },
+      { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！", sub: "You raised a Grown Shark!",     subZh: "你養大了一隻成年鯊魚！" },
+    ],
+    unlockOverlay: { emoji: "🦈", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Shark Egg appeared!", eggLineZh: "出現了一顆鯊魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(200,220,255,0.7)", bgGradient: "linear-gradient(135deg,#0f2744,#1e3a5f,#2d5a8e)" },
   },
 ];
 // locked placeholder slots (fills collection grid to 6 total)
@@ -521,6 +542,10 @@ const OceanCollection = ({ fedTreatsMap, videoWatched, videoWatchedMap, unlockSe
             const dolphin = ANIMALS.find(a => a.id === "dolphin");
             return dolphin ? getAnimalStageIdx(dolphin, fedTreatsMap["dolphin"] ?? 0) === 3 && (videoWatchedMap["dolphin"] ?? false) && (unlockSeenMap["dolphin"] ?? false) : false;
           }
+          if (animal.unlockCondition === "octopus_grown_video_watched") {
+            const octopus = ANIMALS.find(a => a.id === "octopus");
+            return octopus ? getAnimalStageIdx(octopus, fedTreatsMap["octopus"] ?? 0) === 3 && (videoWatchedMap["octopus"] ?? false) && (unlockSeenMap["octopus"] ?? false) : false;
+          }
           return false;
         })();
         const unlockSeen = unlockSeenMap[animal.id] ?? false;
@@ -612,7 +637,7 @@ const KidsWorld = () => {
   }
 
   const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
-  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
+  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45, octopus: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
   const [treats, setTreats] = useState(0);
   const [loading, setLoading] = useState(!isMaster);
   const [hearts, setHearts] = useState<{ id: number; x: number; y: number; delay: number }[]>([]);
@@ -630,7 +655,7 @@ const KidsWorld = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [videoButtonSeen, setVideoButtonSeen] = useState(() => localStorage.getItem(`mpe_videoseen_${code}_${studentName}`) === "1");
   const [videoWatchedMap, setVideoWatchedMap] = useState<Record<string,boolean>>(() => {
-    if (isMaster) return { turtle: true };
+    if (isMaster) return { turtle: true, dolphin: true, octopus: true };
     const map: Record<string,boolean> = {};
     ANIMALS.forEach(a => {
       const key = a.id === "turtle" ? `mpe_videowatched_${code}_${studentName}` : `mpe_videowatched_${a.id}_${code}_${studentName}`;
@@ -645,7 +670,7 @@ const KidsWorld = () => {
 
   const [videoFadingOut, setVideoFadingOut] = useState(false);
   const [showLookBelow, setShowLookBelow] = useState(false);
-  const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); if(!unlockSeenMap["dolphin"] || !unlockSeenMap["octopus"]) setTimeout(() => setShowLookBelow(true), 300); }, 400); };
+  const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); if(!unlockSeenMap["dolphin"] || !unlockSeenMap["octopus"] || !unlockSeenMap["shark"]) setTimeout(() => setShowLookBelow(true), 300); }, 400); };
   const [musicOn, setMusicOn] = useState(() => localStorage.getItem("mpe_music") !== "off");
   const [sfxOn, setSfxOn] = useState(() => localStorage.getItem("mpe_sfx") !== "off");
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.25"));
@@ -1206,9 +1231,10 @@ const KidsWorld = () => {
           {(() => {
             const showDolphin = (fedTreatsState["turtle"] ?? 0) >= 45 && (videoWatchedMap["turtle"] ?? false) && !unlockSeenMap["dolphin"];
             const showOctopus = (fedTreatsState["dolphin"] ?? 0) >= 45 && (videoWatchedMap["dolphin"] ?? false) && (unlockSeenMap["dolphin"] ?? false) && !unlockSeenMap["octopus"];
-            if (!showDolphin && !showOctopus) return null;
+            const showShark = (fedTreatsState["octopus"] ?? 0) >= 45 && (videoWatchedMap["octopus"] ?? false) && (unlockSeenMap["octopus"] ?? false) && !unlockSeenMap["shark"];
+            if (!showDolphin && !showOctopus && !showShark) return null;
             // 3-col grid: col1=16.7%, col2=50%, col3=83.3%
-            const leftPct = showDolphin ? "50%" : "83.3%";
+            const leftPct = showDolphin ? "50%" : showOctopus ? "83.3%" : "16.7%";
             return (
               <div style={{ position: "relative", height: "80px", marginBottom: "0.75rem" }}>
                 <div style={{ position: "absolute", left: leftPct, transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
