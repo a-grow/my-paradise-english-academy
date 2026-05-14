@@ -726,7 +726,7 @@ const KidsWorld = () => {
 
   // Lock scroll when dim overlay is active
   useEffect(() => {
-    if ((stageIdx === 3 && !videoWatched) || showVideo || showLookBelow) {
+    if ((stageIdx === 3 && !videoWatched && !levelUpStage) || showVideo || showLookBelow) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -982,12 +982,12 @@ const KidsWorld = () => {
       })()}
 
       {/* DIM OVERLAY — shown when grown but video not yet watched */}
-      {stageIdx === 3 && !videoWatched && (
+      {stageIdx === 3 && !videoWatched && !levelUpStage && (
         <div style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(0,0,0,0.65)", pointerEvents: "all", animation: "overlayFadeIn 0.6s ease-out" }} />
       )}
 
       {/* WATCH BUTTON — outside all blurred containers, always on top */}
-      {stageIdx === 3 && !showVideo && !videoWatched && (
+      {stageIdx === 3 && !showVideo && !videoWatched && !levelUpStage && (
         <div style={{ position: "fixed", top: "50%", left: 0, right: 0, transform: "translateY(-50%)", zIndex: 200, textAlign: "center", pointerEvents: "none" }}>
           {!videoWatched && (
             <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.1rem", color: "#fbbf24", textAlign: "center", marginBottom: "0.6rem", animation: "shimmer 1.5s ease-in-out infinite" }}>
@@ -1059,7 +1059,7 @@ const KidsWorld = () => {
       )}
 
       {/* MAIN */}
-      <div style={{ position: "relative", zIndex: 10, maxWidth: 520, margin: "0 auto", padding: "72px 14px 50px", filter: (stageIdx === 3 && !videoWatched) ? "blur(4px)" : "none", transition: "filter 0.3s ease" }}>
+      <div style={{ position: "relative", zIndex: 10, maxWidth: 520, margin: "0 auto", padding: "72px 14px 50px", filter: (stageIdx === 3 && !videoWatched && !levelUpStage) ? "blur(4px)" : "none", transition: "filter 0.3s ease" }}>
 
         {/* Title */}
         <div style={{ textAlign: "center", marginBottom: "1rem", animation: "fadeUp 0.5s ease-out" }}>
@@ -1073,7 +1073,7 @@ const KidsWorld = () => {
 
         {/* CREATURE CARD */}
         <div className={`glass ${isMaster ? "gold-border" : ""}`}
-          style={{ padding: "1.75rem 1.25rem 1.5rem", marginBottom: "1rem", textAlign: "center", animation: "fadeUp 0.6s ease-out", boxShadow: "0 8px 40px rgba(0,0,0,0.25)", position: "relative", overflow: "hidden" }}>
+          style={{ padding: "1.75rem 1.25rem 1.5rem", marginBottom: "1rem", textAlign: "center", animation: "fadeUp 0.6s ease-out", boxShadow: "0 8px 40px rgba(0,0,0,0.25)", position: "relative", overflow: "visible" }}>
 
           {justEarned > 0 && (
             <div style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,200,0,0.95)", borderRadius: "999px", padding: "0.3rem 0.9rem", color: "#333", fontFamily: "'Fredoka One',cursive", fontSize: "1rem", animation: "earnedPop 2s ease-out forwards", zIndex: 20 }}>
@@ -1081,7 +1081,7 @@ const KidsWorld = () => {
             </div>
           )}
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 20 }}>
             {petName ? <DisneyNameTag name={petName} onRename={() => setIsRenaming(true)} /> : <div style={{ height: 8 }} />}
             <PetNamingInput petName={petName} onSave={(n) => { savePetName(n); setIsRenaming(false); }} isRenaming={isRenaming} onCancelRename={() => setIsRenaming(false)} />
           </div>
@@ -1094,7 +1094,7 @@ const KidsWorld = () => {
             </div>
           )}
 
-          <div ref={creatureRef} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", cursor: "pointer" }}>
+          <div ref={creatureRef} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", cursor: "pointer", pointerEvents: "none" }}>
             {hearts.map(h => (
               <div key={h.id} style={{ position: "absolute", left: h.x, top: h.y, pointerEvents: "none", animation: `heartFloat 1.4s ease-out ${h.delay}s forwards`, opacity: 0, zIndex: 50 }}>
                 <svg width="22" height="20" viewBox="0 0 24 22">
@@ -1105,9 +1105,9 @@ const KidsWorld = () => {
             <div
               className={isEgg && activeAnimal.isEggType ? (eggWiggle ? "egg-wiggle" : nearHatch ? "egg-near" : "egg-idle") : (petted ? "petted" : "bob")}
               onClick={isEgg ? handleEggTap : handlePet}
-              style={{ width: "min(250px,65vw)", height: "min(210px,55vw)", display: "flex", alignItems: "center", justifyContent: "center", filter: sad ? "saturate(0.4) brightness(0.75)" : "none", position: "relative", transition: "filter 0.5s ease" }}>
+              style={{ width: "min(250px,65vw)", height: "min(210px,55vw)", display: "flex", alignItems: "center", justifyContent: "center", filter: sad ? "saturate(0.4) brightness(0.75)" : "none", position: "relative", transition: "filter 0.5s ease", pointerEvents: "auto" }}>
               {isEgg && activeAnimal.isEggType && <EggCracks treats={fedTreats} />}
-              <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))", transform: activeAnimal.scale && activeAnimal.scale !== 1 ? `scale(${activeAnimal.scale})` : "none", transformOrigin: "center center" }} draggable={false} />
+              <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))", transform: activeAnimal.scale && activeAnimal.scale !== 1 && (activeAnimal.isEggType || stageIdx > 0) ? `scale(${activeAnimal.scale})` : "none", transformOrigin: "center center" }} draggable={false} />
             </div>
 
             {/* Instructional hints — bilingual */}
@@ -1206,6 +1206,9 @@ const KidsWorld = () => {
             <button onClick={() => { const newJar = jarTreats + 1; setJarTreats(newJar); playSfx("treat"); }} style={{ flex: 1, padding: "0.9rem", background: "linear-gradient(135deg,#10b981,#059669)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1rem", cursor: "pointer", boxShadow: "0 6px 20px rgba(16,185,129,0.5)" }}>
               Add to Jar +1
             </button>
+            <button onClick={() => { setFedTreatsState({}); setJarTreats(99); setActiveAnimalId("turtle"); setVideoWatchedMap({}); setUnlockSeenMap({}); localStorage.clear(); ANIMALS.forEach(a => { levelUpFiredRef.current[a.id] = new Set(); }); playSfx("chirp"); }} style={{ flex: 1, padding: "0.9rem", background: "linear-gradient(135deg,#ef4444,#b91c1c)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1rem", cursor: "pointer", boxShadow: "0 6px 20px rgba(239,68,68,0.5)" }}>
+              🥚 Reset to Egg
+            </button>
             <button onClick={handleFeed} disabled={jarTreats <= 0} style={{ flex: 1, padding: "0.9rem", background: jarTreats > 0 ? "linear-gradient(135deg,#f59e0b,#ef4444)" : "rgba(255,255,255,0.1)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1rem", cursor: jarTreats > 0 ? "pointer" : "not-allowed", boxShadow: jarTreats > 0 ? "0 6px 20px rgba(245,158,11,0.5)" : "none" }}>
               Feed {activeAnimal.name}
             </button>
@@ -1232,9 +1235,9 @@ const KidsWorld = () => {
             const showDolphin = (fedTreatsState["turtle"] ?? 0) >= 45 && (videoWatchedMap["turtle"] ?? false) && !unlockSeenMap["dolphin"];
             const showOctopus = (fedTreatsState["dolphin"] ?? 0) >= 45 && (videoWatchedMap["dolphin"] ?? false) && (unlockSeenMap["dolphin"] ?? false) && !unlockSeenMap["octopus"];
             const showShark = (fedTreatsState["octopus"] ?? 0) >= 45 && (videoWatchedMap["octopus"] ?? false) && (unlockSeenMap["octopus"] ?? false) && !unlockSeenMap["shark"];
-            if (!showDolphin && !showOctopus && !showShark) return null;
+            if (!showDolphin && !showOctopus) return null;
             // 3-col grid: col1=16.7%, col2=50%, col3=83.3%
-            const leftPct = showDolphin ? "50%" : showOctopus ? "83.3%" : "16.7%";
+            const leftPct = showDolphin ? "50%" : "83.3%";
             return (
               <div style={{ position: "relative", height: "80px", marginBottom: "0.75rem" }}>
                 <div style={{ position: "absolute", left: leftPct, transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
