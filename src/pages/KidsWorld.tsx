@@ -731,6 +731,7 @@ const KidsWorld = () => {
   const [feedingCookies, setFeedingCookies] = useState<{ id: number; x: number; y: number }[]>([]);
   const creatureRef = useRef<HTMLDivElement>(null);
   const collectionRef = useRef<HTMLDivElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const harpRef = useRef<HTMLAudioElement | null>(null);
   const lullabyRef = useRef<HTMLAudioElement | null>(null);
@@ -957,7 +958,7 @@ const KidsWorld = () => {
   );
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative", overflow: "hidden", fontFamily: "'Fredoka One',cursive", userSelect: "none" }}>
+    <div ref={pageRef} style={{ minHeight: "100vh", position: "relative", overflow: "hidden", fontFamily: "'Fredoka One',cursive", userSelect: "none" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;700;800;900&display=swap');
         @keyframes heartFloat{0%{transform:translateY(0) scale(0.5);opacity:1}60%{transform:translateY(-55px) scale(1.1);opacity:1}100%{transform:translateY(-100px) scale(0.8);opacity:0}}
@@ -1109,7 +1110,7 @@ const KidsWorld = () => {
         const dismiss = () => {
           setShowUnlockFor(null);
           setUnlockSeenMap(m => ({ ...m, [a.id]: true }));
-          setTimeout(() => { document.getElementById(`animal-card-${a.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }); }, 150);
+          setTimeout(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, 400);
           localStorage.setItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`, "1");
           setActiveAnimalId(a.id);
           if (lullabyRef.current) { lullabyRef.current.pause(); lullabyRef.current.currentTime = 0; }
