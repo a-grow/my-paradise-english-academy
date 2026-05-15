@@ -10,7 +10,7 @@ interface AnimalStage { name: string; nameZh: string; min: number; img: string; 
 interface Animal {
   id: string; name: string; nameZh: string; emoji: string;
   stages: AnimalStage[];
-  unlockCondition: "default" | "turtle_grown_video_watched" | "dolphin_grown_video_watched" | "octopus_grown_video_watched";
+  unlockCondition: "default" | "turtle_grown_video_watched" | "dolphin_grown_video_watched" | "octopus_grown_video_watched" | "shark_grown_video_watched" | "clownfish_grown_video_watched";
   collectionBg: string; collectionBorder: string; collectionGlow: string;
   video: string | null; isEggType: boolean; scale?: number;
   accentColor: string; accentGlow: string;
@@ -104,6 +104,48 @@ const ANIMALS: Animal[] = [
       { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！", sub: "You raised a Grown Shark!",     subZh: "你養大了一隻成年鯊魚！" },
     ],
     unlockOverlay: { emoji: "🦈", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Shark Egg appeared!", eggLineZh: "出現了一顆鯊魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(200,220,255,0.7)", bgGradient: "linear-gradient(135deg,#0f2744,#1e3a5f,#2d5a8e)" },
+  },
+  {
+    id: "clownfish", name: "Clownfish", nameZh: "小丑魚", emoji: "🐠",
+    stages: [
+      { name: "Egg",   nameZh: "魚蛋",     min: 0,  img: "/creatures/clownfish-egg.png" },
+      { name: "Baby",  nameZh: "小小丑魚", min: 15, img: "/creatures/clownfish-baby.png" },
+      { name: "Young", nameZh: "年輕小丑魚", min: 30, img: "/creatures/clownfish-young.png" },
+      { name: "Grown", nameZh: "成年小丑魚", min: 45, img: "/creatures/clownfish-grown.png" },
+    ],
+    unlockCondition: "shark_grown_video_watched",
+    collectionBg: "#c2410c", collectionBorder: "rgba(251,146,60,0.7)", collectionGlow: "rgba(249,115,22,0.45)",
+    video: "/video_adult_clownfish.mp4", isEggType: true, scale: 1.0,
+    accentColor: "#fb923c", accentGlow: "rgba(251,146,60,0.5)",
+    btnColor: "#ea580c", btnGlow: "rgba(234,88,12,0.5)", btn3Color: "#f97316", btn3Glow: "rgba(249,115,22,0.5)",
+    feedLabel: "clownfish", feedLabelZh: "小丑魚",
+    levelUpMessages: [
+      { main: "Hello little one!",      zh: "你好小寶貝！",         sub: "A Baby Clownfish appeared!",      subZh: "小小丑魚出現了！" },
+      { main: "Growing so fast!",       zh: "長得好快！",           sub: "Now a Young Clownfish!",          subZh: "現在是年輕小丑魚了！" },
+      { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Clownfish!",   subZh: "你養大了一隻成年小丑魚！" },
+    ],
+    unlockOverlay: { emoji: "🐠", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Clownfish Egg appeared!", eggLineZh: "出現了一顆小丑魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(249,115,22,0.6)", borderColor: "rgba(251,146,60,0.7)", bgGradient: "linear-gradient(135deg,#7c1d0c,#c2410c,#ea580c)" },
+  },
+  {
+    id: "mantaray", name: "Manta Ray", nameZh: "蝠鱝", emoji: "🐟",
+    stages: [
+      { name: "Blanket", nameZh: "裹巾",       min: 0,  img: "/creatures/mantaray-blanket.png" },
+      { name: "Baby",    nameZh: "小蝠鱝",     min: 15, img: "/creatures/mantaray-baby.png" },
+      { name: "Young",   nameZh: "年輕蝠鱝",   min: 30, img: "/creatures/mantaray-young.png" },
+      { name: "Grown",   nameZh: "成年蝠鱝",   min: 45, img: "/creatures/mantaray-grown.png" },
+    ],
+    unlockCondition: "clownfish_grown_video_watched",
+    collectionBg: "#1e3a8a", collectionBorder: "rgba(147,197,253,0.7)", collectionGlow: "rgba(96,165,250,0.45)",
+    video: "/video_adult_mantaray.mp4", isEggType: false, scale: 1.6,
+    accentColor: "#818cf8", accentGlow: "rgba(129,140,248,0.5)",
+    btnColor: "#3b82f6", btnGlow: "rgba(59,130,246,0.5)", btn3Color: "#818cf8", btn3Glow: "rgba(129,140,248,0.5)",
+    feedLabel: "mantaray", feedLabelZh: "蝠鱝",
+    levelUpMessages: [
+      { main: "Hello little one!",      zh: "你好小寶貝！",         sub: "A Baby Manta Ray appeared!",      subZh: "小蝠鱝出現了！" },
+      { main: "Growing so fast!",       zh: "長得好快！",           sub: "Now a Young Manta Ray!",          subZh: "現在是年輕蝠鱝了！" },
+      { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Manta Ray!",   subZh: "你養大了一隻成年蝠鱝！" },
+    ],
+    unlockOverlay: { emoji: "🐟", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Manta Ray appeared!", eggLineZh: "蝠鱝出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(147,197,253,0.7)", bgGradient: "linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb)" },
   },
 ];
 // locked placeholder slots (fills collection grid to 6 total)
@@ -546,6 +588,14 @@ const OceanCollection = ({ fedTreatsMap, videoWatched, videoWatchedMap, unlockSe
             const octopus = ANIMALS.find(a => a.id === "octopus");
             return octopus ? getAnimalStageIdx(octopus, fedTreatsMap["octopus"] ?? 0) === 3 && (videoWatchedMap["octopus"] ?? false) && (unlockSeenMap["octopus"] ?? false) : false;
           }
+          if (animal.unlockCondition === "shark_grown_video_watched") {
+            const shark = ANIMALS.find(a => a.id === "shark");
+            return shark ? getAnimalStageIdx(shark, fedTreatsMap["shark"] ?? 0) === 3 && (videoWatchedMap["shark"] ?? false) && (unlockSeenMap["shark"] ?? false) : false;
+          }
+          if (animal.unlockCondition === "clownfish_grown_video_watched") {
+            const clownfish = ANIMALS.find(a => a.id === "clownfish");
+            return clownfish ? getAnimalStageIdx(clownfish, fedTreatsMap["clownfish"] ?? 0) === 3 && (videoWatchedMap["clownfish"] ?? false) && (unlockSeenMap["clownfish"] ?? false) : false;
+          }
           return false;
         })();
         const unlockSeen = unlockSeenMap[animal.id] ?? false;
@@ -637,7 +687,7 @@ const KidsWorld = () => {
   }
 
   const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
-  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45, octopus: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
+  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45, octopus: 45, shark: 45, clownfish: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
   const [treats, setTreats] = useState(0);
   const [loading, setLoading] = useState(!isMaster);
   const [hearts, setHearts] = useState<{ id: number; x: number; y: number; delay: number }[]>([]);
@@ -655,7 +705,7 @@ const KidsWorld = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [videoButtonSeen, setVideoButtonSeen] = useState(() => localStorage.getItem(`mpe_videoseen_${code}_${studentName}`) === "1");
   const [videoWatchedMap, setVideoWatchedMap] = useState<Record<string,boolean>>(() => {
-    if (isMaster) return { turtle: true, dolphin: true, octopus: true };
+    if (isMaster) return { turtle: true, dolphin: true, octopus: true, shark: true, clownfish: true };
     const map: Record<string,boolean> = {};
     ANIMALS.forEach(a => {
       const key = a.id === "turtle" ? `mpe_videowatched_${code}_${studentName}` : `mpe_videowatched_${a.id}_${code}_${studentName}`;
@@ -670,7 +720,8 @@ const KidsWorld = () => {
 
   const [videoFadingOut, setVideoFadingOut] = useState(false);
   const [showLookBelow, setShowLookBelow] = useState(false);
-  const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); if(!unlockSeenMap["dolphin"] || !unlockSeenMap["octopus"] || !unlockSeenMap["shark"]) setTimeout(() => setShowLookBelow(true), 300); }, 400); };
+  const [showOceanComplete, setShowOceanComplete] = useState(false);
+  const closeVideo = () => { setVideoFadingOut(true); setTimeout(() => { setShowVideo(false); setVideoFadingOut(false); if (audioRef.current) audioRef.current.volume = volume * 0.5; if(!unlockSeenMap["dolphin"] || !unlockSeenMap["octopus"] || !unlockSeenMap["shark"] || !unlockSeenMap["clownfish"] || !unlockSeenMap["mantaray"]) setTimeout(() => setShowLookBelow(true), 300); }, 400); };
   const [musicOn, setMusicOn] = useState(() => localStorage.getItem("mpe_music") !== "off");
   const [sfxOn, setSfxOn] = useState(() => localStorage.getItem("mpe_sfx") !== "off");
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.25"));
@@ -684,6 +735,7 @@ const KidsWorld = () => {
   const harpRef = useRef<HTMLAudioElement | null>(null);
   const lullabyRef = useRef<HTMLAudioElement | null>(null);
   const tadaRef = useRef<HTMLAudioElement | null>(null);
+  const completeRef = useRef<HTMLAudioElement | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
   const prevStageRef = useRef(-1);
   // ── FIX: load previously fired level-ups from localStorage on mount ──
@@ -726,13 +778,36 @@ const KidsWorld = () => {
 
   // Lock scroll when dim overlay is active
   useEffect(() => {
-    if ((stageIdx === 3 && !videoWatched && !levelUpStage) || showVideo || showLookBelow) {
+    if ((stageIdx === 3 && !videoWatched && !levelUpStage) || showVideo || showLookBelow || showOceanComplete) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
     return () => { document.body.style.overflow = ""; };
-  }, [stageIdx, videoWatched, showVideo, showLookBelow]);
+  }, [stageIdx, videoWatched, showVideo, showLookBelow, showOceanComplete]);
+
+  // Ocean complete — fire once when mantaray is fully grown + video watched
+  useEffect(() => {
+    const mantaray = ANIMALS.find(a => a.id === "mantaray");
+    if (!mantaray) return;
+    const mantarayFed = fedTreatsState["mantaray"] ?? 0;
+    const mantarayGrown = getAnimalStageIdx(mantaray, mantarayFed) === 3;
+    const mantarayVideoWatched = videoWatchedMap["mantaray"] ?? false;
+    const alreadySeen = localStorage.getItem(`mpe_oceancomplete_${code}_${studentName}`) === "1";
+    if (mantarayGrown && mantarayVideoWatched && !alreadySeen && !showVideo) {
+      setTimeout(() => {
+        setShowOceanComplete(true);
+        if (audioRef.current) audioRef.current.volume = 0.02;
+        if (!completeRef.current) completeRef.current = new Audio("/completedworld-music.mp3");
+        completeRef.current.currentTime = 0;
+        completeRef.current.volume = 0.5;
+        completeRef.current.play().catch(() => {
+          const tryPlay = () => { completeRef.current?.play().catch(() => {}); };
+          document.addEventListener("pointerdown", tryPlay, { once: true });
+        });
+      }, 800);
+    }
+  }, [fedTreatsState, videoWatchedMap, showVideo]);
 
   const getCtx = () => {
     if (!ctxRef.current) ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -930,6 +1005,86 @@ const KidsWorld = () => {
       <UnderwaterBg sad={sad} />
       {levelUpStage && <LevelUpOverlay animal={levelUpStage.animal} stageIdx={levelUpStage.stageIdx} onDismiss={() => setLevelUpStage(null)} />}
 
+      {/* OCEAN COMPLETE OVERLAY */}
+      {showOceanComplete && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 700, background: "rgba(0,0,30,0.88)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+          <div onClick={e => e.stopPropagation()} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+
+            {/* Sparkle ring around image */}
+            <div style={{ position: "relative", display: "inline-block" }}>
+              {/* Rotating sparkle SVGs */}
+              {[0,45,90,135,180,225,270,315].map((deg, i) => (
+                <div key={i} style={{ position: "absolute", top: "50%", left: "50%", width: "100%", height: "100%", transform: `translate(-50%,-50%) rotate(${deg}deg)`, pointerEvents: "none" }}>
+                  <div style={{ position: "absolute", top: -18, left: "50%", transform: "translateX(-50%)", animation: `spL ${1.2 + i * 0.15}s ease-in-out infinite ${i * 0.1}s` }}>
+                    <svg width="22" height="22" viewBox="0 0 14 14">
+                      <path d="M7 0L8.5 5.5L14 7L8.5 8.5L7 14L5.5 8.5L0 7L5.5 5.5Z" fill={["#ffd700","#ff9de2","#60b8ff","#4ade80","#fbbf24","#c084fc","#fb923c","#f472b6"][i]} />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+              {/* Second ring — counter rotating, smaller */}
+              {[22,67,112,157,202,247,292,337].map((deg, i) => (
+                <div key={`b${i}`} style={{ position: "absolute", top: "50%", left: "50%", width: "110%", height: "110%", transform: `translate(-50%,-50%) rotate(${deg}deg)`, pointerEvents: "none" }}>
+                  <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", animation: `spL ${1.5 + i * 0.2}s ease-in-out infinite ${i * 0.15}s` }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14">
+                      <path d="M7 0L8.5 5.5L14 7L8.5 8.5L7 14L5.5 8.5L0 7L5.5 5.5Z" fill={["#fff","#ffd700","#ff9de2","#60b8ff","#fff","#fbbf24","#c084fc","#fff"][i]} opacity="0.9" />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+              {/* Glowing border around image */}
+              <div style={{ position: "absolute", inset: -6, borderRadius: "1.5rem", background: "transparent", border: "3px solid rgba(255,215,0,0.7)", boxShadow: "0 0 30px rgba(255,215,0,0.6), 0 0 60px rgba(255,180,0,0.4), inset 0 0 20px rgba(255,215,0,0.1)", animation: "goldPulse 1.5s ease-in-out infinite", pointerEvents: "none" }} />
+              <img src="/completed_oceanworld.png" alt="Ocean World Complete!" style={{ width: "min(680px,90vw)", borderRadius: "1.25rem", display: "block", filter: "drop-shadow(0 0 30px rgba(255,215,0,0.5))", position: "relative", zIndex: 1 }} />
+            </div>
+
+            {/* Title */}
+            <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "clamp(1.6rem,5vw,2.2rem)", color: "#ffd700", textShadow: "0 0 20px rgba(255,215,0,0.9), 0 3px 8px rgba(0,0,0,0.6)", marginTop: "1.25rem", textAlign: "center", animation: "shimmer 1.5s ease-in-out infinite" }}>
+              🌊 Ocean World Complete! 🌊
+            </div>
+            <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.05rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.25rem", textAlign: "center" }}>
+              海洋世界完成了！
+            </div>
+
+            {/* Red 3D button */}
+            <button
+              onPointerDown={() => {
+                try {
+                  const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                  const buf = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate);
+                  const data = buf.getChannelData(0);
+                  for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2) * 0.8;
+                  const src = ctx.createBufferSource(); const g = ctx.createGain();
+                  src.buffer = buf; src.connect(g); g.connect(ctx.destination);
+                  g.gain.setValueAtTime(0.6, ctx.currentTime);
+                  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+                  src.start();
+                  const osc = ctx.createOscillator(); const og = ctx.createGain();
+                  osc.connect(og); og.connect(ctx.destination);
+                  osc.type = "sine"; osc.frequency.setValueAtTime(180, ctx.currentTime);
+                  osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.12);
+                  og.gain.setValueAtTime(0.3, ctx.currentTime);
+                  og.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+                  osc.start(); osc.stop(ctx.currentTime + 0.13);
+                } catch {}
+              }}
+              onClick={() => {
+                localStorage.setItem(`mpe_oceancomplete_${code}_${studentName}`, "1");
+                setShowOceanComplete(false);
+                if (completeRef.current) { completeRef.current.pause(); completeRef.current.currentTime = 0; }
+                if (audioRef.current) audioRef.current.volume = volume * 0.5;
+              }}
+              style={{ background: "linear-gradient(180deg,#ff4444 0%,#cc0000 50%,#990000 100%)", border: "none", borderRadius: "999px", padding: "1.1rem 2.8rem", cursor: "pointer", boxShadow: "0 8px 0px #660000, 0 12px 24px rgba(0,0,0,0.5), 0 0 30px rgba(255,60,60,0.5)", transform: "translateY(0)", transition: "transform 0.08s, box-shadow 0.08s", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", color: "white", textShadow: "0 2px 4px rgba(0,0,0,0.4)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.2rem" }}
+              onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(5px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 3px 0px #660000, 0 6px 12px rgba(0,0,0,0.5), 0 0 20px rgba(255,60,60,0.4)"; }}
+              onMouseUp={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 0px #660000, 0 12px 24px rgba(0,0,0,0.5), 0 0 30px rgba(255,60,60,0.5)"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 0px #660000, 0 12px 24px rgba(0,0,0,0.5), 0 0 30px rgba(255,60,60,0.5)"; }}
+            >
+              Click to enter a New World!
+              <span style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1rem", opacity: 0.9 }}>點擊進入新世界！</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* LOOK BELOW POPUP */}
       {showLookBelow && (
         <div style={{ position: "fixed", inset: 0, zIndex: 600, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", animation: "popIn 0.35s ease-out" }}>
@@ -994,7 +1149,7 @@ const KidsWorld = () => {
               Watch first! · 先看影片！👇
             </div>
           )}
-          <button onClick={() => { setShowVideo(true); if(!videoButtonSeen){ setVideoButtonSeen(true); localStorage.setItem(`mpe_videoseen_${code}_${studentName}`,"1"); }}} style={{ pointerEvents: "all", padding: "1rem 2.5rem", background: "linear-gradient(135deg, #00b4d8, #0077b6)", border: "3px solid rgba(255,255,0,0.9)", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", cursor: "pointer", animation: "watchPulse 1.2s ease-in-out infinite", display: "inline-block" }}>
+          <button onClick={() => { setShowVideo(true); if (audioRef.current) audioRef.current.volume = 0.02; if(!videoButtonSeen){ setVideoButtonSeen(true); localStorage.setItem(`mpe_videoseen_${code}_${studentName}`,"1"); }}} style={{ pointerEvents: "all", padding: "1rem 2.5rem", background: "linear-gradient(135deg, #00b4d8, #0077b6)", border: "3px solid rgba(255,255,0,0.9)", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", cursor: "pointer", animation: "watchPulse 1.2s ease-in-out infinite", display: "inline-block" }}>
             🎬 Watch {petName || activeAnimal.name}! · 看{petName || activeAnimal.nameZh}！
           </button>
         </div>
