@@ -601,7 +601,7 @@ const OceanCollection = ({ fedTreatsMap, videoWatched, videoWatchedMap, unlockSe
         const unlockSeen = unlockSeenMap[animal.id] ?? false;
         const isClickable = isUnlocked && !unlockSeen && animal.unlockCondition !== "default";
         return (
-          <div key={animal.id} onClick={isClickable ? () => onAnimalClick(animal.id) : undefined}
+          <div key={animal.id} id={`animal-card-${animal.id}`} onClick={isClickable ? () => onAnimalClick(animal.id) : undefined}
             style={{ position: "relative", borderRadius: "1.25rem",
               background: isClickable ? `${animal.collectionBg}22` : `${animal.collectionBg}${isUnlocked ? "33" : "18"}`,
               border: `2px solid ${isClickable ? animal.collectionBorder : animal.collectionBorder}`,
@@ -1109,6 +1109,7 @@ const KidsWorld = () => {
         const dismiss = () => {
           setShowUnlockFor(null);
           setUnlockSeenMap(m => ({ ...m, [a.id]: true }));
+          setTimeout(() => { document.getElementById(`animal-card-${a.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" }); }, 150);
           localStorage.setItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`, "1");
           setActiveAnimalId(a.id);
           if (lullabyRef.current) { lullabyRef.current.pause(); lullabyRef.current.currentTime = 0; }
