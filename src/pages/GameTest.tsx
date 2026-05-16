@@ -525,15 +525,10 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
   const held=useRef(new Set<string>());
   useEffect(()=>{
     const dn=(e:KeyboardEvent)=>{
-      if(["ArrowUp","ArrowDown"," "].includes(e.key)) e.preventDefault();
+      if(["ArrowUp","ArrowDown"].includes(e.key)) e.preventDefault();
       held.current.add(e.key);
       if(e.key==="ArrowUp") bowYRef.current=Math.max(5,bowYRef.current-2);
       if(e.key==="ArrowDown") bowYRef.current=Math.min(92,bowYRef.current+2);
-      if(e.key===" "){
-        const tgts=balloonsRef.current.filter(b=>b.word===targetRef.current);
-        const best=tgts.length?tgts.reduce((a,b)=>a.x<b.x?a:b):null;
-        if(best) handleClickRef.current(best);
-      }
     };
     const up=(e:KeyboardEvent)=>held.current.delete(e.key);
     const iv=setInterval(()=>{
@@ -674,7 +669,25 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
         <rect x="0" y="15" width="800" height="40" fill="#4a9e4a"/>
         <path d="M0 15 Q100 3 200 13 Q300 2 400 11 Q500 1 600 10 Q700 3 800 13 L800 55 L0 55Z" fill="#5cb85c"/>
       </svg>
-      <InstructionBar text="↑ ↓ Move archer · Space or Click balloon to shoot"/>
+      <div style={{position:"absolute",bottom:0,left:0,right:0,height:56,display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,pointerEvents:"none"}}>
+        {"ontouchstart" in window ?
+          <div style={{display:"flex",gap:24,pointerEvents:"auto"}}>
+            <button
+              onTouchStart={(e)=>{e.stopPropagation();const iv=setInterval(()=>{bowYRef.current=Math.max(5,bowYRef.current-1.2);},16);(e.currentTarget as any)._iv=iv;}}
+              onTouchEnd={(e)=>{e.stopPropagation();clearInterval((e.currentTarget as any)._iv);}}
+              style={{width:80,height:48,borderRadius:16,background:"rgba(0,0,0,0.25)",border:"2px solid rgba(255,255,255,0.4)",color:"white",fontSize:"1.8rem",fontFamily:"Fredoka One, sans-serif",cursor:"pointer",userSelect:"none"}}>▲</button>
+            <button
+              onTouchStart={(e)=>{e.stopPropagation();const iv=setInterval(()=>{bowYRef.current=Math.min(92,bowYRef.current+1.2);},16);(e.currentTarget as any)._iv=iv;}}
+              onTouchEnd={(e)=>{e.stopPropagation();clearInterval((e.currentTarget as any)._iv);}}
+              style={{width:80,height:48,borderRadius:16,background:"rgba(0,0,0,0.25)",border:"2px solid rgba(255,255,255,0.4)",color:"white",fontSize:"1.8rem",fontFamily:"Fredoka One, sans-serif",cursor:"pointer",userSelect:"none"}}>▼</button>
+          </div>
+        :
+          <div style={{textAlign:"center",pointerEvents:"none",background:"rgba(0,0,0,0.55)",borderRadius:999,padding:"0.4rem 1.4rem",border:"2px solid rgba(255,255,255,0.15)"}}>
+            <div style={{color:"#fbbf24",fontFamily:"Fredoka One, sans-serif",fontSize:"1.3rem",letterSpacing:"0.03em"}}>↑ ↓ Move Archer &nbsp;•&nbsp; Click the Correct Balloon!</div>
+            <div style={{color:"#fbbf24",fontFamily:"Nunito, sans-serif",fontSize:"1.1rem",marginTop:2}}>↑ ↓ 移動弓手 • 點擊正確的氣球！</div>
+          </div>
+        }
+      </div>
       {countdown&&<CountdownOverlay onDone={()=>{
         setCountdown(false);setPaused(false);
         setBalloons(prev=>prev.filter(b=>!(b.x<200&&Math.abs(b.y-bowYRef.current)<25)));
@@ -1084,6 +1097,13 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
   const [bullets,setBullets]=useState<Bullet[]>([]);
   const [bursts,setBursts]=useState<Burst[]>([]);
   const [shipX,setShipX]=useState(50);
+  const [cursorVisible,setCursorVisible]=useState(true);
+  const cursorTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+  const handleMouseMove=()=>{
+    setCursorVisible(true);
+    if(cursorTimer.current) clearTimeout(cursorTimer.current);
+    cursorTimer.current=setTimeout(()=>setCursorVisible(false),3000);
+  };
   const [target,setTarget]=useState(unit.vocab[0]);
   const [score,setScore]=useState(0);
   const [lives,setLives]=useState(5);
@@ -1266,8 +1286,27 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
-    <div style={{width:"100%",height:"100vh",background:"#030311",position:"relative",overflow:"hidden",userSelect:"none",cursor:"none",paddingBottom:36}}
-      onMouseMove={moveShip} onTouchMove={moveShip} onClick={shoot} onTouchEnd={shoot}>
+    <div style={{width:"100%",height:"100vh",background:"#030311",position:"relative",overflow:"hidden",userSelect:"none",cursor:cursorVisible?"default":"none",paddingBottom:36}}
+      onMouseMove={handleMouseMove} onTouchMove={moveShip} onTouchEnd={shoot}>
+      <div style={{position:"absolute",bottom:0,left:0,right:0,height:56,display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,pointerEvents:"none"}}>
+        {"ontouchstart" in window ?
+          <div style={{display:"flex",gap:24,pointerEvents:"auto"}}>
+            <button
+              onTouchStart={(e)=>{e.stopPropagation();const iv=setInterval(()=>{shipXRef.current=Math.max(3,shipXRef.current-1.2);},16);(e.currentTarget as any)._iv=iv;}}
+              onTouchEnd={(e)=>{e.stopPropagation();clearInterval((e.currentTarget as any)._iv);}}
+              style={{width:80,height:48,borderRadius:16,background:"rgba(255,255,255,0.15)",border:"2px solid rgba(255,255,255,0.4)",color:"white",fontSize:"1.8rem",fontFamily:"Fredoka One, sans-serif",cursor:"pointer",userSelect:"none"}}>◀</button>
+            <button
+              onTouchStart={(e)=>{e.stopPropagation();const iv=setInterval(()=>{shipXRef.current=Math.min(97,shipXRef.current+1.2);},16);(e.currentTarget as any)._iv=iv;}}
+              onTouchEnd={(e)=>{e.stopPropagation();clearInterval((e.currentTarget as any)._iv);}}
+              style={{width:80,height:48,borderRadius:16,background:"rgba(255,255,255,0.15)",border:"2px solid rgba(255,255,255,0.4)",color:"white",fontSize:"1.8rem",fontFamily:"Fredoka One, sans-serif",cursor:"pointer",userSelect:"none"}}>▶</button>
+          </div>
+        :
+          <div style={{textAlign:"center",pointerEvents:"none"}}>
+            <div style={{color:"#fbbf24",fontFamily:"Fredoka One, sans-serif",fontSize:"1.3rem",letterSpacing:"0.03em"}}>← → Move Ship &nbsp;•&nbsp; Space to Shoot!</div>
+            <div style={{color:"#fbbf24",fontFamily:"Nunito, sans-serif",fontSize:"1.1rem",marginTop:2}}>← → 移動太空船 • 空白鍵射擊！</div>
+          </div>
+        }
+      </div>
       <style>{`
         @keyframes twinkle{0%,100%{opacity:0.18}50%{opacity:1}}
         @keyframes alienBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
@@ -1329,7 +1368,7 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
         </div>
       )}
       <div style={{position:"absolute",bottom:"7%",left:0,right:0,height:2,background:"linear-gradient(90deg,transparent,rgba(74,222,128,0.6),transparent)"}}/>
-      <InstructionBar text="← → Move or mouse · Space or Click to shoot · Hit the word shown above!"/>
+
       {countdown&&<CountdownOverlay onDone={()=>{
         setCountdown(false);setPaused(false);
         setAliens(prev=>prev.filter(a=>!(a.y>70&&Math.abs(a.x-shipXRef.current)<20)));

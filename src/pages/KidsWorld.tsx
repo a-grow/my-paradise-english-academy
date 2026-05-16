@@ -1326,8 +1326,8 @@ const KidsWorld = () => {
         {/* FEED BUTTON */}
         {!isMaster && (nextStage ? (jarTreats > 0 && (
           <button onClick={handleFeed} style={{ width: "100%", padding: "1.1rem", marginBottom: "1rem", background: "linear-gradient(135deg,#fbbf24,#f97316)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(251,191,36,0.55)", animation: "eF 2s ease-in-out infinite" }}>
-            Feed Me! ({jarTreats} treat{jarTreats !== 1 ? "s" : ""} ready)<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.9 }}>餵我！（{jarTreats}個餅乾準備好了）</span>
+            Feed {activeAnimal.nameZh}! ({jarTreats} treat{jarTreats !== 1 ? "s" : ""} ready)<br />
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.9 }}>餵{activeAnimal.nameZh}！（{jarTreats}個餅乾準備好了）</span>
           </button>
         )) : (
           <button onClick={() => playSfx("chirp")} style={{ width: "100%", padding: "1.1rem", marginBottom: "1rem", background: "linear-gradient(135deg,#a855f7,#7c3aed)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.4rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(168,85,247,0.55)", animation: "eF 2s ease-in-out infinite" }}>
@@ -1367,7 +1367,8 @@ const KidsWorld = () => {
               🥚 Reset to Egg
             </button>
             <button onClick={handleFeed} disabled={jarTreats <= 0} style={{ flex: 1, padding: "0.9rem", background: jarTreats > 0 ? "linear-gradient(135deg,#f59e0b,#ef4444)" : "rgba(255,255,255,0.1)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1rem", cursor: jarTreats > 0 ? "pointer" : "not-allowed", boxShadow: jarTreats > 0 ? "0 6px 20px rgba(245,158,11,0.5)" : "none" }}>
-              Feed {activeAnimal.name}
+              Feed {activeAnimal.name}<br/>
+              <span style={{fontFamily:"Nunito,sans-serif",fontSize:"0.8rem",opacity:0.9}}>餵{activeAnimal.nameZh}</span>
             </button>
           </div>
         )}
