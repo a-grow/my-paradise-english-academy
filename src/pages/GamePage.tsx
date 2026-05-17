@@ -14,7 +14,8 @@ const GamePage = () => {
   const isMaster = code === MASTER_CODE;
   const today = new Date().toDateString();
 
-  const jarKey = `mpe_jar_${code}_${studentName}`;
+  const fromDino = sessionStorage.getItem("mpe_from_dino") === "1";
+  const jarKey = fromDino ? `mpe_dino_jar_${code}_${studentName}` : `mpe_jar_${code}_${studentName}`;
   const capKey = `mpe_arcade_cap_${code}_${studentName}_${today}`;
   const comboKey = (unitId: number, gameId: string, diff: string) =>
     `mpe_arcade_${code}_${studentName}_u${unitId}_${gameId}_${diff}_${today}`;
@@ -177,7 +178,7 @@ const GamePage = () => {
             }}>
               Keep Playing! 🎮
             </button>
-            <button onClick={() => navigate(`/world/${code}/${studentName}`)} style={{
+            <button onClick={() => { sessionStorage.removeItem("mpe_from_dino"); navigate(fromDino ? `/dino/${code}/${studentName}` : `/world/${code}/${studentName}`); }} style={{
               width: "100%", padding: "0.85rem",
               background: "linear-gradient(135deg,#f97316,#fbbf24)",
               border: "none", borderRadius: "999px", color: "white",

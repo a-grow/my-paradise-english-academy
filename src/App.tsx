@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Blog from "./pages/Blog";
 import Portal from "./pages/Portal";
 import KidsWorld from "./pages/KidsWorld";
+import DinosaurWorld from "./pages/DinosaurWorld";
 import GamePage from "./pages/GamePage";
 import NotFound from "./pages/NotFound";
 
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/world/:code/:studentName" element={<KidsWorld />} />
 <Route path="/game/:code/:studentName/:book" element={<GamePage />} />
 <Route path="/gametest" element={<GameTest />} />
+              <Route path="/dino/:code/:studentName" element={<DinosaurWorld />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
