@@ -687,7 +687,7 @@ const KidsWorld = () => {
   }
 
   const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
-  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45, octopus: 45, shark: 45, clownfish: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
+  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45, octopus: 45, shark: 45, clownfish: 45, mantaray: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
   const [treats, setTreats] = useState(0);
   const [loading, setLoading] = useState(!isMaster);
   const [hearts, setHearts] = useState<{ id: number; x: number; y: number; delay: number }[]>([]);
@@ -705,7 +705,7 @@ const KidsWorld = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [videoButtonSeen, setVideoButtonSeen] = useState(() => localStorage.getItem(`mpe_videoseen_${code}_${studentName}`) === "1");
   const [videoWatchedMap, setVideoWatchedMap] = useState<Record<string,boolean>>(() => {
-    if (isMaster) return { turtle: true, dolphin: true, octopus: true, shark: true, clownfish: true };
+    if (isMaster) return { turtle: true, dolphin: true, octopus: true, shark: true, clownfish: true, mantaray: true };
     const map: Record<string,boolean> = {};
     ANIMALS.forEach(a => {
       const key = a.id === "turtle" ? `mpe_videowatched_${code}_${studentName}` : `mpe_videowatched_${a.id}_${code}_${studentName}`;
@@ -738,7 +738,7 @@ const KidsWorld = () => {
   const tadaRef = useRef<HTMLAudioElement | null>(null);
   const completeRef = useRef<HTMLAudioElement | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
-  const prevStageRef = useRef(-1);
+  const prevStageRef = useRef<number | null>(null);
   // ── FIX: load previously fired level-ups from localStorage on mount ──
   const levelUpFiredRef = useRef<Record<string, Set<number>>>(
     Object.fromEntries(ANIMALS.map(a => [a.id, new Set<number>(
@@ -808,7 +808,7 @@ const KidsWorld = () => {
         });
       }, 800);
     }
-  }, [fedTreatsState, videoWatchedMap, showVideo]);
+  }, [fedTreatsState, videoWatchedMap, showVideo, levelUpStage]);
 
   const getCtx = () => {
     if (!ctxRef.current) ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -852,6 +852,7 @@ const KidsWorld = () => {
   // Level up — fire ONCE per stage transition, never repeat (persisted in localStorage)
   useEffect(() => {
     const animalFired = levelUpFiredRef.current[activeAnimalId] ?? new Set<number>();
+    if (prevStageRef.current === null) { prevStageRef.current = stageIdx; return; }
     if (stageIdx > 0 && stageIdx !== prevStageRef.current && !animalFired.has(stageIdx)) {
       animalFired.add(stageIdx);
       levelUpFiredRef.current[activeAnimalId] = animalFired;
@@ -1073,6 +1074,7 @@ const KidsWorld = () => {
                 setShowOceanComplete(false);
                 if (completeRef.current) { completeRef.current.pause(); completeRef.current.currentTime = 0; }
                 if (audioRef.current) audioRef.current.volume = volume * 0.5;
+                navigate(`/dino/${code}/${studentName}`);
               }}
               style={{ background: "linear-gradient(180deg,#ff4444 0%,#cc0000 50%,#990000 100%)", border: "none", borderRadius: "999px", padding: "1.1rem 2.8rem", cursor: "pointer", boxShadow: "0 8px 0px #660000, 0 12px 24px rgba(0,0,0,0.5), 0 0 30px rgba(255,60,60,0.5)", transform: "translateY(0)", transition: "transform 0.08s, box-shadow 0.08s", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", color: "white", textShadow: "0 2px 4px rgba(0,0,0,0.4)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.2rem" }}
               onMouseDown={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(5px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 3px 0px #660000, 0 6px 12px rgba(0,0,0,0.5), 0 0 20px rgba(255,60,60,0.4)"; }}
