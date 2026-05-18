@@ -973,10 +973,10 @@ const DinosaurWorld = () => {
               <BoneCookie size={80} />
             </div>
             <div style={{ color: "#DAA520", fontFamily: "'Titan One',cursive", fontSize: "2rem", marginBottom: "0.25rem" }}>Daily Bone Cookie! 🦴</div>
-            <div style={{ color: "rgba(245,230,200,0.75)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginBottom: "0.25rem" }}>每日骨頭餅乾！</div>
+            <div style={{ color: "rgba(245,230,200,0.75)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginBottom: "0.25rem" }}>每日點心！</div>
             <div style={{ color: "rgba(245,230,200,0.8)", fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
               {displayName} gets 1 bone cookie today! 🦴<br />
-              <span style={{ fontFamily: "'Titan One',cursive", fontSize: "0.95rem" }}>{displayName}今天得到1個骨頭餅乾！</span><br />
+              <span style={{ fontFamily: "'Titan One',cursive", fontSize: "0.95rem" }}>{displayName}今天得到1個點心！</span><br />
               <span style={{ fontSize: "0.85rem", opacity: 0.65 }}>Come back tomorrow! · 明天再來！</span>
             </div>
             <button onClick={claimDailyGift} style={{ background: "linear-gradient(135deg,#DAA520,#8B4513)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Titan One',cursive", fontSize: "1.3rem", padding: "0.9rem 2.5rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(218,165,32,0.5)" }}>
@@ -1069,8 +1069,8 @@ const DinosaurWorld = () => {
                 </div>
               </div>
               <div style={{ textAlign: "center", fontFamily: "'Titan One',cursive", fontSize: "1.1rem", color: "#DAA520", textShadow: "0 2px 6px rgba(0,0,0,0.5)", animation: "shimmer 2s ease-in-out infinite" }}>
-                {nextStage.min - fedTreats} more bone cookies to {nextStage.name}!<br />
-                <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>還需要 {nextStage.min - fedTreats} 個骨頭餅乾才能變成{nextStage.nameZh}！</span>
+                {nextStage.min - fedTreats} more treats to {nextStage.name}!<br />
+                <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>還需要 {nextStage.min - fedTreats} 個點心才能變成{nextStage.nameZh}！</span>
               </div>
             </div>
           )}
@@ -1104,8 +1104,8 @@ const DinosaurWorld = () => {
         {/* TREAT JAR */}
         <div className="glass" style={{ padding: "1.5rem", marginBottom: "1rem", animation: "fadeUp 0.7s ease-out" }}>
           <div style={{ color: "#f5e6c8", fontFamily: "'Titan One',cursive", fontSize: "1.15rem", textAlign: "center", marginBottom: "0.85rem" }}>
-            {petName ? `${petName} loves bone cookies! ` : `Feed your ${activeAnimal.name} Bone Cookies! `}🦴<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.8 }}>餵你的{activeAnimal.nameZh}骨頭餅乾！每次餵食讓牠更快長大！</span>
+            {petName ? `${petName} loves treats! ` : `Feed your ${activeAnimal.name} Treats! `}<br />
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.8 }}>餵你的{activeAnimal.nameZh}！每次餵食讓牠更快長大！</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
             <TreatJar treats={jarTreats} nextStage={nextStage} />
@@ -1127,7 +1127,7 @@ const DinosaurWorld = () => {
         {isMaster && (
           <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1rem" }}>
             <button onClick={() => { setJarTreats(j => j + 1); playSfx("treat"); }} style={{ flex: 1, padding: "0.9rem", background: "linear-gradient(135deg,#556B2F,#3d5c1a)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Titan One',cursive", fontSize: "0.95rem", cursor: "pointer" }}>
-              Add Cookie +1
+              Add Treat +1
             </button>
             <button onClick={() => { setFedTreatsState({}); setJarTreats(99); setActiveAnimalId("triceratops"); setVideoWatchedMap({}); setUnlockSeenMap({}); localStorage.clear(); ANIMALS.forEach(a => { levelUpFiredRef.current[a.id] = new Set(); }); playSfx("stomp"); }} style={{ flex: 1, padding: "0.9rem", background: "linear-gradient(135deg,#b91c1c,#7f1d1d)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Titan One',cursive", fontSize: "0.95rem", cursor: "pointer" }}>
               🥚 Reset

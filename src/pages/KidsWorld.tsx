@@ -39,7 +39,7 @@ const ANIMALS: Animal[] = [
       { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Sea Turtle!",        subZh: "現在是年輕海龜了！" },
       { main: "Fully grown! Amazing!",  zh: "完全長大了！太棒了！", sub: "You raised a Grown Sea Turtle!", subZh: "你養大了一隻成年海龜！" },
     ],
-    unlockOverlay: { emoji: "🐢", title: "Sea Turtle!", titleZh: "海龜！", eggLine: "A Sea Turtle appeared!", eggLineZh: "海龜出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "Let's go! · 出發！🎉", glowColor: "rgba(255,215,0,0.6)", borderColor: "rgba(255,215,0,0.7)", bgGradient: "linear-gradient(135deg,#0c3460,#1a6e8a)" },
+    unlockOverlay: { emoji: "🐢", title: "Sea Turtle!", titleZh: "海龜！", eggLine: "A Sea Turtle appeared!", eggLineZh: "海龜出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "Let's go! · 出發！🎉", glowColor: "rgba(255,215,0,0.6)", borderColor: "rgba(255,215,0,0.7)", bgGradient: "linear-gradient(135deg,#0c3460,#1a6e8a)" },
   },
   {
     id: "dolphin", name: "Dolphin", nameZh: "海豚", emoji: "🐬",
@@ -60,7 +60,7 @@ const ANIMALS: Animal[] = [
       { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Dolphin!",        subZh: "現在是年輕海豚了！" },
       { main: "Fully grown! Amazing!",  zh: "完全長大了！太棒了！", sub: "You raised a Grown Dolphin!", subZh: "你養大了一隻成年海豚！" },
     ],
-    unlockOverlay: { emoji: "🐬", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dolphin appeared!", eggLineZh: "海豚出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(100,200,255,0.6)", borderColor: "rgba(100,200,255,0.7)", bgGradient: "linear-gradient(135deg,#003d7a,#0077b6,#00b4d8)" },
+    unlockOverlay: { emoji: "🐬", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dolphin appeared!", eggLineZh: "海豚出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(100,200,255,0.6)", borderColor: "rgba(100,200,255,0.7)", bgGradient: "linear-gradient(135deg,#003d7a,#0077b6,#00b4d8)" },
   },
   // ── ADD NEW ANIMALS HERE — one object = one new animal (octopus before shark) ───
   {
@@ -82,7 +82,7 @@ const ANIMALS: Animal[] = [
       { main: "Growing so fast!",        zh: "長得好快！",           sub: "Now a Young Octopus!",           subZh: "現在是年輕章魚了！" },
       { main: "Magnificent! Amazing!",   zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Octopus!",    subZh: "你養大了一隻成年章魚！" },
     ],
-    unlockOverlay: { emoji: "🐙", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "An Octopus Egg appeared!", eggLineZh: "出現了一顆章魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(168,85,247,0.6)", borderColor: "rgba(216,180,254,0.7)", bgGradient: "linear-gradient(135deg,#2e1065,#581c87,#7e22ce)" },
+    unlockOverlay: { emoji: "🐙", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "An Octopus Egg appeared!", eggLineZh: "出現了一顆章魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(168,85,247,0.6)", borderColor: "rgba(216,180,254,0.7)", bgGradient: "linear-gradient(135deg,#2e1065,#581c87,#7e22ce)" },
   },
   {
     id: "shark", name: "Great White Shark", nameZh: "大白鯊", emoji: "🦈",
@@ -103,7 +103,7 @@ const ANIMALS: Animal[] = [
       { main: "Growing so fast!",       zh: "長得好快！",         sub: "Now a Young Shark!",            subZh: "現在是年輕鯊魚了！" },
       { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！", sub: "You raised a Grown Shark!",     subZh: "你養大了一隻成年鯊魚！" },
     ],
-    unlockOverlay: { emoji: "🦈", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Shark Egg appeared!", eggLineZh: "出現了一顆鯊魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(200,220,255,0.7)", bgGradient: "linear-gradient(135deg,#0f2744,#1e3a5f,#2d5a8e)" },
+    unlockOverlay: { emoji: "🦈", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Shark Egg appeared!", eggLineZh: "出現了一顆鯊魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(200,220,255,0.7)", bgGradient: "linear-gradient(135deg,#0f2744,#1e3a5f,#2d5a8e)" },
   },
   {
     id: "clownfish", name: "Clownfish", nameZh: "小丑魚", emoji: "🐠",
@@ -124,7 +124,7 @@ const ANIMALS: Animal[] = [
       { main: "Growing so fast!",       zh: "長得好快！",           sub: "Now a Young Clownfish!",          subZh: "現在是年輕小丑魚了！" },
       { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Clownfish!",   subZh: "你養大了一隻成年小丑魚！" },
     ],
-    unlockOverlay: { emoji: "🐠", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Clownfish Egg appeared!", eggLineZh: "出現了一顆小丑魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(249,115,22,0.6)", borderColor: "rgba(251,146,60,0.7)", bgGradient: "linear-gradient(135deg,#7c1d0c,#c2410c,#ea580c)" },
+    unlockOverlay: { emoji: "🐠", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Clownfish Egg appeared!", eggLineZh: "出現了一顆小丑魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(249,115,22,0.6)", borderColor: "rgba(251,146,60,0.7)", bgGradient: "linear-gradient(135deg,#7c1d0c,#c2410c,#ea580c)" },
   },
   {
     id: "mantaray", name: "Manta Ray", nameZh: "蝠鱝", emoji: "🐟",
@@ -145,7 +145,7 @@ const ANIMALS: Animal[] = [
       { main: "Growing so fast!",       zh: "長得好快！",           sub: "Now a Young Manta Ray!",          subZh: "現在是年輕蝠鱝了！" },
       { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Manta Ray!",   subZh: "你養大了一隻成年蝠鱝！" },
     ],
-    unlockOverlay: { emoji: "🐟", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Manta Ray appeared!", eggLineZh: "蝠鱝出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(147,197,253,0.7)", bgGradient: "linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb)" },
+    unlockOverlay: { emoji: "🐟", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Manta Ray appeared!", eggLineZh: "蝠鱝出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(147,197,253,0.7)", bgGradient: "linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb)" },
   },
 ];
 // locked placeholder slots (fills collection grid to 6 total)
@@ -1221,7 +1221,7 @@ const KidsWorld = () => {
             <div style={{ color: "rgba(255,255,255,0.75)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginBottom: "0.25rem" }}>每日禮物！</div>
             <div style={{ color: "rgba(255,255,255,0.8)", fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
               {displayName} gets 1 treat today! <br />
-              <span style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.95rem" }}>{displayName}今天得到1個餅乾！</span><br />
+              <span style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.95rem" }}>{displayName}今天得到1個點心！</span><br />
               <span style={{ fontSize: "0.85rem", opacity: 0.65 }}>Come back tomorrow for more! · 明天再來拿更多！</span>
             </div>
             <button onClick={claimDailyGift} style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.35rem", padding: "0.9rem 2.5rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(245,158,11,0.55)" }}>
@@ -1262,7 +1262,7 @@ const KidsWorld = () => {
           {nearHatch && !eggWiggle && (
             <div style={{ background: "rgba(255,255,255,0.95)", borderRadius: "1.2rem", padding: "0.7rem 1.1rem", margin: "0 auto 0.6rem", maxWidth: 260, fontFamily: "Nunito,sans-serif", fontSize: "1rem", color: "#333", lineHeight: 1.5, boxShadow: "0 4px 12px rgba(0,0,0,0.15)", position: "relative" }}>
               I'm almost ready! 🐣<br />
-              <span style={{ fontSize: "0.9rem", color: "#555" }}>我快出來了！再給我幾個餅乾！</span>
+              <span style={{ fontSize: "0.9rem", color: "#555" }}>我快出來了！再給我幾個點心！</span>
               <div style={{ position: "absolute", bottom: -8, left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: "8px solid rgba(255,255,255,0.95)" }} />
             </div>
           )}
@@ -1320,7 +1320,7 @@ const KidsWorld = () => {
               </div>
               <div style={{ textAlign: "center", fontFamily: "'Fredoka One',cursive", fontSize: "1.2rem", color: "#fbbf24", textShadow: "0 2px 6px rgba(0,0,0,0.4)", animation: "shimmer 2s ease-in-out infinite" }}>
                 {nextStage.min - fedTreats} more treats to {nextStage.name}!<br />
-                <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>還需要 {nextStage.min - fedTreats} 個餅乾才能變成{nextStage.nameZh}！</span>
+                <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>還需要 {nextStage.min - fedTreats} 個點心才能變成{nextStage.nameZh}！</span>
               </div>
             </div>
           )}
@@ -1355,7 +1355,7 @@ const KidsWorld = () => {
         <div className="glass" style={{ padding: "1.5rem", marginBottom: "1rem", animation: "fadeUp 0.7s ease-out" }}>
           <div style={{ color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.25rem", textAlign: "center", marginBottom: "0.85rem" }}>
             {petName ? `${petName} loves treats! ` : `Feed your ${activeAnimal.name} Treats! `}<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>餵你的{activeAnimal.nameZh}餅乾！每次餵食讓牠更快長大！</span>
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>餵你的{activeAnimal.nameZh}！每次餵食讓牠更快長大！</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
             <TreatJar treats={jarTreats} nextStage={nextStage} />
