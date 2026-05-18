@@ -203,7 +203,7 @@ const CountdownOverlay = ({onDone}:{onDone:()=>void}) => {
 // ── UNIT CLEAR / WINNER SCREEN ────────────────────────────────────────────────
 // Three zones only: celebration → reward → buttons. No stars, no points.
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
-const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState,diff}:{unit:UnitData;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";diff?:string}) => {
+const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState,diff,treatsEarnedToday=0,fromDino=false}:{unit:UnitData;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";diff?:string;treatsEarnedToday?:number;fromDino?:boolean}) => {
   const treatCount = TREATS_BY_DIFF[diff??""] ?? 2;
   const play=useAudio();
   useEffect(()=>{play("win");},[]);
@@ -232,29 +232,60 @@ const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState,diff}:{unit:Unit
           <div style={{marginBottom:"1.25rem"}}>
             {claimState==="available" && (
               <button onClick={onClaim} style={{width:"100%",padding:"1.1rem",background:"linear-gradient(135deg,#fbbf24,#f97316)",border:"none",borderRadius:"1.5rem",color:"white",fontFamily:F,fontWeight:900,fontSize:"1.35rem",cursor:"pointer",animation:"claimPulse 1.4s ease-in-out infinite",display:"flex",alignItems:"center",justifyContent:"center",gap:"0.5rem"}}>
-                <svg width="36" height="36" viewBox="0 0 36 36" style={{animation:"cookiePop 0.5s ease-out both",flexShrink:0}}><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                {fromDino
+                  ? <svg width="36" height="36" viewBox="0 0 36 36" style={{animation:"cookiePop 0.5s ease-out both",flexShrink:0}}><ellipse cx="18" cy="18" rx="14" ry="7" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="9" cy="18" rx="5" ry="4" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="27" cy="18" rx="5" ry="4" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/></svg>
+                  : <svg width="36" height="36" viewBox="0 0 36 36" style={{animation:"cookiePop 0.5s ease-out both",flexShrink:0}}><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                }
                 <span>+{treatCount} {treatCount === 1 ? "Treat" : "Treats"}!</span>
               </button>
             )}
             {claimState==="claimed" && (
               <div style={{background:"rgba(74,222,128,0.15)",border:"2px solid rgba(74,222,128,0.4)",borderRadius:"1.25rem",padding:"0.85rem 1rem"}}>
-                <div style={{fontFamily:F,fontWeight:800,fontSize:"1.1rem",color:"#4ade80",display:"flex",alignItems:"center",gap:"0.4rem"}}><svg width="22" height="22" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg> Treats added!</div>
-                <div style={{fontFamily:F,fontWeight:700,fontSize:"0.82rem",color:"rgba(255,255,255,0.5)",marginTop:"0.2rem"}}>Go feed your turtle! 🐢</div>
+                <div style={{fontFamily:F,fontWeight:800,fontSize:"1.1rem",color:"#4ade80",display:"flex",alignItems:"center",justifyContent:"center",gap:"0.4rem"}}>
+                  {fromDino
+                    ? <svg width="22" height="22" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="11" ry="5.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="8" cy="18" rx="4" ry="3.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="28" cy="18" rx="4" ry="3.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/></svg>
+                    : <svg width="22" height="22" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                  }
+                  Treats added! · 點心加好了！
+                </div>
+                <div style={{fontFamily:F,fontWeight:700,fontSize:"0.82rem",color:"rgba(255,255,255,0.5)",marginTop:"0.2rem"}}>Go feed your animal! · 去餵你的動物吧！</div>
               </div>
             )}
             {claimState==="capped" && (
               <div style={{background:"rgba(255,255,255,0.08)",border:"2px solid rgba(255,255,255,0.15)",borderRadius:"1.25rem",padding:"0.85rem 1rem"}}>
-                <div style={{fontFamily:F,fontWeight:800,fontSize:"1rem",color:"rgba(255,255,255,0.7)"}}>Great job! 🌟</div>
-                <div style={{fontFamily:F,fontWeight:700,fontSize:"0.82rem",color:"rgba(255,255,255,0.45)",marginTop:"0.2rem"}}>Come back tomorrow for more treats! 🐢</div>
+                <div style={{fontFamily:F,fontWeight:800,fontSize:"1rem",color:"rgba(255,255,255,0.7)"}}>You got all your treats today! · 今天的點心全部拿到了！</div>
+                <div style={{fontFamily:F,fontWeight:700,fontSize:"0.82rem",color:"rgba(255,255,255,0.45)",marginTop:"0.2rem"}}>Come back tomorrow for more! · 明天再來拿更多！</div>
               </div>
             )}
           </div>
         )}
 
-        {/* ZONE 3 — Buttons */}
+        {/* ZONE 3 — Budget row + Buttons */}
+        {onClaim && (
+          <div style={{marginBottom:"0.75rem",textAlign:"center"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"0.35rem"}}>
+              {Array.from({length:9}).map((_,i)=>(
+                i < treatsEarnedToday
+                  ? fromDino
+                    ? <svg key={i} width="26" height="26" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="11" ry="5.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="8" cy="18" rx="4" ry="3.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="28" cy="18" rx="4" ry="3.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/></svg>
+                    : <svg key={i} width="26" height="26" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
+                  : <svg key={i} width="26" height="26" viewBox="0 0 36 36"><circle cx="18" cy="18" r="13" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5"/></svg>
+              ))}
+            </div>
+            <div style={{fontFamily:F,fontWeight:700,fontSize:"0.85rem",color:"rgba(255,255,255,0.6)"}}>
+              {9 - treatsEarnedToday > 0
+                ? `${9 - treatsEarnedToday} more treats to win today! · 今天還可以再得${9 - treatsEarnedToday}個點心！`
+                : `All treats earned today! · 今天的點心全拿了！`}
+            </div>
+          </div>
+        )}
         <div style={{display:"flex",flexDirection:"column",gap:"0.65rem"}}>
-          <button onClick={onPlay} disabled={claimState==="available"} style={{padding:"0.9rem",background:claimState==="available"?"rgba(255,255,255,0.15)":`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:claimState==="available"?"rgba(255,255,255,0.35)":"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:claimState==="available"?"not-allowed":"pointer",boxShadow:claimState==="available"?"none":`0 0 20px ${unit.glow}`,transition:"all 0.3s"}}>Play Again!</button>
-          <button onClick={onBack} disabled={claimState==="available"} style={{padding:"0.9rem",background:claimState==="available"?"rgba(255,255,255,0.1)":"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:claimState==="available"?"rgba(255,255,255,0.35)":"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:claimState==="available"?"not-allowed":"pointer",transition:"all 0.3s"}}>Choose Game</button>
+          <button onClick={onPlay} disabled={claimState==="available"} style={{padding:"0.9rem",background:claimState==="available"?"rgba(255,255,255,0.12)":`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:claimState==="available"?"rgba(255,255,255,0.3)":"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:claimState==="available"?"not-allowed":"pointer",boxShadow:claimState==="available"?"none":`0 0 20px ${unit.glow}`,transition:"all 0.3s"}}>
+            Play Again! · 再玩一次！
+          </button>
+          <button onClick={onBack} disabled={claimState==="available"} style={{padding:"0.9rem",background:claimState==="available"?"rgba(255,255,255,0.08)":"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:claimState==="available"?"rgba(255,255,255,0.3)":"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:claimState==="available"?"not-allowed":"pointer",transition:"all 0.3s"}}>
+            Choose Game · 選擇遊戲
+          </button>
         </div>
       </div>
     </div>
@@ -466,7 +497,7 @@ const InstructionBar = ({text,color="#fbbf24"}:{text:string;color?:string}) => (
 // ══════════════════════════════════════════════════════════════════════════════
 // GAME 1: ARROW SHOOT 🏹
 // ══════════════════════════════════════════════════════════════════════════════
-const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped"}) => {
+const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void}) => {
   const play=useAudio();
   const cfg=DIFF_CONFIG[diff];
   type Balloon={id:number;word:string;x:number;y:number;speed:number;color:string};
@@ -611,6 +642,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
   handleClickRef.current=handleClick;
 
   const doRestart=()=>{
+    onRestart?.();
     setScore(0);setRound(0);setTimeLeft(cfg.timerSec);setLives(5);livesRef.current=5;
     setOuch(false);ouchRef.current=false;setDone(false);setUnitClear(false);
     setBalloons([]);bowYRef.current=50;setPaused(false);setCountdown(false);
@@ -619,7 +651,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
     nextTarget(new Set());
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino}/>;
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
@@ -701,7 +733,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
 // ══════════════════════════════════════════════════════════════════════════════
 // GAME 2: WHACK-A-MOLE 🔨
 // ══════════════════════════════════════════════════════════════════════════════
-const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped"}) => {
+const WhackAMole = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void}) => {
   const play=useAudio();
   const cfg=DIFF_CONFIG[diff];
   const HOLES=9;const TOTAL=unit.vocab.length;
@@ -787,12 +819,13 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
   };
 
   const doRestart=()=>{
+    onRestart?.();
     setScore(0);setRound(0);setTimeLeft(cfg.timerSec);setLives(5);setDone(false);setUnitClear(false);setPaused(false);setCountdown(false);
     wordsClearedRef.current=new Set();setWordsCleared(new Set());
     setMoles(Array(HOLES).fill(null));const t=pickTarget(new Set());setTimeout(()=>spawnMoles(t,new Set()),400);
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino}/>;
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
@@ -853,7 +886,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Di
 // ══════════════════════════════════════════════════════════════════════════════
 // GAME 3: WORD SNAKE 🐍
 // ══════════════════════════════════════════════════════════════════════════════
-const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped"}) => {
+const WordSnake = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void}) => {
   const play=useAudio();
   const cfg=DIFF_CONFIG[diff];
   const COLS=10,ROWS=10,CELL=38;const TOTAL=unit.vocab.length;
@@ -1000,13 +1033,14 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
   };
 
   const doRestart=()=>{
+    onRestart?.();
     setScore(0);setLives(5);setRound(0);setDone(false);setUnitClear(false);
     wordsClearedRef.current=new Set();setWordsCleared(new Set());currentWordRef.current="";completingWordRef.current=false;ouchSnakeRef.current=false;setOuchSnake(false);
     const sn=[{x:4,y:4},{x:3,y:4},{x:2,y:4}];
     setSnake(sn);setDir({x:1,y:0});newWord(sn,new Set());
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino}/>;
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
   const flashBg=flash==="good"?"rgba(74,222,128,0.22)":flash==="bad"?"rgba(239,68,68,0.22)":"transparent";
 
@@ -1085,7 +1119,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Dif
 // ══════════════════════════════════════════════════════════════════════════════
 // GAME 4: SPACE SHOOTER 🚀
 // ══════════════════════════════════════════════════════════════════════════════
-const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped"}) => {
+const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void}) => {
   const play=useAudio();
   const cfg=DIFF_CONFIG[diff];
   const TOTAL=unit.vocab.length;
@@ -1275,6 +1309,7 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
   },[]);
 
   const doRestart=()=>{
+    onRestart?.();
     setScore(0);setLives(5);livesRef.current=5;setRound(0);setTimeLeft(cfg.timerSec);
     setDone(false);setUnitClear(false);setOuchShip(false);setPaused(false);setCountdown(false);
     setAliens([]);setBullets([]);setBursts([]);
@@ -1282,7 +1317,7 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState}:{unit:UnitData;diff:
     wordsClearedRef.current=new Set();setWordsCleared(new Set());nextTarget(new Set());
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino}/>;
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
@@ -1424,12 +1459,15 @@ interface GameTestProps {
   onClaim?: (unitId: number, gameId: string, diff: Diff) => void;
   claimedCombos?: Set<string>;
   treatsCappedToday?: boolean;
+  treatsEarnedToday?: number;
+  fromDino?: boolean;
   studentBook?: number;
 }
 
-const GameTest = ({onClaim, claimedCombos, treatsCappedToday, studentBook=1}: GameTestProps) => {
+const GameTest = ({onClaim, claimedCombos, treatsCappedToday, treatsEarnedToday=0, fromDino=false, studentBook=1}: GameTestProps) => {
   const navigate=useNavigate();
   const [screen,setScreen]=useState<Screen>("books");
+  const [justClaimed,setJustClaimed]=useState(false);
   const [unit,setUnit]=useState<UnitData|null>(null);
   const [game,setGame]=useState<typeof GAMES[0]|null>(null);
   const [diff,setDiff]=useState<Diff>("medium");
@@ -1446,19 +1484,20 @@ const GameTest = ({onClaim, claimedCombos, treatsCappedToday, studentBook=1}: Ga
   // Compute claimState fresh every render so it's never stale
   const claimState: "available"|"claimed"|"capped"|undefined = (() => {
     if(!onClaim || !unit || !game) return undefined;
+    if(justClaimed) return "claimed";
     if(claimedCombos?.has(`u${unit.unit}_${game.id}_${diff}`)) return "claimed";
     if(treatsCappedToday) return "capped";
     return "available";
   })();
 
   const handleClaim = (onClaim && unit && game && claimState==="available")
-    ? () => onClaim(unit.unit, game.id, diff)
+    ? () => { onClaim(unit.unit, game.id, diff); setJustClaimed(true); }
     : undefined;
 
   if(screen==="diff"&&unit&&game) return <DiffPicker game={game} unit={unit} onPick={(d)=>{setDiff(d);setScreen("play");}} onBack={()=>setScreen("games")}/>;
 
   if(screen==="play"&&unit&&game){
-    const props={unit,diff,onBack:()=>setScreen("games"),onClaim:handleClaim,claimState};
+    const props={unit,diff,onBack:()=>setScreen("games"),onClaim:handleClaim,claimState,treatsEarnedToday,fromDino,onRestart:()=>setJustClaimed(false)};
     if(game.id==="arrow") return <ArrowShoot {...props}/>;
     if(game.id==="whack") return <WhackAMole {...props}/>;
     if(game.id==="snake") return <WordSnake {...props}/>;

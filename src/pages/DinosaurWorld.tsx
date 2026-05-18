@@ -402,14 +402,14 @@ const PetNamingInput = ({ petName, onSave, isRenaming, onCancelRename }: { petNa
 };
 
 // ── EARN BUTTONS ──────────────────────────────────────────────────────────────
-const EarnButtons = ({ navigate, code, studentName, activeAnimal }: { navigate: (p: string) => void; code: string; studentName: string; activeAnimal: Animal }) => (
+const EarnButtons = ({ navigate, code, studentName, activeAnimal, onVisit5Days, visitDaysCount, visit5Claimed }: { navigate: (p: string) => void; code: string; studentName: string; activeAnimal: Animal; onVisit5Days: () => void; visitDaysCount: number; visit5Claimed: boolean }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
     {[
-      { label: "Play a Game", sub: "打敗遊戲，得1~3個骨頭餅乾！", reward: "+1~3 bone cookies", color: activeAnimal.btnColor, glow: activeAnimal.btnGlow, path: `/game/${code}/${studentName}/BOOKNUM`, dino: true },
+      { label: "Play a Game", sub: "打敗遊戲，得1~3個點心！", reward: "+1~3 treats", color: activeAnimal.btnColor, glow: activeAnimal.btnGlow, path: `/game/${code}/${studentName}/BOOKNUM`, dino: true },
       { label: "Read & Quiz", sub: "即將推出！Coming Soon!", reward: "🔒", color: "#6B5A42", glow: "rgba(107,90,66,0.0)", path: "", disabled: true },
-      { label: "Visit 5 Days!", sub: "連續來5天！", reward: "+3 bone cookies", color: activeAnimal.btn3Color, glow: activeAnimal.btn3Glow, path: "" },
+      { label: "Visit 5 Days!", sub: "來訪5天！", reward: "+3 treats", color: activeAnimal.btn3Color, glow: activeAnimal.btn3Glow, path: "", visit5: true },
     ].map((btn, i) => (
-      <button key={i} onClick={() => { if (!btn.disabled && btn.path) { const f = JSON.parse(sessionStorage.getItem('mpe_family') || '{}'); if ((btn as any).dino) sessionStorage.setItem('mpe_from_dino', '1'); navigate(btn.path.replace('BOOKNUM', String(f?.book ?? 1))); } }} style={{
+      <button key={i} onClick={() => { if ((btn as any).visit5) { onVisit5Days(); return; } if (!btn.disabled && btn.path) { const f = JSON.parse(sessionStorage.getItem('mpe_family') || '{}'); if ((btn as any).dino) sessionStorage.setItem('mpe_from_dino', '1'); navigate(btn.path.replace('BOOKNUM', String(f?.book ?? 1))); } }} style={{
         width: "100%", padding: "1.1rem 1.25rem",
         background: `linear-gradient(135deg,${btn.color},${btn.color}cc)`,
         border: "none", borderRadius: "1.4rem", opacity: btn.disabled ? 0.4 : 1,
@@ -423,10 +423,18 @@ const EarnButtons = ({ navigate, code, studentName, activeAnimal }: { navigate: 
       >
         <div>
           <div style={{ fontFamily: "'Titan One',cursive", fontSize: "1.25rem", color: "white", lineHeight: 1.2 }}>{btn.label}</div>
-          <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", color: "rgba(255,255,255,0.9)", marginTop: "0.15rem" }}>{btn.sub}</div>
+          <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", color: "rgba(255,255,255,0.9)", marginTop: "0.15rem" }}>
+            {(btn as any).visit5
+              ? visit5Claimed
+                ? "已領取！Come back after 5 more visits!"
+                : `${Math.min(visitDaysCount,5)}/5 days · ${Math.min(visitDaysCount,5)}/5天`
+              : btn.sub}
+          </div>
         </div>
         <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: "999px", padding: "0.35rem 0.9rem", flexShrink: 0, marginLeft: "0.5rem", fontFamily: "'Titan One',cursive", fontSize: "1rem", color: "white", whiteSpace: "nowrap" }}>
-          {btn.reward}
+          {(btn as any).visit5
+            ? visit5Claimed ? "✓" : visitDaysCount >= 5 ? "+3 treats!" : btn.reward
+            : btn.reward}
         </div>
       </button>
     ))}
@@ -508,6 +516,12 @@ const DinosaurWorld = () => {
   const isMaster = code === MASTER_CODE;
 
   const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_dino_jar_${code}_${studentName}`) || "0"));
+  const visitDaysKey = `mpe_dino_visitdays_${code}_${studentName}`;
+  const visit5ClaimedKey = `mpe_dino_visit5claimed_${code}_${studentName}`;
+  const getVisitDays = (): string[] => { try { return JSON.parse(localStorage.getItem(visitDaysKey) || "[]"); } catch { return []; } };
+  const [visitDaysCount, setVisitDaysCount] = useState<number>(() => { const today = new Date().toDateString(); const days = getVisitDays(); if (!days.includes(today)) { const updated = [...days, today]; localStorage.setItem(visitDaysKey, JSON.stringify(updated)); return updated.length; } return days.length; });
+  const [visit5Claimed, setVisit5Claimed] = useState<boolean>(() => { const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); const sets = Math.floor(visitDaysCount / 5); return claimed >= sets && sets > 0; });
+  const handleVisit5Days = () => { if (isMaster) return; const days = getVisitDays(); const sets = Math.floor(days.length / 5); const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); if (sets > claimed) { const newJar = jarTreats + 3; setJarTreats(newJar); localStorage.setItem(`mpe_dino_jar_${code}_${studentName}`, String(newJar)); localStorage.setItem(visit5ClaimedKey, String(sets)); setVisit5Claimed(true); playSfx("stomp"); } };
   const [fedTreatsState, setFedTreatsState] = useState<Record<string, number>>(() =>
     isMaster ? { triceratops: 45, pterodactyl: 45, raptor: 45, brontosaurus: 45, dilophosaurus: 45 } :
       Object.fromEntries(ANIMALS.map(a => [a.id, parseInt(localStorage.getItem(`mpe_dino_fed_${a.id}_${code}_${studentName}`) || "0")]))
@@ -1078,8 +1092,8 @@ const DinosaurWorld = () => {
         {/* FEED BUTTON */}
         {!isMaster && (nextStage ? (jarTreats > 0 && (
           <button onClick={handleFeed} style={{ width: "100%", padding: "1.1rem", marginBottom: "1rem", background: "linear-gradient(135deg,#DAA520,#8B4513)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Titan One',cursive", fontSize: "1.3rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(218,165,32,0.5)", animation: "eF 2s ease-in-out infinite" }}>
-            Feed {activeAnimal.nameZh}! ({jarTreats} bone cookie{jarTreats !== 1 ? "s" : ""} ready) 🦴<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.9 }}>餵{activeAnimal.nameZh}！（{jarTreats}個骨頭餅乾準備好了）</span>
+            Feed {activeAnimal.nameZh}! ({jarTreats} treat{jarTreats !== 1 ? "s" : ""} ready)<br />
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.9 }}>餵{activeAnimal.nameZh}！（{jarTreats}個點心準備好了）</span>
           </button>
         )) : (
           <button onClick={() => playSfx("stomp")} style={{ width: "100%", padding: "1.1rem", marginBottom: "1rem", background: "linear-gradient(135deg,#556B2F,#3d5c1a)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Titan One',cursive", fontSize: "1.3rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(85,107,47,0.5)", animation: "eF 2s ease-in-out infinite" }}>
@@ -1127,10 +1141,10 @@ const DinosaurWorld = () => {
         {/* EARN */}
         <div className="glass" style={{ padding: "1.5rem", marginBottom: "1rem", animation: "fadeUp 0.8s ease-out" }}>
           <div style={{ color: "#f5e6c8", fontFamily: "'Titan One',cursive", fontSize: "1.4rem", marginBottom: "1rem", textAlign: "center" }}>
-            Earn Bone Cookies! 🦴<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.8 }}>賺骨頭餅乾！完成挑戰得到獎勵！</span>
+            Earn Treats!<br />
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.8 }}>完成挑戰，賺取點心！</span>
           </div>
-          <EarnButtons navigate={navigate} code={code ?? ""} studentName={studentName ?? ""} activeAnimal={activeAnimal} />
+          <EarnButtons navigate={navigate} code={code ?? ""} studentName={studentName ?? ""} activeAnimal={activeAnimal} onVisit5Days={handleVisit5Days} visitDaysCount={visitDaysCount} visit5Claimed={visit5Claimed} />
         </div>
 
         {/* COLLECTION */}

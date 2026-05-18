@@ -4,8 +4,7 @@ import GameTest from "./GameTest";
 
 const MASTER_CODE = "1006";
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
-// const DAILY_TREAT_CAP = 9; // commented out for testing
-const DAILY_TREAT_CAP = 999999;
+const DAILY_TREAT_CAP = 9;
 
 const GamePage = () => {
   const { code, studentName, book } = useParams<{ code: string; studentName: string; book: string }>();
@@ -49,7 +48,7 @@ const GamePage = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
 
-  const treatsCappedToday = false; // cap disabled for testing
+  const treatsCappedToday = treatsEarnedToday >= DAILY_TREAT_CAP;
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -104,9 +103,8 @@ const GamePage = () => {
     const comboId = `u${unitId}_${gameId}_${diff}`;
 
     // Guards
-    if (localStorage.getItem(key)) return;
     const earnedSoFar = getTreatsEarnedToday();
-    // if (earnedSoFar >= DAILY_TREAT_CAP) return; // cap disabled for testing
+    if (earnedSoFar >= DAILY_TREAT_CAP) return;
 
     // Write to localStorage
     localStorage.setItem(key, "1");
@@ -117,7 +115,6 @@ const GamePage = () => {
     localStorage.setItem(jarKey, String(current + treats));
 
     // Update state — both updates trigger GameTest re-render with fresh claimState
-    setClaimedCombos(prev => new Set([...prev, comboId]));
     setTreatsEarnedToday(newTotal);
 
     setLastTreats(treats);
@@ -137,6 +134,8 @@ const GamePage = () => {
         onClaim={handleClaim}
         claimedCombos={claimedCombos}
         treatsCappedToday={treatsCappedToday}
+        treatsEarnedToday={treatsEarnedToday}
+        fromDino={fromDino}
         studentBook={studentBook}
       />
 
