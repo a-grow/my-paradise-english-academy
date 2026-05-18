@@ -156,7 +156,7 @@ const GamePage = () => {
             animation: "celebPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both"
           }}>
             <style>{`@keyframes celebPop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:1}}`}</style>
-            <div style={{ marginBottom: "0.25rem" }}><svg width="64" height="64" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg></div>
+            <div style={{ marginBottom: "0.25rem" }}>{fromDino ? <svg width="64" height="64" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="14" ry="7" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="9" cy="18" rx="5" ry="4" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="27" cy="18" rx="5" ry="4" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/></svg> : <svg width="64" height="64" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>}</div>
             <div style={{
               fontFamily: "'Nunito',sans-serif", fontWeight: 900,
               fontSize: "2.2rem", color: "#f97316", lineHeight: 1
@@ -165,7 +165,7 @@ const GamePage = () => {
               fontFamily: "'Nunito',sans-serif", fontWeight: 700,
               fontSize: "0.95rem", color: "#888", margin: "0.5rem 0 1.5rem"
             }}>
-              太棒了！Go feed your turtle! 🐢
+              {fromDino ? "太棒了！去餵你的恐龍！Go feed your dino!" : "太棒了！去餵你的動物！Go feed your animal!"}
             </div>
             <button onClick={() => setShowCelebration(false)} style={{
               width: "100%", padding: "0.85rem",
@@ -175,7 +175,7 @@ const GamePage = () => {
               cursor: "pointer", marginBottom: "0.6rem",
               boxShadow: "0 6px 20px rgba(74,222,128,0.5)"
             }}>
-              Keep Playing! 🎮
+              Keep Playing! · 繼續玩！
             </button>
             <button onClick={() => { sessionStorage.removeItem("mpe_from_dino"); navigate(fromDino ? `/dino/${code}/${studentName}` : `/world/${code}/${studentName}`); }} style={{
               width: "100%", padding: "0.85rem",
@@ -185,7 +185,7 @@ const GamePage = () => {
               cursor: "pointer",
               boxShadow: "0 6px 20px rgba(249,115,22,0.5)"
             }}>
-              🌊 Back to {studentName.charAt(0).toUpperCase() + studentName.slice(1)}'s World!
+              {fromDino ? "🦕" : "🌊"} Back to {studentName.charAt(0).toUpperCase() + studentName.slice(1)}'s World!
             </button>
           </div>
         </div>
