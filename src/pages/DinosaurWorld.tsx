@@ -1036,7 +1036,7 @@ const DinosaurWorld = () => {
             )}
             {!isEgg && (
               <div style={{ color: "rgba(245,230,200,0.85)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginTop: "0.4rem", animation: "shimmer 2.2s ease-in-out infinite", textAlign: "center" }}>
-                Pet me to make me happy! · 摸摸我讓我開心！🦕
+                Pet me to make me happy! · 摸摸我讓我開心！
               </div>
             )}
           </div>
@@ -1062,8 +1062,8 @@ const DinosaurWorld = () => {
           )}
           {!nextStage && (
             <div style={{ color: "#DAA520", fontFamily: "'Titan One',cursive", fontSize: "1.2rem", marginTop: "0.75rem", textShadow: "0 2px 8px rgba(0,0,0,0.5)" }}>
-              {petName ? `${petName} is all grown up! 🦖` : `Your ${activeAnimal.name} is all grown up! 🦖`}<br />
-              <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>你的{activeAnimal.nameZh}長大了！🎉</span>
+              {petName ? `${petName} is all grown up!` : `Your ${activeAnimal.name} is all grown up!`}<br />
+              <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.85 }}>你的{activeAnimal.nameZh}長大了！</span>
             </div>
           )}
         </div>

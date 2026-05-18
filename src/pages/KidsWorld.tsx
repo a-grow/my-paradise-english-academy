@@ -795,7 +795,7 @@ const KidsWorld = () => {
     const mantarayGrown = getAnimalStageIdx(mantaray, mantarayFed) === 3;
     const mantarayVideoWatched = videoWatchedMap["mantaray"] ?? false;
     const alreadySeen = localStorage.getItem(`mpe_oceancomplete_${code}_${studentName}`) === "1";
-    if (mantarayGrown && mantarayVideoWatched && !alreadySeen && !showVideo) {
+    if (mantarayGrown && mantarayVideoWatched && !alreadySeen && !showVideo && !levelUpStage) {
       setTimeout(() => {
         setShowOceanComplete(true);
         if (audioRef.current) audioRef.current.volume = 0.02;
@@ -806,7 +806,7 @@ const KidsWorld = () => {
           const tryPlay = () => { completeRef.current?.play().catch(() => {}); };
           document.addEventListener("pointerdown", tryPlay, { once: true });
         });
-      }, 800);
+      }, 2500);
     }
   }, [fedTreatsState, videoWatchedMap, showVideo, levelUpStage]);
 
