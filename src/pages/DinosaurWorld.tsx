@@ -9,7 +9,7 @@ interface AnimalStage { name: string; nameZh: string; min: number; img: string; 
 interface Animal {
   id: string; name: string; nameZh: string; emoji: string;
   stages: AnimalStage[];
-  unlockCondition: "default" | "triceratops_grown_video_watched" | "pterodactyl_grown_video_watched" | "raptor_grown_video_watched" | "brontosaurus_grown_video_watched" | "dilophosaurus_grown_video_watched";
+  unlockCondition: "default" | "triceratops_grown_video_watched" | "pterodactyl_grown_video_watched" | "velociraptor_grown_video_watched" | "brontosaurus_grown_video_watched" | "dilophosaurus_grown_video_watched";
   collectionBg: string; collectionBorder: string; collectionGlow: string;
   video: string | null; isEggType: boolean; scale?: number;
   accentColor: string; accentGlow: string;
@@ -63,25 +63,25 @@ const ANIMALS: Animal[] = [
     unlockOverlay: { emoji: "🦅", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Pterodactyl Egg appeared!", eggLineZh: "翼龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(210,105,30,0.6)", borderColor: "rgba(210,105,30,0.8)", bgGradient: "linear-gradient(135deg,#2d1a08,#5c3d11,#8B4513)" },
   },
   {
-    id: "raptor", name: "Raptor", nameZh: "迅猛龍", emoji: "🦖",
+    id: "velociraptor", name: "Velociraptor", nameZh: "迅猛龍", emoji: "🦖",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/triceratop-egg.png" },
-      { name: "Baby", nameZh: "小迅猛龍", min: 15, img: "/creatures/triceratop-baby.png" },
-      { name: "Young", nameZh: "年輕迅猛龍", min: 30, img: "/creatures/triceratop-young.png" },
-      { name: "Grown", nameZh: "成年迅猛龍", min: 45, img: "/creatures/triceratop-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/velociraptor-egg.png" },
+      { name: "Baby", nameZh: "小迅猛龍", min: 15, img: "/creatures/velociraptor-baby.png" },
+      { name: "Young", nameZh: "年輕迅猛龍", min: 30, img: "/creatures/velociraptor-young.png" },
+      { name: "Grown", nameZh: "成年迅猛龍", min: 45, img: "/creatures/velociraptor-grown.png" },
     ],
     unlockCondition: "pterodactyl_grown_video_watched",
     collectionBg: "#4a5c1a", collectionBorder: "rgba(107,142,35,0.7)", collectionGlow: "rgba(107,142,35,0.4)",
-    video: null, isEggType: true, scale: 1.2,
+    video: "/video_adult_velociraptor.mp4", isEggType: true, scale: 1.2,
     accentColor: "#6B8E23", accentGlow: "rgba(107,142,35,0.5)",
     btnColor: "#556B2F", btnGlow: "rgba(85,107,47,0.5)", btn3Color: "#6B8E23", btn3Glow: "rgba(107,142,35,0.5)",
-    feedLabel: "raptor", feedLabelZh: "迅猛龍",
+    feedLabel: "velociraptor", feedLabelZh: "迅猛龍",
     levelUpMessages: [
-      { main: "Welcome, little one!", zh: "歡迎來到世界！", sub: "Meet your Baby Raptor!", subZh: "快來認識你的小迅猛龍！" },
-      { main: "Growing strong!", zh: "長得好壯！", sub: "Now a Young Raptor!", subZh: "現在是年輕迅猛龍了！" },
-      { main: "Fully grown! ROAR!", zh: "完全長大了！吼！", sub: "You raised a Grown Raptor!", subZh: "你養大了一隻成年迅猛龍！" },
+      { main: "Welcome, little one!", zh: "歡迎來到世界！", sub: "Meet your Baby Velociraptor!", subZh: "快來認識你的小迅猛龍！" },
+      { main: "Growing strong!", zh: "長得好壯！", sub: "Now a Young Velociraptor!", subZh: "現在是年輕迅猛龍了！" },
+      { main: "Fully grown! ROAR!", zh: "完全長大了！吼！", sub: "You raised a Grown Velociraptor!", subZh: "你養大了一隻成年迅猛龍！" },
     ],
-    unlockOverlay: { emoji: "🦖", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Raptor Egg appeared!", eggLineZh: "迅猛龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(107,142,35,0.6)", borderColor: "rgba(107,142,35,0.8)", bgGradient: "linear-gradient(135deg,#1e2a08,#4a5c1a,#556B2F)" },
+    unlockOverlay: { emoji: "🦖", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Velociraptor Egg appeared!", eggLineZh: "迅猛龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(107,142,35,0.6)", borderColor: "rgba(107,142,35,0.8)", bgGradient: "linear-gradient(135deg,#1e2a08,#4a5c1a,#556B2F)" },
   },
   {
     id: "brontosaurus", name: "Brontosaurus", nameZh: "雷龍", emoji: "🦕",
@@ -91,7 +91,7 @@ const ANIMALS: Animal[] = [
       { name: "Young", nameZh: "年輕雷龍", min: 30, img: "/creatures/triceratop-young.png" },
       { name: "Grown", nameZh: "成年雷龍", min: 45, img: "/creatures/triceratop-grown.png" },
     ],
-    unlockCondition: "raptor_grown_video_watched",
+    unlockCondition: "velociraptor_grown_video_watched",
     collectionBg: "#3d5c2a", collectionBorder: "rgba(154,205,50,0.7)", collectionGlow: "rgba(154,205,50,0.4)",
     video: null, isEggType: true, scale: 1.5,
     accentColor: "#9ACD32", accentGlow: "rgba(154,205,50,0.5)",
@@ -453,7 +453,7 @@ const DinoCollection = ({ fedTreatsMap, videoWatchedMap, unlockSeenMap, onAnimal
           if (animal.unlockCondition === "default") return true;
           if (animal.unlockCondition === "triceratops_grown_video_watched") return getAnimalStageIdx(ANIMALS[0], fedTreatsMap["triceratops"] ?? 0) === 3 && (videoWatchedMap["triceratops"] ?? false);
           if (animal.unlockCondition === "pterodactyl_grown_video_watched") { const a = ANIMALS.find(x => x.id === "pterodactyl"); return a ? getAnimalStageIdx(a, fedTreatsMap["pterodactyl"] ?? 0) === 3 && (videoWatchedMap["pterodactyl"] ?? false) && (unlockSeenMap["pterodactyl"] ?? false) : false; }
-          if (animal.unlockCondition === "raptor_grown_video_watched") { const a = ANIMALS.find(x => x.id === "raptor"); return a ? getAnimalStageIdx(a, fedTreatsMap["raptor"] ?? 0) === 3 && (videoWatchedMap["raptor"] ?? false) && (unlockSeenMap["raptor"] ?? false) : false; }
+          if (animal.unlockCondition === "velociraptor_grown_video_watched") { const a = ANIMALS.find(x => x.id === "velociraptor"); return a ? getAnimalStageIdx(a, fedTreatsMap["velociraptor"] ?? 0) === 3 && (videoWatchedMap["velociraptor"] ?? false) && (unlockSeenMap["velociraptor"] ?? false) : false; }
           if (animal.unlockCondition === "brontosaurus_grown_video_watched") { const a = ANIMALS.find(x => x.id === "brontosaurus"); return a ? getAnimalStageIdx(a, fedTreatsMap["brontosaurus"] ?? 0) === 3 && (videoWatchedMap["brontosaurus"] ?? false) && (unlockSeenMap["brontosaurus"] ?? false) : false; }
           if (animal.unlockCondition === "dilophosaurus_grown_video_watched") { const a = ANIMALS.find(x => x.id === "dilophosaurus"); return a ? getAnimalStageIdx(a, fedTreatsMap["dilophosaurus"] ?? 0) === 3 && (videoWatchedMap["dilophosaurus"] ?? false) && (unlockSeenMap["dilophosaurus"] ?? false) : false; }
           return false;
@@ -523,7 +523,7 @@ const DinosaurWorld = () => {
   const [visit5Claimed, setVisit5Claimed] = useState<boolean>(() => { const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); const sets = Math.floor(visitDaysCount / 5); return claimed >= sets && sets > 0; });
   const handleVisit5Days = () => { if (isMaster) return; const days = getVisitDays(); const sets = Math.floor(days.length / 5); const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); if (sets > claimed) { const newJar = jarTreats + 3; setJarTreats(newJar); localStorage.setItem(`mpe_dino_jar_${code}_${studentName}`, String(newJar)); localStorage.setItem(visit5ClaimedKey, String(sets)); setVisit5Claimed(true); playSfx("stomp"); } };
   const [fedTreatsState, setFedTreatsState] = useState<Record<string, number>>(() =>
-    isMaster ? { triceratops: 45, pterodactyl: 45, raptor: 45, brontosaurus: 45, dilophosaurus: 45 } :
+    isMaster ? { triceratops: 45, pterodactyl: 45, velociraptor: 45, brontosaurus: 45, dilophosaurus: 45 } :
       Object.fromEntries(ANIMALS.map(a => [a.id, parseInt(localStorage.getItem(`mpe_dino_fed_${a.id}_${code}_${studentName}`) || "0")]))
   );
   const [loading, setLoading] = useState(!isMaster);
@@ -540,7 +540,7 @@ const DinosaurWorld = () => {
   const [levelUpStage, setLevelUpStage] = useState<{ animal: Animal; stageIdx: number } | null>(null);
   const [showVideo, setShowVideo] = useState(false);
   const [videoWatchedMap, setVideoWatchedMap] = useState<Record<string, boolean>>(() => {
-    if (isMaster) return { triceratops: true, pterodactyl: true, raptor: true, brontosaurus: true, dilophosaurus: true };
+    if (isMaster) return { triceratops: true, pterodactyl: true, velociraptor: true, brontosaurus: true, dilophosaurus: true };
     return Object.fromEntries(ANIMALS.map(a => [a.id, localStorage.getItem(`mpe_dino_videowatched_${a.id}_${code}_${studentName}`) === "1"]));
   });
   const [showUnlockFor, setShowUnlockFor] = useState<string | null>(null);
@@ -688,7 +688,7 @@ const DinosaurWorld = () => {
     setTimeout(() => {
       setShowVideo(false); setVideoFadingOut(false);
       if (audioRef.current) audioRef.current.volume = volume * 0.5;
-      if (!unlockSeenMap["pterodactyl"] || !unlockSeenMap["raptor"] || !unlockSeenMap["brontosaurus"] || !unlockSeenMap["dilophosaurus"] || !unlockSeenMap["trex"])
+      if (!unlockSeenMap["pterodactyl"] || !unlockSeenMap["velociraptor"] || !unlockSeenMap["brontosaurus"] || !unlockSeenMap["dilophosaurus"] || !unlockSeenMap["trex"])
         setTimeout(() => setShowLookBelow(true), 300);
     }, 400);
   };
@@ -1156,8 +1156,8 @@ const DinosaurWorld = () => {
           {/* Arrow for new unlock */}
           {(() => {
             const showPtero = (fedTreatsState["triceratops"] ?? 0) >= 45 && (videoWatchedMap["triceratops"] ?? false) && !unlockSeenMap["pterodactyl"];
-            const showRaptor = (fedTreatsState["pterodactyl"] ?? 0) >= 45 && (videoWatchedMap["pterodactyl"] ?? false) && (unlockSeenMap["pterodactyl"] ?? false) && !unlockSeenMap["raptor"];
-            if (!showPtero && !showRaptor) return null;
+            const showVelociraptor = (fedTreatsState["pterodactyl"] ?? 0) >= 45 && (videoWatchedMap["pterodactyl"] ?? false) && (unlockSeenMap["pterodactyl"] ?? false) && !unlockSeenMap["velociraptor"];
+            if (!showPtero && !showVelociraptor) return null;
             const leftPct = showPtero ? "50%" : "83.3%";
             return (
               <div style={{ position: "relative", height: "80px", marginBottom: "0.75rem" }}>
