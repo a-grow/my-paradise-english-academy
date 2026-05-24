@@ -1,9 +1,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Megaphone, Sparkles, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
-// SheetDB API endpoint for Blog tab
-const SHEETDB_BLOG_URL = 'https://sheetdb.io/api/v1/9ctz2zljbz6wx?sheet=Blog';
+import { fetchSheet } from '@/lib/sheets';
 
 interface BlogPost {
   title: string;
@@ -23,9 +21,7 @@ const WhatsNewSection = () => {
     const fetchLatestPost = async () => {
       try {
         setLoading(true);
-        const response = await fetch(SHEETDB_BLOG_URL);
-        if (!response.ok) throw new Error('Failed to fetch');
-        const data: BlogPost[] = await response.json();
+        const data = await fetchSheet("Blog") as BlogPost[];
         
         // Sort by date descending and get the newest
         const sorted = data.sort((a, b) => 

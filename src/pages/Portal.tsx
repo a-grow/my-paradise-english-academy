@@ -2,14 +2,13 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, Star, BookOpen, Calendar, LogOut, Trophy, X, ChevronDown, ChevronUp } from "lucide-react";
+import { fetchSheet } from "@/lib/sheets";
 
 import book1Data from "@/data/oxford-discover-book1.json";
 import book2Data from "@/data/oxford-discover-book2.json";
 import book3Data from "@/data/oxford-discover-book3.json";
 import book4Data from "@/data/oxford-discover-book4.json";
 import book5Data from "@/data/oxford-discover-book5.json";
-
-const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 
 const ZH = ({ children, size = "0.95em" }: { children: React.ReactNode; size?: string }) => (
   <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: size, color: "rgba(0,0,0,0.45)", marginTop: "0.15rem", lineHeight: 1.3 }}>
@@ -149,8 +148,7 @@ const LoginScreen = () => {
     if (!code.trim()) return;
     setLoading(true); setError("");
     try {
-      const res = await fetch(`${SHEETDB_URL}?sheet=Families`);
-      const data = await res.json();
+      const data = await fetchSheet("Families");
       const success = login(code, data);
       if (!success) setError("That code doesn't match any family. Please try again! 🌴");
     } catch { setError("Connection problem. Please try again."); }
@@ -195,7 +193,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (!family) return;
-    fetch(`${SHEETDB_URL}?sheet=Evals`).then(r => r.json()).then(data => {
+    fetchSheet("Evals").then(data => {
       const map: Record<string, EvalEntry[]> = {};
       data.filter((row: any) => row.code === family.code).forEach((row: any) => {
         const name = row.student;

@@ -1,9 +1,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Calendar, Clock, Users, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
-// SheetDB API endpoint for Classes tab
-const SHEETDB_CLASSES_URL = 'https://sheetdb.io/api/v1/9ctz2zljbz6wx?sheet=Classes';
+import { fetchSheet } from '@/lib/sheets';
 
 interface RawSheetRow {
   ID: string;
@@ -47,9 +45,7 @@ const ClassesSection = () => {
     const fetchClasses = async () => {
       try {
         setLoading(true);
-        const response = await fetch(SHEETDB_CLASSES_URL);
-        if (!response.ok) throw new Error('Failed to fetch classes');
-        const raw: RawSheetRow[] = await response.json();
+        const raw = await fetchSheet("Classes") as RawSheetRow[];
 
         // Skip header-like row and map to ClassItem
         const parsed: ClassItem[] = raw
