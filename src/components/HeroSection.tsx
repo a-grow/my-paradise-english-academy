@@ -43,6 +43,13 @@ const HeroSection = () => {
         <p className="text-2xl md:text-3xl text-white/90 font-medium mb-12 drop-shadow-md">
           {t('hero.subtitle')}
         </p>
+
+        <a
+          href="/world/1006/Demo"
+          className="inline-flex items-center gap-3 bg-white text-[#ec4899] font-bold text-xl px-10 py-5 rounded-full shadow-2xl hover:scale-105 hover:shadow-pink-300/50 transition-all duration-200 mb-4"
+        >
+          🌟 Try the Kids' Portal — Demo
+        </a>
       </div>
 
       {/* Bottom Wave */}
