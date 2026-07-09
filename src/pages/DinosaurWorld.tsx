@@ -86,14 +86,14 @@ const ANIMALS: Animal[] = [
   {
     id: "brontosaurus", name: "Brontosaurus", nameZh: "雷龍", emoji: "🦕",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/triceratop-egg.png" },
-      { name: "Baby", nameZh: "小雷龍", min: 15, img: "/creatures/triceratop-baby.png" },
-      { name: "Young", nameZh: "年輕雷龍", min: 30, img: "/creatures/triceratop-young.png" },
-      { name: "Grown", nameZh: "成年雷龍", min: 45, img: "/creatures/triceratop-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/brontosaurus-egg.png" },
+      { name: "Baby", nameZh: "小雷龍", min: 15, img: "/creatures/brontosaurus-baby.png" },
+      { name: "Young", nameZh: "年輕雷龍", min: 30, img: "/creatures/brontosaurus-young.png" },
+      { name: "Grown", nameZh: "成年雷龍", min: 45, img: "/creatures/brontosaurus-grown.png" },
     ],
     unlockCondition: "velociraptor_grown_video_watched",
     collectionBg: "#3d5c2a", collectionBorder: "rgba(154,205,50,0.7)", collectionGlow: "rgba(154,205,50,0.4)",
-    video: null, isEggType: true, scale: 1.5,
+    video: "/video_adult_brontosaurus.mp4", isEggType: true, scale: 1.5,
     accentColor: "#9ACD32", accentGlow: "rgba(154,205,50,0.5)",
     btnColor: "#6B8E23", btnGlow: "rgba(107,142,35,0.5)", btn3Color: "#9ACD32", btn3Glow: "rgba(154,205,50,0.5)",
     feedLabel: "brontosaurus", feedLabelZh: "雷龍",
@@ -107,14 +107,14 @@ const ANIMALS: Animal[] = [
   {
     id: "dilophosaurus", name: "Dilophosaurus", nameZh: "雙冠龍", emoji: "🦎",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/triceratop-egg.png" },
-      { name: "Baby", nameZh: "小雙冠龍", min: 15, img: "/creatures/triceratop-baby.png" },
-      { name: "Young", nameZh: "年輕雙冠龍", min: 30, img: "/creatures/triceratop-young.png" },
-      { name: "Grown", nameZh: "成年雙冠龍", min: 45, img: "/creatures/triceratop-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/dilophosaurus-egg.png" },
+      { name: "Baby", nameZh: "小雙冠龍", min: 15, img: "/creatures/dilophosaurus-baby.png" },
+      { name: "Young", nameZh: "年輕雙冠龍", min: 30, img: "/creatures/dilophosaurus-young.png" },
+      { name: "Grown", nameZh: "成年雙冠龍", min: 45, img: "/creatures/dilophosaurus-grown.png" },
     ],
     unlockCondition: "brontosaurus_grown_video_watched",
     collectionBg: "#7c2d12", collectionBorder: "rgba(234,88,12,0.7)", collectionGlow: "rgba(234,88,12,0.4)",
-    video: null, isEggType: true, scale: 1.2,
+    video: "/video_adult_dilophosaurus.mp4", isEggType: true, scale: 1.2,
     accentColor: "#ea580c", accentGlow: "rgba(234,88,12,0.5)",
     btnColor: "#c2410c", btnGlow: "rgba(194,65,12,0.5)", btn3Color: "#ea580c", btn3Glow: "rgba(234,88,12,0.5)",
     feedLabel: "dilophosaurus", feedLabelZh: "雙冠龍",
@@ -128,14 +128,14 @@ const ANIMALS: Animal[] = [
   {
     id: "trex", name: "T-Rex", nameZh: "暴龍", emoji: "🦖",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/triceratop-egg.png" },
-      { name: "Baby", nameZh: "小暴龍", min: 15, img: "/creatures/triceratop-baby.png" },
-      { name: "Young", nameZh: "年輕暴龍", min: 30, img: "/creatures/triceratop-young.png" },
-      { name: "Grown", nameZh: "成年暴龍", min: 45, img: "/creatures/triceratop-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/trex-egg.png" },
+      { name: "Baby", nameZh: "小暴龍", min: 15, img: "/creatures/trex-baby.png" },
+      { name: "Young", nameZh: "年輕暴龍", min: 30, img: "/creatures/trex-young.png" },
+      { name: "Grown", nameZh: "成年暴龍", min: 45, img: "/creatures/trex-grown.png" },
     ],
     unlockCondition: "dilophosaurus_grown_video_watched",
     collectionBg: "#6b1a1a", collectionBorder: "rgba(220,38,38,0.7)", collectionGlow: "rgba(220,38,38,0.4)",
-    video: null, isEggType: true, scale: 1.6,
+    video: "/video_adult_trex.mp4", isEggType: true, scale: 1.6,
     accentColor: "#dc2626", accentGlow: "rgba(220,38,38,0.5)",
     btnColor: "#b91c1c", btnGlow: "rgba(185,28,28,0.5)", btn3Color: "#dc2626", btn3Glow: "rgba(220,38,38,0.5)",
     feedLabel: "t-rex", feedLabelZh: "暴龍",
@@ -848,12 +848,20 @@ const DinosaurWorld = () => {
         <div style={{ position: "fixed", inset: 0, zIndex: 700, background: "rgba(20,8,0,0.92)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
           <div onClick={e => e.stopPropagation()} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
             <div style={{ fontFamily: "'Titan One',cursive", fontSize: "clamp(1.8rem,5vw,2.5rem)", color: "#DAA520", textShadow: "0 0 20px rgba(218,165,32,0.9)", textAlign: "center", animation: "shimmer 1.5s ease-in-out infinite" }}>
-              🦖 Dinosaur World Complete! 🦕
+              🦖 Congratulations! 🦕
             </div>
-            <div style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "1.1rem", color: "rgba(245,230,200,0.85)", textAlign: "center" }}>恐龍世界完成了！</div>
+            <div style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "1.1rem", color: "rgba(245,230,200,0.85)", textAlign: "center" }}>恭喜你！</div>
+            <div style={{ fontFamily: "'Titan One',cursive", fontSize: "1.1rem", color: "#f5e6c8", textAlign: "center", lineHeight: 1.6 }}>
+              You raised every dinosaur!<br />
+              <span style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "1rem", opacity: 0.85 }}>你養大了所有恐龍！</span>
+            </div>
+            <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "0.95rem", color: "rgba(245,230,200,0.7)", textAlign: "center", maxWidth: 320, lineHeight: 1.6 }}>
+              We're searching for new worlds with more animals for you to raise. When we find them, we'll let you know!<br />
+              <span style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "0.9rem", opacity: 0.85 }}>我們正在尋找新的世界，讓你可以養育更多動物。找到的時候，我們會告訴你！</span>
+            </div>
             <button onClick={() => { localStorage.setItem(`mpe_dinocomplete_${code}_${studentName}`, "1"); setShowDinoComplete(false); if (audioRef.current) audioRef.current.volume = volume * 0.5; }}
               style={{ background: "linear-gradient(180deg,#DAA520 0%,#8B6914 50%,#5c4409 100%)", border: "none", borderRadius: "999px", padding: "1.1rem 2.8rem", cursor: "pointer", boxShadow: "0 8px 0px #3d2a04,0 12px 24px rgba(0,0,0,0.5)", fontFamily: "'Titan One',cursive", fontSize: "1.5rem", color: "#1a0a02", textShadow: "0 1px 2px rgba(255,255,255,0.2)" }}>
-              Enter a New World! · 進入新世界！
+              Yay! · 太棒了！
             </button>
           </div>
         </div>
@@ -1033,7 +1041,7 @@ const DinosaurWorld = () => {
             <div
               className={isEgg ? (eggWiggle ? "egg-wiggle" : nearHatch ? "egg-near" : "egg-idle") : (petted ? "petted" : "bob")}
               onClick={isEgg ? handleEggTap : handlePet}
-              style={{ width: "min(250px,65vw)", height: "min(210px,55vw)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", transition: "filter 0.5s ease", pointerEvents: "auto" }}>
+              style={{ width: "min(250px,65vw)", height: "min(210px,55vw)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", transition: "filter 0.5s ease", pointerEvents: "auto", marginTop: activeAnimal.scale && activeAnimal.scale > 1 && stageIdx > 0 ? `${Math.round((activeAnimal.scale - 1) * 0.5 * 210)}px` : undefined, marginBottom: activeAnimal.scale && activeAnimal.scale > 1 && stageIdx > 0 ? `${Math.round((activeAnimal.scale - 1) * 0.5 * 210)}px` : undefined }}>
               {isEgg && <EggCracks treats={fedTreats} />}
               <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.5))", transform: activeAnimal.scale && activeAnimal.scale !== 1 && stageIdx > 0 ? `scale(${activeAnimal.scale})` : "none", transformOrigin: "center center" }} draggable={false} />
             </div>
@@ -1157,20 +1165,13 @@ const DinosaurWorld = () => {
           {(() => {
             const showPtero = (fedTreatsState["triceratops"] ?? 0) >= 45 && (videoWatchedMap["triceratops"] ?? false) && !unlockSeenMap["pterodactyl"];
             const showVelociraptor = (fedTreatsState["pterodactyl"] ?? 0) >= 45 && (videoWatchedMap["pterodactyl"] ?? false) && (unlockSeenMap["pterodactyl"] ?? false) && !unlockSeenMap["velociraptor"];
-            if (!showPtero && !showVelociraptor) return null;
-            const leftPct = showPtero ? "50%" : "83.3%";
+            const showBronto = (fedTreatsState["velociraptor"] ?? 0) >= 45 && (videoWatchedMap["velociraptor"] ?? false) && (unlockSeenMap["velociraptor"] ?? false) && !unlockSeenMap["brontosaurus"];
+            const showDilo = (fedTreatsState["brontosaurus"] ?? 0) >= 45 && (videoWatchedMap["brontosaurus"] ?? false) && (unlockSeenMap["brontosaurus"] ?? false) && !unlockSeenMap["dilophosaurus"];
+            const showTrex = (fedTreatsState["dilophosaurus"] ?? 0) >= 45 && (videoWatchedMap["dilophosaurus"] ?? false) && (unlockSeenMap["dilophosaurus"] ?? false) && !unlockSeenMap["trex"];
+            if (!showPtero && !showVelociraptor && !showBronto && !showDilo && !showTrex) return null;
             return (
-              <div style={{ position: "relative", height: "80px", marginBottom: "0.75rem" }}>
-                <div style={{ position: "absolute", left: leftPct, transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                  <div style={{ fontFamily: "'Titan One',cursive", fontSize: "0.95rem", color: "#DAA520", textAlign: "center", marginBottom: "0.3rem", animation: "shimmer 1s ease-in-out infinite", whiteSpace: "nowrap" }}>
-                    ✨ New dino unlocked!<br /><span style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "0.85rem" }}>你解鎖了新恐龍！</span>
-                  </div>
-                  <div style={{ animation: "arrowWiggle 0.7s ease-in-out infinite" }}>
-                    <svg width="40" height="36" viewBox="0 0 40 40" style={{ filter: "drop-shadow(0 0 10px rgba(218,165,32,1))" }}>
-                      <path d="M20 4 L20 28 M20 28 L10 18 M20 28 L30 18" stroke="#DAA520" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                    </svg>
-                  </div>
-                </div>
+              <div style={{ textAlign: "center", marginBottom: "0.75rem", fontFamily: "'Titan One',cursive", fontSize: "0.95rem", color: "#DAA520", animation: "shimmer 1s ease-in-out infinite" }}>
+                ✨ New dino unlocked!<br /><span style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "0.85rem" }}>你解鎖了新恐龍！</span>
               </div>
             );
           })()}
@@ -1185,9 +1186,14 @@ const DinosaurWorld = () => {
               lullabyRef.current.onended = () => { if (audioRef.current) audioRef.current.volume = volume * 0.5; };
             }} />
           </div>
-          <div style={{ color: "rgba(245,230,200,0.45)", fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", marginTop: "0.85rem", textAlign: "center" }}>
-            More dinos unlocking soon! · 更多恐龍即將解鎖！
-          </div>
+          {(() => {
+            const allUnlocked = ANIMALS.every(a => a.unlockCondition === "default" || (unlockSeenMap[a.id] ?? false));
+            return !allUnlocked ? (
+              <div style={{ color: "rgba(245,230,200,0.45)", fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", marginTop: "0.85rem", textAlign: "center" }}>
+                More dinos unlocking soon! · 更多恐龍即將解鎖！
+              </div>
+            ) : null;
+          })()}
         </div>
       </div>
 
