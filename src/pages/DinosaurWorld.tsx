@@ -562,6 +562,7 @@ const DinosaurWorld = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const lullabyRef = useRef<HTMLAudioElement | null>(null);
   const tadaRef = useRef<HTMLAudioElement | null>(null);
+  const completeRef = useRef<HTMLAudioElement | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
   const prevStageRef = useRef<number | null>(null);
   const levelUpFiredRef = useRef<Record<string, Set<number>>>(
@@ -620,6 +621,13 @@ const DinosaurWorld = () => {
       setTimeout(() => {
         setShowDinoComplete(true);
         if (audioRef.current) audioRef.current.volume = 0.02;
+        if (!completeRef.current) completeRef.current = new Audio("/completedworld-music.mp3");
+        completeRef.current.currentTime = 0;
+        completeRef.current.volume = 0.5;
+        completeRef.current.play().catch(() => {
+          const tryPlay = () => { completeRef.current?.play().catch(() => {}); };
+          document.addEventListener("pointerdown", tryPlay, { once: true });
+        });
       }, 800);
     }
   }, [fedTreatsState, videoWatchedMap, showVideo]);
@@ -847,6 +855,34 @@ const DinosaurWorld = () => {
       {showDinoComplete && (
         <div style={{ position: "fixed", inset: 0, zIndex: 700, background: "rgba(20,8,0,0.92)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
           <div onClick={e => e.stopPropagation()} style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
+
+            {/* Sparkle ring around image */}
+            <div style={{ position: "relative", display: "inline-block" }}>
+              {/* Rotating sparkle SVGs */}
+              {[0,45,90,135,180,225,270,315].map((deg, i) => (
+                <div key={i} style={{ position: "absolute", top: "50%", left: "50%", width: "100%", height: "100%", transform: `translate(-50%,-50%) rotate(${deg}deg)`, pointerEvents: "none" }}>
+                  <div style={{ position: "absolute", top: -18, left: "50%", transform: "translateX(-50%)", animation: `spL ${1.2 + i * 0.15}s ease-in-out infinite ${i * 0.1}s` }}>
+                    <svg width="22" height="22" viewBox="0 0 14 14">
+                      <path d="M7 0L8.5 5.5L14 7L8.5 8.5L7 14L5.5 8.5L0 7L5.5 5.5Z" fill={["#ffd700","#ff9de2","#60b8ff","#4ade80","#fbbf24","#c084fc","#fb923c","#f472b6"][i]} />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+              {/* Second ring — counter rotating, smaller */}
+              {[22,67,112,157,202,247,292,337].map((deg, i) => (
+                <div key={`b${i}`} style={{ position: "absolute", top: "50%", left: "50%", width: "110%", height: "110%", transform: `translate(-50%,-50%) rotate(${deg}deg)`, pointerEvents: "none" }}>
+                  <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", animation: `spL ${1.5 + i * 0.2}s ease-in-out infinite ${i * 0.15}s` }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14">
+                      <path d="M7 0L8.5 5.5L14 7L8.5 8.5L7 14L5.5 8.5L0 7L5.5 5.5Z" fill={["#fff","#ffd700","#ff9de2","#60b8ff","#fff","#fbbf24","#c084fc","#fff"][i]} opacity="0.9" />
+                    </svg>
+                  </div>
+                </div>
+              ))}
+              {/* Glowing border around image */}
+              <div style={{ position: "absolute", inset: -6, borderRadius: "1.5rem", background: "transparent", border: "3px solid rgba(255,215,0,0.7)", boxShadow: "0 0 30px rgba(255,215,0,0.6), 0 0 60px rgba(255,180,0,0.4), inset 0 0 20px rgba(255,215,0,0.1)", animation: "goldPulse 1.5s ease-in-out infinite", pointerEvents: "none" }} />
+              <img src="/completed_dinosaurworld.png" alt="Dinosaur World Complete!" style={{ width: "min(680px,90vw)", borderRadius: "1.25rem", display: "block", filter: "drop-shadow(0 0 30px rgba(255,215,0,0.5))", position: "relative", zIndex: 1 }} />
+            </div>
+
             <div style={{ fontFamily: "'Titan One',cursive", fontSize: "clamp(1.8rem,5vw,2.5rem)", color: "#DAA520", textShadow: "0 0 20px rgba(218,165,32,0.9)", textAlign: "center", animation: "shimmer 1.5s ease-in-out infinite" }}>
               🦖 Congratulations! 🦕
             </div>
@@ -859,7 +895,7 @@ const DinosaurWorld = () => {
               We're searching for new worlds with more animals for you to raise. When we find them, we'll let you know!<br />
               <span style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "0.9rem", opacity: 0.85 }}>我們正在尋找新的世界，讓你可以養育更多動物。找到的時候，我們會告訴你！</span>
             </div>
-            <button onClick={() => { localStorage.setItem(`mpe_dinocomplete_${code}_${studentName}`, "1"); setShowDinoComplete(false); if (audioRef.current) audioRef.current.volume = volume * 0.5; }}
+            <button onClick={() => { localStorage.setItem(`mpe_dinocomplete_${code}_${studentName}`, "1"); setShowDinoComplete(false); if (completeRef.current) { completeRef.current.pause(); completeRef.current.currentTime = 0; } if (audioRef.current) audioRef.current.volume = volume * 0.5; }}
               style={{ background: "linear-gradient(180deg,#DAA520 0%,#8B6914 50%,#5c4409 100%)", border: "none", borderRadius: "999px", padding: "1.1rem 2.8rem", cursor: "pointer", boxShadow: "0 8px 0px #3d2a04,0 12px 24px rgba(0,0,0,0.5)", fontFamily: "'Titan One',cursive", fontSize: "1.5rem", color: "#1a0a02", textShadow: "0 1px 2px rgba(255,255,255,0.2)" }}>
               Yay! · 太棒了！
             </button>
