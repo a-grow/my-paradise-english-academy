@@ -184,12 +184,43 @@ const LoginScreen = () => {
   );
 };
 
+const WorldNoticeModal = ({ onConfirm, dontShowAgain, setDontShowAgain }: { onConfirm: () => void; dontShowAgain: boolean; setDontShowAgain: (v: boolean) => void }) => (
+  <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center p-4 overflow-y-auto" style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}>
+    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md my-auto flex flex-col" style={{ border: "3px solid hsl(var(--paradise-mint)/0.5)" }}>
+      <div className="overflow-y-auto flex-1 px-6 py-6">
+        <p className="font-body text-base leading-relaxed text-foreground/90 whitespace-pre-line">
+          🐣 Welcome to the pet world!{"\n"}
+          A couple of quick things for parents:{"\n"}
+          • Your child's pets and treats are saved on this device only — computer, phone, or tablet — so it's best to always play on the same one.{"\n"}
+          • If this device's saved data is cleared, the pets start fresh — but that's okay, the fun starts all over again! 💛
+        </p>
+        <div style={{ fontFamily: "Noto Sans TC, sans-serif" }} className="mt-4 text-base leading-relaxed text-foreground/80 whitespace-pre-line">
+          🐣 歡迎來到Pet World！{"\n"}
+          給家長的小提醒：孩子的寵物和點心只會儲存在「同一個裝置」上（電腦、手機或平板）。建議使用同一個裝置，如果清除了這個裝置的紀錄，需要重新開始飼養寵物。重新體驗一次全新的樂趣！
+        </div>
+        <label className="mt-5 flex items-center gap-3 cursor-pointer select-none">
+          <input type="checkbox" checked={dontShowAgain} onChange={e => setDontShowAgain(e.target.checked)} className="w-5 h-5 rounded" style={{ accentColor: "hsl(var(--paradise-teal))" }} />
+          <span className="font-body text-sm text-muted-foreground">Don't show this again / 不要再顯示</span>
+        </label>
+      </div>
+      <div className="px-6 py-4 border-t border-gray-100">
+        <button onClick={onConfirm} className="w-full py-4 rounded-2xl font-display font-bold text-lg text-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl" style={{ background: "linear-gradient(135deg, hsl(var(--paradise-mint)), hsl(var(--paradise-teal)))", boxShadow: "0 6px 20px rgba(0,0,0,0.15)" }}>
+          Got it!
+          <div style={{ fontSize: "0.75em", opacity: 0.85 }}>我知道了</div>
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 const Dashboard = () => {
   const { family, logout } = useAuth();
   const navigate = useNavigate();
   const [evals, setEvals] = useState<Record<string, EvalEntry[]>>({});
   const [modalStudent, setModalStudent] = useState<string | null>(null);
   const [expandedEvals, setExpandedEvals] = useState<Record<string, boolean>>({});
+  const [worldNotice, setWorldNotice] = useState<string | null>(null);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useEffect(() => {
     if (!family) return;
@@ -213,6 +244,18 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen" style={{ background: "hsl(45 100% 98%)" }}>
       {modalStudent && <EvalsModal student={modalStudent} evals={studentEvalsForModal} onClose={() => setModalStudent(null)} />}
+      {worldNotice && (
+        <WorldNoticeModal
+          dontShowAgain={dontShowAgain}
+          setDontShowAgain={setDontShowAgain}
+          onConfirm={() => {
+            if (dontShowAgain) localStorage.setItem(`mpe_worldnotice_seen_${family.code}`, "true");
+            navigate(worldNotice);
+            setWorldNotice(null);
+            setDontShowAgain(false);
+          }}
+        />
+      )}
       <nav className="sticky top-0 z-50 backdrop-blur-md shadow-lg px-6 py-3 flex items-center justify-between" style={{ background: "linear-gradient(to right, hsl(var(--paradise-purple)/0.92), hsl(var(--paradise-sky)/0.92))" }}>
         <div className="flex items-center gap-2">
           <Sparkles className="w-7 h-7 text-paradise-yellow animate-bounce-gentle" />
@@ -273,7 +316,14 @@ const Dashboard = () => {
           </div>
           {family.students.map((student) => (
             <div key={student.name} className="text-center w-full">
-              <button onClick={() => navigate(`/world/${family.code}/${student.name.toLowerCase()}`)} className="relative w-full py-4 px-6 rounded-2xl font-display font-bold text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-xl" style={{ background: "linear-gradient(135deg, hsl(var(--paradise-mint)), hsl(var(--paradise-teal)))", boxShadow: "0 6px 20px rgba(0,0,0,0.15)", animation: "wobble 3s ease-in-out infinite" }}>
+              <button onClick={() => {
+                const path = `/world/${family.code}/${student.name.toLowerCase()}`;
+                if (localStorage.getItem(`mpe_worldnotice_seen_${family.code}`) === "true") {
+                  navigate(path);
+                } else {
+                  setWorldNotice(path);
+                }
+              }} className="relative w-full py-4 px-6 rounded-2xl font-display font-bold text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-xl" style={{ background: "linear-gradient(135deg, hsl(var(--paradise-mint)), hsl(var(--paradise-teal)))", boxShadow: "0 6px 20px rgba(0,0,0,0.15)", animation: "wobble 3s ease-in-out infinite" }}>
                 <span className="absolute -top-2 left-3 text-lg" style={{ animation: "sparkleAnim 2s ease-in-out infinite" }}>✨</span>
                 🌴 {student.name}'s World
                 <span className="absolute -top-2 right-3 text-lg" style={{ animation: "sparkleAnim 2s ease-in-out infinite 0.7s" }}>✨</span>
