@@ -167,10 +167,10 @@ const LoginScreen = () => {
           <Sparkles className="w-7 h-7 text-paradise-purple animate-bounce-gentle" />
         </div>
         <div className="text-5xl mb-2">🌴</div>
-        <h1 className="font-display font-bold text-3xl text-paradise-coral mb-1">Family Portal</h1>
-        <ZH size="1em">家庭入口</ZH>
-        <p className="font-body text-muted-foreground mt-3 mb-1 text-sm">Enter your family code to continue!</p>
-        <ZH>請輸入你的家庭密碼！</ZH>
+        <h1 className="font-display font-bold text-3xl text-paradise-coral mb-1">Student Portal</h1>
+        <ZH size="1em">學生入口</ZH>
+        <p className="font-body text-muted-foreground mt-3 mb-1 text-sm">Enter your student code to continue!</p>
+        <ZH>請輸入你的學生密碼！</ZH>
         <input className="w-full px-5 py-4 rounded-2xl font-display font-bold text-xl text-center tracking-widest uppercase outline-none transition-all duration-200 mb-4 mt-5" style={{ border: error ? "3px solid #f87171" : "3px solid hsl(var(--paradise-sky)/0.5)", background: error ? "#fef2f2" : "hsl(var(--paradise-sky)/0.07)" }} type="text" placeholder="e.g. ELSA123" value={code} onChange={(e) => { setCode(e.target.value); setError(""); }} onKeyDown={(e) => e.key === "Enter" && handleLogin()} maxLength={20} autoFocus />
         <button onClick={handleLogin} disabled={loading || !code.trim()} className="w-full py-4 rounded-2xl font-display font-bold text-xl text-white transition-all duration-200 disabled:opacity-50 hover:-translate-y-1 hover:shadow-xl active:translate-y-0" style={{ background: "linear-gradient(135deg, hsl(var(--paradise-coral)), hsl(var(--paradise-pink)), hsl(var(--paradise-purple)))", boxShadow: "0 8px 25px rgba(0,0,0,0.15)" }}>
           {loading ? "Checking... ✨" : "Enter Portal →"}
@@ -272,8 +272,8 @@ const Dashboard = () => {
         <Star className="absolute bottom-6 right-12 w-6 h-6 text-paradise-yellow fill-paradise-yellow animate-float-delayed" />
         <h1 className="font-display font-bold text-4xl text-white drop-shadow-lg mb-1 relative z-10">Welcome, {family.familyName} family! 👋</h1>
         <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.8)", marginBottom: "0.25rem" }}>歡迎，{family.familyName}家！</div>
-        <p className="font-body text-white/80 text-base relative z-10">My Paradise English Academy — Family Portal</p>
-        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(255,255,255,0.6)" }}>天堂英語學院 — 家庭入口</div>
+        <p className="font-body text-white/80 text-base relative z-10">My Paradise English Academy — Student Portal</p>
+        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(255,255,255,0.6)" }}>天堂英語學院 — 學生入口</div>
       </div>
       <div className="max-w-4xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-5">
         {family.students.map((student) => {
