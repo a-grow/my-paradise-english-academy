@@ -44,12 +44,14 @@ const HeroSection = () => {
           {t('hero.subtitle')}
         </p>
 
+        {/*
         <a
           href="/world/DEMO99/Star"
           className="inline-flex items-center gap-3 bg-white text-[#ec4899] font-bold text-xl px-10 py-5 rounded-full shadow-2xl hover:scale-105 hover:shadow-pink-300/50 transition-all duration-200 mb-4"
         >
           🌟 Try the Kids' Portal — Demo
         </a>
+        */}
       </div>
 
       {/* Bottom Wave */}
