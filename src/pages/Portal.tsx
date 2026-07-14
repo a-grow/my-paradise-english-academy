@@ -275,8 +275,9 @@ const Dashboard = () => {
         <p className="font-body text-white/80 text-base relative z-10">My Paradise English Academy — Student Portal</p>
         <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(255,255,255,0.6)" }}>天堂英語學院 — 學生入口</div>
       </div>
-      <div className="max-w-4xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-2 gap-5">
-        {family.students.map((student) => {
+      <div className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-5">
+        {/* EVALS HIDDEN — parents see vocab + world only. Fetch + latestUnitsStr kept so vocab still gets the current unit. Reversible: uncomment to restore. */}
+        {/* {family.students.map((student) => {
           const studentEvals = evals[student.name] || [];
           const latestEval = studentEvals[0] || null;
           return (
@@ -308,7 +309,7 @@ const Dashboard = () => {
               )}
             </div>
           );
-        })}
+        })} */}
         <div className="card-fun p-6 flex flex-col items-center justify-center gap-5">
           <div className="flex flex-col items-start self-start gap-0.5">
             <div className="flex items-center gap-2"><Star className="w-5 h-5 text-paradise-yellow fill-paradise-yellow" /><span className="font-body text-xs font-bold uppercase tracking-widest text-muted-foreground">Student World</span></div>
