@@ -71,13 +71,8 @@ const ClassesSection = () => {
         setClasses(sorted);
       } catch (err) {
         console.error('Error fetching classes:', err);
-        setClasses([
-          { id: 'book4', time: '6:00 PM - 6:50 PM', day: 'Tuesday', book: 'Book 4', status: 'available' },
-          { id: 'book3', time: '7:00 PM - 7:50 PM', day: 'Tuesday', book: 'Book 3', status: 'available' },
-          { id: 'book2', time: '8:00 PM - 8:50 PM', day: 'Tuesday', book: 'Book 2', status: 'full' },
-          { id: 'book1', time: '7:00 PM - 7:50 PM', day: 'Friday', book: 'Book 1', status: 'available' },
-          { id: 'book5', time: '8:30 PM - 9:20 PM', day: 'Friday', book: 'Book 5', status: 'available' },
-        ]);
+        // FALLBACK EMPTY - never show fake classes
+        setClasses([]);
       } finally {
         setLoading(false);
       }
