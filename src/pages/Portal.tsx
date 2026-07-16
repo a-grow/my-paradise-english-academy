@@ -84,29 +84,44 @@ function parseLatestUnit(unitsStr: string): number | null {
 }
 
 // ---- VOCAB CARD ----
-const VocabCard = ({ bookNum, unitsStr }: { bookNum: number; unitsStr: string }) => {
+const VocabCard = ({ bookNum, code }: { bookNum: number; code: string }) => {
 
-  const unitNum = parseLatestUnit(unitsStr);
-  if (!unitNum) return null;
+  const storageKey = `mpe_vocabunit_${code}`;
+  const [unitNum, setUnitNum] = useState<number | null>(() => {
+    const saved = localStorage.getItem(storageKey);
+    return saved ? parseInt(saved, 10) : null;
+  });
+
   const bookData = getBookData(bookNum);
   if (!bookData) return null;
   const units = getUnits(bookData);
-  const unit = units.find((u: any) => u.unit === unitNum);
-  if (!unit?.vocabulary?.words) return null;
+  const unit = unitNum ? units.find((u: any) => u.unit === unitNum) : null;
 
-  const enriched: VocabWord[] = unit.vocabulary.words
-    .filter((w: any) => typeof w === "object" && w.word && w.definition_en)
-    .map((w: any) => ({ word: w.word, definition_en: w.definition_en, definition_zh: w.definition_zh || "", part_of_speech: w.part_of_speech || "" }));
+  const enriched: VocabWord[] = unit?.vocabulary?.words
+    ? unit.vocabulary.words
+      .filter((w: any) => typeof w === "object" && w.word && w.definition_en)
+      .map((w: any) => ({ word: w.word, definition_en: w.definition_en, definition_zh: w.definition_zh || "", part_of_speech: w.part_of_speech || "" }))
+    : [];
 
-  const raw: string[] = unit.vocabulary.words
-    .filter((w: any) => typeof w === "string")
-    .map((w: any) => w);
+  const raw: string[] = unit?.vocabulary?.words
+    ? unit.vocabulary.words.filter((w: any) => typeof w === "string").map((w: any) => w)
+    : [];
 
   const hasDefinitions = enriched.length > 0;
   const displayWords = hasDefinitions ? enriched : raw.map(w => ({ word: w, definition_en: "", definition_zh: "" }));
-  if (displayWords.length === 0) return null;
+  const topicLabel = unit ? (unit.vocabulary?.topic || unit.topic || "") : "";
+  const showWords = !!unit && displayWords.length > 0;
 
-  const topicLabel = unit.vocabulary?.topic || unit.topic || "";
+  const handleUnitChange = (value: string) => {
+    if (!value) {
+      setUnitNum(null);
+      localStorage.removeItem(storageKey);
+    } else {
+      const n = parseInt(value, 10);
+      setUnitNum(n);
+      localStorage.setItem(storageKey, String(n));
+    }
+  };
 
   return (
     <div className="card-fun p-6 md:col-span-2">
@@ -117,24 +132,51 @@ const VocabCard = ({ bookNum, unitsStr }: { bookNum: number; unitsStr: string })
         </div>
       </div>
       <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>本單元詞彙</div>
-      <h3 className="font-display font-bold text-xl text-paradise-sky mb-1">📖 Book {bookNum} · Unit {unitNum}{topicLabel ? ` — ${topicLabel}` : ""}</h3>
-      <p className="font-body text-sm text-muted-foreground mb-1">Parents: Practice these words with your child — then quiz them! 🌟</p>
-      <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.4)", marginBottom: "1.25rem" }}>家長：跟孩子一起練習這些單字，然後考考他們！</div>
 
-      <div className="flex flex-col divide-y divide-gray-100">
-        {displayWords.map((w) => (
-          <div key={w.word} className="flex items-baseline gap-3 py-3 px-2">
-            <span className="font-display font-bold text-base text-paradise-sky min-w-fit">{w.word}</span>
-            {w.part_of_speech && (
-              <span className="font-body text-xs text-muted-foreground italic">{w.part_of_speech}</span>
-            )}
-            {w.definition_zh && (
-              <span style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(0,0,0,0.6)" }}>{w.definition_zh}</span>
-            )}
+      <select
+        value={unitNum ?? ""}
+        onChange={(e) => handleUnitChange(e.target.value)}
+        className="w-full sm:w-auto px-4 py-3 rounded-xl font-body text-base outline-none mb-4"
+        style={{ border: "2px solid hsl(var(--paradise-sky)/0.4)", background: "hsl(var(--paradise-sky)/0.05)" }}
+      >
+        <option value="">Select a unit · 選擇單元</option>
+        {units.map((u: any) => {
+          const t = u.vocabulary?.topic || u.topic || "";
+          return (
+            <option key={u.unit} value={u.unit}>
+              {`Unit ${u.unit}${t ? ` — ${t}` : ""}`}
+            </option>
+          );
+        })}
+      </select>
+
+      {showWords ? (
+        <>
+          <h3 className="font-display font-bold text-xl text-paradise-sky mb-1">📖 Book {bookNum} · Unit {unitNum}{topicLabel ? ` — ${topicLabel}` : ""}</h3>
+          <p className="font-body text-sm text-muted-foreground mb-1">Parents: Practice these words with your child — then quiz them! 🌟</p>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.4)", marginBottom: "1.25rem" }}>家長：跟孩子一起練習這些單字，然後考考他們！</div>
+
+          <div className="flex flex-col divide-y divide-gray-100">
+            {displayWords.map((w) => (
+              <div key={w.word} className="flex items-baseline gap-3 py-3 px-2">
+                <span className="font-display font-bold text-base text-paradise-sky min-w-fit">{w.word}</span>
+                {w.part_of_speech && (
+                  <span className="font-body text-xs text-muted-foreground italic">{w.part_of_speech}</span>
+                )}
+                {w.definition_zh && (
+                  <span style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(0,0,0,0.6)" }}>{w.definition_zh}</span>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <p className="font-body text-xs text-muted-foreground mt-4 text-center">{displayWords.length} words · Book {bookNum} Unit {unitNum}</p>
+          <p className="font-body text-xs text-muted-foreground mt-4 text-center">{displayWords.length} words · Book {bookNum} Unit {unitNum}</p>
+        </>
+      ) : (
+        <>
+          <p className="font-body text-sm text-muted-foreground text-center py-6">👆 Pick your child's unit to see the vocabulary</p>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.4)", textAlign: "center", paddingBottom: "1.5rem" }}>👆 請選擇孩子的單元來查看詞彙</div>
+        </>
+      )}
     </div>
   );
 };
@@ -336,7 +378,7 @@ const Dashboard = () => {
         </div>
         {/* Vocab Card */}
         {family.book && (
-          <VocabCard bookNum={family.book} unitsStr={family.unit || "1"} />
+          <VocabCard bookNum={family.book} code={family.code} />
         )}
 
         {/* HOMEWORK SECTION — commented out, keeping for later
