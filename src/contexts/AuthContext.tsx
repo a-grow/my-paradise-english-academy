@@ -12,6 +12,7 @@ export interface Family {
   familyName: string;
   students: Student[];
   book: number;
+  unit: string;
 }
 
 interface AuthContextType {
@@ -44,6 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         code: rows[0].code,
         familyName: rows[0].familyName,
         book: parseInt(rows[0].book, 10) || 1,
+        unit: String(rows[0].unit ?? "").trim(),
         students: rows.map((r) => ({
           name: r.students,
           unit: r.unit || "",

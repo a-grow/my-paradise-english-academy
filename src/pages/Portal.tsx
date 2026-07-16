@@ -336,7 +336,7 @@ const Dashboard = () => {
         </div>
         {/* Vocab Card */}
         {family.book && (
-          <VocabCard bookNum={family.book} unitsStr={latestUnitsStr || "1"} />
+          <VocabCard bookNum={family.book} unitsStr={family.unit || "1"} />
         )}
 
         {/* HOMEWORK SECTION — commented out, keeping for later
