@@ -260,25 +260,7 @@ const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState,diff,treatsEarne
           </div>
         )}
 
-        {/* ZONE 3 — Budget row + Buttons */}
-        {onClaim && (
-          <div style={{marginBottom:"0.75rem",textAlign:"center"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",marginBottom:"0.35rem"}}>
-              {Array.from({length:9}).map((_,i)=>(
-                i < treatsEarnedToday
-                  ? fromDino
-                    ? <svg key={i} width="26" height="26" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="11" ry="5.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="8" cy="18" rx="4" ry="3.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="28" cy="18" rx="4" ry="3.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/></svg>
-                    : <svg key={i} width="26" height="26" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
-                  : <svg key={i} width="26" height="26" viewBox="0 0 36 36"><circle cx="18" cy="18" r="13" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5"/></svg>
-              ))}
-            </div>
-            <div style={{fontFamily:F,fontWeight:700,fontSize:"0.85rem",color:"rgba(255,255,255,0.6)"}}>
-              {9 - treatsEarnedToday > 0
-                ? `${9 - treatsEarnedToday} more treats to win today! · 今天還可以再得${9 - treatsEarnedToday}個點心！`
-                : `All treats earned today! · 今天的點心全拿了！`}
-            </div>
-          </div>
-        )}
+        {/* ZONE 3 — Buttons (no caps, budget row removed) */}
         <div style={{display:"flex",flexDirection:"column",gap:"0.65rem"}}>
           <button onClick={onPlay} disabled={claimState==="available"} style={{padding:"0.9rem",background:claimState==="available"?"rgba(255,255,255,0.12)":`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:claimState==="available"?"rgba(255,255,255,0.3)":"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:claimState==="available"?"not-allowed":"pointer",boxShadow:claimState==="available"?"none":`0 0 20px ${unit.glow}`,transition:"all 0.3s"}}>
             Play Again! · 再玩一次！
@@ -1485,8 +1467,7 @@ const GameTest = ({onClaim, claimedCombos, treatsCappedToday, treatsEarnedToday=
   const claimState: "available"|"claimed"|"capped"|undefined = (() => {
     if(!onClaim || !unit || !game) return undefined;
     if(justClaimed) return "claimed";
-    if(claimedCombos?.has(`u${unit.unit}_${game.id}_${diff}`)) return "claimed";
-    if(treatsCappedToday) return "capped";
+    // NO CAPS - every play pays, parents set the limits
     return "available";
   })();
 

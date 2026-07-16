@@ -417,15 +417,17 @@ const LevelUpOverlay = ({ animal, stageIdx, onDismiss }: { animal: Animal; stage
 };
 
 // ── PET NAMING ────────────────────────────────────────────────────────────────
-const PetNamingInput = ({ petName, onSave, isRenaming, onCancelRename }: { petName: string; onSave: (n: string) => void; isRenaming?: boolean; onCancelRename?: () => void }) => {
+const PetNamingInput = ({ petName, onSave, isRenaming, onCancelRename, nudgeKey }: { petName: string; onSave: (n: string) => void; isRenaming?: boolean; onCancelRename?: () => void; nudgeKey?: string }) => {
   const [val, setVal] = useState(petName);
   useEffect(() => { setVal(petName); }, [petName]);
 
   // First-time naming: no name yet, show prompt button or input
   const [editingFirst, setEditingFirst] = useState(false);
+  // One-time nudge: wiggle+glow until first tap, then off forever
+  const [nudged, setNudged] = useState(() => nudgeKey ? localStorage.getItem(nudgeKey) === "1" : true);
 
   if (!petName && !editingFirst) return (
-    <button onClick={() => setEditingFirst(true)} style={{ background: "rgba(255,255,255,0.15)", border: "1.5px dashed rgba(255,255,255,0.4)", borderRadius: "999px", color: "rgba(255,255,255,0.8)", fontFamily: "'Fredoka One',cursive", fontSize: "0.95rem", padding: "0.3rem 1rem", cursor: "pointer", marginBottom: "0.5rem" }}>
+    <button onClick={() => { setEditingFirst(true); if (!nudged && nudgeKey) { setNudged(true); localStorage.setItem(nudgeKey, "1"); } }} style={{ background: "rgba(255,255,255,0.15)", border: "1.5px dashed rgba(255,255,255,0.4)", borderRadius: "999px", color: "rgba(255,255,255,0.8)", fontFamily: "'Fredoka One',cursive", fontSize: "0.95rem", padding: "0.3rem 1rem", cursor: "pointer", marginBottom: "0.5rem", animation: nudged ? "none" : "nameNudge 2.4s ease-in-out infinite" }}>
       Give your pet a name! · 幫你的寵物取個名字！
     </button>
   );
@@ -1004,6 +1006,7 @@ const KidsWorld = () => {
         @keyframes arrowWiggle{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(6px) rotate(8deg)}}
         @keyframes clickMePulse{0%,100%{transform:scale(1);box-shadow:0 0 20px rgba(255,215,0,0.5)}50%{transform:scale(1.04);box-shadow:0 0 40px rgba(255,215,0,1)}}
         @keyframes dolphinPulse{0%,100%{transform:scale(1);box-shadow:0 0 30px rgba(100,200,255,0.8)}50%{transform:scale(1.05);box-shadow:0 0 60px rgba(100,200,255,1)}}
+        @keyframes nameNudge{0%,100%{transform:rotate(0deg) scale(1);box-shadow:0 0 0 rgba(255,255,255,0)}20%{transform:rotate(-3deg) scale(1.05);box-shadow:0 0 18px rgba(255,255,255,0.75)}40%{transform:rotate(3deg) scale(1.05);box-shadow:0 0 22px rgba(255,255,255,0.9)}60%{transform:rotate(-2deg) scale(1.03);box-shadow:0 0 18px rgba(255,255,255,0.75)}80%{transform:rotate(1deg) scale(1.01);box-shadow:0 0 8px rgba(255,255,255,0.4)}}
         @keyframes watchPulse{0%,100%{transform:scale(1);box-shadow:0 0 30px rgba(255,220,0,0.8),0 0 60px rgba(0,180,216,0.6)}50%{transform:scale(1.06);box-shadow:0 0 60px rgba(255,220,0,1),0 0 100px rgba(0,180,216,0.9)}}
         .bob{animation:bobAnim 3.4s ease-in-out infinite}
         .petted{animation:pettedAnim 0.9s ease-in-out}
@@ -1256,7 +1259,7 @@ const KidsWorld = () => {
 
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 20 }}>
             {petName ? <DisneyNameTag name={petName} onRename={() => setIsRenaming(true)} /> : <div style={{ height: 8 }} />}
-            <PetNamingInput petName={petName} onSave={(n) => { savePetName(n); setIsRenaming(false); }} isRenaming={isRenaming} onCancelRename={() => setIsRenaming(false)} />
+            <PetNamingInput petName={petName} onSave={(n) => { savePetName(n); setIsRenaming(false); }} isRenaming={isRenaming} onCancelRename={() => setIsRenaming(false)} nudgeKey={`mpe_namenudge_${code}_${studentName}`} />
           </div>
 
           {nearHatch && !eggWiggle && (

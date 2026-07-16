@@ -118,8 +118,8 @@ const VocabCard = ({ bookNum, unitsStr }: { bookNum: number; unitsStr: string })
       </div>
       <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>本單元詞彙</div>
       <h3 className="font-display font-bold text-xl text-paradise-sky mb-1">📖 Book {bookNum} · Unit {unitNum}{topicLabel ? ` — ${topicLabel}` : ""}</h3>
-      <p className="font-body text-sm text-muted-foreground mb-1">Practice these words with your child — then quiz them! 🌟</p>
-      <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.4)", marginBottom: "1.25rem" }}>跟孩子一起練習這些單字，然後考考他們！</div>
+      <p className="font-body text-sm text-muted-foreground mb-1">Parents: Practice these words with your child — then quiz them! 🌟</p>
+      <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.4)", marginBottom: "1.25rem" }}>家長：跟孩子一起練習這些單字，然後考考他們！</div>
 
       <div className="flex flex-col divide-y divide-gray-100">
         {displayWords.map((w) => (
@@ -189,13 +189,13 @@ const WorldNoticeModal = ({ onConfirm, dontShowAgain, setDontShowAgain }: { onCo
     <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md my-auto flex flex-col" style={{ border: "3px solid hsl(var(--paradise-mint)/0.5)" }}>
       <div className="overflow-y-auto flex-1 px-6 py-6">
         <p className="font-body text-base leading-relaxed text-foreground/90 whitespace-pre-line">
-          🐣 Welcome to the pet world!{"\n"}
+          🐣 Welcome to the Creature World!{"\n"}
           A couple of quick things for parents:{"\n"}
           • Your child's pets and treats are saved on this device only — computer, phone, or tablet — so it's best to always play on the same one.{"\n"}
           • If this device's saved data is cleared, the pets start fresh — but that's okay, the fun starts all over again! 💛
         </p>
         <div style={{ fontFamily: "Noto Sans TC, sans-serif" }} className="mt-4 text-base leading-relaxed text-foreground/80 whitespace-pre-line">
-          🐣 歡迎來到Pet World！{"\n"}
+          🐣 歡迎來到Creature World！{"\n"}
           給家長的小提醒：孩子的寵物和點心只會儲存在「同一個裝置」上（電腦、手機或平板）。建議使用同一個裝置，如果清除了這個裝置的紀錄，需要重新開始飼養寵物。重新體驗一次全新的樂趣！
         </div>
         <label className="mt-5 flex items-center gap-3 cursor-pointer select-none">
@@ -270,8 +270,8 @@ const Dashboard = () => {
         <div className="bubble bubble-1 opacity-30" /><div className="bubble bubble-2 opacity-30" />
         <Star className="absolute top-6 left-10 w-7 h-7 text-paradise-yellow fill-paradise-yellow animate-float" />
         <Star className="absolute bottom-6 right-12 w-6 h-6 text-paradise-yellow fill-paradise-yellow animate-float-delayed" />
-        <h1 className="font-display font-bold text-4xl text-white drop-shadow-lg mb-1 relative z-10">Welcome, {family.familyName} family! 👋</h1>
-        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.8)", marginBottom: "0.25rem" }}>歡迎，{family.familyName}家！</div>
+        <h1 className="font-display font-bold text-4xl text-white drop-shadow-lg mb-1 relative z-10">Welcome, {family.familyName}! 👋</h1>
+        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.8)", marginBottom: "0.25rem" }}>歡迎，{family.familyName}！</div>
         <p className="font-body text-white/80 text-base relative z-10">My Paradise English Academy — Student Portal</p>
         <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(255,255,255,0.6)" }}>天堂英語學院 — 學生入口</div>
       </div>
@@ -363,8 +363,8 @@ const Dashboard = () => {
           <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>課程時間</div>
           <h3 className="font-display font-bold text-2xl text-paradise-coral mb-1">📆 Time Off or Schedule Changes</h3>
           <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(0,0,0,0.45)", marginBottom: "1rem" }}>請假或更改課程時間</div>
-          <p className="font-body text-base text-foreground/75 leading-relaxed">Need to request time off or make a schedule change? Message Teacher Shirley directly on LINE! 💬</p>
-          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(0,0,0,0.5)", marginTop: "0.5rem", lineHeight: 1.6 }}>需要請假或更改課程時間嗎？直接在LINE上傳訊息給Shirley老師！💬</div>
+          <p className="font-body text-base text-foreground/75 leading-relaxed">Parents: Need to request time off or make a schedule change? Message Teacher Shirley directly on LINE! 💬</p>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(0,0,0,0.5)", marginTop: "0.5rem", lineHeight: 1.6 }}>家長：需要請假或更改課程時間嗎？直接在LINE上傳訊息給Shirley老師！💬</div>
         </div>
       </div>
       <div className="text-center py-6 font-body text-xs text-muted-foreground">

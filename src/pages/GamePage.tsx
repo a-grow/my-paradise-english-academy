@@ -4,7 +4,7 @@ import GameTest from "./GameTest";
 
 const MASTER_CODE = "1006";
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
-const DAILY_TREAT_CAP = 9;
+const DAILY_TREAT_CAP = 24;
 
 const GamePage = () => {
   const { code, studentName, book } = useParams<{ code: string; studentName: string; book: string }>();
