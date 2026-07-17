@@ -160,6 +160,7 @@ const VocabCard = ({ code }: { code: string }) => {
         {[1, 2, 3, 4, 5].map((b) => (
           <option key={b} value={b}>{`Book ${b}`}</option>
         ))}
+        <option value="6" disabled>Book 6 — Coming Soon! 即將推出</option>
       </select>
 
       <select
