@@ -1517,7 +1517,7 @@ const GameTest = ({onClaim, claimedCombos, treatsCappedToday, treatsEarnedToday=
               <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.5)",marginTop:"0.25rem"}}>Pick a book to start playing</div>
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:"1rem"}}>
-              {[1,2,3,4,5].map((bookNum,i)=>{const unlocked=bookNum<=studentBook;const book={id:bookNum,label:`Book ${bookNum}`,unlocked,color:unlocked?"#f97316":"#6b7280",desc:unlocked?`Units 1–18`:"🔒 Keep studying to unlock!"};return(
+              {[1,2,3,4,5].map((bookNum,i)=>{const unlocked=true;const book={id:bookNum,label:`Book ${bookNum}`,unlocked,color:"#f97316",desc:`Units 1–18`};return(
                 <button key={book.id} disabled={!book.unlocked} onClick={()=>{if(book.unlocked){setSelectedBook(book.id);setScreen("units");}}}
                   style={{padding:"1.2rem 1.5rem",background:book.unlocked?`linear-gradient(135deg,${book.color}cc,${book.color}88)`:"rgba(255,255,255,0.04)",border:`2px solid ${book.unlocked?book.color:"rgba(255,255,255,0.08)"}`,borderRadius:"1.5rem",cursor:book.unlocked?"pointer":"not-allowed",display:"flex",alignItems:"center",gap:"1rem",opacity:book.unlocked?1:0.45,animation:book.unlocked?`floatUpDown ${2.5+i*0.3}s ease-in-out infinite ${i*0.2}s`:"none"}}>
                   <div style={{fontSize:"2.8rem"}}>📚</div>

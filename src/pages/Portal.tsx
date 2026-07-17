@@ -84,17 +84,21 @@ function parseLatestUnit(unitsStr: string): number | null {
 }
 
 // ---- VOCAB CARD ----
-const VocabCard = ({ bookNum, code }: { bookNum: number; code: string }) => {
+const VocabCard = ({ code }: { code: string }) => {
 
+  const bookKey = `mpe_vocabbook_${code}`;
   const storageKey = `mpe_vocabunit_${code}`;
+  const [bookNum, setBookNum] = useState<number | null>(() => {
+    const saved = localStorage.getItem(bookKey);
+    return saved ? parseInt(saved, 10) : null;
+  });
   const [unitNum, setUnitNum] = useState<number | null>(() => {
     const saved = localStorage.getItem(storageKey);
     return saved ? parseInt(saved, 10) : null;
   });
 
-  const bookData = getBookData(bookNum);
-  if (!bookData) return null;
-  const units = getUnits(bookData);
+  const bookData = bookNum ? getBookData(bookNum) : null;
+  const units = bookData ? getUnits(bookData) : [];
   const unit = unitNum ? units.find((u: any) => u.unit === unitNum) : null;
 
   const enriched: VocabWord[] = unit?.vocabulary?.words
@@ -111,6 +115,19 @@ const VocabCard = ({ bookNum, code }: { bookNum: number; code: string }) => {
   const displayWords = hasDefinitions ? enriched : raw.map(w => ({ word: w, definition_en: "", definition_zh: "" }));
   const topicLabel = unit ? (unit.vocabulary?.topic || unit.topic || "") : "";
   const showWords = !!unit && displayWords.length > 0;
+
+  const handleBookChange = (value: string) => {
+    setUnitNum(null);
+    localStorage.removeItem(storageKey);
+    if (!value) {
+      setBookNum(null);
+      localStorage.removeItem(bookKey);
+    } else {
+      const n = parseInt(value, 10);
+      setBookNum(n);
+      localStorage.setItem(bookKey, String(n));
+    }
+  };
 
   const handleUnitChange = (value: string) => {
     if (!value) {
@@ -134,10 +151,23 @@ const VocabCard = ({ bookNum, code }: { bookNum: number; code: string }) => {
       <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.92rem", color: "rgba(0,0,0,0.4)", marginBottom: "0.5rem" }}>本單元詞彙</div>
 
       <select
+        value={bookNum ?? ""}
+        onChange={(e) => handleBookChange(e.target.value)}
+        className="w-full sm:w-auto px-4 py-3 rounded-xl font-body text-base outline-none mb-4 sm:mr-3"
+        style={{ border: "2px solid hsl(var(--paradise-sky)/0.4)", background: "hsl(var(--paradise-sky)/0.05)" }}
+      >
+        <option value="">Select a book · 選擇書本</option>
+        {[1, 2, 3, 4, 5].map((b) => (
+          <option key={b} value={b}>{`Book ${b}`}</option>
+        ))}
+      </select>
+
+      <select
         value={unitNum ?? ""}
         onChange={(e) => handleUnitChange(e.target.value)}
+        disabled={!bookNum}
         className="w-full sm:w-auto px-4 py-3 rounded-xl font-body text-base outline-none mb-4"
-        style={{ border: "2px solid hsl(var(--paradise-sky)/0.4)", background: "hsl(var(--paradise-sky)/0.05)" }}
+        style={{ border: "2px solid hsl(var(--paradise-sky)/0.4)", background: "hsl(var(--paradise-sky)/0.05)", opacity: bookNum ? 1 : 0.4, cursor: bookNum ? "pointer" : "not-allowed" }}
       >
         <option value="">Select a unit · 選擇單元</option>
         {units.map((u: any) => {
@@ -173,8 +203,8 @@ const VocabCard = ({ bookNum, code }: { bookNum: number; code: string }) => {
         </>
       ) : (
         <>
-          <p className="font-body text-sm text-muted-foreground text-center py-6">👆 Pick your child's unit to see the vocabulary</p>
-          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.4)", textAlign: "center", paddingBottom: "1.5rem" }}>👆 請選擇孩子的單元來查看詞彙</div>
+          <p className="font-body text-sm text-muted-foreground text-center py-6">{bookNum ? "👆 Pick your child's unit to see the vocabulary" : "👆 Pick your child's book first, then the unit"}</p>
+          <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.85rem", color: "rgba(0,0,0,0.4)", textAlign: "center", paddingBottom: "1.5rem" }}>{bookNum ? "👆 請選擇孩子的單元來查看詞彙" : "👆 請先選擇書本，再選擇單元"}</div>
         </>
       )}
     </div>
@@ -378,7 +408,7 @@ const Dashboard = () => {
         </div>
         {/* Vocab Card */}
         {family.book && (
-          <VocabCard bookNum={family.book} code={family.code} />
+          <VocabCard code={family.code} />
         )}
 
         {/* HOMEWORK SECTION — commented out, keeping for later
