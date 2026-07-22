@@ -637,7 +637,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
-    <div style={{width:"100%",height:"100vh",position:"relative",overflow:"hidden",cursor:"url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" viewBox=\"0 0 48 48\"><circle cx=\"24\" cy=\"24\" r=\"10\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"/><circle cx=\"24\" cy=\"24\" r=\"10\" fill=\"none\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"24\" y1=\"2\" x2=\"24\" y2=\"16\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"24\" y1=\"2\" x2=\"24\" y2=\"16\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"24\" y1=\"32\" x2=\"24\" y2=\"46\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"24\" y1=\"32\" x2=\"24\" y2=\"46\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"2\" y1=\"24\" x2=\"16\" y2=\"24\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"2\" y1=\"24\" x2=\"16\" y2=\"24\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"32\" y1=\"24\" x2=\"46\" y2=\"24\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"32\" y1=\"24\" x2=\"46\" y2=\"24\" stroke=\"white\" stroke-width=\"1.5\"/></svg>') 24 24, crosshair",paddingBottom:36,background:"linear-gradient(180deg,#4fc3f7 0%,#81d4fa 30%,#b3e5fc 55%,#c8e6c9 75%,#a5d6a7 100%)"}}>
+    <div className="mpe-game-noselect" style={{width:"100%",height:"100vh",position:"relative",overflow:"hidden",cursor:"url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" viewBox=\"0 0 48 48\"><circle cx=\"24\" cy=\"24\" r=\"10\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"/><circle cx=\"24\" cy=\"24\" r=\"10\" fill=\"none\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"24\" y1=\"2\" x2=\"24\" y2=\"16\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"24\" y1=\"2\" x2=\"24\" y2=\"16\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"24\" y1=\"32\" x2=\"24\" y2=\"46\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"24\" y1=\"32\" x2=\"24\" y2=\"46\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"2\" y1=\"24\" x2=\"16\" y2=\"24\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"2\" y1=\"24\" x2=\"16\" y2=\"24\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"32\" y1=\"24\" x2=\"46\" y2=\"24\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"32\" y1=\"24\" x2=\"46\" y2=\"24\" stroke=\"white\" stroke-width=\"1.5\"/></svg>') 24 24, crosshair",paddingBottom:36,background:"linear-gradient(180deg,#4fc3f7 0%,#81d4fa 30%,#b3e5fc 55%,#c8e6c9 75%,#a5d6a7 100%)",userSelect:"none",WebkitTouchCallout:"none"}}>
       <style>{`
         @keyframes bFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(2deg)}}
         @keyframes popBurst{0%{transform:scale(1);opacity:1}100%{transform:scale(3.5);opacity:0}}
@@ -683,17 +683,17 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
         <rect x="0" y="15" width="800" height="40" fill="#4a9e4a"/>
         <path d="M0 15 Q100 3 200 13 Q300 2 400 11 Q500 1 600 10 Q700 3 800 13 L800 55 L0 55Z" fill="#5cb85c"/>
       </svg>
-      <div style={{position:"absolute",bottom:0,left:0,right:0,height:56,display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,pointerEvents:"none"}}>
+      <div style={{position:"absolute",bottom:0,left:0,right:0,paddingBottom:"calc(env(safe-area-inset-bottom) + 90px)",paddingLeft:24,display:"flex",alignItems:"flex-end",justifyContent:"flex-start",zIndex:100,pointerEvents:"none"}}>
         {"ontouchstart" in window ?
-          <div style={{display:"flex",gap:24,pointerEvents:"auto"}}>
+          <div style={{display:"flex",flexDirection:"column",gap:16,pointerEvents:"auto"}}>
             <button
               onTouchStart={(e)=>{e.stopPropagation();const iv=setInterval(()=>{bowYRef.current=Math.max(5,bowYRef.current-1.2);},16);(e.currentTarget as any)._iv=iv;}}
               onTouchEnd={(e)=>{e.stopPropagation();clearInterval((e.currentTarget as any)._iv);}}
-              style={{width:80,height:48,borderRadius:16,background:"rgba(0,0,0,0.25)",border:"2px solid rgba(255,255,255,0.4)",color:"white",fontSize:"1.8rem",fontFamily:"Fredoka One, sans-serif",cursor:"pointer",userSelect:"none"}}>▲</button>
+              style={{width:96,height:72,borderRadius:16,background:"rgba(0,0,0,0.25)",border:"2px solid rgba(255,255,255,0.4)",color:"white",fontSize:"1.8rem",fontFamily:"Fredoka One, sans-serif",cursor:"pointer",userSelect:"none",touchAction:"none"}}>▲</button>
             <button
               onTouchStart={(e)=>{e.stopPropagation();const iv=setInterval(()=>{bowYRef.current=Math.min(92,bowYRef.current+1.2);},16);(e.currentTarget as any)._iv=iv;}}
               onTouchEnd={(e)=>{e.stopPropagation();clearInterval((e.currentTarget as any)._iv);}}
-              style={{width:80,height:48,borderRadius:16,background:"rgba(0,0,0,0.25)",border:"2px solid rgba(255,255,255,0.4)",color:"white",fontSize:"1.8rem",fontFamily:"Fredoka One, sans-serif",cursor:"pointer",userSelect:"none"}}>▼</button>
+              style={{width:96,height:72,borderRadius:16,background:"rgba(0,0,0,0.25)",border:"2px solid rgba(255,255,255,0.4)",color:"white",fontSize:"1.8rem",fontFamily:"Fredoka One, sans-serif",cursor:"pointer",userSelect:"none",touchAction:"none"}}>▼</button>
           </div>
         :
           <div style={{textAlign:"center",pointerEvents:"none",background:"rgba(0,0,0,0.55)",borderRadius:999,padding:"0.4rem 1.4rem",border:"2px solid rgba(255,255,255,0.15)"}}>
@@ -811,7 +811,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
-    <div style={{minHeight:"100vh",background:"linear-gradient(180deg,#0c4a6e 0%,#0369a1 40%,#0891b2 70%,#06b6d4 100%)",overflow:"hidden",userSelect:"none",cursor:overUI?"pointer":"none",paddingBottom:36}}
+    <div className="mpe-game-noselect" style={{minHeight:"100vh",background:"linear-gradient(180deg,#0c4a6e 0%,#0369a1 40%,#0891b2 70%,#06b6d4 100%)",overflow:"hidden",userSelect:"none",WebkitTouchCallout:"none",cursor:overUI?"pointer":"none",paddingBottom:36}}
       onMouseMove={e=>setMousePos({x:e.clientX,y:e.clientY})} onClick={()=>setSlamming(true)}>
       <style>{`
         @keyframes moleRise{0%{transform:translateY(120%) scaleY(0.6);opacity:0}60%{transform:translateY(-8%) scaleY(1.05)}100%{transform:translateY(0) scaleY(1);opacity:1}}
@@ -1027,7 +1027,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,from
   const flashBg=flash==="good"?"rgba(74,222,128,0.22)":flash==="bad"?"rgba(239,68,68,0.22)":"transparent";
 
   return (
-    <div style={{minHeight:"100vh",background:"linear-gradient(180deg,#14532d 0%,#15803d 35%,#166534 65%,#052e16 100%)",display:"flex",flexDirection:"column",alignItems:"center",padding:"0.75rem 0.75rem 46px",userSelect:"none"}}>
+    <div className="mpe-game-noselect" style={{minHeight:"100vh",background:"linear-gradient(180deg,#14532d 0%,#15803d 35%,#166534 65%,#052e16 100%)",display:"flex",flexDirection:"column",alignItems:"center",padding:"0.75rem 0.75rem 46px",userSelect:"none",WebkitTouchCallout:"none"}}>
       <style>{`
         @keyframes lPulse{0%,100%{opacity:0.75;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
         @keyframes firefly{0%{opacity:0}50%{opacity:1}100%{opacity:0;transform:translate(20px,-30px)}}
@@ -1088,7 +1088,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,from
         ))}
       </div>
       <div style={{marginTop:"0.7rem",display:"grid",gridTemplateColumns:"repeat(3,52px)",gridTemplateRows:"repeat(3,52px)",gap:4,zIndex:10}}>
-        {[null,{dx:0,dy:-1,l:"▲"},null,{dx:-1,dy:0,l:"◀"},null,{dx:1,dy:0,l:"▶"},null,{dx:0,dy:1,l:"▼"},null].map((b,i)=>
+        {[null,{dx:0,dy:-1,l:"▲︎"},null,{dx:-1,dy:0,l:"◀︎"},null,{dx:1,dy:0,l:"▶︎"},null,{dx:0,dy:1,l:"▼︎"},null].map((b,i)=>
           b?<button key={i} onPointerDown={()=>go(b.dx,b.dy)} style={{background:"rgba(74,222,128,0.2)",border:"2px solid rgba(74,222,128,0.4)",borderRadius:12,color:"#4ade80",fontSize:"1.2rem",cursor:"pointer",touchAction:"none",boxShadow:"0 3px 10px rgba(0,0,0,0.4)"}}>{b.l}</button>
           :<div key={i}/>
         )}
@@ -1303,7 +1303,7 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,f
   if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
 
   return (
-    <div style={{width:"100%",height:"100vh",background:"#030311",position:"relative",overflow:"hidden",userSelect:"none",cursor:cursorVisible?"default":"none",paddingBottom:36}}
+    <div className="mpe-game-noselect" style={{width:"100%",height:"100vh",background:"#030311",position:"relative",overflow:"hidden",userSelect:"none",WebkitTouchCallout:"none",cursor:cursorVisible?"default":"none",paddingBottom:36}}
       onMouseMove={handleMouseMove} onTouchMove={moveShip} onTouchEnd={shoot}>
       <div style={{position:"absolute",bottom:0,left:0,right:0,height:56,display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,pointerEvents:"none"}}>
         {"ontouchstart" in window ?
