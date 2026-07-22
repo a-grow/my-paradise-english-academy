@@ -108,6 +108,9 @@
     overscroll-behavior: none;
   }
 
+  :fullscreen .mpe-fs-bar { padding-left: 64px !important; }
+  :-webkit-full-screen .mpe-fs-bar { padding-left: 64px !important; }
+
   .mpe-game-noselect, .mpe-game-noselect * {
     -webkit-user-select: none;
     user-select: none;

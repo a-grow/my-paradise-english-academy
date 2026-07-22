@@ -10,6 +10,30 @@ import book5Data from "@/data/oxford-discover-book5.json";
 const FONT_URL="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap";
 const F="'Nunito',sans-serif";
 
+// ── FULLSCREEN BUTTON (iPad only) ────────────────────────────────────────────
+const FullscreenButton = () => {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const el = document.documentElement as any;
+    const canFs = !!(el.requestFullscreen || el.webkitRequestFullscreen);
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    setShow(canFs && isTouch);
+  }, []);
+  if (!show) return null;
+  const toggle = () => {
+    const el = document.documentElement as any;
+    const doc = document as any;
+    if (doc.fullscreenElement || doc.webkitFullscreenElement) {
+      (doc.exitFullscreen || doc.webkitExitFullscreen)?.call(doc);
+    } else {
+      (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el);
+    }
+  };
+  return (
+    <button onClick={toggle} style={{background:"rgba(0,0,0,0.55)",border:"2px solid rgba(255,255,255,0.25)",color:"white",fontFamily:F,fontWeight:800,fontSize:"1.15rem",padding:"0.3rem 0.7rem",borderRadius:999,cursor:"pointer",flexShrink:0,lineHeight:1}}>{"\u26F6\uFE0E"}</button>
+  );
+};
+
 // ── DATA ──────────────────────────────────────────────────────────────────────
 const BOOK_COLORS = ["#f43f5e","#8b5cf6","#f97316","#0ea5e9","#10b981","#e11d48","#7c3aed","#ea580c","#0284c7","#059669","#db2777","#6d28d9","#c2410c","#0369a1","#047857","#be185d","#5b21b6","#9a3412","#075985","#065f46"];
 const BOOK_GLOWS = ["rgba(244,63,94,0.6)","rgba(139,92,246,0.6)","rgba(249,115,22,0.6)","rgba(14,165,233,0.6)","rgba(16,185,129,0.6)","rgba(225,29,72,0.6)","rgba(124,58,237,0.6)","rgba(234,88,12,0.6)","rgba(2,132,199,0.6)","rgba(5,150,105,0.6)","rgba(219,39,119,0.6)","rgba(109,40,217,0.6)","rgba(194,65,12,0.6)","rgba(3,105,161,0.6)","rgba(4,120,87,0.6)","rgba(190,24,93,0.6)","rgba(91,33,182,0.6)","rgba(154,52,18,0.6)","rgba(7,89,133,0.6)","rgba(6,95,70,0.6)"];
@@ -647,8 +671,9 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
       `}</style>
       <CloudSVG x={6} y={5} scale={1.1} delay={0}/><CloudSVG x={32} y={12} scale={0.8} delay={2}/>
       <CloudSVG x={60} y={4} scale={1} delay={4}/><CloudSVG x={78} y={16} scale={0.85} delay={1}/>
-      <div style={{position:"absolute",top:12,left:0,right:0,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0 12px",zIndex:50,gap:"0.5rem"}}>
+      <div className="mpe-fs-bar" style={{position:"absolute",top:12,left:0,right:0,display:"flex",justifyContent:"space-between",alignItems:"center",padding:"0 12px",zIndex:50,gap:"0.5rem"}}>
         <button onClick={onBack} style={{background:"rgba(0,0,0,0.55)",border:"2px solid rgba(255,255,255,0.25)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer",flexShrink:0}}>← Back</button>
+        <FullscreenButton/>
         <div style={{background:"rgba(0,0,0,0.72)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.45rem 1.4rem",border:"2px solid rgba(255,255,255,0.25)",flex:1,textAlign:"center",minWidth:0}}>
           <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🏹 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}>🔊</button></span>
         </div>
@@ -822,8 +847,11 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
         <div key={i} style={{position:"fixed",left:`${8+i*9}%`,bottom:-24,width:6+i%4*4,height:6+i%4*4,borderRadius:"50%",border:"1.5px solid rgba(255,255,255,0.5)",background:"rgba(255,255,255,0.08)",animation:`bubUp ${3.5+i*0.6}s ease-in infinite ${i*0.5}s`}}/>
       ))}
       <div style={{padding:"0.75rem 1rem 0",position:"relative",zIndex:20}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.5rem"}}>
-          <button onClick={onBack} onMouseEnter={()=>setOverUI(true)} onMouseLeave={()=>setOverUI(false)} style={{background:"rgba(255,255,255,0.18)",border:"2px solid rgba(255,255,255,0.35)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer"}}>← Back</button>
+        <div className="mpe-fs-bar" style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"0.5rem"}}>
+          <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
+            <button onClick={onBack} onMouseEnter={()=>setOverUI(true)} onMouseLeave={()=>setOverUI(false)} style={{background:"rgba(255,255,255,0.18)",border:"2px solid rgba(255,255,255,0.35)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer"}}>← Back</button>
+            <FullscreenButton/>
+          </div>
           <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
             <Pill dark red={timeLeft<=10}>⏱{timeLeft}s</Pill>
             <Pill>⭐{score}</Pill>
@@ -1037,8 +1065,11 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,from
       {[...Array(5)].map((_,i)=>(
         <div key={i} style={{position:"fixed",left:`${12+i*17}%`,top:`${22+i*10}%`,width:5,height:5,borderRadius:"50%",background:"#fbbf24",boxShadow:"0 0 8px #fbbf24",animation:`firefly ${3+i*0.7}s ease-in-out infinite ${i*0.5}s`,pointerEvents:"none"}}/>
       ))}
-      <div style={{display:"flex",justifyContent:"space-between",width:"100%",maxWidth:420,marginBottom:"0.5rem",zIndex:10,alignItems:"center"}}>
-        <button onClick={onBack} style={{background:"rgba(255,255,255,0.15)",border:"2px solid rgba(255,255,255,0.25)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.28rem 0.8rem",borderRadius:999,cursor:"pointer"}}>← Back</button>
+      <div className="mpe-fs-bar" style={{display:"flex",justifyContent:"space-between",width:"100%",marginBottom:"0.5rem",zIndex:10,alignItems:"center"}}>
+        <div style={{display:"flex",gap:"0.4rem",alignItems:"center"}}>
+          <button onClick={onBack} style={{background:"rgba(255,255,255,0.15)",border:"2px solid rgba(255,255,255,0.25)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.28rem 0.8rem",borderRadius:999,cursor:"pointer"}}>← Back</button>
+          <FullscreenButton/>
+        </div>
         <div style={{display:"flex",gap:"0.4rem",alignItems:"center"}}>
           <Pill>⭐{score}</Pill>
           <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
@@ -1337,8 +1368,9 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,f
       ))}
       <div style={{position:"absolute",top:"8%",left:"12%",width:280,height:180,background:"radial-gradient(ellipse,rgba(139,92,246,0.18) 0%,transparent 80%)",borderRadius:"60% 40% 70% 30%",animation:"nebulaFloat 12s ease-in-out infinite"}}/>
       <div style={{position:"absolute",top:"35%",right:"5%",width:200,height:200,background:"radial-gradient(ellipse,rgba(236,72,153,0.14) 0%,transparent 80%)",borderRadius:"40% 60% 30% 70%",animation:"nebulaFloat 16s ease-in-out infinite 3s"}}/>
-      <div style={{position:"absolute",top:12,left:0,right:0,display:"flex",justifyContent:"space-between",padding:"0 12px",zIndex:50,alignItems:"center",gap:"0.5rem"}}>
+      <div className="mpe-fs-bar" style={{position:"absolute",top:12,left:0,right:0,display:"flex",justifyContent:"space-between",padding:"0 12px",zIndex:50,alignItems:"center",gap:"0.5rem"}}>
         <button onClick={(e)=>{e.stopPropagation();onBack();}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.2)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer",flexShrink:0}}>← Back</button>
+        <span onClick={(e)=>e.stopPropagation()} style={{flexShrink:0,display:"flex"}}><FullscreenButton/></span>
         <div style={{background:"rgba(0,0,20,0.85)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.4rem 1.4rem",border:"1.5px solid rgba(0,255,255,0.25)",flex:1,textAlign:"center",minWidth:0}}>
           <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🚀 <span style={{color:"#00ffff",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}>🔊</button></span>
         </div>
