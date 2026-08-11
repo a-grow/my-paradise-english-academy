@@ -769,7 +769,7 @@ const KidsWorld = () => {
     return s?.name ?? (n.charAt(0).toUpperCase() + n.slice(1));
   })();
 
-  const [activeAnimalId, setActiveAnimalId] = useState("turtle");
+  const [activeAnimalId, setActiveAnimalId] = useState(() => isMaster ? "turtle" : (localStorage.getItem(`mpe_active_${code}_${studentName}`) || "turtle"));
   const activeAnimal = ANIMALS.find(a => a.id === activeAnimalId) ?? ANIMALS[0];
   const videoWatched = videoWatchedMap[activeAnimalId] ?? false;
   const fedTreats = fedTreatsState[activeAnimalId] ?? 0;
@@ -1132,6 +1132,7 @@ const KidsWorld = () => {
           setTimeout(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, 400);
           localStorage.setItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`, "1");
           setActiveAnimalId(a.id);
+          localStorage.setItem(`mpe_active_${code}_${studentName}`, a.id);
           if (lullabyRef.current) { lullabyRef.current.pause(); lullabyRef.current.currentTime = 0; }
           if (audioRef.current) audioRef.current.volume = volume * 0.5;
         };
