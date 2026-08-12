@@ -541,7 +541,7 @@ const EarnButtons = ({ navigate, code, studentName, activeAnimal, onVisit5Days, 
   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
     {[
       { label: "Play a Game", sub: "打敗遊戲，得1~3個點心！", reward: "+1~3 treats", color: activeAnimal.btnColor, glow: activeAnimal.btnGlow, path: `/game/${code}/${studentName}/BOOKNUM` },
-      { label: "Read & Quiz", sub: "即將推出！Coming Soon!", reward: "🔒", color: "#a855f7", glow: "rgba(168,85,247,0.0)", path: "", disabled: true },
+      // { label: "Grammar Games", sub: "玩文法遊戲，賺取獎勵！", reward: "play!", color: "#8b5cf6", glow: "rgba(139,92,246,0.5)", path: `/grammar/${code}/${studentName}/BOOKNUM` },
       { label: "Visit 5 Days!", sub: "來訪5天！", reward: "+3 treats", color: activeAnimal.btn3Color, glow: activeAnimal.btn3Glow, path: "", visit5: true },
     ].map((btn, i) => (
       <button key={i} onClick={() => { if((btn as any).visit5){ onVisit5Days(); return; } if(!btn.disabled && btn.path){ const f = JSON.parse(sessionStorage.getItem('mpe_family') || '{}'); navigate(btn.path.replace('BOOKNUM', String(f?.book ?? 1))); }}} style={{
@@ -769,7 +769,17 @@ const KidsWorld = () => {
     return s?.name ?? (n.charAt(0).toUpperCase() + n.slice(1));
   })();
 
-  const [activeAnimalId, setActiveAnimalId] = useState(() => isMaster ? "turtle" : (localStorage.getItem(`mpe_active_${code}_${studentName}`) || "turtle"));
+  const [activeAnimalId, setActiveAnimalId] = useState(() => {
+    if (isMaster) return "turtle";
+    const saved = localStorage.getItem(`mpe_active_${code}_${studentName}`);
+    if (saved) return saved;
+    let furthest = "turtle";
+    for (const a of ANIMALS) {
+      if (localStorage.getItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`) === "1") furthest = a.id;
+    }
+    if (furthest !== "turtle") localStorage.setItem(`mpe_active_${code}_${studentName}`, furthest);
+    return furthest;
+  });
   const activeAnimal = ANIMALS.find(a => a.id === activeAnimalId) ?? ANIMALS[0];
   const videoWatched = videoWatchedMap[activeAnimalId] ?? false;
   const fedTreats = fedTreatsState[activeAnimalId] ?? 0;
