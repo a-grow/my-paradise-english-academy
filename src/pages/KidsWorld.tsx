@@ -697,7 +697,7 @@ const KidsWorld = () => {
   }
 
   const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
-  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45, octopus: 45, shark: 45, clownfish: 45, mantaray: 45 } : { turtle: parseInt(localStorage.getItem(`mpe_fed_${code}_${studentName}`) || "0") });
+  const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45, octopus: 45, shark: 45, clownfish: 45, mantaray: 45 } : Object.fromEntries(ANIMALS.map(a => [a.id, parseInt(localStorage.getItem(a.id === "turtle" ? `mpe_fed_${code}_${studentName}` : `mpe_fed_${a.id}_${code}_${studentName}`) || "0")])));
   const [treats, setTreats] = useState(0);
   const [loading, setLoading] = useState(!isMaster);
   const [hearts, setHearts] = useState<{ id: number; x: number; y: number; delay: number }[]>([]);
