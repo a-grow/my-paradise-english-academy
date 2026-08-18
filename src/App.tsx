@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
@@ -12,6 +12,7 @@ import Portal from "./pages/Portal";
 import KidsWorld from "./pages/KidsWorld";
 import DinosaurWorld from "./pages/DinosaurWorld";
 import GamePage from "./pages/GamePage";
+import Grammar from "./pages/Grammar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,7 +31,8 @@ const App = () => (
               <Route path="/portal" element={<Portal />} />
               <Route path="/world/:code/:studentName" element={<KidsWorld />} />
 <Route path="/game/:code/:studentName/:book" element={<GamePage />} />
-<Route path="/gametest" element={<GameTest />} />
+{/* <Route path="/grammar/:code/:studentName/:book" element={<Grammar />} /> */}
+<Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<DinosaurWorld />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
