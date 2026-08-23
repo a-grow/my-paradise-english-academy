@@ -4,7 +4,7 @@ import GameTest from "./GameTest";
 
 const MASTER_CODE = "1006";
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
-const DAILY_TREAT_CAP = 24;
+const DAILY_TREAT_CAP = 999999; // no cap (Andy rule)
 
 const GamePage = () => {
   const { code, studentName, book } = useParams<{ code: string; studentName: string; book: string }>();
@@ -48,7 +48,7 @@ const GamePage = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
 
-  const treatsCappedToday = treatsEarnedToday >= DAILY_TREAT_CAP;
+  const treatsCappedToday = false; // no cap (Andy rule)
 
   useEffect(() => {
     if (!audioRef.current) {
@@ -104,7 +104,7 @@ const GamePage = () => {
 
     // Guards
     const earnedSoFar = getTreatsEarnedToday();
-    if (earnedSoFar >= DAILY_TREAT_CAP) return;
+    // if (earnedSoFar >= DAILY_TREAT_CAP) return; // no cap (Andy rule)
 
     // Write to localStorage
     localStorage.setItem(key, "1");
