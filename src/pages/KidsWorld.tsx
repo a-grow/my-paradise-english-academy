@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { saveJarToCloud, loadJarFromCloud, saveDataToCloud } from "@/lib/cloudSave";
+import { saveJarToCloud, loadJarFromCloud, saveDataToCloud, loadDataFromCloud } from "@/lib/cloudSave";
 
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 const MASTER_CODE = "1006";
@@ -859,6 +859,62 @@ const KidsWorld = () => {
         localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(cloud));
       }
       jarCloudReady.current = true;
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Cloud read-back for the progress blob on mount (device-wins-first). Runs once.
+  useEffect(() => {
+    if (isMaster) { dataCloudReady.current = true; return; }
+    let cancelled = false;
+    (async () => {
+      const result = await loadDataFromCloud(code, studentName);
+      if (cancelled) return;
+      if (result === null || result.data === null) {
+        await saveDataToCloud(code, studentName, activeAnimalId, gatherOceanBlob());
+      } else {
+        const d = result.data;
+        const oceanAnimals = d?.ocean?.animals ?? {};
+        const newFed: Record<string, number> = {};
+        const newPetNames: Record<string, string> = {};
+        const newVideoWatched: Record<string, boolean> = {};
+        const newUnlockSeen: Record<string, boolean> = {};
+        ANIMALS.forEach(a => {
+          const av = oceanAnimals[a.id] ?? {};
+          const fed = av.fed ?? 0;
+          const petName = av.petName ?? "";
+          const videoWatched = av.videoWatched === 1;
+          const unlkseen = av.unlkseen ?? 0;
+          const levelup = Array.isArray(av.levelup) ? av.levelup : [];
+          newFed[a.id] = fed;
+          newPetNames[a.id] = petName;
+          newVideoWatched[a.id] = videoWatched;
+          newUnlockSeen[a.id] = unlkseen === 1;
+          const fedKey = a.id === "turtle" ? `mpe_fed_${code}_${studentName}` : `mpe_fed_${a.id}_${code}_${studentName}`;
+          localStorage.setItem(fedKey, String(fed));
+          localStorage.setItem(`mpe_petname_${a.id}_${code}_${studentName}`, petName);
+          const vKey = a.id === "turtle" ? `mpe_videowatched_${code}_${studentName}` : `mpe_videowatched_${a.id}_${code}_${studentName}`;
+          localStorage.setItem(vKey, videoWatched ? "1" : "0");
+          localStorage.setItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`, unlkseen === 1 ? "1" : "0");
+          localStorage.setItem(`mpe_levelup_${a.id}_${code}_${studentName}`, JSON.stringify(levelup));
+        });
+        setFedTreatsState(newFed);
+        setPetNameMap(newPetNames);
+        setVideoWatchedMap(newVideoWatched);
+        setUnlockSeenMap(newUnlockSeen);
+        const videoSeen = d?.ocean?.videoSeen === 1;
+        setVideoButtonSeen(videoSeen);
+        localStorage.setItem(`mpe_videoseen_${code}_${studentName}`, videoSeen ? "1" : "0");
+        const visitDays = Array.isArray(d?.shared?.visitDays) ? d.shared.visitDays : [];
+        localStorage.setItem(visitDaysKey, JSON.stringify(visitDays));
+        const visit5 = d?.shared?.visit5Claimed ?? 0;
+        localStorage.setItem(visit5ClaimedKey, String(visit5));
+        if (result.activePet) {
+          setActiveAnimalId(result.activePet);
+          localStorage.setItem(`mpe_active_${code}_${studentName}`, result.activePet);
+        }
+      }
+      dataCloudReady.current = true;
     })();
     return () => { cancelled = true; };
   }, []);
