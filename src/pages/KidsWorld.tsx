@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { saveJarToCloud, loadJarFromCloud, saveDataToCloud } from "@/lib/cloudSave";
 
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 const MASTER_CODE = "1006";
@@ -802,6 +803,65 @@ const KidsWorld = () => {
   }, [musicOn]);
   useEffect(() => { if (audioRef.current) audioRef.current.volume = volume * 0.5; localStorage.setItem("mpe_volume", String(volume)); }, [volume]);
   useEffect(() => { localStorage.setItem("mpe_sfx", sfxOn ? "on" : "off"); }, [sfxOn]);
+
+  // Cloud save: mirror jar to Supabase whenever it changes (write-only for now)
+  const jarCloudReady = useRef(false);
+  useEffect(() => {
+    if (isMaster) return;
+    if (!jarCloudReady.current) { jarCloudReady.current = true; return; }
+    saveJarToCloud(code, studentName, jarTreats);
+  }, [jarTreats]);
+
+  // Cloud save: mirror all Ocean progress (except jar) to Supabase on change
+  const dataCloudReady = useRef(false);
+  const gatherOceanBlob = () => {
+    const levelupFor = (id: string) => {
+      try { return JSON.parse(localStorage.getItem(`mpe_levelup_${id}_${code}_${studentName}`) || "[]"); }
+      catch { return []; }
+    };
+    const animals: Record<string, any> = {};
+    ANIMALS.forEach(a => {
+      animals[a.id] = {
+        fed: fedTreatsState[a.id] ?? 0,
+        petName: petNameMap[a.id] ?? "",
+        levelup: levelupFor(a.id),
+        videoWatched: videoWatchedMap[a.id] ? 1 : 0,
+        unlkseen: unlockSeenMap[a.id] ? 1 : 0,
+      };
+    });
+    return {
+      ocean: { videoSeen: videoButtonSeen ? 1 : 0, animals },
+      shared: {
+        visitDays: getVisitDays(),
+        visit5Claimed: parseInt(localStorage.getItem(visit5ClaimedKey) || "0"),
+      },
+    };
+  };
+  useEffect(() => {
+    if (isMaster) return;
+    if (!dataCloudReady.current) { dataCloudReady.current = true; return; }
+    saveDataToCloud(code, studentName, activeAnimalId, gatherOceanBlob());
+  }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, videoButtonSeen, visitDaysCount, visit5Claimed]);
+
+  // Cloud read-back on mount (device-wins-first). Runs once.
+  useEffect(() => {
+    if (isMaster) { jarCloudReady.current = true; return; }
+    let cancelled = false;
+    (async () => {
+      const cloud = await loadJarFromCloud(code, studentName);
+      if (cancelled) return;
+      if (cloud === null) {
+        // No cloud row yet: push device jar UP first. Device wins.
+        await saveJarToCloud(code, studentName, jarTreats);
+      } else {
+        // Real cloud value (including 0): cloud wins.
+        setJarTreats(cloud);
+        localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(cloud));
+      }
+      jarCloudReady.current = true;
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Lock scroll when dim overlay is active
   useEffect(() => {
