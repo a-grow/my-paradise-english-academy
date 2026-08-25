@@ -34,7 +34,7 @@ export async function loadJarFromCloud(code: string, studentName: string): Promi
 export async function saveDataToCloud(
   code: string,
   studentName: string,
-  activePet: string,
+  activePet: string | null,
   data: Record<string, any>
 ) {
   try {
@@ -46,10 +46,12 @@ export async function saveDataToCloud(
       .eq("student_name", studentName)
       .maybeSingle();
     const merged = { ...(existing?.data ?? {}), ...data };
+    const row: Record<string, any> = { code, student_name: studentName, data: merged };
+    if (activePet !== null) row.active_pet = activePet;
     const { error } = await supabase
       .from("student_progress")
       .upsert(
-        { code, student_name: studentName, active_pet: activePet, data: merged },
+        row,
         { onConflict: "code,student_name" }
       );
     if (error) console.error("[cloudSave] data save failed:", error.message);

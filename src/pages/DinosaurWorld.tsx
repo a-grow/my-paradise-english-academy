@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { saveDataToCloud, loadDataFromCloud } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
 
@@ -601,6 +602,93 @@ const DinosaurWorld = () => {
   }, [musicOn]);
   useEffect(() => { if (audioRef.current) audioRef.current.volume = volume * 0.5; localStorage.setItem("mpe_volume", String(volume)); }, [volume]);
   useEffect(() => { localStorage.setItem("mpe_sfx", sfxOn ? "on" : "off"); }, [sfxOn]);
+
+  // Cloud save: mirror all Dino progress to Supabase on change (jar lives in blob; treats column is Ocean-only)
+  const dataCloudReady = useRef(false);
+  const gatherDinoBlob = () => {
+    const levelupFor = (id: string) => {
+      try { return JSON.parse(localStorage.getItem(`mpe_dino_levelup_${id}_${code}_${studentName}`) || "[]"); }
+      catch { return []; }
+    };
+    const animals: Record<string, any> = {};
+    ANIMALS.forEach(a => {
+      animals[a.id] = {
+        fed: fedTreatsState[a.id] ?? 0,
+        petName: petNameMap[a.id] ?? "",
+        levelup: levelupFor(a.id),
+        videoWatched: videoWatchedMap[a.id] ? 1 : 0,
+        unlkseen: unlockSeenMap[a.id] ? 1 : 0,
+      };
+    });
+    return {
+      dino: {
+        jar: jarTreats,
+        activePet: activeAnimalId,
+        animals,
+        visitDays: getVisitDays(),
+        visit5Claimed: parseInt(localStorage.getItem(visit5ClaimedKey) || "0"),
+      },
+    };
+  };
+  useEffect(() => {
+    if (isMaster) return;
+    if (!dataCloudReady.current) { dataCloudReady.current = true; return; }
+    saveDataToCloud(code, studentName, null, gatherDinoBlob());
+  }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, jarTreats, activeAnimalId, visitDaysCount, visit5Claimed]);
+
+  // Cloud read-back for Dino on mount (device-wins-first). Runs once.
+  // TRAP: cannot use result.data === null — a kid who finished Ocean has {ocean:...}, not null.
+  // Dino's "first time here?" test is: is result.data?.dino missing? If so, device wins.
+  useEffect(() => {
+    if (isMaster) { dataCloudReady.current = true; return; }
+    let cancelled = false;
+    (async () => {
+      const result = await loadDataFromCloud(code, studentName);
+      if (cancelled) return;
+      if (result === null || result.data == null || result.data.dino == null) {
+        // No Dino data in cloud yet: push device Dino UP first. Device wins.
+        await saveDataToCloud(code, studentName, null, gatherDinoBlob());
+      } else {
+        const dino = result.data.dino;
+        const dinoAnimals = dino.animals ?? {};
+        const newFed: Record<string, number> = {};
+        const newPetNames: Record<string, string> = {};
+        const newVideoWatched: Record<string, boolean> = {};
+        const newUnlockSeen: Record<string, boolean> = {};
+        ANIMALS.forEach(a => {
+          const av = dinoAnimals[a.id] ?? {};
+          const fed = av.fed ?? 0;
+          const petName = av.petName ?? "";
+          const videoWatched = av.videoWatched === 1;
+          const unlkseen = av.unlkseen ?? 0;
+          const levelup = Array.isArray(av.levelup) ? av.levelup : [];
+          newFed[a.id] = fed;
+          newPetNames[a.id] = petName;
+          newVideoWatched[a.id] = videoWatched;
+          newUnlockSeen[a.id] = unlkseen === 1;
+          localStorage.setItem(`mpe_dino_fed_${a.id}_${code}_${studentName}`, String(fed));
+          localStorage.setItem(`mpe_dino_petname_${a.id}_${code}_${studentName}`, petName);
+          localStorage.setItem(`mpe_dino_videowatched_${a.id}_${code}_${studentName}`, videoWatched ? "1" : "0");
+          localStorage.setItem(`mpe_dino_unlkseen_${a.id}_${code}_${studentName}`, unlkseen === 1 ? "1" : "0");
+          localStorage.setItem(`mpe_dino_levelup_${a.id}_${code}_${studentName}`, JSON.stringify(levelup));
+        });
+        setFedTreatsState(newFed);
+        setPetNameMap(newPetNames);
+        setVideoWatchedMap(newVideoWatched);
+        setUnlockSeenMap(newUnlockSeen);
+        const jar = dino.jar ?? 0;
+        setJarTreats(jar);
+        localStorage.setItem(`mpe_dino_jar_${code}_${studentName}`, String(jar));
+        if (dino.activePet) setActiveAnimalId(dino.activePet);
+        const visitDays = Array.isArray(dino.visitDays) ? dino.visitDays : [];
+        localStorage.setItem(visitDaysKey, JSON.stringify(visitDays));
+        const visit5 = dino.visit5Claimed ?? 0;
+        localStorage.setItem(visit5ClaimedKey, String(visit5));
+      }
+      dataCloudReady.current = true;
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if ((stageIdx === 3 && !videoWatched && !levelUpStage) || showVideo || showLookBelow || showDinoComplete) {
