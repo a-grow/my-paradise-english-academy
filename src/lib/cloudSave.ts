@@ -38,10 +38,18 @@ export async function saveDataToCloud(
   data: Record<string, any>
 ) {
   try {
+    // Merge: read existing blob first so a second world does not wipe the first.
+    const { data: existing } = await supabase
+      .from("student_progress")
+      .select("data")
+      .eq("code", code)
+      .eq("student_name", studentName)
+      .maybeSingle();
+    const merged = { ...(existing?.data ?? {}), ...data };
     const { error } = await supabase
       .from("student_progress")
       .upsert(
-        { code, student_name: studentName, active_pet: activePet, data },
+        { code, student_name: studentName, active_pet: activePet, data: merged },
         { onConflict: "code,student_name" }
       );
     if (error) console.error("[cloudSave] data save failed:", error.message);
