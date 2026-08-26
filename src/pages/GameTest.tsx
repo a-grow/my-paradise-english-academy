@@ -1510,7 +1510,7 @@ const GameTest = ({onClaim, claimedCombos, treatsCappedToday, treatsEarnedToday=
   if(screen==="diff"&&unit&&game) return <DiffPicker game={game} unit={unit} onPick={(d)=>{setDiff(d);setScreen("play");}} onBack={()=>setScreen("games")}/>;
 
   if(screen==="play"&&unit&&game){
-    const props={unit,diff,onBack:()=>setScreen("games"),onClaim:handleClaim,claimState,treatsEarnedToday,fromDino,onRestart:()=>setJustClaimed(false)};
+    const props={unit,diff,onBack:()=>{setJustClaimed(false);setScreen("games");},onClaim:handleClaim,claimState,treatsEarnedToday,fromDino,onRestart:()=>setJustClaimed(false)};
     if(game.id==="arrow") return <ArrowShoot {...props}/>;
     if(game.id==="whack") return <WhackAMole {...props}/>;
     if(game.id==="snake") return <WordSnake {...props}/>;
