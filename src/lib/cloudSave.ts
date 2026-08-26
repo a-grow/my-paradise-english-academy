@@ -61,6 +61,30 @@ export async function saveDataToCloud(
   }
 }
 
+export async function saveDinoJarToCloud(code: string, studentName: string, jar: number) {
+  try {
+    // Dino jar lives inside data.dino.jar (not the treats column). Read blob, bump only jar, write back.
+    const { data: existing } = await supabase
+      .from("student_progress")
+      .select("data")
+      .eq("code", code)
+      .eq("student_name", studentName)
+      .maybeSingle();
+    const blob = { ...(existing?.data ?? {}) };
+    blob.dino = { ...(blob.dino ?? {}), jar };
+    const { error } = await supabase
+      .from("student_progress")
+      .upsert(
+        { code, student_name: studentName, data: blob },
+        { onConflict: "code,student_name" }
+      );
+    if (error) console.error("[cloudSave] dino jar save failed:", error.message);
+    else console.log("[cloudSave] dino jar saved:", code, studentName, jar);
+  } catch (e) {
+    console.error("[cloudSave] dino jar save threw:", e);
+  }
+}
+
 export async function loadDataFromCloud(
   code: string,
   studentName: string

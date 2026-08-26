@@ -1,20 +1,22 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import GameTest from "./GameTest";
+import { saveJarToCloud, saveDinoJarToCloud } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
 const DAILY_TREAT_CAP = 999999; // no cap (Andy rule)
 
 const GamePage = () => {
-  const { code, studentName, book } = useParams<{ code: string; studentName: string; book: string }>();
+  const { world, code, studentName, book } = useParams<{ world?: string; code: string; studentName: string; book: string }>();
   const studentBook = parseInt(book || "1", 10);
   const navigate = useNavigate();
   const isMaster = code === MASTER_CODE;
   const today = new Date().toDateString();
 
-  const fromDino = sessionStorage.getItem("mpe_from_dino") === "1";
-  const jarKey = fromDino ? `mpe_dino_jar_${code}_${studentName}` : `mpe_jar_${code}_${studentName}`;
+  const gameWorld = world || "ocean";
+  const fromDino = gameWorld === "dino";
+  const jarKey = gameWorld === "dino" ? `mpe_dino_jar_${code}_${studentName}` : `mpe_jar_${code}_${studentName}`;
   const capKey = `mpe_arcade_cap_${code}_${studentName}_${today}`;
   const comboKey = (unitId: number, gameId: string, diff: string) =>
     `mpe_arcade_${code}_${studentName}_u${unitId}_${gameId}_${diff}_${today}`;
@@ -112,7 +114,11 @@ const GamePage = () => {
     const newTotal = earnedSoFar + treats;
     localStorage.setItem(capKey, String(newTotal));
     const current = parseInt(localStorage.getItem(jarKey) || "0");
-    localStorage.setItem(jarKey, String(current + treats));
+    const newJarTotal = current + treats;
+    localStorage.setItem(jarKey, String(newJarTotal));
+    // Push fresh jar total to cloud so the World doesn't reload a stale value.
+    if (gameWorld === "dino") saveDinoJarToCloud(code, studentName, newJarTotal);
+    else saveJarToCloud(code, studentName, newJarTotal);
 
     // Update state — both updates trigger GameTest re-render with fresh claimState
     setTreatsEarnedToday(newTotal);
