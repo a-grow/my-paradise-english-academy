@@ -227,7 +227,7 @@ const CountdownOverlay = ({onDone}:{onDone:()=>void}) => {
 // ── UNIT CLEAR / WINNER SCREEN ────────────────────────────────────────────────
 // Three zones only: celebration → reward → buttons. No stars, no points.
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
-const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState,diff,treatsEarnedToday=0,fromDino=false}:{unit:UnitData;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";diff?:string;treatsEarnedToday?:number;fromDino?:boolean}) => {
+const UnitClearScreen = ({unit,onBack,onPlay,onClaim,onBackToWorld,claimState,diff,treatsEarnedToday=0,fromDino=false}:{unit:UnitData;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;onBackToWorld?:()=>void;claimState?:"available"|"claimed"|"capped";diff?:string;treatsEarnedToday?:number;fromDino?:boolean}) => {
   const treatCount = TREATS_BY_DIFF[diff??""] ?? 2;
   const play=useAudio();
   useEffect(()=>{play("win");},[]);
@@ -284,22 +284,35 @@ const UnitClearScreen = ({unit,onBack,onPlay,onClaim,claimState,diff,treatsEarne
           </div>
         )}
 
-        {/* ZONE 3 — Buttons (no caps, budget row removed) */}
+        {/* ZONE 3 — Buttons. available: none (claim button only). claimed: Choose Game + Back to World. fallback: original two. */}
+        {claimState==="available" ? null : claimState==="claimed" ? (
         <div style={{display:"flex",flexDirection:"column",gap:"0.65rem"}}>
-          <button onClick={onPlay} disabled={claimState==="available"} style={{padding:"0.9rem",background:claimState==="available"?"rgba(255,255,255,0.12)":`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:claimState==="available"?"rgba(255,255,255,0.3)":"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:claimState==="available"?"not-allowed":"pointer",boxShadow:claimState==="available"?"none":`0 0 20px ${unit.glow}`,transition:"all 0.3s"}}>
+          <button onClick={onBack} style={{padding:"0.9rem",background:"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:"pointer",transition:"all 0.3s"}}>
+            Choose Game · 選擇遊戲
+          </button>
+          {onBackToWorld && (
+          <button onClick={onBackToWorld} style={{padding:"0.9rem",background:`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:"pointer",boxShadow:`0 0 20px ${unit.glow}`,transition:"all 0.3s"}}>
+            {fromDino ? "🦕" : "🌊"} Back to World! · 回到世界！
+          </button>
+          )}
+        </div>
+        ) : (
+        <div style={{display:"flex",flexDirection:"column",gap:"0.65rem"}}>
+          <button onClick={onPlay} style={{padding:"0.9rem",background:`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:"pointer",boxShadow:`0 0 20px ${unit.glow}`,transition:"all 0.3s"}}>
             Play Again! · 再玩一次！
           </button>
-          <button onClick={onBack} disabled={claimState==="available"} style={{padding:"0.9rem",background:claimState==="available"?"rgba(255,255,255,0.08)":"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:claimState==="available"?"rgba(255,255,255,0.3)":"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:claimState==="available"?"not-allowed":"pointer",transition:"all 0.3s"}}>
+          <button onClick={onBack} style={{padding:"0.9rem",background:"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:"pointer",transition:"all 0.3s"}}>
             Choose Game · 選擇遊戲
           </button>
         </div>
+        )}
       </div>
     </div>
   );
 };
 
 // ── RESULT SCREEN (time up / game over) ───────────────────────────────────────
-const ResultScreen = ({score,total,onBack,onPlay,reason}:{score:number;total:number;onBack:()=>void;onPlay:()=>void;reason?:"timeout"|"lives"}) => {
+const ResultScreen = ({score,total,onBack,onPlay,reason,onBackToWorld,fromDino=false}:{score:number;total:number;onBack:()=>void;onPlay:()=>void;reason?:"timeout"|"lives";onBackToWorld?:()=>void;fromDino?:boolean}) => {
   const pct=total>0?Math.round((score/total)*100):0;
   const stars=pct>=80?3:pct>=50?2:1;
   const heading = reason==="timeout" ? "⏰ Out of Time!" : reason==="lives" ? "💔 No More Hearts!" : "Game Over!";
@@ -309,15 +322,14 @@ const ResultScreen = ({score,total,onBack,onPlay,reason}:{score:number;total:num
     <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#1e1b4b,#312e81,#4c1d95)",display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
       <div style={{background:"rgba(255,255,255,0.1)",backdropFilter:"blur(24px)",borderRadius:"2.5rem",padding:"2.5rem 2rem",textAlign:"center",maxWidth:360,width:"100%",border:"2px solid rgba(255,255,255,0.2)",animation:"popIn 0.5s cubic-bezier(0.34,1.56,0.64,1)"}}>
         <div style={{fontFamily:F,fontWeight:900,fontSize:"2rem",color:"white",marginBottom:"0.75rem"}}>{heading}</div>
-        <div style={{display:"flex",justifyContent:"center",gap:"0.5rem",marginBottom:"0.75rem"}}>
-          {[1,2,3].map(i=><span key={i} style={{fontSize:"2.5rem",filter:i<=stars?"none":"grayscale(1) opacity(0.3)",animation:i<=stars?`starPop2 0.4s ease-out ${i*0.15}s both`:"none"}}>⭐</span>)}
-        </div>
-        <div style={{fontFamily:F,fontWeight:900,fontSize:"3rem",color:"#fbbf24",lineHeight:1}}>{score}/{total}</div>
         <div style={{fontFamily:F,fontWeight:800,fontSize:"1.3rem",color:"white",margin:"0.75rem 0"}}>{msg}</div>
         <div style={{fontFamily:F,fontWeight:700,fontSize:"1.05rem",color:"rgba(255,255,255,0.65)",marginBottom:"1.5rem"}}>{zh}</div>
         <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
           <button onClick={onPlay} style={{padding:"0.9rem",background:"linear-gradient(135deg,#4ade80,#22d3ee)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:"pointer"}}>Play Again!</button>
           <button onClick={onBack} style={{padding:"0.9rem",background:"linear-gradient(135deg,#f97316,#fbbf24)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:"pointer"}}>Choose Game</button>
+          {onBackToWorld && (
+          <button onClick={onBackToWorld} style={{padding:"0.9rem",background:"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:"pointer"}}>{fromDino ? "🦕" : "🌊"} Back to World! · 回到世界！</button>
+          )}
         </div>
       </div>
       <style>{`@keyframes popIn{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}@keyframes starPop2{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}`}</style>
@@ -503,7 +515,7 @@ const InstructionBar = ({text,color="#fbbf24"}:{text:string;color?:string}) => (
 // ══════════════════════════════════════════════════════════════════════════════
 // GAME 1: ARROW SHOOT 🏹
 // ══════════════════════════════════════════════════════════════════════════════
-const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void}) => {
+const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart,onBackToWorld}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void;onBackToWorld?:()=>void}) => {
   const play=useAudio();
   const cfg=DIFF_CONFIG[diff];
   type Balloon={id:number;word:string;x:number;y:number;speed:number;color:string};
@@ -657,8 +669,8 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
     nextTarget(new Set());
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino}/>;
-  if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld}/>;
+  if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason} onBackToWorld={onBackToWorld} fromDino={fromDino}/>;
 
   return (
     <div className="mpe-game-noselect" style={{width:"100%",height:"100vh",position:"relative",overflow:"hidden",cursor:"url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"48\" height=\"48\" viewBox=\"0 0 48 48\"><circle cx=\"24\" cy=\"24\" r=\"10\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"/><circle cx=\"24\" cy=\"24\" r=\"10\" fill=\"none\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"24\" y1=\"2\" x2=\"24\" y2=\"16\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"24\" y1=\"2\" x2=\"24\" y2=\"16\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"24\" y1=\"32\" x2=\"24\" y2=\"46\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"24\" y1=\"32\" x2=\"24\" y2=\"46\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"2\" y1=\"24\" x2=\"16\" y2=\"24\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"2\" y1=\"24\" x2=\"16\" y2=\"24\" stroke=\"white\" stroke-width=\"1.5\"/><line x1=\"32\" y1=\"24\" x2=\"46\" y2=\"24\" stroke=\"black\" stroke-width=\"3\"/><line x1=\"32\" y1=\"24\" x2=\"46\" y2=\"24\" stroke=\"white\" stroke-width=\"1.5\"/></svg>') 24 24, crosshair",paddingBottom:36,background:"linear-gradient(180deg,#4fc3f7 0%,#81d4fa 30%,#b3e5fc 55%,#c8e6c9 75%,#a5d6a7 100%)",userSelect:"none",WebkitTouchCallout:"none"}}>
@@ -740,7 +752,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
 // ══════════════════════════════════════════════════════════════════════════════
 // GAME 2: WHACK-A-MOLE 🔨
 // ══════════════════════════════════════════════════════════════════════════════
-const WhackAMole = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void}) => {
+const WhackAMole = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart,onBackToWorld}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void;onBackToWorld?:()=>void}) => {
   const play=useAudio();
   const cfg=DIFF_CONFIG[diff];
   const HOLES=9;const TOTAL=unit.vocab.length;
@@ -832,8 +844,8 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
     setMoles(Array(HOLES).fill(null));const t=pickTarget(new Set());setTimeout(()=>spawnMoles(t,new Set()),400);
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino}/>;
-  if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld}/>;
+  if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason} onBackToWorld={onBackToWorld} fromDino={fromDino}/>;
 
   return (
     <div className="mpe-game-noselect" style={{minHeight:"100vh",background:"linear-gradient(180deg,#0c4a6e 0%,#0369a1 40%,#0891b2 70%,#06b6d4 100%)",overflow:"hidden",userSelect:"none",WebkitTouchCallout:"none",cursor:overUI?"pointer":"none",paddingBottom:36}}
@@ -896,7 +908,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
 // ══════════════════════════════════════════════════════════════════════════════
 // GAME 3: WORD SNAKE 🐍
 // ══════════════════════════════════════════════════════════════════════════════
-const WordSnake = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void}) => {
+const WordSnake = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart,onBackToWorld}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void;onBackToWorld?:()=>void}) => {
   const play=useAudio();
   const cfg=DIFF_CONFIG[diff];
   const COLS=10,ROWS=10,CELL=38;const TOTAL=unit.vocab.length;
@@ -1050,8 +1062,8 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,from
     setSnake(sn);setDir({x:1,y:0});newWord(sn,new Set());
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino}/>;
-  if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld}/>;
+  if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason} onBackToWorld={onBackToWorld} fromDino={fromDino}/>;
   const flashBg=flash==="good"?"rgba(74,222,128,0.22)":flash==="bad"?"rgba(239,68,68,0.22)":"transparent";
 
   return (
@@ -1132,7 +1144,7 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,from
 // ══════════════════════════════════════════════════════════════════════════════
 // GAME 4: SPACE SHOOTER 🚀
 // ══════════════════════════════════════════════════════════════════════════════
-const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void}) => {
+const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fromDino=false,onRestart,onBackToWorld}:{unit:UnitData;diff:Diff;onBack:()=>void;onClaim?:()=>void;claimState?:"available"|"claimed"|"capped";treatsEarnedToday?:number;fromDino?:boolean;onRestart?:()=>void;onBackToWorld?:()=>void}) => {
   const play=useAudio();
   const cfg=DIFF_CONFIG[diff];
   const TOTAL=unit.vocab.length;
@@ -1330,8 +1342,8 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,f
     wordsClearedRef.current=new Set();setWordsCleared(new Set());nextTarget(new Set());
   };
 
-  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino}/>;
-  if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason}/>;
+  if(unitClear) return <UnitClearScreen unit={unit} onBack={onBack} onPlay={doRestart} onClaim={onClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld}/>;
+  if(done) return <ResultScreen score={score} total={Math.max(round,1)} onBack={onBack} onPlay={doRestart} reason={doneReason} onBackToWorld={onBackToWorld} fromDino={fromDino}/>;
 
   return (
     <div className="mpe-game-noselect" style={{width:"100%",height:"100vh",background:"#030311",position:"relative",overflow:"hidden",userSelect:"none",WebkitTouchCallout:"none",cursor:cursorVisible?"default":"none",paddingBottom:36}}
@@ -1471,6 +1483,7 @@ type Screen="books"|"units"|"games"|"diff"|"play";
 
 interface GameTestProps {
   onClaim?: (unitId: number, gameId: string, diff: Diff) => void;
+  onBackToWorld?: () => void;
   claimedCombos?: Set<string>;
   treatsCappedToday?: boolean;
   treatsEarnedToday?: number;
@@ -1478,7 +1491,7 @@ interface GameTestProps {
   studentBook?: number;
 }
 
-const GameTest = ({onClaim, claimedCombos, treatsCappedToday, treatsEarnedToday=0, fromDino=false, studentBook=1}: GameTestProps) => {
+const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, treatsEarnedToday=0, fromDino=false, studentBook=1}: GameTestProps) => {
   const navigate=useNavigate();
   const [screen,setScreen]=useState<Screen>("books");
   const [justClaimed,setJustClaimed]=useState(false);
@@ -1510,7 +1523,7 @@ const GameTest = ({onClaim, claimedCombos, treatsCappedToday, treatsEarnedToday=
   if(screen==="diff"&&unit&&game) return <DiffPicker game={game} unit={unit} onPick={(d)=>{setDiff(d);setScreen("play");}} onBack={()=>setScreen("games")}/>;
 
   if(screen==="play"&&unit&&game){
-    const props={unit,diff,onBack:()=>{setJustClaimed(false);setScreen("games");},onClaim:handleClaim,claimState,treatsEarnedToday,fromDino,onRestart:()=>setJustClaimed(false)};
+    const props={unit,diff,onBack:()=>{setJustClaimed(false);setScreen("games");},onClaim:handleClaim,onBackToWorld,claimState,treatsEarnedToday,fromDino,onRestart:()=>setJustClaimed(false)};
     if(game.id==="arrow") return <ArrowShoot {...props}/>;
     if(game.id==="whack") return <WhackAMole {...props}/>;
     if(game.id==="snake") return <WordSnake {...props}/>;
