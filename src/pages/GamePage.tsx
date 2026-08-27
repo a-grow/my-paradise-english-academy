@@ -1,20 +1,22 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import GameTest from "./GameTest";
+import { saveJarToCloud, saveDinoJarToCloud } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
 const DAILY_TREAT_CAP = 999999; // no cap (Andy rule)
 
 const GamePage = () => {
-  const { code, studentName, book } = useParams<{ code: string; studentName: string; book: string }>();
+  const { world, code, studentName, book } = useParams<{ world?: string; code: string; studentName: string; book: string }>();
   const studentBook = parseInt(book || "1", 10);
   const navigate = useNavigate();
   const isMaster = code === MASTER_CODE;
   const today = new Date().toDateString();
 
-  const fromDino = sessionStorage.getItem("mpe_from_dino") === "1";
-  const jarKey = fromDino ? `mpe_dino_jar_${code}_${studentName}` : `mpe_jar_${code}_${studentName}`;
+  const gameWorld = world || "ocean";
+  const fromDino = gameWorld === "dino";
+  const jarKey = gameWorld === "dino" ? `mpe_dino_jar_${code}_${studentName}` : `mpe_jar_${code}_${studentName}`;
   const capKey = `mpe_arcade_cap_${code}_${studentName}_${today}`;
   const comboKey = (unitId: number, gameId: string, diff: string) =>
     `mpe_arcade_${code}_${studentName}_u${unitId}_${gameId}_${diff}_${today}`;
@@ -112,7 +114,11 @@ const GamePage = () => {
     const newTotal = earnedSoFar + treats;
     localStorage.setItem(capKey, String(newTotal));
     const current = parseInt(localStorage.getItem(jarKey) || "0");
-    localStorage.setItem(jarKey, String(current + treats));
+    const newJarTotal = current + treats;
+    localStorage.setItem(jarKey, String(newJarTotal));
+    // Push fresh jar total to cloud so the World doesn't reload a stale value.
+    if (gameWorld === "dino") saveDinoJarToCloud(code, studentName, newJarTotal);
+    else saveJarToCloud(code, studentName, newJarTotal);
 
     // Update state — both updates trigger GameTest re-render with fresh claimState
     setTreatsEarnedToday(newTotal);
@@ -132,6 +138,7 @@ const GamePage = () => {
       {/* ARCADE */}
       <GameTest
         onClaim={handleClaim}
+        onBackToWorld={() => { sessionStorage.removeItem("mpe_from_dino"); navigate(fromDino ? `/dino/${code}/${studentName}` : `/world/${code}/${studentName}`); }}
         claimedCombos={claimedCombos}
         treatsCappedToday={treatsCappedToday}
         treatsEarnedToday={treatsEarnedToday}
@@ -139,57 +146,6 @@ const GamePage = () => {
         studentBook={studentBook}
       />
 
-      {/* CELEBRATION OVERLAY */}
-      {showCelebration && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 500,
-          background: "rgba(0,0,0,0.65)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          padding: "1rem"
-        }}>
-          <div style={{
-            background: "linear-gradient(135deg,#fff9e6,#fffde7)",
-            borderRadius: "2.5rem", padding: "2.5rem 2rem",
-            textAlign: "center", maxWidth: 320, width: "100%",
-            border: "3px solid #fbbf24",
-            boxShadow: "0 0 60px rgba(251,191,36,0.6), 0 20px 60px rgba(0,0,0,0.3)",
-            animation: "celebPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both"
-          }}>
-            <style>{`@keyframes celebPop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:1}}`}</style>
-            <div style={{ marginBottom: "0.25rem" }}>{fromDino ? <svg width="64" height="64" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="14" ry="7" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="9" cy="18" rx="5" ry="4" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="27" cy="18" rx="5" ry="4" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/></svg> : <svg width="64" height="64" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>}</div>
-            <div style={{
-              fontFamily: "'Nunito',sans-serif", fontWeight: 900,
-              fontSize: "2.2rem", color: "#f97316", lineHeight: 1
-            }}>+{lastTreats} {lastTreats === 1 ? "Treat" : "Treats"}!</div>
-            <div style={{
-              fontFamily: "'Nunito',sans-serif", fontWeight: 700,
-              fontSize: "0.95rem", color: "#888", margin: "0.5rem 0 1.5rem"
-            }}>
-              {fromDino ? "太棒了！去餵你的恐龍！Go feed your dino!" : "太棒了！去餵你的動物！Go feed your animal!"}
-            </div>
-            <button onClick={() => setShowCelebration(false)} style={{
-              width: "100%", padding: "0.85rem",
-              background: "linear-gradient(135deg,#4ade80,#22d3ee)",
-              border: "none", borderRadius: "999px", color: "white",
-              fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: "1.1rem",
-              cursor: "pointer", marginBottom: "0.6rem",
-              boxShadow: "0 6px 20px rgba(74,222,128,0.5)"
-            }}>
-              Keep Playing! · 繼續玩！
-            </button>
-            <button onClick={() => { sessionStorage.removeItem("mpe_from_dino"); navigate(fromDino ? `/dino/${code}/${studentName}` : `/world/${code}/${studentName}`); }} style={{
-              width: "100%", padding: "0.85rem",
-              background: "linear-gradient(135deg,#f97316,#fbbf24)",
-              border: "none", borderRadius: "999px", color: "white",
-              fontFamily: "'Nunito',sans-serif", fontWeight: 800, fontSize: "1.1rem",
-              cursor: "pointer",
-              boxShadow: "0 6px 20px rgba(249,115,22,0.5)"
-            }}>
-              {fromDino ? "🦕" : "🌊"} Back to {studentName.charAt(0).toUpperCase() + studentName.slice(1)}'s World!
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

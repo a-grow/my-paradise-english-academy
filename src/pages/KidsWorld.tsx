@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { saveJarToCloud, loadJarFromCloud, saveDataToCloud, loadDataFromCloud } from "@/lib/cloudSave";
 
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 const MASTER_CODE = "1006";
@@ -540,7 +541,7 @@ const UnderwaterBg = ({ sad }: { sad: boolean }) => (
 const EarnButtons = ({ navigate, code, studentName, activeAnimal, onVisit5Days, visitDaysCount, visit5Claimed }: { navigate: (p: string) => void; code: string; studentName: string; activeAnimal: Animal; onVisit5Days: () => void; visitDaysCount: number; visit5Claimed: boolean }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
     {[
-      { label: "Play a Game", sub: "打敗遊戲，得1~3個點心！", reward: "+1~3 treats", color: activeAnimal.btnColor, glow: activeAnimal.btnGlow, path: `/game/${code}/${studentName}/BOOKNUM` },
+      { label: "Play a Game", sub: "打敗遊戲，得1~3個點心！", reward: "+1~3 treats", color: activeAnimal.btnColor, glow: activeAnimal.btnGlow, path: `/game/ocean/${code}/${studentName}/BOOKNUM` },
       // { label: "Grammar Games", sub: "玩文法遊戲，賺取獎勵！", reward: "play!", color: "#8b5cf6", glow: "rgba(139,92,246,0.5)", path: `/grammar/${code}/${studentName}/BOOKNUM` },
       { label: "Visit 5 Days!", sub: "來訪5天！", reward: "+3 treats", color: activeAnimal.btn3Color, glow: activeAnimal.btn3Glow, path: "", visit5: true },
     ].map((btn, i) => (
@@ -686,7 +687,9 @@ const OceanCollection = ({ fedTreatsMap, videoWatched, videoWatchedMap, unlockSe
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 const KidsWorld = () => {
-  const { code, studentName } = useParams<{ code: string; studentName: string }>();
+  const { code: rawCode, studentName: rawStudentName } = useParams<{ code: string; studentName: string }>();
+  const code = rawCode ? rawCode.toUpperCase() : rawCode;
+  const studentName = rawStudentName ? rawStudentName.toLowerCase() : rawStudentName;
   const { family } = useAuth();
   const navigate = useNavigate();
 
@@ -802,6 +805,121 @@ const KidsWorld = () => {
   }, [musicOn]);
   useEffect(() => { if (audioRef.current) audioRef.current.volume = volume * 0.5; localStorage.setItem("mpe_volume", String(volume)); }, [volume]);
   useEffect(() => { localStorage.setItem("mpe_sfx", sfxOn ? "on" : "off"); }, [sfxOn]);
+
+  // Cloud save: mirror jar to Supabase whenever it changes (write-only for now)
+  const jarCloudReady = useRef(false);
+  useEffect(() => {
+    if (isMaster) return;
+    if (!jarCloudReady.current) { jarCloudReady.current = true; return; }
+    saveJarToCloud(code, studentName, jarTreats);
+  }, [jarTreats]);
+
+  // Cloud save: mirror all Ocean progress (except jar) to Supabase on change
+  const dataCloudReady = useRef(false);
+  const gatherOceanBlob = () => {
+    const levelupFor = (id: string) => {
+      try { return JSON.parse(localStorage.getItem(`mpe_levelup_${id}_${code}_${studentName}`) || "[]"); }
+      catch { return []; }
+    };
+    const animals: Record<string, any> = {};
+    ANIMALS.forEach(a => {
+      animals[a.id] = {
+        fed: fedTreatsState[a.id] ?? 0,
+        petName: petNameMap[a.id] ?? "",
+        levelup: levelupFor(a.id),
+        videoWatched: videoWatchedMap[a.id] ? 1 : 0,
+        unlkseen: unlockSeenMap[a.id] ? 1 : 0,
+      };
+    });
+    return {
+      ocean: { videoSeen: videoButtonSeen ? 1 : 0, animals },
+      shared: {
+        visitDays: getVisitDays(),
+        visit5Claimed: parseInt(localStorage.getItem(visit5ClaimedKey) || "0"),
+      },
+    };
+  };
+  useEffect(() => {
+    if (isMaster) return;
+    if (!dataCloudReady.current) { dataCloudReady.current = true; return; }
+    saveDataToCloud(code, studentName, activeAnimalId, gatherOceanBlob());
+  }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, videoButtonSeen, visitDaysCount, visit5Claimed]);
+
+  // Cloud read-back on mount (device-wins-first). Runs once.
+  useEffect(() => {
+    if (isMaster) { jarCloudReady.current = true; return; }
+    let cancelled = false;
+    (async () => {
+      const cloud = await loadJarFromCloud(code, studentName);
+      if (cancelled) return;
+      if (cloud === null) {
+        // No cloud row yet: push device jar UP first. Device wins.
+        await saveJarToCloud(code, studentName, jarTreats);
+      } else {
+        // Real cloud value (including 0): cloud wins.
+        setJarTreats(cloud);
+        localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(cloud));
+      }
+      jarCloudReady.current = true;
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Cloud read-back for the progress blob on mount (device-wins-first). Runs once.
+  useEffect(() => {
+    if (isMaster) { dataCloudReady.current = true; return; }
+    let cancelled = false;
+    (async () => {
+      const result = await loadDataFromCloud(code, studentName);
+      if (cancelled) return;
+      if (result === null || result.data === null) {
+        await saveDataToCloud(code, studentName, activeAnimalId, gatherOceanBlob());
+      } else {
+        const d = result.data;
+        const oceanAnimals = d?.ocean?.animals ?? {};
+        const newFed: Record<string, number> = {};
+        const newPetNames: Record<string, string> = {};
+        const newVideoWatched: Record<string, boolean> = {};
+        const newUnlockSeen: Record<string, boolean> = {};
+        ANIMALS.forEach(a => {
+          const av = oceanAnimals[a.id] ?? {};
+          const fed = av.fed ?? 0;
+          const petName = av.petName ?? "";
+          const videoWatched = av.videoWatched === 1;
+          const unlkseen = av.unlkseen ?? 0;
+          const levelup = Array.isArray(av.levelup) ? av.levelup : [];
+          newFed[a.id] = fed;
+          newPetNames[a.id] = petName;
+          newVideoWatched[a.id] = videoWatched;
+          newUnlockSeen[a.id] = unlkseen === 1;
+          const fedKey = a.id === "turtle" ? `mpe_fed_${code}_${studentName}` : `mpe_fed_${a.id}_${code}_${studentName}`;
+          localStorage.setItem(fedKey, String(fed));
+          localStorage.setItem(`mpe_petname_${a.id}_${code}_${studentName}`, petName);
+          const vKey = a.id === "turtle" ? `mpe_videowatched_${code}_${studentName}` : `mpe_videowatched_${a.id}_${code}_${studentName}`;
+          localStorage.setItem(vKey, videoWatched ? "1" : "0");
+          localStorage.setItem(`mpe_unlkseen_${a.id}_${code}_${studentName}`, unlkseen === 1 ? "1" : "0");
+          localStorage.setItem(`mpe_levelup_${a.id}_${code}_${studentName}`, JSON.stringify(levelup));
+        });
+        setFedTreatsState(newFed);
+        setPetNameMap(newPetNames);
+        setVideoWatchedMap(newVideoWatched);
+        setUnlockSeenMap(newUnlockSeen);
+        const videoSeen = d?.ocean?.videoSeen === 1;
+        setVideoButtonSeen(videoSeen);
+        localStorage.setItem(`mpe_videoseen_${code}_${studentName}`, videoSeen ? "1" : "0");
+        const visitDays = Array.isArray(d?.shared?.visitDays) ? d.shared.visitDays : [];
+        localStorage.setItem(visitDaysKey, JSON.stringify(visitDays));
+        const visit5 = d?.shared?.visit5Claimed ?? 0;
+        localStorage.setItem(visit5ClaimedKey, String(visit5));
+        if (result.activePet) {
+          setActiveAnimalId(result.activePet);
+          localStorage.setItem(`mpe_active_${code}_${studentName}`, result.activePet);
+        }
+      }
+      dataCloudReady.current = true;
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Lock scroll when dim overlay is active
   useEffect(() => {

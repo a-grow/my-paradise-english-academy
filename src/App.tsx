@@ -30,6 +30,7 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/portal" element={<Portal />} />
               <Route path="/world/:code/:studentName" element={<KidsWorld />} />
+<Route path="/game/:world/:code/:studentName/:book" element={<GamePage />} />
 <Route path="/game/:code/:studentName/:book" element={<GamePage />} />
 {/* <Route path="/grammar/:code/:studentName/:book" element={<Grammar />} /> */}
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
