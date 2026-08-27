@@ -541,7 +541,7 @@ const UnderwaterBg = ({ sad }: { sad: boolean }) => (
 const EarnButtons = ({ navigate, code, studentName, activeAnimal, onVisit5Days, visitDaysCount, visit5Claimed }: { navigate: (p: string) => void; code: string; studentName: string; activeAnimal: Animal; onVisit5Days: () => void; visitDaysCount: number; visit5Claimed: boolean }) => (
   <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
     {[
-      { label: "Play a Game", sub: "打敗遊戲，得1~3個點心！", reward: "+1~3 treats", color: activeAnimal.btnColor, glow: activeAnimal.btnGlow, path: `/game/${code}/${studentName}/BOOKNUM` },
+      { label: "Play a Game", sub: "打敗遊戲，得1~3個點心！", reward: "+1~3 treats", color: activeAnimal.btnColor, glow: activeAnimal.btnGlow, path: `/game/ocean/${code}/${studentName}/BOOKNUM` },
       // { label: "Grammar Games", sub: "玩文法遊戲，賺取獎勵！", reward: "play!", color: "#8b5cf6", glow: "rgba(139,92,246,0.5)", path: `/grammar/${code}/${studentName}/BOOKNUM` },
       { label: "Visit 5 Days!", sub: "來訪5天！", reward: "+3 treats", color: activeAnimal.btn3Color, glow: activeAnimal.btn3Glow, path: "", visit5: true },
     ].map((btn, i) => (
@@ -687,7 +687,9 @@ const OceanCollection = ({ fedTreatsMap, videoWatched, videoWatchedMap, unlockSe
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 const KidsWorld = () => {
-  const { code, studentName } = useParams<{ code: string; studentName: string }>();
+  const { code: rawCode, studentName: rawStudentName } = useParams<{ code: string; studentName: string }>();
+  const code = rawCode ? rawCode.toUpperCase() : rawCode;
+  const studentName = rawStudentName ? rawStudentName.toLowerCase() : rawStudentName;
   const { family } = useAuth();
   const navigate = useNavigate();
 

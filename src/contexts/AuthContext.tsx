@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
     if (rows.length > 0) {
       const family: Family = {
-        code: rows[0].code,
+        code: rows[0].code.toUpperCase(),
         familyName: rows[0].familyName,
         book: parseInt(rows[0].book, 10) || 1,
         unit: String(rows[0].unit ?? "").trim(),
