@@ -241,13 +241,13 @@ const LoginScreen = () => {
         </div>
         <div className="text-5xl mb-2">🌴</div>
         <h1 className="font-display font-bold text-3xl text-paradise-coral mb-1">Student Portal</h1>
-        <ZH size="1em">學生入口</ZH>
+        <ZH size="1em">帳號</ZH>
         <p className="font-body text-muted-foreground mt-3 mb-1 text-sm">Enter your student code to continue!</p>
-        <ZH>請輸入你的學生密碼！</ZH>
+        <ZH>輸入密碼</ZH>
         <input className="w-full px-5 py-4 rounded-2xl font-display font-bold text-xl text-center tracking-widest uppercase outline-none transition-all duration-200 mb-4 mt-5" style={{ border: error ? "3px solid #f87171" : "3px solid hsl(var(--paradise-sky)/0.5)", background: error ? "#fef2f2" : "hsl(var(--paradise-sky)/0.07)" }} type="text" placeholder="e.g. ELSA123" value={code} onChange={(e) => { setCode(e.target.value); setError(""); }} onKeyDown={(e) => e.key === "Enter" && handleLogin()} maxLength={20} autoFocus />
         <button onClick={handleLogin} disabled={loading || !code.trim()} className="w-full py-4 rounded-2xl font-display font-bold text-xl text-white transition-all duration-200 disabled:opacity-50 hover:-translate-y-1 hover:shadow-xl active:translate-y-0" style={{ background: "linear-gradient(135deg, hsl(var(--paradise-coral)), hsl(var(--paradise-pink)), hsl(var(--paradise-purple)))", boxShadow: "0 8px 25px rgba(0,0,0,0.15)" }}>
           {loading ? "Checking... ✨" : "Enter Portal →"}
-          {!loading && <ZHwhite size="0.7em">進入入口</ZHwhite>}
+          {!loading && <ZHwhite size="0.7em">登入</ZHwhite>}
         </button>
         {error && <p className="mt-4 text-red-500 font-body text-sm">{error}</p>}
         <p className="mt-6 text-xs text-muted-foreground font-body">Don't know your code? Message us on Line! 💬</p>
@@ -345,8 +345,8 @@ const Dashboard = () => {
         <Star className="absolute bottom-6 right-12 w-6 h-6 text-paradise-yellow fill-paradise-yellow animate-float-delayed" />
         <h1 className="font-display font-bold text-4xl text-white drop-shadow-lg mb-1 relative z-10">Welcome, {family.familyName}! 👋</h1>
         <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.8)", marginBottom: "0.25rem" }}>歡迎，{family.familyName}！</div>
-        <p className="font-body text-white/80 text-base relative z-10">My Paradise English Academy — Student Portal</p>
-        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(255,255,255,0.6)" }}>天堂英語學院 — 學生入口</div>
+        <p className="font-body text-white/80 text-base relative z-10">My Paradise English — Student Portal</p>
+        <div className="relative z-10" style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.95rem", color: "rgba(255,255,255,0.6)" }}>My Paradise English — 學習帳號</div>
       </div>
       <div className="max-w-lg mx-auto px-4 py-8 flex flex-col gap-5">
         {/* EVALS HIDDEN — parents see vocab + world only. Fetch + latestUnitsStr kept so vocab still gets the current unit. Reversible: uncomment to restore. */}
@@ -377,7 +377,7 @@ const Dashboard = () => {
               ) : (
                 <>
                   <p className="font-body text-base text-muted-foreground italic">No evaluation yet — check back after your next milestone! 🌟</p>
-                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.88rem", color: "rgba(0,0,0,0.35)", marginTop: "0.25rem" }}>還沒有評估 — 下次里程碑後再來看看！</div>
+                  <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.88rem", color: "rgba(0,0,0,0.35)", marginTop: "0.25rem" }}>還沒有評估 — 之後再回來喔！</div>
                 </>
               )}
             </div>
@@ -441,8 +441,8 @@ const Dashboard = () => {
         </div>
       </div>
       <div className="text-center py-6 font-body text-xs text-muted-foreground">
-        🌴 My Paradise English Academy · Learning is an Adventure!
-        <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.9em", marginTop: "0.2rem" }}>天堂英語學院 · 學習是一場冒險！</div>
+        🌴 My Paradise English · Learning is an Adventure!
+        <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "0.9em", marginTop: "0.2rem" }}>My Paradise English</div>
       </div>
       <style>{`
         @keyframes wobble { 0%, 100% { transform: rotate(-1deg) scale(1); } 25% { transform: rotate(1.5deg) scale(1.02); } 50% { transform: rotate(-1deg) scale(1); } 75% { transform: rotate(1deg) scale(1.01); } }

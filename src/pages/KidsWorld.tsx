@@ -26,7 +26,7 @@ const ANIMALS: Animal[] = [
     stages: [
       { name: "Egg",   nameZh: "蛋",      min: 0,  img: "/creatures/turtle-egg.png" },
       { name: "Baby",  nameZh: "小海龜",   min: 15, img: "/creatures/turtle-baby.png" },
-      { name: "Young", nameZh: "年輕海龜", min: 30, img: "/creatures/turtle-young.png" },
+      { name: "Young", nameZh: "少年海龜", min: 30, img: "/creatures/turtle-young.png" },
       { name: "Grown", nameZh: "成年海龜", min: 45, img: "/creatures/turtle-grown.png" },
     ],
     unlockCondition: "default",
@@ -37,17 +37,17 @@ const ANIMALS: Animal[] = [
     feedLabel: "turtle", feedLabelZh: "海龜",
     levelUpMessages: [
       { main: "Welcome Home!",          zh: "歡迎回家！",           sub: "Meet your Baby Sea Turtle!",     subZh: "快來認識你的小海龜！" },
-      { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Sea Turtle!",        subZh: "現在是年輕海龜了！" },
+      { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Sea Turtle!",        subZh: "現在是少年海龜了！" },
       { main: "Fully grown! Amazing!",  zh: "完全長大了！太棒了！", sub: "You raised a Grown Sea Turtle!", subZh: "你養大了一隻成年海龜！" },
     ],
-    unlockOverlay: { emoji: "🐢", title: "Sea Turtle!", titleZh: "海龜！", eggLine: "A Sea Turtle appeared!", eggLineZh: "海龜出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "Let's go! · 出發！🎉", glowColor: "rgba(255,215,0,0.6)", borderColor: "rgba(255,215,0,0.7)", bgGradient: "linear-gradient(135deg,#0c3460,#1a6e8a)" },
+    unlockOverlay: { emoji: "🐢", title: "Sea Turtle!", titleZh: "海龜！", eggLine: "A Sea Turtle appeared!", eggLineZh: "海龜出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "Let's go! · 出發！🎉", glowColor: "rgba(255,215,0,0.6)", borderColor: "rgba(255,215,0,0.7)", bgGradient: "linear-gradient(135deg,#0c3460,#1a6e8a)" },
   },
   {
     id: "dolphin", name: "Dolphin", nameZh: "海豚", emoji: "🐬",
     stages: [
-      { name: "Blanket", nameZh: "裹巾",     min: 0,  img: "/creatures/dolphin-blanket.png" },
-      { name: "Young", nameZh: "年輕海豚", min: 15, img: "/creatures/dolphin-baby.png" },
-      { name: "Teen",  nameZh: "青少海豚", min: 30, img: "/creatures/dolphin-young.png" },
+      { name: "Blanket", nameZh: "小毯子",     min: 0,  img: "/creatures/dolphin-blanket.png" },
+      { name: "Young", nameZh: "少年海豚", min: 15, img: "/creatures/dolphin-baby.png" },
+      { name: "Teen",  nameZh: "少年海豚", min: 30, img: "/creatures/dolphin-young.png" },
       { name: "Grown", nameZh: "成年海豚", min: 45, img: "/creatures/dolphin-grown.png" },
     ],
     unlockCondition: "turtle_grown_video_watched",
@@ -58,18 +58,18 @@ const ANIMALS: Animal[] = [
     feedLabel: "dolphin", feedLabelZh: "海豚",
     levelUpMessages: [
       { main: "Welcome Home!",          zh: "歡迎回家！",           sub: "Meet your Baby Dolphin!",     subZh: "快來認識你的小海豚！" },
-      { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Dolphin!",        subZh: "現在是年輕海豚了！" },
+      { main: "Look how you've grown!", zh: "你長大了！",           sub: "Now a Young Dolphin!",        subZh: "現在是少年海豚了！" },
       { main: "Fully grown! Amazing!",  zh: "完全長大了！太棒了！", sub: "You raised a Grown Dolphin!", subZh: "你養大了一隻成年海豚！" },
     ],
-    unlockOverlay: { emoji: "🐬", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dolphin appeared!", eggLineZh: "海豚出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(100,200,255,0.6)", borderColor: "rgba(100,200,255,0.7)", bgGradient: "linear-gradient(135deg,#003d7a,#0077b6,#00b4d8)" },
+    unlockOverlay: { emoji: "🐬", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dolphin appeared!", eggLineZh: "海豚出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(100,200,255,0.6)", borderColor: "rgba(100,200,255,0.7)", bgGradient: "linear-gradient(135deg,#003d7a,#0077b6,#00b4d8)" },
   },
   // ── ADD NEW ANIMALS HERE — one object = one new animal (octopus before shark) ───
   {
     id: "octopus", name: "Octopus", nameZh: "章魚", emoji: "🐙",
     stages: [
-      { name: "Egg",   nameZh: "章魚蛋",   min: 0,  img: "/creatures/octopus-egg.png" },
+      { name: "Egg",   nameZh: "",   min: 0,  img: "/creatures/octopus-egg.png" },
       { name: "Baby",  nameZh: "小章魚",   min: 15, img: "/creatures/octopus-egg-baby.png" },
-      { name: "Young", nameZh: "年輕章魚", min: 30, img: "/creatures/octopus-young.png" },
+      { name: "Young", nameZh: "少年章魚", min: 30, img: "/creatures/octopus-young.png" },
       { name: "Grown", nameZh: "成年章魚", min: 45, img: "/creatures/octopus-grown.png" },
     ],
     unlockCondition: "dolphin_grown_video_watched",
@@ -80,17 +80,17 @@ const ANIMALS: Animal[] = [
     feedLabel: "octopus", feedLabelZh: "章魚",
     levelUpMessages: [
       { main: "Hello little one!",       zh: "你好小寶貝！",         sub: "A Baby Octopus appeared!",       subZh: "小章魚出現了！" },
-      { main: "Growing so fast!",        zh: "長得好快！",           sub: "Now a Young Octopus!",           subZh: "現在是年輕章魚了！" },
+      { main: "Growing so fast!",        zh: "長得好快！",           sub: "Now a Young Octopus!",           subZh: "現在是少年章魚了！" },
       { main: "Magnificent! Amazing!",   zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Octopus!",    subZh: "你養大了一隻成年章魚！" },
     ],
-    unlockOverlay: { emoji: "🐙", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "An Octopus Egg appeared!", eggLineZh: "出現了一顆章魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(168,85,247,0.6)", borderColor: "rgba(216,180,254,0.7)", bgGradient: "linear-gradient(135deg,#2e1065,#581c87,#7e22ce)" },
+    unlockOverlay: { emoji: "🐙", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "An Octopus Egg appeared!", eggLineZh: "出現了一顆章魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(168,85,247,0.6)", borderColor: "rgba(216,180,254,0.7)", bgGradient: "linear-gradient(135deg,#2e1065,#581c87,#7e22ce)" },
   },
   {
     id: "shark", name: "Great White Shark", nameZh: "大白鯊", emoji: "🦈",
     stages: [
-      { name: "Blanket", nameZh: "裹巾",     min: 0,  img: "/creatures/shark-blanket.png" },
+      { name: "Blanket", nameZh: "小毯子",     min: 0,  img: "/creatures/shark-blanket.png" },
       { name: "Baby",  nameZh: "小鯊魚",   min: 15, img: "/creatures/shark-baby.png" },
-      { name: "Young", nameZh: "年輕鯊魚", min: 30, img: "/creatures/shark-young.png" },
+      { name: "Young", nameZh: "少年鯊魚", min: 30, img: "/creatures/shark-young.png" },
       { name: "Grown", nameZh: "成年鯊魚", min: 45, img: "/creatures/shark-grown.png" },
     ],
     unlockCondition: "octopus_grown_video_watched",
@@ -101,17 +101,17 @@ const ANIMALS: Animal[] = [
     feedLabel: "shark", feedLabelZh: "鯊魚",
     levelUpMessages: [
       { main: "Hello little one!",      zh: "你好小寶貝！",       sub: "A Baby Shark appeared!",        subZh: "小鯊魚出現了！" },
-      { main: "Growing so fast!",       zh: "長得好快！",         sub: "Now a Young Shark!",            subZh: "現在是年輕鯊魚了！" },
+      { main: "Growing so fast!",       zh: "長得好快！",         sub: "Now a Young Shark!",            subZh: "現在是少年鯊魚了！" },
       { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！", sub: "You raised a Grown Shark!",     subZh: "你養大了一隻成年鯊魚！" },
     ],
-    unlockOverlay: { emoji: "🦈", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Shark Egg appeared!", eggLineZh: "出現了一顆鯊魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(200,220,255,0.7)", bgGradient: "linear-gradient(135deg,#0f2744,#1e3a5f,#2d5a8e)" },
+    unlockOverlay: { emoji: "🦈", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Shark Egg appeared!", eggLineZh: "出現了一顆鯊魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(200,220,255,0.7)", bgGradient: "linear-gradient(135deg,#0f2744,#1e3a5f,#2d5a8e)" },
   },
   {
     id: "clownfish", name: "Clownfish", nameZh: "小丑魚", emoji: "🐠",
     stages: [
-      { name: "Egg",   nameZh: "魚蛋",     min: 0,  img: "/creatures/clownfish-egg.png" },
+      { name: "Egg",   nameZh: "",     min: 0,  img: "/creatures/clownfish-egg.png" },
       { name: "Baby",  nameZh: "小小丑魚", min: 15, img: "/creatures/clownfish-baby.png" },
-      { name: "Young", nameZh: "年輕小丑魚", min: 30, img: "/creatures/clownfish-young.png" },
+      { name: "Young", nameZh: "少年小丑魚", min: 30, img: "/creatures/clownfish-young.png" },
       { name: "Grown", nameZh: "成年小丑魚", min: 45, img: "/creatures/clownfish-grown.png" },
     ],
     unlockCondition: "shark_grown_video_watched",
@@ -122,31 +122,31 @@ const ANIMALS: Animal[] = [
     feedLabel: "clownfish", feedLabelZh: "小丑魚",
     levelUpMessages: [
       { main: "Hello little one!",      zh: "你好小寶貝！",         sub: "A Baby Clownfish appeared!",      subZh: "小小丑魚出現了！" },
-      { main: "Growing so fast!",       zh: "長得好快！",           sub: "Now a Young Clownfish!",          subZh: "現在是年輕小丑魚了！" },
+      { main: "Growing so fast!",       zh: "長得好快！",           sub: "Now a Young Clownfish!",          subZh: "現在是少年小丑魚了！" },
       { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Clownfish!",   subZh: "你養大了一隻成年小丑魚！" },
     ],
-    unlockOverlay: { emoji: "🐠", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Clownfish Egg appeared!", eggLineZh: "出現了一顆小丑魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(249,115,22,0.6)", borderColor: "rgba(251,146,60,0.7)", bgGradient: "linear-gradient(135deg,#7c1d0c,#c2410c,#ea580c)" },
+    unlockOverlay: { emoji: "🐠", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Clownfish Egg appeared!", eggLineZh: "出現了一顆小丑魚蛋！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(249,115,22,0.6)", borderColor: "rgba(251,146,60,0.7)", bgGradient: "linear-gradient(135deg,#7c1d0c,#c2410c,#ea580c)" },
   },
   {
-    id: "mantaray", name: "Manta Ray", nameZh: "蝠鱝", emoji: "🐟",
+    id: "mantaray", name: "Manta Ray", nameZh: "魟魚", emoji: "🐟",
     stages: [
-      { name: "Blanket", nameZh: "裹巾",       min: 0,  img: "/creatures/mantaray-blanket.png" },
-      { name: "Baby",    nameZh: "小蝠鱝",     min: 15, img: "/creatures/mantaray-baby.png" },
-      { name: "Young",   nameZh: "年輕蝠鱝",   min: 30, img: "/creatures/mantaray-young.png" },
-      { name: "Grown",   nameZh: "成年蝠鱝",   min: 45, img: "/creatures/mantaray-grown.png" },
+      { name: "Blanket", nameZh: "小毯子",       min: 0,  img: "/creatures/mantaray-blanket.png" },
+      { name: "Baby",    nameZh: "小魟魚",     min: 15, img: "/creatures/mantaray-baby.png" },
+      { name: "Young",   nameZh: "少年魟魚",   min: 30, img: "/creatures/mantaray-young.png" },
+      { name: "Grown",   nameZh: "成年魟魚",   min: 45, img: "/creatures/mantaray-grown.png" },
     ],
     unlockCondition: "clownfish_grown_video_watched",
     collectionBg: "#1e3a8a", collectionBorder: "rgba(147,197,253,0.7)", collectionGlow: "rgba(96,165,250,0.45)",
     video: "/video_adult_mantaray.mp4", isEggType: false, scale: 1.6,
     accentColor: "#818cf8", accentGlow: "rgba(129,140,248,0.5)",
     btnColor: "#3b82f6", btnGlow: "rgba(59,130,246,0.5)", btn3Color: "#818cf8", btn3Glow: "rgba(129,140,248,0.5)",
-    feedLabel: "mantaray", feedLabelZh: "蝠鱝",
+    feedLabel: "mantaray", feedLabelZh: "魟魚",
     levelUpMessages: [
-      { main: "Hello little one!",      zh: "你好小寶貝！",         sub: "A Baby Manta Ray appeared!",      subZh: "小蝠鱝出現了！" },
-      { main: "Growing so fast!",       zh: "長得好快！",           sub: "Now a Young Manta Ray!",          subZh: "現在是年輕蝠鱝了！" },
-      { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Manta Ray!",   subZh: "你養大了一隻成年蝠鱝！" },
+      { main: "Hello little one!",      zh: "你好小寶貝！",         sub: "A Baby Manta Ray appeared!",      subZh: "小魟魚出現了！" },
+      { main: "Growing so fast!",       zh: "長得好快！",           sub: "Now a Young Manta Ray!",          subZh: "現在是少年魟魚了！" },
+      { main: "Magnificent! Amazing!",  zh: "太壯觀了！太棒了！",   sub: "You raised a Grown Manta Ray!",   subZh: "你養大了一隻成年魟魚！" },
     ],
-    unlockOverlay: { emoji: "🐟", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Manta Ray appeared!", eggLineZh: "蝠鱝出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠點心讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(147,197,253,0.7)", bgGradient: "linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb)" },
+    unlockOverlay: { emoji: "🐟", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Manta Ray appeared!", eggLineZh: "魟魚出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(96,165,250,0.6)", borderColor: "rgba(147,197,253,0.7)", bgGradient: "linear-gradient(135deg,#0f172a,#1e3a8a,#2563eb)" },
   },
 ];
 // locked placeholder slots (fills collection grid to 6 total)
@@ -543,7 +543,7 @@ const EarnButtons = ({ navigate, code, studentName, activeAnimal, onVisit5Days, 
     {[
       { label: "Play a Game", sub: "打敗遊戲，得1~3個點心！", reward: "+1~3 treats", color: activeAnimal.btnColor, glow: activeAnimal.btnGlow, path: `/game/ocean/${code}/${studentName}/BOOKNUM` },
       // { label: "Grammar Games", sub: "玩文法遊戲，賺取獎勵！", reward: "play!", color: "#8b5cf6", glow: "rgba(139,92,246,0.5)", path: `/grammar/${code}/${studentName}/BOOKNUM` },
-      { label: "Visit 5 Days!", sub: "來訪5天！", reward: "+3 treats", color: activeAnimal.btn3Color, glow: activeAnimal.btn3Glow, path: "", visit5: true },
+      { label: "Visit 5 Days!", sub: "連續5天", reward: "+3 treats", color: activeAnimal.btn3Color, glow: activeAnimal.btn3Glow, path: "", visit5: true },
     ].map((btn, i) => (
       <button key={i} onClick={() => { if((btn as any).visit5){ onVisit5Days(); return; } if(!btn.disabled && btn.path){ const f = JSON.parse(sessionStorage.getItem('mpe_family') || '{}'); navigate(btn.path.replace('BOOKNUM', String(f?.book ?? 1))); }}} style={{
         width: "100%", padding: "1.1rem 1.25rem",
@@ -1189,7 +1189,7 @@ const KidsWorld = () => {
               🌊 Ocean World Complete! 🌊
             </div>
             <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.05rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.25rem", textAlign: "center" }}>
-              海洋世界完成了！
+              完成海洋世界了！
             </div>
 
             {/* Red 3D button */}
@@ -1354,7 +1354,7 @@ const KidsWorld = () => {
             <div style={{ color: "rgba(255,255,255,0.8)", fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
               {displayName} gets 1 treat today! <br />
               <span style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.95rem" }}>{displayName}今天得到1個點心！</span><br />
-              <span style={{ fontSize: "0.85rem", opacity: 0.65 }}>Come back tomorrow for more! · 明天再來拿更多！</span>
+              <span style={{ fontSize: "0.85rem", opacity: 0.65 }}>Come back tomorrow for more! · 明天再回來喔</span>
             </div>
             <button onClick={claimDailyGift} style={{ background: "linear-gradient(135deg,#f59e0b,#ef4444)", border: "none", borderRadius: "999px", color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.35rem", padding: "0.9rem 2.5rem", cursor: "pointer", boxShadow: "0 6px 24px rgba(245,158,11,0.55)" }}>
               Claim +1 Treat! · 領取！
@@ -1394,7 +1394,7 @@ const KidsWorld = () => {
           {nearHatch && !eggWiggle && (
             <div style={{ background: "rgba(255,255,255,0.95)", borderRadius: "1.2rem", padding: "0.7rem 1.1rem", margin: "0 auto 0.6rem", maxWidth: 260, fontFamily: "Nunito,sans-serif", fontSize: "1rem", color: "#333", lineHeight: 1.5, boxShadow: "0 4px 12px rgba(0,0,0,0.15)", position: "relative" }}>
               I'm almost ready! 🐣<br />
-              <span style={{ fontSize: "0.9rem", color: "#555" }}>我快出來了！再給我幾個點心！</span>
+              <span style={{ fontSize: "0.9rem", color: "#555" }}>快出來了！再餵幾個點心！</span>
               <div style={{ position: "absolute", bottom: -8, left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: "8px solid rgba(255,255,255,0.95)" }} />
             </div>
           )}
@@ -1423,12 +1423,12 @@ const KidsWorld = () => {
             )}
             {nearHatch && (
               <div style={{ color: "#fbbf24", fontFamily: "'Fredoka One',cursive", fontSize: "1.05rem", marginTop: "0.4rem", animation: "shimmer 1s ease-in-out infinite", textAlign: "center" }}>
-                Almost there! ✨ · 快到了！✨
+                Almost there! ✨ · 快了！✨
               </div>
             )}
             {!isEgg && !sad && (
               <div style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginTop: "0.4rem", animation: "shimmer 2.2s ease-in-out infinite", textAlign: "center" }}>
-                Pet me to make me happy! · 摸摸我讓我開心！🐢
+                Pet me to make me happy! · 拍拍我🐢
               </div>
             )}
 
@@ -1487,7 +1487,7 @@ const KidsWorld = () => {
         <div className="glass" style={{ padding: "1.5rem", marginBottom: "1rem", animation: "fadeUp 0.7s ease-out" }}>
           <div style={{ color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.25rem", textAlign: "center", marginBottom: "0.85rem" }}>
             {petName ? `${petName} loves treats! ` : `Feed your ${activeAnimal.name} Treats! `}<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>餵你的{activeAnimal.nameZh}！每次餵食讓牠更快長大！</span>
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>餵你的{activeAnimal.nameZh}！讓他更快長大！</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
             <TreatJar treats={jarTreats} nextStage={nextStage} />
@@ -1496,7 +1496,7 @@ const KidsWorld = () => {
                 {stageIdx + 1}<span style={{ fontSize: "1.3rem", opacity: 0.6 }}>/4</span>
               </div>
               <div style={{ color: "rgba(255,255,255,0.7)", fontFamily: "Nunito,sans-serif", fontSize: "0.95rem" }}>
-                stages done · 已完成階段
+                stages done · 已完成
               </div>
               <div style={{ marginTop: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem", justifyContent: "center" }}>
                 <FaceCookie size={24} />
@@ -1534,7 +1534,7 @@ const KidsWorld = () => {
         <div className="glass" style={{ padding: "1.5rem", animation: "fadeUp 0.9s ease-out" }}>
           <div style={{ color: "white", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", marginBottom: "1rem", textAlign: "center" }}>
             Ocean Collection 🌊<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>海洋收藏！收集所有生物！</span>
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", opacity: 0.8 }}>蒐集所有海洋生物！</span>
           </div>
           {/* Wiggle arrow pointing at correct collection slot */}
           {(() => {
@@ -1572,7 +1572,7 @@ const KidsWorld = () => {
             };
           }} /></div>
           <div style={{ color: "rgba(255,255,255,0.5)", fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", marginTop: "0.85rem", textAlign: "center" }}>
-            More creatures unlocking soon! · 更多生物即將解鎖！
+            More creatures unlocking soon! · 解鎖更多生物
           </div>
         </div>
       </div>

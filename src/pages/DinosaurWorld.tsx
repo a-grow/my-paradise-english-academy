@@ -36,11 +36,11 @@ const ANIMALS: Animal[] = [
     btnColor: "#b45309", btnGlow: "rgba(180,83,9,0.5)", btn3Color: "#556B2F", btn3Glow: "rgba(85,107,47,0.5)",
     feedLabel: "triceratops", feedLabelZh: "三角龍",
     levelUpMessages: [
-      { main: "Welcome, little one!", zh: "歡迎來到世界！", sub: "Meet your Baby Triceratops!", subZh: "快來認識你的小三角龍！" },
+      { main: "Welcome, little one!", zh: "歡迎來到恐龍世界！", sub: "Meet your Baby Triceratops!", subZh: "快來認識你的小三角龍！" },
       { main: "Growing strong!", zh: "長得好壯！", sub: "Now a Young Triceratops!", subZh: "現在是年輕三角龍了！" },
       { main: "Fully grown! ROAR!", zh: "完全長大了！吼！", sub: "You raised a Grown Triceratops!", subZh: "你養大了一隻成年三角龍！" },
     ],
-    unlockOverlay: { emoji: "🦕", title: "Triceratops!", titleZh: "三角龍！", eggLine: "A Triceratops Egg appeared!", eggLineZh: "三角龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "Let's go! · 出發！🎉", glowColor: "rgba(218,165,32,0.6)", borderColor: "rgba(218,165,32,0.8)", bgGradient: "linear-gradient(135deg,#3d2b1f,#7c4a1a)" },
+    unlockOverlay: { emoji: "🦕", title: "Triceratops!", titleZh: "三角龍！", eggLine: "A Triceratops Egg appeared!", eggLineZh: "三角龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "Let's go! · 出發！🎉", glowColor: "rgba(218,165,32,0.6)", borderColor: "rgba(218,165,32,0.8)", bgGradient: "linear-gradient(135deg,#3d2b1f,#7c4a1a)" },
   },
   {
     id: "pterodactyl", name: "Pterodactyl", nameZh: "翼龍", emoji: "🦅",
@@ -57,11 +57,11 @@ const ANIMALS: Animal[] = [
     btnColor: "#D2691E", btnGlow: "rgba(210,105,30,0.5)", btn3Color: "#8B4513", btn3Glow: "rgba(139,69,19,0.5)",
     feedLabel: "pterodactyl", feedLabelZh: "翼龍",
     levelUpMessages: [
-      { main: "Welcome, little one!", zh: "歡迎來到世界！", sub: "Meet your Baby Pterodactyl!", subZh: "快來認識你的小翼龍！" },
+      { main: "Welcome, little one!", zh: "歡迎來到恐龍世界！", sub: "Meet your Baby Pterodactyl!", subZh: "快來認識你的小翼龍！" },
       { main: "Growing strong!", zh: "長得好壯！", sub: "Now a Young Pterodactyl!", subZh: "現在是年輕翼龍了！" },
       { main: "Fully grown! ROAR!", zh: "完全長大了！吼！", sub: "You raised a Grown Pterodactyl!", subZh: "你養大了一隻成年翼龍！" },
     ],
-    unlockOverlay: { emoji: "🦅", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Pterodactyl Egg appeared!", eggLineZh: "翼龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(210,105,30,0.6)", borderColor: "rgba(210,105,30,0.8)", bgGradient: "linear-gradient(135deg,#2d1a08,#5c3d11,#8B4513)" },
+    unlockOverlay: { emoji: "🦅", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Pterodactyl Egg appeared!", eggLineZh: "翼龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(210,105,30,0.6)", borderColor: "rgba(210,105,30,0.8)", bgGradient: "linear-gradient(135deg,#2d1a08,#5c3d11,#8B4513)" },
   },
   {
     id: "velociraptor", name: "Velociraptor", nameZh: "迅猛龍", emoji: "🦖",
@@ -78,11 +78,11 @@ const ANIMALS: Animal[] = [
     btnColor: "#556B2F", btnGlow: "rgba(85,107,47,0.5)", btn3Color: "#6B8E23", btn3Glow: "rgba(107,142,35,0.5)",
     feedLabel: "velociraptor", feedLabelZh: "迅猛龍",
     levelUpMessages: [
-      { main: "Welcome, little one!", zh: "歡迎來到世界！", sub: "Meet your Baby Velociraptor!", subZh: "快來認識你的小迅猛龍！" },
+      { main: "Welcome, little one!", zh: "歡迎來到恐龍世界！", sub: "Meet your Baby Velociraptor!", subZh: "快來認識你的小迅猛龍！" },
       { main: "Growing strong!", zh: "長得好壯！", sub: "Now a Young Velociraptor!", subZh: "現在是年輕迅猛龍了！" },
       { main: "Fully grown! ROAR!", zh: "完全長大了！吼！", sub: "You raised a Grown Velociraptor!", subZh: "你養大了一隻成年迅猛龍！" },
     ],
-    unlockOverlay: { emoji: "🦖", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Velociraptor Egg appeared!", eggLineZh: "迅猛龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(107,142,35,0.6)", borderColor: "rgba(107,142,35,0.8)", bgGradient: "linear-gradient(135deg,#1e2a08,#4a5c1a,#556B2F)" },
+    unlockOverlay: { emoji: "🦖", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Velociraptor Egg appeared!", eggLineZh: "迅猛龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(107,142,35,0.6)", borderColor: "rgba(107,142,35,0.8)", bgGradient: "linear-gradient(135deg,#1e2a08,#4a5c1a,#556B2F)" },
   },
   {
     id: "brontosaurus", name: "Brontosaurus", nameZh: "雷龍", emoji: "🦕",
@@ -99,11 +99,11 @@ const ANIMALS: Animal[] = [
     btnColor: "#6B8E23", btnGlow: "rgba(107,142,35,0.5)", btn3Color: "#9ACD32", btn3Glow: "rgba(154,205,50,0.5)",
     feedLabel: "brontosaurus", feedLabelZh: "雷龍",
     levelUpMessages: [
-      { main: "Welcome, little one!", zh: "歡迎來到世界！", sub: "Meet your Baby Brontosaurus!", subZh: "快來認識你的小雷龍！" },
+      { main: "Welcome, little one!", zh: "歡迎來到恐龍世界！", sub: "Meet your Baby Brontosaurus!", subZh: "快來認識你的小雷龍！" },
       { main: "Growing strong!", zh: "長得好壯！", sub: "Now a Young Brontosaurus!", subZh: "現在是年輕雷龍了！" },
       { main: "Fully grown! ROAR!", zh: "完全長大了！吼！", sub: "You raised a Grown Brontosaurus!", subZh: "你養大了一隻成年雷龍！" },
     ],
-    unlockOverlay: { emoji: "🦕", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Brontosaurus Egg appeared!", eggLineZh: "雷龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(154,205,50,0.6)", borderColor: "rgba(154,205,50,0.8)", bgGradient: "linear-gradient(135deg,#1a2e0d,#3d5c2a,#556B2F)" },
+    unlockOverlay: { emoji: "🦕", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Brontosaurus Egg appeared!", eggLineZh: "雷龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(154,205,50,0.6)", borderColor: "rgba(154,205,50,0.8)", bgGradient: "linear-gradient(135deg,#1a2e0d,#3d5c2a,#556B2F)" },
   },
   {
     id: "dilophosaurus", name: "Dilophosaurus", nameZh: "雙冠龍", emoji: "🦎",
@@ -120,11 +120,11 @@ const ANIMALS: Animal[] = [
     btnColor: "#c2410c", btnGlow: "rgba(194,65,12,0.5)", btn3Color: "#ea580c", btn3Glow: "rgba(234,88,12,0.5)",
     feedLabel: "dilophosaurus", feedLabelZh: "雙冠龍",
     levelUpMessages: [
-      { main: "Welcome, little one!", zh: "歡迎來到世界！", sub: "Meet your Baby Dilophosaurus!", subZh: "快來認識你的小雙冠龍！" },
+      { main: "Welcome, little one!", zh: "歡迎來到恐龍世界！", sub: "Meet your Baby Dilophosaurus!", subZh: "快來認識你的小雙冠龍！" },
       { main: "Growing strong!", zh: "長得好壯！", sub: "Now a Young Dilophosaurus!", subZh: "現在是年輕雙冠龍了！" },
       { main: "Fully grown! ROAR!", zh: "完全長大了！吼！", sub: "You raised a Grown Dilophosaurus!", subZh: "你養大了一隻成年雙冠龍！" },
     ],
-    unlockOverlay: { emoji: "🦎", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dilophosaurus Egg appeared!", eggLineZh: "雙冠龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(234,88,12,0.6)", borderColor: "rgba(234,88,12,0.8)", bgGradient: "linear-gradient(135deg,#3d0f04,#7c2d12,#c2410c)" },
+    unlockOverlay: { emoji: "🦎", title: "New Friend!", titleZh: "新朋友來了！", eggLine: "A Dilophosaurus Egg appeared!", eggLineZh: "雙冠龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "So cool! · 太酷了！🎉", glowColor: "rgba(234,88,12,0.6)", borderColor: "rgba(234,88,12,0.8)", bgGradient: "linear-gradient(135deg,#3d0f04,#7c2d12,#c2410c)" },
   },
   {
     id: "trex", name: "T-Rex", nameZh: "暴龍", emoji: "🦖",
@@ -141,11 +141,11 @@ const ANIMALS: Animal[] = [
     btnColor: "#b91c1c", btnGlow: "rgba(185,28,28,0.5)", btn3Color: "#dc2626", btn3Glow: "rgba(220,38,38,0.5)",
     feedLabel: "t-rex", feedLabelZh: "暴龍",
     levelUpMessages: [
-      { main: "Welcome, little one!", zh: "歡迎來到世界！", sub: "Meet your Baby T-Rex!", subZh: "快來認識你的小暴龍！" },
+      { main: "Welcome, little one!", zh: "歡迎來到恐龍世界！", sub: "Meet your Baby T-Rex!", subZh: "快來認識你的小暴龍！" },
       { main: "Growing strong!", zh: "長得好壯！", sub: "Now a Young T-Rex!", subZh: "現在是年輕暴龍了！" },
       { main: "Fully grown! ROAR!", zh: "完全長大了！吼！", sub: "You raised a Grown T-Rex!", subZh: "你養大了一隻成年暴龍！" },
     ],
-    unlockOverlay: { emoji: "🦖", title: "T-REX!", titleZh: "暴龍！", eggLine: "A T-Rex Egg appeared!", eggLineZh: "暴龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵牠餅乾讓牠長大！", btnText: "ROAR! · 吼！🦖", glowColor: "rgba(220,38,38,0.6)", borderColor: "rgba(220,38,38,0.8)", bgGradient: "linear-gradient(135deg,#2d0808,#6b1a1a,#b91c1c)" },
+    unlockOverlay: { emoji: "🦖", title: "T-REX!", titleZh: "暴龍！", eggLine: "A T-Rex Egg appeared!", eggLineZh: "暴龍蛋出現了！", feedLine: "Feed it treats to help it grow!", feedLineZh: "餵他點心讓他長大！", btnText: "ROAR! · 吼！🦖", glowColor: "rgba(220,38,38,0.6)", borderColor: "rgba(220,38,38,0.8)", bgGradient: "linear-gradient(135deg,#2d0808,#6b1a1a,#b91c1c)" },
   },
 ];
 
@@ -983,7 +983,7 @@ const DinosaurWorld = () => {
             </div>
             <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "0.95rem", color: "rgba(245,230,200,0.7)", textAlign: "center", maxWidth: 320, lineHeight: 1.6 }}>
               We're searching for new worlds with more animals for you to raise. When we find them, we'll let you know!<br />
-              <span style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "0.9rem", opacity: 0.85 }}>我們正在尋找新的世界，讓你可以養育更多動物。找到的時候，我們會告訴你！</span>
+              <span style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "0.9rem", opacity: 0.85 }}>我們正在探索新的世界，讓你可以養育更多動物。新世界一旦找到，就會通知你！</span>
             </div>
             <button onClick={() => { localStorage.setItem(`mpe_dinocomplete_${code}_${studentName}`, "1"); setShowDinoComplete(false); if (completeRef.current) { completeRef.current.pause(); completeRef.current.currentTime = 0; } if (audioRef.current) audioRef.current.volume = volume * 0.5; }}
               style={{ background: "linear-gradient(180deg,#DAA520 0%,#8B6914 50%,#5c4409 100%)", border: "none", borderRadius: "999px", padding: "1.1rem 2.8rem", cursor: "pointer", boxShadow: "0 8px 0px #3d2a04,0 12px 24px rgba(0,0,0,0.5)", fontFamily: "'Titan One',cursive", fontSize: "1.5rem", color: "#1a0a02", textShadow: "0 1px 2px rgba(255,255,255,0.2)" }}>
@@ -1107,7 +1107,7 @@ const DinosaurWorld = () => {
               <BoneCookie size={80} />
             </div>
             <div style={{ color: "#DAA520", fontFamily: "'Titan One',cursive", fontSize: "2rem", marginBottom: "0.25rem" }}>Daily Bone Cookie! 🦴</div>
-            <div style={{ color: "rgba(245,230,200,0.75)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginBottom: "0.25rem" }}>每日點心！</div>
+            <div style={{ color: "rgba(245,230,200,0.75)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginBottom: "0.25rem" }}>每日禮物！</div>
             <div style={{ color: "rgba(245,230,200,0.8)", fontFamily: "Nunito,sans-serif", fontSize: "1.05rem", marginBottom: "1.5rem", lineHeight: 1.6 }}>
               {displayName} gets 1 bone cookie today! 🦴<br />
               <span style={{ fontFamily: "'Titan One',cursive", fontSize: "0.95rem" }}>{displayName}今天得到1個點心！</span><br />
@@ -1151,7 +1151,7 @@ const DinosaurWorld = () => {
           {nearHatch && !eggWiggle && (
             <div style={{ background: "rgba(61,43,31,0.95)", borderRadius: "1.2rem", padding: "0.7rem 1.1rem", margin: "0 auto 0.6rem", maxWidth: 260, fontFamily: "Nunito,sans-serif", fontSize: "1rem", color: "#f5e6c8", lineHeight: 1.5, boxShadow: "0 4px 12px rgba(0,0,0,0.3)", position: "relative", border: "1px solid rgba(218,165,32,0.3)" }}>
               I'm almost ready! 🥚<br />
-              <span style={{ fontSize: "0.9rem", color: "rgba(245,230,200,0.7)" }}>我快出來了！再給我幾個骨頭！</span>
+              <span style={{ fontSize: "0.9rem", color: "rgba(245,230,200,0.7)" }}>快出來了！再餵幾個點心！</span>
               <div style={{ position: "absolute", bottom: -8, left: "50%", transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "8px solid transparent", borderRight: "8px solid transparent", borderTop: "8px solid rgba(61,43,31,0.95)" }} />
             </div>
           )}
@@ -1179,12 +1179,12 @@ const DinosaurWorld = () => {
             )}
             {nearHatch && (
               <div style={{ color: "#DAA520", fontFamily: "'Titan One',cursive", fontSize: "1.05rem", marginTop: "0.4rem", animation: "shimmer 1s ease-in-out infinite", textAlign: "center" }}>
-                Almost hatching! ✨ · 快出殼了！✨
+                Almost hatching! ✨ · 快破殼而出了！✨
               </div>
             )}
             {!isEgg && (
               <div style={{ color: "rgba(245,230,200,0.85)", fontFamily: "Nunito,sans-serif", fontSize: "1rem", marginTop: "0.4rem", animation: "shimmer 2.2s ease-in-out infinite", textAlign: "center" }}>
-                Pet me to make me happy! · 摸摸我讓我開心！
+                Pet me to make me happy! · 拍拍我
               </div>
             )}
           </div>
@@ -1239,7 +1239,7 @@ const DinosaurWorld = () => {
         <div className="glass" style={{ padding: "1.5rem", marginBottom: "1rem", animation: "fadeUp 0.7s ease-out" }}>
           <div style={{ color: "#f5e6c8", fontFamily: "'Titan One',cursive", fontSize: "1.15rem", textAlign: "center", marginBottom: "0.85rem" }}>
             {petName ? `${petName} loves treats! ` : `Feed your ${activeAnimal.name} Treats! `}<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.8 }}>餵你的{activeAnimal.nameZh}！每次餵食讓牠更快長大！</span>
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.8 }}>餵你的{activeAnimal.nameZh}！讓他更快長大！</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "2rem" }}>
             <TreatJar treats={jarTreats} nextStage={nextStage} />
@@ -1248,7 +1248,7 @@ const DinosaurWorld = () => {
                 {stageIdx + 1}<span style={{ fontSize: "1.3rem", opacity: 0.6 }}>/4</span>
               </div>
               <div style={{ color: "rgba(245,230,200,0.7)", fontFamily: "Nunito,sans-serif", fontSize: "0.95rem" }}>
-                stages done · 已完成階段
+                stages done · 已完成
               </div>
               <div style={{ marginTop: "0.75rem", display: "flex", alignItems: "center", gap: "0.4rem", justifyContent: "center" }}>
                 <BoneCookie size={24} />
@@ -1285,7 +1285,7 @@ const DinosaurWorld = () => {
         <div className="glass" style={{ padding: "1.5rem", animation: "fadeUp 0.9s ease-out" }}>
           <div style={{ color: "#f5e6c8", fontFamily: "'Titan One',cursive", fontSize: "1.4rem", marginBottom: "1rem", textAlign: "center" }}>
             Dino Collection 🦕<br />
-            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.8 }}>恐龍收藏！收集所有恐龍！</span>
+            <span style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", opacity: 0.8 }}>蒐集所有恐龍！</span>
           </div>
           {/* Arrow for new unlock */}
           {(() => {
@@ -1316,7 +1316,7 @@ const DinosaurWorld = () => {
             const allUnlocked = ANIMALS.every(a => a.unlockCondition === "default" || (unlockSeenMap[a.id] ?? false));
             return !allUnlocked ? (
               <div style={{ color: "rgba(245,230,200,0.45)", fontFamily: "Nunito,sans-serif", fontSize: "0.9rem", marginTop: "0.85rem", textAlign: "center" }}>
-                More dinos unlocking soon! · 更多恐龍即將解鎖！
+                More dinos unlocking soon! · 解鎖更多恐龍
               </div>
             ) : null;
           })()}

@@ -101,11 +101,11 @@ const translations: Record<Language, Record<string, string>> = {
     // Classes
     'classes.badge': '課程時間表',
     'classes.title': '團體課程',
-    'classes.subtitle': '加入我們有趣又互動的團體學習體驗',
+    'classes.subtitle': '加入我們，享受有趣的學習時光！',
     'classes.groupTitle': '每週時間表',
-    'classes.note': '所有團體課程均使用 Oxford Discover 教材',
+    'classes.note': '團體課程使用 Oxford Discover 教材',
     'classes.full': '已滿',
-    'classes.available': '可報名',
+    'classes.available': '歡迎報名',
     
     // Curriculum
     'curriculum.badge': '世界級教材',
