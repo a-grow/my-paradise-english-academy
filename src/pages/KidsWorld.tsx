@@ -872,7 +872,7 @@ const KidsWorld = () => {
     (async () => {
       const result = await loadDataFromCloud(code, studentName);
       if (cancelled) return;
-      if (result === null || result.data === null) {
+      if (result === null || result.data == null || result.data.ocean == null) {
         await saveDataToCloud(code, studentName, activeAnimalId, gatherOceanBlob());
       } else {
         const d = result.data;
