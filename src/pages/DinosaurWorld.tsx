@@ -635,7 +635,7 @@ const DinosaurWorld = () => {
   useEffect(() => {
     if (isMaster) return;
     if (!dataCloudReady.current) { dataCloudReady.current = true; return; }
-    saveDataToCloud(code, studentName, activeAnimalId, gatherDinoBlob());
+    saveDataToCloud(code, studentName, null, gatherDinoBlob());
   }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, jarTreats, activeAnimalId, visitDaysCount, visit5Claimed]);
 
   // Cloud read-back for Dino on mount (device-wins-first). Runs once.
@@ -649,7 +649,7 @@ const DinosaurWorld = () => {
       if (cancelled) return;
       if (result === null || result.data == null || result.data.dino == null) {
         // No Dino data in cloud yet: push device Dino UP first. Device wins.
-        await saveDataToCloud(code, studentName, activeAnimalId, gatherDinoBlob());
+        await saveDataToCloud(code, studentName, null, gatherDinoBlob());
       } else {
         const dino = result.data.dino;
         const dinoAnimals = dino.animals ?? {};

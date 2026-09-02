@@ -699,15 +699,6 @@ const KidsWorld = () => {
     localStorage.removeItem(`mpe_levelup_${code}_Test`);
   }
 
-  const finishedOceanAtMount = useRef(
-    !isMaster && localStorage.getItem(`mpe_oceancomplete_${code}_${studentName}`) === "1"
-  );
-  useEffect(() => {
-    if (finishedOceanAtMount.current) {
-      navigate(`/dino/${code}/${studentName}`, { replace: true });
-    }
-  }, []);
-
   const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
   const [fedTreatsState, setFedTreatsState] = useState<Record<string,number>>(() => isMaster ? { turtle: 45, dolphin: 45, octopus: 45, shark: 45, clownfish: 45, mantaray: 45 } : Object.fromEntries(ANIMALS.map(a => [a.id, parseInt(localStorage.getItem(a.id === "turtle" ? `mpe_fed_${code}_${studentName}` : `mpe_fed_${a.id}_${code}_${studentName}`) || "0")])));
   const [treats, setTreats] = useState(0);
@@ -951,7 +942,6 @@ const KidsWorld = () => {
     if (mantarayGrown && mantarayVideoWatched && !alreadySeen && !showVideo && !levelUpStage) {
       setTimeout(() => {
         setShowOceanComplete(true);
-        localStorage.setItem(`mpe_oceancomplete_${code}_${studentName}`, "1");
         if (audioRef.current) audioRef.current.volume = 0.02;
         if (!completeRef.current) completeRef.current = new Audio("/completedworld-music.mp3");
         completeRef.current.currentTime = 0;
@@ -1104,7 +1094,6 @@ const KidsWorld = () => {
   const creatureImg = activeAnimal.stages[stageIdx]?.img ?? activeAnimal.stages[0].img;
 
 
-  if (finishedOceanAtMount.current) return null;
   if (loading) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg,#003d6b,#00b4a0)" }}>
       <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "2rem", color: "white", textAlign: "center" }}>
