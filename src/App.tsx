@@ -14,6 +14,7 @@ import DinosaurWorld from "./pages/DinosaurWorld";
 import GamePage from "./pages/GamePage";
 import Grammar from "./pages/Grammar";
 import NotFound from "./pages/NotFound";
+import TeacherHQ from "./pages/TeacherHQ";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<DinosaurWorld />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/mpe-teacher-secret-hq" element={<TeacherHQ />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
