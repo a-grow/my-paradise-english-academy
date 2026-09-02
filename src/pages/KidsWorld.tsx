@@ -915,6 +915,14 @@ const KidsWorld = () => {
           setActiveAnimalId(result.activePet);
           localStorage.setItem(`mpe_active_${code}_${studentName}`, result.activePet);
         }
+        const mantarayFedCloud = newFed["mantaray"] ?? 0;
+        const mantarayObj = ANIMALS.find(a => a.id === "mantaray");
+        const mantarayGrownCloud = mantarayObj ? getAnimalStageIdx(mantarayObj, mantarayFedCloud) === 3 : false;
+        const mantarayVideoCloud = newVideoWatched["mantaray"] ?? false;
+        if (!isMaster && mantarayGrownCloud && mantarayVideoCloud) {
+          navigate(`/dino/${code}/${studentName}`, { replace: true });
+          return;
+        }
       }
       dataCloudReady.current = true;
     })();
