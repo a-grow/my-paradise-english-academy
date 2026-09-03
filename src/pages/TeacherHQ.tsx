@@ -4,14 +4,13 @@ import { supabase } from "@/lib/supabase";
 // ---- simple client-side gate (keeps the curious out, not the determined) ----
 const PASSWORD = "paradise2026";
 const SESSION_KEY = "mpe_hq_ok";
+const SORT_KEY = "mpe_hq_sort";
 
 // ---- REAL animal orders, copied verbatim from KidsWorld.tsx / DinosaurWorld.tsx ----
 // Ocean: turtle -> dolphin -> octopus -> shark -> clownfish -> mantaray
 // Dino:  triceratops -> pterodactyl -> velociraptor -> brontosaurus -> dilophosaurus -> trex
 const OCEAN_ORDER = ["turtle", "dolphin", "octopus", "shark", "clownfish", "mantaray"];
 const DINO_ORDER = ["triceratops", "pterodactyl", "velociraptor", "brontosaurus", "dilophosaurus", "trex"];
-const OCEAN_EMOJI: Record<string, string> = { turtle: "🐢", dolphin: "🐬", octopus: "🐙", shark: "🦈", clownfish: "🐠", mantaray: "🐟" };
-const DINO_EMOJI: Record<string, string> = { triceratops: "🦕", pterodactyl: "🦅", velociraptor: "🦖", brontosaurus: "🦕", dilophosaurus: "🦎", trex: "🦖" };
 // Pretty display names (real names from the game, e.g. "Manta Ray" two words)
 const OCEAN_NAMES: Record<string, string> = { turtle: "Turtle", dolphin: "Dolphin", octopus: "Octopus", shark: "Shark", clownfish: "Clownfish", mantaray: "Manta Ray" };
 const DINO_NAMES: Record<string, string> = { triceratops: "Triceratops", pterodactyl: "Pterodactyl", velociraptor: "Velociraptor", brontosaurus: "Brontosaurus", dilophosaurus: "Dilophosaurus", trex: "T-Rex" };
@@ -96,10 +95,10 @@ function worldLines(data: any, treats: number | null, activePetCol: string | nul
   return out;
 }
 
-// full fed strip for a world, in real order: [{name,fed}]
+// full fed strip for a world, in real order: [{id,name,fed}]
 function fedStrip(world: any, order: string[], nameMap: Record<string, string>) {
   if (!world || !world.animals) return [];
-  return order.map((n) => ({ name: nameMap[n] || cap(n), fed: world.animals[n]?.fed ?? 0 }));
+  return order.map((n) => ({ id: n, name: nameMap[n] || cap(n), fed: world.animals[n]?.fed ?? 0 }));
 }
 
 // ---- last seen: return the most recent visit Date (or null) ----
@@ -129,12 +128,6 @@ function grownCount(data: any): { grown: number; total: number } {
   for (const n of OCEAN_ORDER) if ((data?.ocean?.animals?.[n]?.fed ?? 0) >= GROWN_AT) grown++;
   for (const n of DINO_ORDER) if ((data?.dino?.animals?.[n]?.fed ?? 0) >= GROWN_AT) grown++;
   return { grown, total };
-}
-
-// ---- total treats across both jars ----
-function totalTreats(data: any, treats: number | null): number {
-  const dinoJar = typeof data?.dino?.jar === "number" ? data.dino.jar : 0;
-  return (treats ?? 0) + dinoJar;
 }
 
 // ---- HEALTH CHECK: green / yellow / red, with reasons ----
@@ -241,15 +234,23 @@ export default function TeacherHQ() {
     try { return sessionStorage.getItem(SESSION_KEY) === "1"; } catch { return false; }
   });
   const [pw, setPw] = useState("");
+  const [showPw, setShowPw] = useState(false);
   const [wrongPw, setWrongPw] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-  const [sortBy, setSortBy] = useState<"name" | "seen">("name");
+  const [sortBy, setSortBy] = useState<"name" | "seen">(() => {
+    try { return (sessionStorage.getItem(SORT_KEY) as "name" | "seen") || "name"; } catch { return "name"; }
+  });
 
   function unlock() {
     setOk(true);
     try { sessionStorage.setItem(SESSION_KEY, "1"); } catch {}
+  }
+
+  function chooseSort(s: "name" | "seen") {
+    setSortBy(s);
+    try { sessionStorage.setItem(SORT_KEY, s); } catch {}
   }
 
   useEffect(() => {
@@ -276,19 +277,29 @@ export default function TeacherHQ() {
           <p style={{ margin: "0 0 16px", color: "#6b7c93", fontSize: 14 }}>
             Enter the password to continue.
           </p>
-          <input
-            type="password"
-            value={pw}
-            onChange={(e) => { setPw(e.target.value); setWrongPw(false); }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                if (pw === PASSWORD) unlock();
-                else setWrongPw(true);
-              }
-            }}
-            placeholder="Password"
-            style={gateInput}
-          />
+          <div style={{ position: "relative", marginBottom: 10 }}>
+            <input
+              type={showPw ? "text" : "password"}
+              value={pw}
+              onChange={(e) => { setPw(e.target.value); setWrongPw(false); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  if (pw === PASSWORD) unlock();
+                  else setWrongPw(true);
+                }
+              }}
+              placeholder="Password"
+              style={{ ...gateInput, marginBottom: 0, paddingRight: 44 }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw((v) => !v)}
+              style={eyeBtn}
+              title={showPw ? "Hide password" : "Show password"}
+            >
+              {showPw ? "🙈" : "👁️"}
+            </button>
+          </div>
           <button
             onClick={() => {
               if (pw === PASSWORD) unlock();
@@ -341,13 +352,13 @@ export default function TeacherHQ() {
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
           <span style={{ fontSize: 13, color: "#6b7c93" }}>Sort by:</span>
           <button
-            onClick={() => setSortBy("name")}
+            onClick={() => chooseSort("name")}
             style={sortBy === "name" ? sortBtnActive : sortBtn}
           >
             Name
           </button>
           <button
-            onClick={() => setSortBy("seen")}
+            onClick={() => chooseSort("seen")}
             style={sortBy === "seen" ? sortBtnActive : sortBtn}
           >
             Last seen
@@ -361,9 +372,14 @@ export default function TeacherHQ() {
             const lines = worldLines(r.data, r.treats, r.active_pet);
             const days = daysSince(seen);
             const { grown, total } = grownCount(r.data);
-            const totTreats = totalTreats(r.data, r.treats);
             const oceanStrip = fedStrip(r.data?.ocean, OCEAN_ORDER, OCEAN_NAMES);
             const dinoStrip = worldTouched(r.data?.dino) ? fedStrip(r.data?.dino, DINO_ORDER, DINO_NAMES) : [];
+            // which animal is the kid currently on, per world (for highlight)
+            const oceanActiveId = r.data?.ocean?.activePet
+              || (r.data?.ocean?.animals?.[r.active_pet ?? ""] ? r.active_pet : null);
+            const dinoActiveId = r.data?.dino?.activePet ?? null;
+            const oceanDone = worldFinished(r.data?.ocean, OCEAN_ORDER);
+            const dinoDone = worldFinished(r.data?.dino, DINO_ORDER);
             const dotColor = health.level === "red" ? "#e03131" : health.level === "yellow" ? "#f0a020" : "#2e9e5b";
             return (
               <div key={r.code + r.student_name} style={card}>
@@ -381,41 +397,37 @@ export default function TeacherHQ() {
                 {/* quick stat row */}
                 <div style={statRow}>
                   <span>🏆 {grown} of {total} grown</span>
-                  <span style={dot}>·</span>
-                  <span>🍬 {totTreats} treats total</span>
                 </div>
 
                 {lines.length > 0 ? (
-                  lines.map((ln) =>
-                    ln.done ? (
-                      <div key={ln.world} style={line}>
-                        <span style={{ marginRight: 6 }}>{ln.world === "dino" ? "🦕" : "🌊"}</span>
-                        <b style={{ color: "#1e3a5f" }}>{ln.world === "dino" ? "Dino World" : "Ocean World"}</b>
-                        <span style={dot}>·</span>
-                        <span style={{ color: "#2e9e5b", fontWeight: 600 }}>all done ✓</span>
-                        {ln.world === "dino" && (<><span style={dot}>·</span>Dino treats {ln.jar ?? 0}</>)}
-                      </div>
-                    ) : (
-                      <div key={ln.world} style={line}>
-                        <span style={{ marginRight: 6 }}>{ln.world === "dino" ? "🦕" : "🌊"}</span>
+                  lines.map((ln) => {
+                    if (ln.done) return null;
+                    const isDino = ln.world === "dino";
+                    const boxBg = isDino ? "#eef3e6" : "#e6f1fb";
+                    const boxBorder = isDino ? "#c0dd97" : "#b5d4f4";
+                    const accent = isDino ? "#3b6d11" : "#185fa5";
+                    const dotc = isDino ? "#97c459" : "#85b7eb";
+                    return (
+                      <div key={ln.world} style={{ background: boxBg, border: `0.5px solid ${boxBorder}`, borderRadius: 12, padding: "9px 14px", margin: "8px 0 4px", fontSize: 14.5, lineHeight: 1.5, color: "#2b3a4d", display: "flex", alignItems: "center", flexWrap: "wrap" }}>
+                        <span style={{ marginRight: 6 }}>{isDino ? "🦕" : "🌊"}</span>
                         <b style={{ color: "#1e3a5f" }}>{ln.animal}</b>
                         {ln.petName ? (
-                          <span style={petTag}>"{ln.petName}"</span>
+                          <span style={{ marginLeft: 6, color: accent, fontStyle: "italic", fontSize: 13 }}>"{ln.petName}"</span>
                         ) : (
                           <span style={noName}>*No name</span>
                         )}
-                        {ln.position && (<><span style={dot}>·</span><span style={{ color: "#6b7c93" }}>{ln.position} of {ln.total}</span></>)}
-                        <span style={dot}>·</span>
+                        {ln.position && (<><span style={{ margin: "0 7px", color: dotc }}>·</span><span style={{ color: accent }}>{ln.position} of {ln.total}</span></>)}
+                        <span style={{ margin: "0 7px", color: dotc }}>·</span>
                         {ln.label}
-                        <span style={dot}>·</span>
+                        <span style={{ margin: "0 7px", color: dotc }}>·</span>
                         {ln.fed}/{GROWN_AT} fed
-                        {ln.toGrow > 0 ? (<><span style={dot}>·</span><b>{ln.toGrow} to grow</b></>) : (<><span style={dot}>·</span><span style={{ color: "#2e9e5b" }}>fully grown ✓</span></>)}
-                        {ln.next && (<><span style={dot}>·</span><span style={{ color: "#9aa8bd" }}>next: {ln.next}</span></>)}
-                        <span style={dot}>·</span>
-                        {ln.world === "dino" ? "Dino treats" : "Treats"} {ln.jar ?? 0}
+                        {ln.toGrow > 0 ? (<><span style={{ margin: "0 7px", color: dotc }}>·</span><b>{ln.toGrow} to grow</b></>) : (<><span style={{ margin: "0 7px", color: dotc }}>·</span><b style={{ color: "#1e3a5f" }}>fully grown ✓</b></>)}
+                        {ln.next && (<><span style={{ margin: "0 7px", color: dotc }}>·</span><span style={{ color: accent }}>next: {ln.next}</span></>)}
+                        <span style={{ margin: "0 7px", color: dotc }}>·</span>
+                        <span style={{ color: "#2b3a4d" }}>Treats in jar: <b style={{ color: "#1e3a5f" }}>{ln.jar ?? 0}</b></span>
                       </div>
-                    )
-                  )
+                    );
+                  })
                 ) : (
                   <div style={{ ...line, color: "#9aa8bd" }}>No world progress yet</div>
                 )}
@@ -424,21 +436,27 @@ export default function TeacherHQ() {
                 {oceanStrip.length > 0 && worldTouched(r.data?.ocean) && (
                   <div style={strip}>
                     <span style={stripLabel}>🌊 Ocean</span>
-                    {oceanStrip.map((s, i) => (
-                      <span key={i} style={{ ...stripItem, color: s.fed >= GROWN_AT ? "#2e9e5b" : s.fed > 0 ? "#3a4a5f" : "#aeb9c7" }}>
-                        {s.name} <b>{s.fed}</b>{s.fed >= GROWN_AT ? " ✓" : ""}
-                      </span>
-                    ))}
+                    {oceanStrip.map((s, i) => {
+                      const isCurrent = !oceanDone && s.id === oceanActiveId && s.fed < GROWN_AT;
+                      return (
+                        <span key={i} style={{ ...stripItem, fontWeight: isCurrent ? 700 : 500, color: isCurrent ? "#1e3a5f" : s.fed >= GROWN_AT ? "#2e9e5b" : s.fed > 0 ? "#3a4a5f" : "#aeb9c7" }}>
+                          {s.name} <b>{s.fed}</b>{s.fed >= GROWN_AT ? " ✓" : ""}
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
                 {dinoStrip.length > 0 && (
                   <div style={strip}>
                     <span style={stripLabel}>🦕 Dino</span>
-                    {dinoStrip.map((s, i) => (
-                      <span key={i} style={{ ...stripItem, color: s.fed >= GROWN_AT ? "#2e9e5b" : s.fed > 0 ? "#3a4a5f" : "#aeb9c7" }}>
-                        {s.name} <b>{s.fed}</b>{s.fed >= GROWN_AT ? " ✓" : ""}
-                      </span>
-                    ))}
+                    {dinoStrip.map((s, i) => {
+                      const isCurrent = !dinoDone && s.id === dinoActiveId && s.fed < GROWN_AT;
+                      return (
+                        <span key={i} style={{ ...stripItem, fontWeight: isCurrent ? 700 : 500, color: isCurrent ? "#1e3a5f" : s.fed >= GROWN_AT ? "#2e9e5b" : s.fed > 0 ? "#3a4a5f" : "#aeb9c7" }}>
+                          {s.name} <b>{s.fed}</b>{s.fed >= GROWN_AT ? " ✓" : ""}
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
 
@@ -480,7 +498,7 @@ export default function TeacherHQ() {
 // ---- styles ----
 const pageWrap: React.CSSProperties = {
   minHeight: "100vh",
-  background: "linear-gradient(160deg,#e8f4ff 0%,#f7fbff 100%)",
+  background: "#e8f1fb",
   padding: "20px 14px 40px",
   fontFamily: "system-ui, -apple-system, sans-serif",
 };
@@ -488,18 +506,18 @@ const header: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 12,
-  background: "linear-gradient(135deg,#2b6cb0,#1e3a5f)",
+  background: "linear-gradient(100deg,#3f7cbf 0%,#28517f 45%,#16233a 100%)",
   borderRadius: 16,
-  padding: "16px 20px",
+  padding: "18px 22px",
   marginBottom: 18,
-  boxShadow: "0 6px 20px rgba(30,58,95,0.25)",
+  boxShadow: "0 6px 20px rgba(30,58,95,0.22)",
 };
 const card: React.CSSProperties = {
   background: "#fff",
-  borderRadius: 14,
-  padding: "14px 16px",
-  boxShadow: "0 2px 10px rgba(30,58,95,0.08)",
-  border: "1px solid #eaf1f8",
+  borderRadius: 16,
+  padding: "16px 18px",
+  boxShadow: "0 2px 12px rgba(30,58,95,0.07)",
+  border: "0.5px solid #e4edf6",
 };
 const cardTop: React.CSSProperties = {
   display: "flex",
@@ -548,9 +566,9 @@ const stripLabel: React.CSSProperties = { fontSize: 12.5, fontWeight: 700, color
 const stripItem: React.CSSProperties = { fontWeight: 500 };
 const sortBtn: React.CSSProperties = {
   fontSize: 13,
-  padding: "5px 12px",
-  borderRadius: 8,
-  border: "1px solid #cfe0f0",
+  padding: "6px 16px",
+  borderRadius: 999,
+  border: "0.5px solid #cfe0f0",
   background: "#fff",
   color: "#3a4a5f",
   cursor: "pointer",
@@ -559,7 +577,7 @@ const sortBtnActive: React.CSSProperties = {
   ...sortBtn,
   background: "#2b6cb0",
   color: "#fff",
-  border: "1px solid #2b6cb0",
+  border: "0.5px solid #2b6cb0",
 };
 const gateWrap: React.CSSProperties = {
   minHeight: "100vh",
@@ -585,6 +603,18 @@ const gateInput: React.CSSProperties = {
   border: "1px solid #cfe0f0",
   marginBottom: 10,
   boxSizing: "border-box",
+};
+const eyeBtn: React.CSSProperties = {
+  position: "absolute",
+  right: 6,
+  top: "50%",
+  transform: "translateY(-50%)",
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  fontSize: 16,
+  padding: "2px 6px",
+  lineHeight: 1,
 };
 const gateBtn: React.CSSProperties = {
   width: "100%",
