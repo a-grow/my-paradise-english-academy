@@ -682,8 +682,11 @@ const DinosaurWorld = () => {
         setJarTreats(jar);
         localStorage.setItem(`mpe_dino_jar_${code}_${studentName}`, String(jar));
         if (dino.activePet) setActiveAnimalId(dino.activePet);
-        const visitDays = Array.isArray(dino.visitDays) ? dino.visitDays : [];
-        localStorage.setItem(visitDaysKey, JSON.stringify(visitDays));
+        const cloudVisitDays = Array.isArray(dino.visitDays) ? dino.visitDays : [];
+        const today = new Date().toDateString();
+        const mergedVisitDays = cloudVisitDays.includes(today) ? cloudVisitDays : [...cloudVisitDays, today];
+        localStorage.setItem(visitDaysKey, JSON.stringify(mergedVisitDays));
+        setVisitDaysCount(mergedVisitDays.length);
         const visit5 = dino.visit5Claimed ?? 0;
         localStorage.setItem(visit5ClaimedKey, String(visit5));
       }

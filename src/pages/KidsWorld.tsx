@@ -907,8 +907,11 @@ const KidsWorld = () => {
         const videoSeen = d?.ocean?.videoSeen === 1;
         setVideoButtonSeen(videoSeen);
         localStorage.setItem(`mpe_videoseen_${code}_${studentName}`, videoSeen ? "1" : "0");
-        const visitDays = Array.isArray(d?.shared?.visitDays) ? d.shared.visitDays : [];
-        localStorage.setItem(visitDaysKey, JSON.stringify(visitDays));
+        const cloudVisitDays = Array.isArray(d?.shared?.visitDays) ? d.shared.visitDays : [];
+        const today = new Date().toDateString();
+        const mergedVisitDays = cloudVisitDays.includes(today) ? cloudVisitDays : [...cloudVisitDays, today];
+        localStorage.setItem(visitDaysKey, JSON.stringify(mergedVisitDays));
+        setVisitDaysCount(mergedVisitDays.length);
         const visit5 = d?.shared?.visit5Claimed ?? 0;
         localStorage.setItem(visit5ClaimedKey, String(visit5));
         if (result.activePet) {
