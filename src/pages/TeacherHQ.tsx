@@ -120,6 +120,15 @@ function daysSince(d: Date | null): number | null {
   const ms = Date.now() - d.getTime();
   return Math.floor(ms / (1000 * 60 * 60 * 24));
 }
+function recencyLabel(d: Date | null, days: number | null): { text: string; color: string; bold: boolean } {
+  if (!d) return { text: fmtDate(d), color: "#9aa8bd", bold: false };
+  const today = new Date().toDateString();
+  const yest = new Date(Date.now() - 86400000).toDateString();
+  const seen = d.toDateString();
+  if (seen === today) return { text: "Today", color: "#2e9e5b", bold: true };
+  if (seen === yest) return { text: "Yesterday", color: "#a9741f", bold: true };
+  return { text: `${fmtDate(d)}${days != null ? ` · ${days}d ago` : ""}`, color: days != null && days >= 7 ? "#f0a020" : "#9aa8bd", bold: false };
+}
 
 // ---- overall progress: how many animals grown across both worlds (X of 12) ----
 function grownCount(data: any): { grown: number; total: number } {
@@ -231,7 +240,7 @@ type Row = {
 
 export default function TeacherHQ() {
   const [ok, setOk] = useState<boolean>(() => {
-    try { return sessionStorage.getItem(SESSION_KEY) === "1"; } catch { return false; }
+    try { return localStorage.getItem(SESSION_KEY) === "1"; } catch { return false; }
   });
   const [pw, setPw] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -240,12 +249,12 @@ export default function TeacherHQ() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "seen">(() => {
-    try { return (sessionStorage.getItem(SORT_KEY) as "name" | "seen") || "name"; } catch { return "name"; }
+    try { return (sessionStorage.getItem(SORT_KEY) as "name" | "seen") || "seen"; } catch { return "seen"; }
   });
 
   function unlock() {
     setOk(true);
-    try { sessionStorage.setItem(SESSION_KEY, "1"); } catch {}
+    try { localStorage.setItem(SESSION_KEY, "1"); } catch {}
   }
 
   function chooseSort(s: "name" | "seen") {
@@ -389,8 +398,8 @@ export default function TeacherHQ() {
                     <span style={{ fontWeight: 700, fontSize: 17, color: "#1e3a5f" }}>{cap(r.student_name)}</span>
                     <span style={{ color: "#9aa8bd", fontSize: 13 }}>{r.code}</span>
                   </div>
-                  <span style={{ color: days != null && days >= 7 ? "#f0a020" : "#9aa8bd", fontSize: 12 }}>
-                    Last seen {fmtDate(seen)}{days != null ? ` · ${days}d ago` : ""}
+                  <span style={{ color: recencyLabel(seen, days).color, fontSize: 12, fontWeight: recencyLabel(seen, days).bold ? 700 : 400 }}>
+                    Last seen {recencyLabel(seen, days).text}
                   </span>
                 </div>
 
