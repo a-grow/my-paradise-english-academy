@@ -9,7 +9,7 @@ export async function saveJarToCloud(code: string, studentName: string, treats: 
         { onConflict: "code,student_name" }
       );
     if (error) console.error("[cloudSave] jar save failed:", error.message);
-    else console.log("[cloudSave] jar saved:", code, studentName, treats);
+    else { console.log("[cloudSave] jar saved:", code, studentName, treats); await updateLastLogin(code, studentName); }
   } catch (e) {
     console.error("[cloudSave] jar save threw:", e);
   }
@@ -55,7 +55,7 @@ export async function saveDataToCloud(
         { onConflict: "code,student_name" }
       );
     if (error) console.error("[cloudSave] data save failed:", error.message);
-    else console.log("[cloudSave] data saved:", code, studentName);
+    else { console.log("[cloudSave] data saved:", code, studentName); await updateLastLogin(code, studentName); }
   } catch (e) {
     console.error("[cloudSave] data save threw:", e);
   }
@@ -102,5 +102,19 @@ export async function loadDataFromCloud(
   } catch (e) {
     console.error("[cloudSave] data load threw:", e);
     return null;
+  }
+}
+
+export async function updateLastLogin(code: string, studentName: string) {
+  try {
+    const { error } = await supabase
+      .from("student_progress")
+      .update({ last_login: new Date().toISOString() })
+      .eq("code", code)
+      .eq("student_name", studentName);
+    if (error) console.error("[cloudSave] last_login update failed:", error.message);
+    else console.log("[cloudSave] last_login updated:", code, studentName);
+  } catch (e) {
+    console.error("[cloudSave] last_login update threw:", e);
   }
 }

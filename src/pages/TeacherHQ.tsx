@@ -102,14 +102,13 @@ function fedStrip(world: any, order: string[], nameMap: Record<string, string>) 
 }
 
 // ---- last seen: return the most recent visit Date (or null) ----
-function lastSeenDate(data: any): Date | null {
-  const lists: string[] = [];
-  if (data?.shared?.visitDays) lists.push(...data.shared.visitDays);
-  if (data?.ocean?.visitDays) lists.push(...data.ocean.visitDays);
-  if (data?.dino?.visitDays) lists.push(...data.dino.visitDays);
-  const times = lists.map((d) => new Date(d).getTime()).filter((t) => !isNaN(t));
-  if (times.length === 0) return null;
-  return new Date(Math.max(...times));
+function lastSeenDate(lastLoginStr: string | null): Date | null {
+  if (!lastLoginStr) return null;
+  try {
+    return new Date(lastLoginStr);
+  } catch {
+    return null;
+  }
 }
 function fmtDate(d: Date | null): string {
   if (!d) return "—";
@@ -125,9 +124,10 @@ function recencyLabel(d: Date | null, days: number | null): { text: string; colo
   const today = new Date().toDateString();
   const yest = new Date(Date.now() - 86400000).toDateString();
   const seen = d.toDateString();
-  if (seen === today) return { text: "Today", color: "#2e9e5b", bold: true };
-  if (seen === yest) return { text: "Yesterday", color: "#a9741f", bold: true };
-  return { text: `${fmtDate(d)}${days != null ? ` · ${days}d ago` : ""}`, color: days != null && days >= 7 ? "#f0a020" : "#9aa8bd", bold: false };
+  const time = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true });
+  if (seen === today) return { text: `Today ${time}`, color: "#2e9e5b", bold: true };
+  if (seen === yest) return { text: `Yesterday ${time}`, color: "#a9741f", bold: true };
+  return { text: `${fmtDate(d)} ${time}${days != null ? ` · ${days}d ago` : ""}`, color: days != null && days >= 7 ? "#f0a020" : "#9aa8bd", bold: false };
 }
 
 // ---- overall progress: how many animals grown across both worlds (X of 12) ----
@@ -267,7 +267,7 @@ export default function TeacherHQ() {
     setLoading(true);
     supabase
       .from("student_progress")
-      .select("code, student_name, treats, active_pet, data")
+      .select("code, student_name, treats, active_pet, data, last_login")
       .then(({ data, error }) => {
         if (error) setErr(error.message);
         else setRows((data as Row[]) || []);
@@ -329,7 +329,7 @@ export default function TeacherHQ() {
   }
 
   const withMeta = rows.map((r) => {
-    const seen = lastSeenDate(r.data);
+    const seen = lastSeenDate(r.last_login);
     return { r, seen, health: checkHealth(r.data, r.treats, r.active_pet) };
   });
 
