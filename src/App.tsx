@@ -15,6 +15,7 @@ import GamePage from "./pages/GamePage";
 import Grammar from "./pages/Grammar";
 import GrammarRun from "./pages/GrammarRun";
 import GrammarSwim from "./pages/GrammarSwim";
+import GrammarHub from "./pages/GrammarHub";
 import NotFound from "./pages/NotFound";
 import TeacherHQ from "./pages/TeacherHQ";
 
@@ -38,6 +39,7 @@ const App = () => (
 {/* <Route path="/grammar/:code/:studentName/:book" element={<Grammar />} /> */}
 <Route path="/grammar-run/:code/:studentName/:level" element={<GrammarRun />} />
 <Route path="/grammar-swim/:code/:studentName" element={<GrammarSwim />} />
+<Route path="/grammar-hub/:code/:studentName" element={<GrammarHub />} />
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<DinosaurWorld />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
