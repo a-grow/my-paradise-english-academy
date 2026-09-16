@@ -84,6 +84,7 @@ export default function GrammarHub() {
         if (id === "run") navigate(`/grammar-run/${kidCode}/${kidName}/${selected.n}`);
         if (id === "swim") navigate(`/grammar-swim/${kidCode}/${kidName}`);
         if (id === "dig") navigate(`/grammar-dig/${kidCode}/${kidName}`);
+        if (id === "grab") navigate(`/grammar-grab/${kidCode}/${kidName}`);
       });
     };
 
@@ -110,7 +111,7 @@ export default function GrammarHub() {
         titleSize: "clamp(1.7rem, 6vw, 2.9rem)",
       },
       { id: "dig", title: "", img: "/grammar-dig-btn.png", ready: true },
-      { id: "adaptive", title: "Brain Boost", ready: false, emoji: "🧠" },
+      { id: "grab", title: "", img: "/grammar-grab-btn.png", ready: true },
     ];
 
     return (

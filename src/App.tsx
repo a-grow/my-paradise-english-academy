@@ -16,6 +16,7 @@ import Grammar from "./pages/Grammar";
 import GrammarRun from "./pages/GrammarRun";
 import GrammarSwim from "./pages/GrammarSwim";
 import GrammarDig from "./pages/GrammarDig";
+import GrammarGrab from "./pages/GrammarGrab";
 import GrammarHub from "./pages/GrammarHub";
 import NotFound from "./pages/NotFound";
 import TeacherHQ from "./pages/TeacherHQ";
@@ -41,6 +42,7 @@ const App = () => (
 <Route path="/grammar-run/:code/:studentName/:level" element={<GrammarRun />} />
 <Route path="/grammar-swim/:code/:studentName" element={<GrammarSwim />} />
 <Route path="/grammar-dig/:code/:studentName" element={<GrammarDig />} />
+<Route path="/grammar-grab/:code/:studentName" element={<GrammarGrab />} />
 <Route path="/grammar-hub/:code/:studentName" element={<GrammarHub />} />
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<DinosaurWorld />} />
