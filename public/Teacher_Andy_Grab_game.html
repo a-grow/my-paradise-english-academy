@@ -115,11 +115,109 @@ const CLAW_LIFT_SPEED = 150; // px/sec UP — carry the box up at a readable pac
 
 // ---------- Placeholder sentences ----------
 // Each: wrong sentence, the blank slot word to fix, options (1 correct), correct word.
-const SENTENCES = [
-  { text:"She ___ happy today.",  correct:"is",  options:["is","are","am"] },
-  { text:"They ___ my friends.",  correct:"are", options:["is","are","was"] },
-  { text:"I ___ a red apple.",     correct:"have",options:["have","has","haves"] },
+const RAW_SENTENCES = [
+  {text:"I see ___ cat.",correct:"a",options:["a","an"]},
+  {text:"She has ___ apple.",correct:"an",options:["a","an"]},
+  {text:"It is ___ dog.",correct:"a",options:["a","an"]},
+  {text:"This is ___ egg.",correct:"an",options:["a","an"]},
+  {text:"He rides ___ bike.",correct:"a",options:["a","an"]},
+  {text:"She eats ___ orange.",correct:"an",options:["a","an"]},
+  {text:"He is ___ teacher.",correct:"a",options:["a","an"]},
+  {text:"I want ___ umbrella.",correct:"an",options:["a","an"]},
+  {text:"That is ___ ball.",correct:"a",options:["a","an"]},
+  {text:"Here is ___ owl.",correct:"an",options:["a","an"]},
+  {text:"I eat ___ banana.",correct:"a",options:["a","an"]},
+  {text:"It is ___ ant.",correct:"an",options:["a","an"]},
+  {text:"We have ___ car.",correct:"a",options:["a","an"]},
+  {text:"She is ___ artist.",correct:"an",options:["a","an"]},
+  {text:"I read ___ book.",correct:"a",options:["a","an"]},
+  {text:"He has ___ idea.",correct:"an",options:["a","an"]},
+  {text:"She wants ___ ice cream cone.",correct:"an",options:["a","an"]},
+  {text:"I wear ___ hat.",correct:"a",options:["a","an"]},
+  {text:"Look at ___ egg.",correct:"an",options:["a","an"]},
+  {text:"I have ___ eraser.",correct:"an",options:["a","an"]},
+  {text:"He pets ___ horse.",correct:"a",options:["a","an"]},
+  {text:"It is ___ ox.",correct:"an",options:["a","an"]},
+  {text:"We see ___ house.",correct:"a",options:["a","an"]},
+  {text:"I want ___ apple.",correct:"an",options:["a","an"]},
+  {text:"He flies ___ kite.",correct:"a",options:["a","an"]},
+  {text:"She finds ___ shell.",correct:"a",options:["a","an"]},
+  {text:"They see ___ octopus.",correct:"an",options:["a","an"]},
+  {text:"I eat ___ cookie.",correct:"a",options:["a","an"]},
+  {text:"It is ___ eye.",correct:"an",options:["a","an"]},
+  {text:"She has ___ doll.",correct:"a",options:["a","an"]},
+  {text:"This is ___ igloo.",correct:"an",options:["a","an"]},
+  {text:"I use ___ spoon.",correct:"a",options:["a","an"]},
+  {text:"He has ___ egg.",correct:"an",options:["a","an"]},
+  {text:"She picks ___ flower.",correct:"a",options:["a","an"]},
+  {text:"That is ___ ant.",correct:"an",options:["a","an"]},
+  {text:"I catch ___ fish.",correct:"a",options:["a","an"]},
+  {text:"He wants ___ apple.",correct:"an",options:["a","an"]},
+  {text:"She bakes ___ cake.",correct:"a",options:["a","an"]},
+  {text:"It is ___ oven.",correct:"an",options:["a","an"]},
+  {text:"I see ___ spider.",correct:"a",options:["a","an"]},
+  {text:"Here is ___ egg.",correct:"an",options:["a","an"]},
+  {text:"She has ___ rabbit.",correct:"a",options:["a","an"]},
+  {text:"He has ___ egg.",correct:"an",options:["a","an"]},
+  {text:"I make ___ sandwich.",correct:"a",options:["a","an"]},
+  {text:"It is ___ apple.",correct:"an",options:["a","an"]},
+  {text:"She draws ___ star.",correct:"a",options:["a","an"]},
+  {text:"Look at ___ owl.",correct:"an",options:["a","an"]},
+  {text:"I sit on ___ chair.",correct:"a",options:["a","an"]},
+  {text:"They have ___ box.",correct:"a",options:["a","an"]},
+  {text:"He has ___ bag.",correct:"a",options:["a","an"]},
+  {text:"It is ___ ear.",correct:"an",options:["a","an"]},
+  {text:"I eat ___ apple.",correct:"an",options:["a","an"]},
+  {text:"He drives ___ truck.",correct:"a",options:["a","an"]},
+  {text:"She finds ___ coin.",correct:"a",options:["a","an"]},
+  {text:"They have ___ orange.",correct:"an",options:["a","an"]},
+  {text:"I see ___ duck.",correct:"a",options:["a","an"]},
+  {text:"This is ___ egg.",correct:"an",options:["a","an"]},
+  {text:"She holds ___ crayon.",correct:"a",options:["a","an"]},
+  {text:"It is ___ ant.",correct:"an",options:["a","an"]},
+  {text:"I hold ___ balloon.",correct:"a",options:["a","an"]},
+  {text:"He sees ___ owl.",correct:"an",options:["a","an"]},
+  {text:"She eats ___ peach.",correct:"a",options:["a","an"]},
+  {text:"We cut ___ onion.",correct:"an",options:["a","an"]},
+  {text:"I use ___ towel.",correct:"a",options:["a","an"]},
+  {text:"It is ___ egg.",correct:"an",options:["a","an"]},
+  {text:"She sees ___ monkey.",correct:"a",options:["a","an"]},
+  {text:"They have ___ apple.",correct:"an",options:["a","an"]},
+  {text:"I eat ___ grape.",correct:"a",options:["a","an"]},
+  {text:"He wants ___ egg.",correct:"an",options:["a","an"]},
+  {text:"She has ___ bike.",correct:"a",options:["a","an"]},
+  {text:"It is ___ ox.",correct:"an",options:["a","an"]},
+  {text:"I play ___ drum.",correct:"a",options:["a","an"]},
+  {text:"He found ___ pen.",correct:"a",options:["a","an"]},
+  {text:"She has ___ jar.",correct:"a",options:["a","an"]},
+  {text:"Look at ___ ant.",correct:"an",options:["a","an"]},
+  {text:"I see ___ snake.",correct:"a",options:["a","an"]},
+  {text:"It is ___ apron.",correct:"an",options:["a","an"]},
+  {text:"She lights ___ candle.",correct:"a",options:["a","an"]},
+  {text:"This is ___ island.",correct:"an",options:["a","an"]},
+  {text:"I turn on ___ lamp.",correct:"a",options:["a","an"]},
+  {text:"He sees ___ owl.",correct:"an",options:["a","an"]},
+  {text:"She eats ___ muffin.",correct:"a",options:["a","an"]},
+  {text:"We found ___ egg.",correct:"an",options:["a","an"]},
+  {text:"I wear ___ jacket.",correct:"a",options:["a","an"]},
+  {text:"It is ___ igloo.",correct:"an",options:["a","an"]},
+  {text:"She sees ___ turtle.",correct:"a",options:["a","an"]},
+  {text:"They have ___ apple.",correct:"an",options:["a","an"]},
+  {text:"I eat ___ pear.",correct:"a",options:["a","an"]},
+  {text:"He wants ___ ant.",correct:"an",options:["a","an"]},
+  {text:"She has ___ puppy.",correct:"a",options:["a","an"]},
+  {text:"It is ___ eel.",correct:"an",options:["a","an"]},
+  {text:"I blow ___ whistle.",correct:"a",options:["a","an"]},
+  {text:"He found ___ pencil.",correct:"a",options:["a","an"]},
+  {text:"She eats ___ lemon.",correct:"a",options:["a","an"]},
+  {text:"We see ___ ape.",correct:"an",options:["a","an"]},
+  {text:"I see ___ frog.",correct:"a",options:["a","an"]},
+  {text:"He has ___ plate.",correct:"a",options:["a","an"]},
+  {text:"She ties ___ ribbon.",correct:"a",options:["a","an"]},
+  {text:"We found ___ ant.",correct:"an",options:["a","an"]},
 ];
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+let SENTENCES = shuffle(RAW_SENTENCES.slice());
 
 // ---------- Layout (fractions of BASE, tuned to this bg) ----------
 // Grated floor starts ~0.62 of height. Belt sits on it. Andy platform behind belt.
@@ -150,28 +248,52 @@ let wrongShake = 0;        // >0 = sentence flashes red + shakes
 let hasMoved = false;      // becomes true once the kid moves the claw (hides hint arrows)
 let btnPressed = 0;       // >0 = show pressed sprite (frames of press feedback)
 
+// ---------- Make ONE random box (Andy's flowing-belt design) ----------
+const DECOY_WORDS = ["cat","dog","apple","egg","the","is","are","my"];
+const PASTELS = ['box_blue','box_green','box_yellow','box_purple'];
+let lastLabel = null, sameCount = 0;
+function rollLabel(){
+  const r = Math.random();
+  if(r < 0.40)      return SENTENCES[level].correct;
+  else if(r < 0.65) return (SENTENCES[level].correct==="a"?"an":"a");
+  else if(r < 0.85) return DECOY_WORDS[(Math.random()*DECOY_WORDS.length)|0];
+  else if(r < 0.95) return 'SKULL';
+  else              return 'HEART';
+}
+let lastCorrectTime = 0;   // ms timestamp of the last correct-word box we made
+function makeBox(x){
+  const correctWord = SENTENCES[level].correct;
+  const now = performance.now();
+  // SAFEGUARD: if it's been >6s since a correct box AND none is on the belt, force a correct one
+  const correctOnBelt = boxes.some(b => b.label === correctWord);
+  let label;
+  if(now - lastCorrectTime > 8000 && !correctOnBelt){
+    label = correctWord;
+  } else {
+    label = rollLabel();
+    // never repeat the same label back-to-back, and never two CORRECT answers in a row
+    let tries = 0;
+    while(tries < 8 && (label === lastLabel || (label === correctWord && lastLabel === correctWord))){ label = rollLabel(); tries++; }
+  }
+  if(label === correctWord) lastCorrectTime = now;
+  lastLabel = label;
+  let sprite;
+  if(label==='SKULL') sprite='box_x';
+  else if(label==='HEART') sprite='box_heart';
+  else sprite = PASTELS[(Math.random()*PASTELS.length)|0];
+  return { x, label, sprite };
+}
+
 // ---------- Build a fresh belt of boxes for current sentence ----------
 function buildBoxes(){
   boxes = [];
-  const s = SENTENCES[level];
-  // Pool = the options + a poison box (skull)
-  let pool = s.options.slice();
-  pool.push('SKULL');
-  // Occasionally add an extra-life heart box
-  if(Math.random() < 0.5) pool.push('HEART');
-  // shuffle
-  for(let i=pool.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[pool[i],pool[j]]=[pool[j],pool[i]];}
-  // place along belt starting off the right edge, spaced
-  const pastel=['box_blue','box_green','box_yellow','box_purple'];
-  let pi=0, x = BASE_W + 100;
-  for(const label of pool){
-    let sprite;
-    if(label==='SKULL') sprite='box_x';
-    else if(label==='HEART') sprite='box_heart';
-    else { sprite=pastel[pi % pastel.length]; pi++; }
-    boxes.push({ x, label, sprite });
-    // random gap: sometimes clustered, sometimes far apart
-    x += 170 + Math.random()*320;
+  // Fill the belt with a flowing mix of random boxes (Andy's design).
+  // random number of boxes (5-9) at random gaps, so the belt feels uneven and alive
+  let x = BASE_W + 100;
+  const count = 5 + ((Math.random()*5)|0);   // 5 to 9
+  for(let i=0;i<count;i++){
+    boxes.push(makeBox(x));
+    x += 200 + Math.random()*320;             // random gap
   }
 }
 buildBoxes();
@@ -239,7 +361,7 @@ function resolveHeld(){
     setAndy('correct', 1.4);
     solvedBanner = { text: s.text.replace('___', s.correct), timer: 2.0 };
     if(wins >= WIN_TARGET){ winGame(); }   // win song only, no correct blip
-    else { playSfx('correct', 1.0); nextSentence(); }
+    else { playSfx('correct', 1.0); level = (level+1) % SENTENCES.length; }  // new sentence, belt keeps flowing (no wipe)
   } else if(hit.label === 'HEART'){
     hearts++;
     setAndy('correct', 1.2);
@@ -323,12 +445,13 @@ function update(dt){
   if(!gameWon){
     beltOffset = (beltOffset + BELT_SPEED*dt) % 1000;
     for(const b of boxes){ b.x -= BELT_SPEED*dt; }
-    // wrap boxes that slide off the left back to the right
-    const minX = Math.min(...boxes.map(b=>b.x), BASE_W);
+    // wrap boxes that slide off the left back to the right, with a FRESH random word
     for(const b of boxes){
       if(b.x < -120){
         const maxX = Math.max(...boxes.map(bb=>bb.x));
-        b.x = maxX + BOX_GAP;
+        const spawnX = Math.max(maxX, BASE_W) + 200 + Math.random()*320;   // always off the right edge
+        const fresh = makeBox(spawnX);   // random gap on wrap, spawns off-screen
+        b.x = fresh.x; b.label = fresh.label; b.sprite = fresh.sprite;
       }
     }
   }
@@ -583,7 +706,7 @@ canvas.addEventListener('pointerdown', ()=>{
     return;
   }
   if(gameWon && andyState==='sad'){
-    hearts=START_HEARTS; wins=0; level=0; gameWon=false; winHandoffSent=false;
+    hearts=START_HEARTS; wins=0; level=0; gameWon=false; winHandoffSent=false; SENTENCES=shuffle(RAW_SENTENCES.slice());
     setAndy('default',0); buildBoxes();
   }
 });
