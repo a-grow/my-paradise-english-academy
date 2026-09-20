@@ -106,7 +106,7 @@ function toggleFullscreen(){
 const FS_BTN = { x: BASE_W-70, y: 20, s: 46 };
 
 // ---------- Game config (Andy's rules) ----------
-const WIN_TARGET = 3;        // fix 3 sentences = win (matches Dig). Temp until JSON pool.
+const WIN_TARGET = 5;        // 5 sentences = win. Temp until JSON pool.
 const START_HEARTS = 5;
 const BELT_SPEED = 90;       // px/sec, FLAT (no per-level speed-up — Andy's no-difficulty rule)
 const BOX_GAP = 300;         // horizontal spacing between boxes on belt
@@ -347,7 +347,11 @@ function grabAtClaw(){
     if(d < 90 && d < best){ best = d; hit = b; }
   }
   claw.holding = hit || null;                 // may grab nothing
-  if(hit){ boxes = boxes.filter(b=>b!==hit); playGrabSfx(); } // take it off the belt so only the claw carries it
+  if(hit){
+    boxes = boxes.filter(b=>b!==hit); playGrabSfx(); // take it off the belt so only the claw carries it
+    const maxX = boxes.length ? Math.max(...boxes.map(bb=>bb.x)) : BASE_W;
+    boxes.push(makeBox(Math.max(maxX, BASE_W) + 200 + Math.random()*320)); // replace it on the right so the belt never empties
+  }
 }
 
 // ---------- At the top: judge the held box (correct / wrong) ----------
