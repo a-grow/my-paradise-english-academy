@@ -10,6 +10,7 @@ export default function GrammarSwim() {
 
   const [won, setWon] = useState(false);
   const claimed = useRef(false);
+  const frameRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     function onMsg(e: MessageEvent) {
@@ -31,6 +32,8 @@ export default function GrammarSwim() {
   return (
     <div style={{ position: "fixed", inset: 0, background: "#000" }}>
       <iframe
+        ref={frameRef}
+        onLoad={() => frameRef.current?.contentWindow?.focus()}
         src="/Teacher_Andy_Swim_game.html"
         title="Teacher Andy Swim"
         style={{ width: "100%", height: "100%", border: "none", display: "block" }}
@@ -44,15 +47,26 @@ export default function GrammarSwim() {
           }}
         >
           <div style={{ fontSize: 32, fontWeight: 700 }}>You won 2 treats! 🎉</div>
-          <button
-            onClick={() => navigate(`/world/${kidCode}/${kidName}`)}
-            style={{
-              fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
-              background: "#5ce0ff", color: "#003", fontWeight: 700, cursor: "pointer",
-            }}
-          >
-            Back to World
-          </button>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <button
+              onClick={() => navigate(`/grammar-hub/${kidCode}/${kidName}`)}
+              style={{
+                fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
+                background: "#fde047", color: "#003", fontWeight: 700, cursor: "pointer",
+              }}
+            >
+              Choose Game
+            </button>
+            <button
+              onClick={() => navigate(`/world/${kidCode}/${kidName}`)}
+              style={{
+                fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
+                background: "#5ce0ff", color: "#003", fontWeight: 700, cursor: "pointer",
+              }}
+            >
+              Return to World
+            </button>
+          </div>
         </div>
       )}
     </div>

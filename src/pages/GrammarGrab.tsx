@@ -10,6 +10,7 @@ export default function GrammarGrab() {
 
   const [won, setWon] = useState(false);
   const claimed = useRef(false);
+  const frameRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     function onMsg(e: MessageEvent) {
@@ -30,6 +31,8 @@ export default function GrammarGrab() {
   return (
     <div style={{ position: "fixed", inset: 0, background: "#000" }}>
       <iframe
+        ref={frameRef}
+        onLoad={() => frameRef.current?.contentWindow?.focus()}
         src="/Teacher_Andy_Grab_game.html"
         title="Teacher Andy Grab"
         style={{ width: "100%", height: "100%", border: "none", display: "block" }}
