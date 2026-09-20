@@ -1,0 +1,1002 @@
+[
+  {
+    "before": "I see",
+    "after": "cat.",
+    "answers": [
+      "an",
+      "soft",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "She has",
+    "after": "apple.",
+    "answers": [
+      "warm",
+      "an",
+      "a"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "It is",
+    "after": "dog.",
+    "answers": [
+      "an",
+      "blue",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "This is",
+    "after": "egg.",
+    "answers": [
+      "a",
+      "an",
+      "soft"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "He rides",
+    "after": "bike.",
+    "answers": [
+      "big",
+      "a",
+      "an"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She eats",
+    "after": "orange.",
+    "answers": [
+      "a",
+      "big",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "He is",
+    "after": "teacher.",
+    "answers": [
+      "an",
+      "a",
+      "blue"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "I want",
+    "after": "umbrella.",
+    "answers": [
+      "little",
+      "a",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "That is",
+    "after": "ball.",
+    "answers": [
+      "a",
+      "blue",
+      "an"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "Here is",
+    "after": "owl.",
+    "answers": [
+      "big",
+      "a",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "I eat",
+    "after": "banana.",
+    "answers": [
+      "red",
+      "a",
+      "an"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "It is",
+    "after": "ant.",
+    "answers": [
+      "blue",
+      "an",
+      "a"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "We have",
+    "after": "car.",
+    "answers": [
+      "small",
+      "a",
+      "an"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She is",
+    "after": "artist.",
+    "answers": [
+      "an",
+      "happy",
+      "a"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I read",
+    "after": "book.",
+    "answers": [
+      "a",
+      "an",
+      "big"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "He has",
+    "after": "idea.",
+    "answers": [
+      "little",
+      "a",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "She wants",
+    "after": "ice cream cone.",
+    "answers": [
+      "an",
+      "a",
+      "small"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I wear",
+    "after": "hat.",
+    "answers": [
+      "a",
+      "an",
+      "soft"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "Look at",
+    "after": "egg.",
+    "answers": [
+      "a",
+      "soft",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "I have",
+    "after": "eraser.",
+    "answers": [
+      "a",
+      "an",
+      "big"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "He pets",
+    "after": "horse.",
+    "answers": [
+      "an",
+      "cute",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "It is",
+    "after": "ox.",
+    "answers": [
+      "an",
+      "small",
+      "a"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "We see",
+    "after": "house.",
+    "answers": [
+      "a",
+      "an",
+      "old"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I want",
+    "after": "apple.",
+    "answers": [
+      "an",
+      "red",
+      "a"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "He flies",
+    "after": "kite.",
+    "answers": [
+      "a",
+      "an",
+      "blue"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "She finds",
+    "after": "shell.",
+    "answers": [
+      "an",
+      "a",
+      "warm"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "They see",
+    "after": "octopus.",
+    "answers": [
+      "cute",
+      "an",
+      "a"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "I eat",
+    "after": "cookie.",
+    "answers": [
+      "an",
+      "a",
+      "little"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "It is",
+    "after": "eye.",
+    "answers": [
+      "an",
+      "red",
+      "a"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "She has",
+    "after": "doll.",
+    "answers": [
+      "an",
+      "a",
+      "cute"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "This is",
+    "after": "igloo.",
+    "answers": [
+      "a",
+      "an",
+      "big"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "I use",
+    "after": "spoon.",
+    "answers": [
+      "blue",
+      "an",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "He has",
+    "after": "egg.",
+    "answers": [
+      "a",
+      "red",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "She picks",
+    "after": "flower.",
+    "answers": [
+      "a",
+      "an",
+      "blue"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "That is",
+    "after": "ant.",
+    "answers": [
+      "an",
+      "a",
+      "blue"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I catch",
+    "after": "fish.",
+    "answers": [
+      "a",
+      "an",
+      "funny"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "He wants",
+    "after": "apple.",
+    "answers": [
+      "red",
+      "an",
+      "a"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She bakes",
+    "after": "cake.",
+    "answers": [
+      "a",
+      "an",
+      "blue"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "It is",
+    "after": "oven.",
+    "answers": [
+      "an",
+      "a",
+      "warm"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I see",
+    "after": "spider.",
+    "answers": [
+      "a",
+      "big",
+      "an"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "Here is",
+    "after": "egg.",
+    "answers": [
+      "blue",
+      "a",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "She has",
+    "after": "rabbit.",
+    "answers": [
+      "an",
+      "small",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "I make",
+    "after": "sandwich.",
+    "answers": [
+      "an",
+      "a",
+      "red"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "It is",
+    "after": "apple.",
+    "answers": [
+      "soft",
+      "an",
+      "a"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She draws",
+    "after": "star.",
+    "answers": [
+      "a",
+      "funny",
+      "an"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "Look at",
+    "after": "owl.",
+    "answers": [
+      "little",
+      "an",
+      "a"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "I sit on",
+    "after": "chair.",
+    "answers": [
+      "an",
+      "a",
+      "soft"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "They have",
+    "after": "box.",
+    "answers": [
+      "a",
+      "an",
+      "soft"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "He has",
+    "after": "bag.",
+    "answers": [
+      "soft",
+      "a",
+      "an"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "It is",
+    "after": "doll.",
+    "answers": [
+      "an",
+      "big",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "I eat",
+    "after": "apple.",
+    "answers": [
+      "old",
+      "a",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "He drives",
+    "after": "truck.",
+    "answers": [
+      "an",
+      "little",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "She finds",
+    "after": "coin.",
+    "answers": [
+      "soft",
+      "a",
+      "an"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "They have",
+    "after": "orange.",
+    "answers": [
+      "red",
+      "an",
+      "a"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "I see",
+    "after": "duck.",
+    "answers": [
+      "an",
+      "a",
+      "little"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She holds",
+    "after": "crayon.",
+    "answers": [
+      "a",
+      "tall",
+      "an"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I hold",
+    "after": "balloon.",
+    "answers": [
+      "big",
+      "an",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "He sees",
+    "after": "owl.",
+    "answers": [
+      "a",
+      "cute",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "She eats",
+    "after": "peach.",
+    "answers": [
+      "an",
+      "a",
+      "blue"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "We cut",
+    "after": "onion.",
+    "answers": [
+      "an",
+      "a",
+      "small"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I use",
+    "after": "towel.",
+    "answers": [
+      "an",
+      "a",
+      "small"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She sees",
+    "after": "monkey.",
+    "answers": [
+      "a",
+      "an",
+      "red"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I eat",
+    "after": "grape.",
+    "answers": [
+      "little",
+      "an",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "He wants",
+    "after": "egg.",
+    "answers": [
+      "an",
+      "a",
+      "little"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "She has",
+    "after": "bike.",
+    "answers": [
+      "an",
+      "a",
+      "blue"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "I play",
+    "after": "drum.",
+    "answers": [
+      "a",
+      "warm",
+      "an"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "He found",
+    "after": "pen.",
+    "answers": [
+      "a",
+      "an",
+      "soft"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "She has",
+    "after": "jar.",
+    "answers": [
+      "a",
+      "an",
+      "old"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "Look at",
+    "after": "ant.",
+    "answers": [
+      "a",
+      "small",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "I see",
+    "after": "snake.",
+    "answers": [
+      "small",
+      "a",
+      "an"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "It is",
+    "after": "apron.",
+    "answers": [
+      "a",
+      "an",
+      "tall"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She lights",
+    "after": "candle.",
+    "answers": [
+      "an",
+      "tall",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "This is",
+    "after": "island.",
+    "answers": [
+      "a",
+      "an",
+      "small"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "I turn on",
+    "after": "lamp.",
+    "answers": [
+      "an",
+      "blue",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "She eats",
+    "after": "muffin.",
+    "answers": [
+      "big",
+      "an",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "We found",
+    "after": "egg.",
+    "answers": [
+      "an",
+      "a",
+      "cute"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I wear",
+    "after": "jacket.",
+    "answers": [
+      "an",
+      "a",
+      "blue"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She sees",
+    "after": "turtle.",
+    "answers": [
+      "a",
+      "an",
+      "warm"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I eat",
+    "after": "pear.",
+    "answers": [
+      "a",
+      "blue",
+      "an"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "He wants",
+    "after": "ant.",
+    "answers": [
+      "a",
+      "blue",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "She has",
+    "after": "puppy.",
+    "answers": [
+      "a",
+      "soft",
+      "an"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "It is",
+    "after": "eel.",
+    "answers": [
+      "a",
+      "big",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "I blow",
+    "after": "whistle.",
+    "answers": [
+      "an",
+      "loud",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "He found",
+    "after": "pencil.",
+    "answers": [
+      "a",
+      "big",
+      "an"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "She eats",
+    "after": "lemon.",
+    "answers": [
+      "an",
+      "small",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "We see",
+    "after": "ape.",
+    "answers": [
+      "an",
+      "a",
+      "blue"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I see",
+    "after": "frog.",
+    "answers": [
+      "red",
+      "a",
+      "an"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "He has",
+    "after": "plate.",
+    "answers": [
+      "cute",
+      "a",
+      "an"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She ties",
+    "after": "ribbon.",
+    "answers": [
+      "small",
+      "a",
+      "an"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "We found",
+    "after": "ant.",
+    "answers": [
+      "a",
+      "an",
+      "big"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She rides",
+    "after": "pony.",
+    "answers": [
+      "a",
+      "an",
+      "cute"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "He opens",
+    "after": "door.",
+    "answers": [
+      "an",
+      "big",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "I paint",
+    "after": "wall.",
+    "answers": [
+      "an",
+      "blue",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "We watch",
+    "after": "movie.",
+    "answers": [
+      "a",
+      "funny",
+      "an"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "She wears",
+    "after": "apron.",
+    "answers": [
+      "a",
+      "red",
+      "an"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "He climbs",
+    "after": "tree.",
+    "answers": [
+      "a",
+      "an",
+      "tall"
+    ],
+    "correct": 0
+  },
+  {
+    "before": "I meet",
+    "after": "astronaut.",
+    "answers": [
+      "a",
+      "an",
+      "happy"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "She buys",
+    "after": "ticket.",
+    "answers": [
+      "an",
+      "small",
+      "a"
+    ],
+    "correct": 2
+  },
+  {
+    "before": "He eats",
+    "after": "olive.",
+    "answers": [
+      "little",
+      "an",
+      "a"
+    ],
+    "correct": 1
+  },
+  {
+    "before": "I ride",
+    "after": "elephant.",
+    "answers": [
+      "a",
+      "an",
+      "big"
+    ],
+    "correct": 1
+  }
+]
