@@ -20,12 +20,12 @@ const LEVELS = [
 ];
 
 export default function GrammarHub() {
-  const { code, studentName } = useParams();
+  const { code, studentName, level: levelParam } = useParams();
   const navigate = useNavigate();
   const kidCode = (code || "").toUpperCase();
   const kidName = (studentName || "").toLowerCase();
 
-  const [level, setLevel] = useState<number | null>(null);
+  const [level, setLevel] = useState<number | null>(levelParam ? Number(levelParam) : null);
 
   const selected = LEVELS.find((l) => l.n === level);
 
@@ -82,9 +82,9 @@ export default function GrammarHub() {
     const playGame = (id: string) => {
       fadeOutThen(() => {
         if (id === "run") navigate(`/grammar-run/${kidCode}/${kidName}/${selected.n}`);
-        if (id === "swim") navigate(`/grammar-swim/${kidCode}/${kidName}`);
-        if (id === "dig") navigate(`/grammar-dig/${kidCode}/${kidName}`);
-        if (id === "grab") navigate(`/grammar-grab/${kidCode}/${kidName}`);
+        if (id === "swim") navigate(`/grammar-swim/${kidCode}/${kidName}/${selected.n}`);
+        if (id === "dig") navigate(`/grammar-dig/${kidCode}/${kidName}/${selected.n}`);
+        if (id === "grab") navigate(`/grammar-grab/${kidCode}/${kidName}/${selected.n}`);
       });
     };
 

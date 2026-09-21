@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { saveJarToCloud } from "@/lib/cloudSave";
 
 export default function GrammarGrab() {
-  const { code, studentName } = useParams();
+  const { code, studentName, level } = useParams();
   const navigate = useNavigate();
   const kidCode = (code || "").toUpperCase();
   const kidName = (studentName || "").toLowerCase();
@@ -48,7 +48,7 @@ export default function GrammarGrab() {
           <div style={{ fontSize: 32, fontWeight: 700 }}>You won 2 treats! 🎉</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <button
-              onClick={() => navigate(`/grammar-hub/${kidCode}/${kidName}`)}
+              onClick={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
               style={{
                 fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
                 background: "#fde047", color: "#003", fontWeight: 700, cursor: "pointer",

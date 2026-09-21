@@ -39,11 +39,11 @@ const App = () => (
 <Route path="/game/:world/:code/:studentName/:book" element={<GamePage />} />
 <Route path="/game/:code/:studentName/:book" element={<GamePage />} />
 {/* <Route path="/grammar/:code/:studentName/:book" element={<Grammar />} /> */}
-<Route path="/grammar-run/:code/:studentName/:level" element={<GrammarRun />} />
-<Route path="/grammar-swim/:code/:studentName" element={<GrammarSwim />} />
-<Route path="/grammar-dig/:code/:studentName" element={<GrammarDig />} />
-<Route path="/grammar-grab/:code/:studentName" element={<GrammarGrab />} />
-<Route path="/grammar-hub/:code/:studentName" element={<GrammarHub />} />
+<Route path="/grammar-run/:code/:studentName/:level?" element={<GrammarRun />} />
+<Route path="/grammar-swim/:code/:studentName/:level?" element={<GrammarSwim />} />
+<Route path="/grammar-dig/:code/:studentName/:level?" element={<GrammarDig />} />
+<Route path="/grammar-grab/:code/:studentName/:level?" element={<GrammarGrab />} />
+<Route path="/grammar-hub/:code/:studentName/:level?" element={<GrammarHub />} />
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<DinosaurWorld />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
