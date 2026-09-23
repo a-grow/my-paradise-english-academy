@@ -1,0 +1,402 @@
+[
+  {
+    "s": "I am happy.",
+    "ans": true
+  },
+  {
+    "s": "I am a student.",
+    "ans": true
+  },
+  {
+    "s": "I am busy.",
+    "ans": true
+  },
+  {
+    "s": "I am tall.",
+    "ans": true
+  },
+  {
+    "s": "I am hungry.",
+    "ans": true
+  },
+  {
+    "s": "I am at home.",
+    "ans": true
+  },
+  {
+    "s": "I am a boy.",
+    "ans": true
+  },
+  {
+    "s": "I am a girl.",
+    "ans": true
+  },
+  {
+    "s": "I am ready.",
+    "ans": true
+  },
+  {
+    "s": "I am tired.",
+    "ans": true
+  },
+  {
+    "s": "You are my friend.",
+    "ans": true
+  },
+  {
+    "s": "You are kind.",
+    "ans": true
+  },
+  {
+    "s": "You are tall.",
+    "ans": true
+  },
+  {
+    "s": "You are a good student.",
+    "ans": true
+  },
+  {
+    "s": "He is my brother.",
+    "ans": true
+  },
+  {
+    "s": "He is a teacher.",
+    "ans": true
+  },
+  {
+    "s": "He is tall.",
+    "ans": true
+  },
+  {
+    "s": "She is my sister.",
+    "ans": true
+  },
+  {
+    "s": "She is happy.",
+    "ans": true
+  },
+  {
+    "s": "She is a doctor.",
+    "ans": true
+  },
+  {
+    "s": "It is a cat.",
+    "ans": true
+  },
+  {
+    "s": "It is red.",
+    "ans": true
+  },
+  {
+    "s": "It is big.",
+    "ans": true
+  },
+  {
+    "s": "It is cold.",
+    "ans": true
+  },
+  {
+    "s": "The dog is small.",
+    "ans": true
+  },
+  {
+    "s": "The cat is black.",
+    "ans": true
+  },
+  {
+    "s": "My mom is kind.",
+    "ans": true
+  },
+  {
+    "s": "My dad is strong.",
+    "ans": true
+  },
+  {
+    "s": "The sun is hot.",
+    "ans": true
+  },
+  {
+    "s": "The apple is red.",
+    "ans": true
+  },
+  {
+    "s": "We are friends.",
+    "ans": true
+  },
+  {
+    "s": "We are happy.",
+    "ans": true
+  },
+  {
+    "s": "We are at school.",
+    "ans": true
+  },
+  {
+    "s": "They are my cats.",
+    "ans": true
+  },
+  {
+    "s": "They are big.",
+    "ans": true
+  },
+  {
+    "s": "They are students.",
+    "ans": true
+  },
+  {
+    "s": "The dogs are brown.",
+    "ans": true
+  },
+  {
+    "s": "The birds are small.",
+    "ans": true
+  },
+  {
+    "s": "My friends are nice.",
+    "ans": true
+  },
+  {
+    "s": "The books are new.",
+    "ans": true
+  },
+  {
+    "s": "The apples are green.",
+    "ans": true
+  },
+  {
+    "s": "The kids are happy.",
+    "ans": true
+  },
+  {
+    "s": "The cups are blue.",
+    "ans": true
+  },
+  {
+    "s": "You and I are friends.",
+    "ans": true
+  },
+  {
+    "s": "Tom and Amy are tall.",
+    "ans": true
+  },
+  {
+    "s": "The flowers are pretty.",
+    "ans": true
+  },
+  {
+    "s": "The shoes are black.",
+    "ans": true
+  },
+  {
+    "s": "The trees are tall.",
+    "ans": true
+  },
+  {
+    "s": "My hands are cold.",
+    "ans": true
+  },
+  {
+    "s": "The stars are bright.",
+    "ans": true
+  },
+  {
+    "s": "I is happy.",
+    "ans": false
+  },
+  {
+    "s": "I are a student.",
+    "ans": false
+  },
+  {
+    "s": "I is tall.",
+    "ans": false
+  },
+  {
+    "s": "I are hungry.",
+    "ans": false
+  },
+  {
+    "s": "I is at home.",
+    "ans": false
+  },
+  {
+    "s": "I are ready.",
+    "ans": false
+  },
+  {
+    "s": "I is a boy.",
+    "ans": false
+  },
+  {
+    "s": "I are tired.",
+    "ans": false
+  },
+  {
+    "s": "He am tall.",
+    "ans": false
+  },
+  {
+    "s": "She am happy.",
+    "ans": false
+  },
+  {
+    "s": "It am a cat.",
+    "ans": false
+  },
+  {
+    "s": "You is my friend.",
+    "ans": false
+  },
+  {
+    "s": "You is kind.",
+    "ans": false
+  },
+  {
+    "s": "You am tall.",
+    "ans": false
+  },
+  {
+    "s": "He are my brother.",
+    "ans": false
+  },
+  {
+    "s": "He are a teacher.",
+    "ans": false
+  },
+  {
+    "s": "She are my sister.",
+    "ans": false
+  },
+  {
+    "s": "She are a doctor.",
+    "ans": false
+  },
+  {
+    "s": "It are a dog.",
+    "ans": false
+  },
+  {
+    "s": "It are red.",
+    "ans": false
+  },
+  {
+    "s": "It are big.",
+    "ans": false
+  },
+  {
+    "s": "The dog are small.",
+    "ans": false
+  },
+  {
+    "s": "The cat are black.",
+    "ans": false
+  },
+  {
+    "s": "My mom are kind.",
+    "ans": false
+  },
+  {
+    "s": "My dad are strong.",
+    "ans": false
+  },
+  {
+    "s": "The sun are hot.",
+    "ans": false
+  },
+  {
+    "s": "The apple are red.",
+    "ans": false
+  },
+  {
+    "s": "The bird are small.",
+    "ans": false
+  },
+  {
+    "s": "We is friends.",
+    "ans": false
+  },
+  {
+    "s": "We is happy.",
+    "ans": false
+  },
+  {
+    "s": "We am at school.",
+    "ans": false
+  },
+  {
+    "s": "They is my cats.",
+    "ans": false
+  },
+  {
+    "s": "They is big.",
+    "ans": false
+  },
+  {
+    "s": "They am students.",
+    "ans": false
+  },
+  {
+    "s": "The dogs is brown.",
+    "ans": false
+  },
+  {
+    "s": "The birds is small.",
+    "ans": false
+  },
+  {
+    "s": "My friends is nice.",
+    "ans": false
+  },
+  {
+    "s": "The books is new.",
+    "ans": false
+  },
+  {
+    "s": "The apples is green.",
+    "ans": false
+  },
+  {
+    "s": "The kids is happy.",
+    "ans": false
+  },
+  {
+    "s": "The cups is blue.",
+    "ans": false
+  },
+  {
+    "s": "Tom and Amy is tall.",
+    "ans": false
+  },
+  {
+    "s": "The flowers is pretty.",
+    "ans": false
+  },
+  {
+    "s": "The shoes is black.",
+    "ans": false
+  },
+  {
+    "s": "The trees is tall.",
+    "ans": false
+  },
+  {
+    "s": "My hands is cold.",
+    "ans": false
+  },
+  {
+    "s": "The stars is bright.",
+    "ans": false
+  },
+  {
+    "s": "The cats is white.",
+    "ans": false
+  },
+  {
+    "s": "The girls is happy.",
+    "ans": false
+  },
+  {
+    "s": "The boys am tall.",
+    "ans": false
+  }
+]
