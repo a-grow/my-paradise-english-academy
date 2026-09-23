@@ -34,7 +34,7 @@ export default function GrammarSwim() {
       <iframe
         ref={frameRef}
         onLoad={() => frameRef.current?.contentWindow?.focus()}
-        src="/Teacher_Andy_Swim_game.html"
+        src={`/Teacher_Andy_Swim_game.html?level=${level || 1}`}
         title="Teacher Andy Swim"
         style={{ width: "100%", height: "100%", border: "none", display: "block" }}
       />
