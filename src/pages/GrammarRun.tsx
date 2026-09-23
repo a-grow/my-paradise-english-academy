@@ -34,7 +34,7 @@ export default function GrammarRun() {
       <iframe
         ref={frameRef}
         onLoad={() => frameRef.current?.contentWindow?.focus()}
-        src="/Teacher_Andy_Run_game.html"
+        src={`/Teacher_Andy_Run_game.html?level=${level || 1}`}
         title="Teacher Andy Run"
         style={{ width: "100%", height: "100%", border: "none", display: "block" }}
       />
