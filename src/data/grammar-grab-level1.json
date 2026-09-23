@@ -1,0 +1,794 @@
+[
+ {
+  "text": "I see ___ cat.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She has ___ apple.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ dog.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "This is ___ egg.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He rides ___ bike.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She eats ___ orange.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He is ___ teacher.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I want ___ umbrella.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "That is ___ ball.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "Here is ___ owl.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I eat ___ banana.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ ant.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "We have ___ car.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She is ___ artist.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I read ___ book.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He has ___ idea.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She wants ___ ice cream cone.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I wear ___ hat.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "Look at ___ egg.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I have ___ eraser.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He pets ___ horse.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ ox.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "We see ___ house.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I want ___ apple.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He flies ___ kite.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She finds ___ shell.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "They see ___ octopus.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I eat ___ cookie.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ eye.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She has ___ doll.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "This is ___ igloo.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I use ___ spoon.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He has ___ egg.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She picks ___ flower.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "That is ___ ant.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I catch ___ fish.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He wants ___ apple.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She bakes ___ cake.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ oven.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I see ___ spider.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "Here is ___ egg.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She has ___ rabbit.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He has ___ egg.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I make ___ sandwich.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ apple.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She draws ___ star.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "Look at ___ owl.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I sit on ___ chair.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "They have ___ box.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He has ___ bag.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ ear.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I eat ___ apple.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He drives ___ truck.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She finds ___ coin.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "They have ___ orange.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I see ___ duck.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "This is ___ egg.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She holds ___ crayon.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ ant.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I hold ___ balloon.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He sees ___ owl.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She eats ___ peach.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "We cut ___ onion.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I use ___ towel.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ egg.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She sees ___ monkey.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "They have ___ apple.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I eat ___ grape.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He wants ___ egg.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She has ___ bike.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ ox.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I play ___ drum.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He found ___ pen.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She has ___ jar.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "Look at ___ ant.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I see ___ snake.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ apron.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She lights ___ candle.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "This is ___ island.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I turn on ___ lamp.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He sees ___ owl.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She eats ___ muffin.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "We found ___ egg.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I wear ___ jacket.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ igloo.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She sees ___ turtle.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "They have ___ apple.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I eat ___ pear.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He wants ___ ant.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She has ___ puppy.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "It is ___ eel.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I blow ___ whistle.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He found ___ pencil.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She eats ___ lemon.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "We see ___ ape.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "I see ___ frog.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "He has ___ plate.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "She ties ___ ribbon.",
+  "correct": "a",
+  "options": [
+   "a",
+   "an"
+  ]
+ },
+ {
+  "text": "We found ___ ant.",
+  "correct": "an",
+  "options": [
+   "a",
+   "an"
+  ]
+ }
+]
