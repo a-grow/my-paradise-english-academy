@@ -145,6 +145,7 @@ let andyState = 'default';   // default|correct|wrong|sad|win
 let andyTimer = 0;
 let gameWon = false;
 let winHandoffSent = false;  // double-pay guard (game side)
+let winKeyAt = 0;
 let sparks = [];
 let lastT = performance.now();
 let solvedBanner = null;   // {text, timer} — shows completed sentence in green
@@ -207,6 +208,7 @@ const keys = {};
 addEventListener('keydown', e=>{ startAudioOnce(); keys[e.key]=true;
   if(e.key===' '||e.key==='ArrowDown') grab(); });
 addEventListener('keyup', e=>{ keys[e.key]=false; });
+addEventListener('keydown', e=>{ if((e.key===' '||e.key==='Enter')&&!e.repeat&&gameWon&&andyState==='win'&&!winHandoffSent&&performance.now()-winKeyAt>1000){ winHandoffSent=true; try{ window.parent.postMessage({type:"MPE_GRAB_WIN"}, "*"); }catch(err){} } });
 
 // touch: left half moves claw toward touch x; a GRAB button drawn bottom-center
 let touchX = null;
@@ -302,6 +304,7 @@ function nextSentence(){
 function winGame(){
   gameWon = true;
   setAndy('win', 999);
+  winKeyAt = performance.now();
   fadeOutMusic();                       // fade + stop theme
   try{ winMusic.currentTime=0; winMusic.play(); }catch(e){}   // play win music
   // handoff now waits for a tap — fires in the pointerdown listener below

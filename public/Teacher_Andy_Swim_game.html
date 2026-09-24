@@ -38,7 +38,7 @@ let BANK=drawSwimQuestions();
 let qi=0,msg='',msgT=0,lives=5;let armed=true;
 let correctCount=0; const TOTAL_Q=BANK.length; let chestOpen=false, chestShake=0;
 let heartBub=null, heartTimer=2+Math.random()*4;
-let winTimer=0, won=false; let winHandoffSent=false;
+let winTimer=0, won=false; let winHandoffSent=false; let winKeyAt=0;
 // each target gets hitGlow that flares to 1 then fades
 
 let targets=[];
@@ -117,7 +117,7 @@ function update(dt){
    if(dx<(P.w+e.w)*0.26&&dy<(P.h+e.h)*0.28){lives--;P.inv=1.3;sfxHit();reset();if(lives<=0)lives=5;}}}
  for(const t of targets){t.cy=t.cy0+Math.sin(T*t.s1+t.ph)*t.a1+Math.sin(T*t.s2+t.ph*1.7)*t.a2;t.cx=t.bx+Math.sin(T*t.sx+t.ph)*t.dx; if(t.hitGlow>0)t.hitGlow=Math.max(0,t.hitGlow-dt*1.6);}
  if(chestShake>0)chestShake=Math.max(0,chestShake-dt);
- if(winTimer>0){winTimer-=dt; if(winTimer<=0)won=true;}
+ if(winTimer>0){winTimer-=dt; if(winTimer<=0){won=true;winKeyAt=performance.now();}}
  // heart bubble
  if(!heartBub){ heartTimer-=dt; if(heartTimer<=0){ const vert=Math.random()<0.5; if(vert){heartBub={x:W*(0.2+Math.random()*0.6),y:H+40,vx:0,vy:-(50+Math.random()*30),r:44};} else {const ltr=Math.random()<0.5; heartBub={x:ltr?-40:W+40,y:H*(0.2+Math.random()*0.5),vx:(ltr?1:-1)*(50+Math.random()*30),vy:0,r:44};} } }
  if(heartBub){ heartBub.x+=heartBub.vx*dt; heartBub.y+=heartBub.vy*dt;
@@ -273,6 +273,7 @@ cv.addEventListener('mousedown',unlock);
 function winTapHandoff(){ if(won && !winHandoffSent){ winHandoffSent=true; try{ window.parent.postMessage({type:'MPE_SWIM_WIN'},'*'); }catch(e){} } }
 cv.addEventListener('touchstart',winTapHandoff,{passive:true});
 cv.addEventListener('mousedown',winTapHandoff);
+addEventListener('keydown',e=>{ if((e.key===' '||e.key==='Enter')&&!e.repeat&&won&&performance.now()-winKeyAt>1000) winTapHandoff(); });
 
 let last=performance.now();
 function loop(t){const dt=Math.min(0.05,(t-last)/1000);last=t;update(dt);draw();requestAnimationFrame(loop);}
