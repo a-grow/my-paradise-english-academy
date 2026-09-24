@@ -157,22 +157,23 @@ let btnPressed = 0;       // >0 = show pressed sprite (frames of press feedback)
 const DECOY_WORDS = ["cat","dog","apple","egg","is","are"];
 const PASTELS = ['box_blue','box_green','box_yellow','box_purple'];
 let lastLabel = null, sameCount = 0;
+function boxWord(w){ return w==='I' ? 'I' : w.toLowerCase(); }  // word boxes always lowercase (except "I"); green banner keeps the capital
 function rollLabel(){
   const r = Math.random();
-  if(r < 0.40)      return SENTENCES[level].correct;
-  else if(r < 0.65) return SENTENCES[level].options.find(o=>o!==SENTENCES[level].correct);
+  if(r < 0.40)      return boxWord(SENTENCES[level].correct);
+  else if(r < 0.65) return boxWord(SENTENCES[level].options.find(o=>o!==SENTENCES[level].correct));
   else if(r < 0.85) return DECOY_WORDS[(Math.random()*DECOY_WORDS.length)|0];
   else if(r < 0.95) return 'SKULL';
   else              return 'HEART';
 }
 let lastCorrectTime = 0;   // ms timestamp of the last correct-word box we made
 function makeBox(x){
-  const correctWord = SENTENCES[level].correct;
+  const correctWord = boxWord(SENTENCES[level].correct);
   const now = performance.now();
-  // SAFEGUARD: if it's been >6s since a correct box AND none is on the belt, force a correct one
+  // SAFEGUARD: if it's been >5s since a correct box AND none is on the belt, force a correct one
   const correctOnBelt = boxes.some(b => b.label === correctWord);
   let label;
-  if(now - lastCorrectTime > 8000 && !correctOnBelt){
+  if(now - lastCorrectTime > 5000 && !correctOnBelt){
     label = correctWord;
   } else {
     label = rollLabel();
@@ -266,7 +267,7 @@ function resolveHeld(){
   claw.holding = null;
   if(!hit) return;                            // grabbed nothing — no effect
   const s = SENTENCES[level];
-  if(hit.label === s.correct){
+  if(hit.label === boxWord(s.correct)){
     wins++;
     setAndy('correct', 1.4);
     solvedBanner = { text: s.text.replace('___', s.correct), timer: 2.0 };
