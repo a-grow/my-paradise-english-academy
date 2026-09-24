@@ -5,18 +5,18 @@ const F = "'Nunito',sans-serif";
 
 // 12 grammar levels — locked list, easiest → hardest. English only for now.
 const LEVELS = [
-  { n: 1, topic: "Nouns & a/an", emoji: "🍎" },
-  { n: 2, topic: "Plurals", emoji: "🐱" },
-  { n: 3, topic: "Be-verbs (am/are/is)", emoji: "⭐" },
-  { n: 4, topic: "Pronouns & this/that", emoji: "👉" },
-  { n: 5, topic: "Possessives & Wh-Questions", emoji: "🔑" },
-  { n: 6, topic: "There is/are, some/any", emoji: "🧺" },
-  { n: 7, topic: "Adjectives & adverbs", emoji: "🌈" },
-  { n: 8, topic: "Present tenses", emoji: "🏃" },
-  { n: 9, topic: "Have/has, can, prepositions", emoji: "🎁" },
-  { n: 10, topic: "Past", emoji: "🕰️" },
-  { n: 11, topic: "Future", emoji: "🚀" },
-  { n: 12, topic: "Advanced", emoji: "🏆" },
+  { n: 1, topic: "Nouns & a/an" },
+  { n: 2, topic: "Plurals" },
+  { n: 3, topic: "Be-verbs (am/are/is)" },
+  { n: 4, topic: "Pronouns & this/that" },
+  { n: 5, topic: "Possessives & Wh-Questions" },
+  { n: 6, topic: "There is/are, some/any" },
+  { n: 7, topic: "Adjectives & adverbs" },
+  { n: 8, topic: "Present tenses" },
+  { n: 9, topic: "Have/has, can, prepositions" },
+  { n: 10, topic: "Past" },
+  { n: 11, topic: "Future" },
+  { n: 12, topic: "Comparatives & superlatives" },
 ];
 
 export default function GrammarHub() {
@@ -308,7 +308,7 @@ export default function GrammarHub() {
                         marginTop: 2,
                       }}
                     >
-                      🔒 Coming Soon!
+                      Coming Soon!
                     </div>
                   </div>
                 )}
@@ -393,14 +393,13 @@ export default function GrammarHub() {
             textShadow: "0 0 20px rgba(168,85,247,0.9)",
           }}
         >
-          📖 Grammar
+          Grammar
         </span>
         <div style={{ width: 72 }} />
       </nav>
 
       <div style={{ position: "relative", zIndex: 10, maxWidth: 560, margin: "0 auto", padding: "72px 16px 40px" }}>
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <div style={{ fontSize: "4.5rem", display: "inline-block" }}>📖</div>
           <div
             style={{
               fontFamily: F,
@@ -444,7 +443,6 @@ export default function GrammarHub() {
                 boxShadow: "0 0 20px rgba(168,85,247,0.4),0 8px 24px rgba(0,0,0,0.3)",
               }}
             >
-              <div style={{ fontSize: "2.3rem" }}>{l.emoji}</div>
               <div style={{ flex: 1, textAlign: "left" }}>
                 <div
                   style={{
