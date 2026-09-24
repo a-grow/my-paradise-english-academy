@@ -166,7 +166,7 @@ function spawnHearts(){ hearts=[]; const used=new Set([andy.cx+","+andy.cy]);
   let tries=0;
   while(hearts.length<3 && tries<200){ tries++;
     const[cx,cy]=farTunnel(andy.cx,andy.cy,4); const key=cx+","+cy;
-    if(used.has(key))continue;
+    if(used.has(key)||rockAt(cx,cy))continue;
     // keep hearts spread from each other
     let ok=true; for(const h of hearts){ if(Math.hypot(h.cx-cx,h.cy-cy)<4){ok=false;break;} }
     if(!ok)continue;
@@ -175,7 +175,7 @@ function spawnHearts(){ hearts=[]; const used=new Set([andy.cx+","+andy.cy]);
 }
 function spawnOneHeart(){ if(hearts.length>=3)return;
   for(let t=0;t<80;t++){ const[cx,cy]=farTunnel(andy.cx,andy.cy,4);
-    let ok=true; for(const h of hearts){if(Math.hypot(h.cx-cx,h.cy-cy)<4){ok=false;break;}}
+    let ok=!rockAt(cx,cy); for(const h of hearts){if(Math.hypot(h.cx-cx,h.cy-cy)<4){ok=false;break;}}
     if(ok){hearts.push({cx,cy,phase:Math.random()*Math.PI*2});return;} }
 }
 function placeAll(){let c=cellCenter(andy.cx,andy.cy);andy.px=andy.tx=c.x;andy.py=andy.ty=c.y;
@@ -231,7 +231,7 @@ function doStrike(){
 let pendingRespawn=[];
 function spawnNextButton(){ const[cx,cy]=farTunnel(andy.cx,andy.cy,3); nextBtn={cx,cy,gone:false,isNext:true,shake:0}; }
 function goNextSentence(){ sentenceIdx=(sentenceIdx+1)%SENTENCES.length;SENTENCE=SENTENCES[sentenceIdx];
-  progress=0;won=false;layoutWords();nextBtn=null;play(levelSfx); }
+  progress=0;won=false;layoutWords();nextBtn=null;hearts=hearts.filter(h=>!rockAt(h.cx,h.cy));if(hearts.length<3&&heartTimer<=0)heartTimer=6;play(levelSfx); }
 
 const keys={};
 addEventListener('keydown',e=>{const k=e.key;startAudio();
