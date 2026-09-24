@@ -144,6 +144,7 @@ const GRAB_STOP_Y = BOX_Y - 150;   // claw tips meet the box TOP here (looks gra
 let andyState = 'default';   // default|correct|wrong|sad|win
 let andyTimer = 0;
 let gameWon = false;
+let loseHandoffSent = false;
 let winHandoffSent = false;  // double-pay guard (game side)
 let winKeyAt = 0;
 let sparks = [];
@@ -313,6 +314,7 @@ function winGame(){
 function loseGame(){
   gameWon = true;   // reuse flag to stop input
   setAndy('sad', 999);
+  if(!loseHandoffSent){ loseHandoffSent = true; try{ window.parent.postMessage({type:"MPE_GRAB_LOSE"}, "*"); }catch(e){} }
   // (Standalone: reset on tap. Real Game Over screen comes at wiring step.)
 }
 

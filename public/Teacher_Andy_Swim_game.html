@@ -38,7 +38,7 @@ let BANK=drawSwimQuestions();
 let qi=0,msg='',msgT=0,lives=5;let armed=true;
 let correctCount=0; const TOTAL_Q=BANK.length; let chestOpen=false, chestShake=0;
 let heartBub=null, heartTimer=2+Math.random()*4;
-let winTimer=0, won=false; let winHandoffSent=false; let winKeyAt=0;
+let winTimer=0, won=false; let lost=false, loseHandoffSent=false; let winHandoffSent=false; let winKeyAt=0;
 // each target gets hitGlow that flares to 1 then fades
 
 let targets=[];
@@ -98,7 +98,7 @@ cv.addEventListener('touchend',()=>{tx=ty=null;},{passive:false});
 let T=0;const ZR=100;
 function update(dt){
  T+=dt;
- if(won)return;const acc=1400,damp=0.88,max=560;
+ if(won||lost)return;const acc=1400,damp=0.88,max=560;
  if(keys['ArrowLeft'])P.vx-=acc*dt;if(keys['ArrowRight'])P.vx+=acc*dt;
  if(keys['ArrowUp'])P.vy-=acc*dt;if(keys['ArrowDown'])P.vy+=acc*dt;
  if(tx!==null){const dx=tx-P.x,dy=ty-P.y;P.vx+=Math.sign(dx)*acc*dt*Math.min(1,Math.abs(dx)/60);P.vy+=Math.sign(dy)*acc*dt*Math.min(1,Math.abs(dy)/60);}
@@ -114,7 +114,7 @@ function update(dt){
   else{e.y=e.cy+Math.sin(T*e.vs+e.ph)*e.ampY;e.x=e.baseX+Math.sin(T*e.swayS+e.ph)*e.swayA;
    if(e.ft>0.22){e.ft=0;e.fr=(e.fr+1)%jellyF.length;}}
   if(P.inv<=0){const dx=Math.abs(P.x-e.x),dy=Math.abs(P.y-e.y);
-   if(dx<(P.w+e.w)*0.26&&dy<(P.h+e.h)*0.28){lives--;P.inv=1.3;sfxHit();reset();if(lives<=0)lives=5;}}}
+   if(dx<(P.w+e.w)*0.26&&dy<(P.h+e.h)*0.28){lives--;P.inv=1.3;sfxHit();reset();if(lives<=0)loseHandoff();}}}
  for(const t of targets){t.cy=t.cy0+Math.sin(T*t.s1+t.ph)*t.a1+Math.sin(T*t.s2+t.ph*1.7)*t.a2;t.cx=t.bx+Math.sin(T*t.sx+t.ph)*t.dx; if(t.hitGlow>0)t.hitGlow=Math.max(0,t.hitGlow-dt*1.6);}
  if(chestShake>0)chestShake=Math.max(0,chestShake-dt);
  if(winTimer>0){winTimer-=dt; if(winTimer<=0){won=true;winKeyAt=performance.now();}}
@@ -270,6 +270,7 @@ function unlock(){ initAudio(); if(actx&&actx.state==='suspended')actx.resume();
 addEventListener('keydown',unlock);
 cv.addEventListener('touchstart',unlock);
 cv.addEventListener('mousedown',unlock);
+function loseHandoff(){ lost=true; if(!loseHandoffSent){ loseHandoffSent=true; try{ window.parent.postMessage({type:'MPE_SWIM_LOSE'},'*'); }catch(e){} } }
 function winTapHandoff(){ if(won && !winHandoffSent){ winHandoffSent=true; try{ window.parent.postMessage({type:'MPE_SWIM_WIN'},'*'); }catch(e){} } }
 cv.addEventListener('touchstart',winTapHandoff,{passive:true});
 cv.addEventListener('mousedown',winTapHandoff);

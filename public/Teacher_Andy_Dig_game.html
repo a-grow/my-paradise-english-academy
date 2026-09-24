@@ -104,7 +104,7 @@ function reachableAll(blockedSet, targets, fx=START_CX, fy=START_CY){
 }
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
-let lives=5, won=false;
+let lives=5, won=false; let lost=false, loseHandoffSent=false;
 let rocks=[]; let progress=0; let nextBtn=null;
 
 // GUARANTEED non-blocking placement: each rock reachable with the others as walls
@@ -281,13 +281,15 @@ function stepWorm(w){
 }
 function checkHit(){ if(andy.invuln>0||won||andy.digging)return; // digging = swinging pickaxe, can't be hurt
   for(const w of worms){if(w.hurt>0)continue;
-    if(Math.hypot(w.px-andy.px,w.py-andy.py)<cell*0.55){play(hurtSfx);lives--;respawnAndy();if(lives<=0)resetGame();return;}}}
+    if(Math.hypot(w.px-andy.px,w.py-andy.py)<cell*0.55){play(hurtSfx);lives--;respawnAndy();if(lives<=0)loseHandoff();return;}}}
 function checkHeart(){ for(let i=hearts.length-1;i>=0;i--){ const h=hearts[i];
     if(h.cx===andy.cx&&h.cy===andy.cy){ lives++; play(correctSfx); hearts.splice(i,1); heartTimer=6; } } }
+function loseHandoff(){ lost=true; if(!loseHandoffSent){ loseHandoffSent=true; try{ window.parent.postMessage({type:'MPE_DIG_LOSE'},'*'); }catch(e){} } }
 function resetGame(){lives=5;progress=0;won=false;sentenceIdx=0;SENTENCE=SENTENCES[0];layoutWords();initWorms();placeAll();spawnHearts();respawnAndy();}
 
 let lastT=performance.now();
 function update(dt){
+  if(lost)return;
   if(andy.invuln>0)andy.invuln-=dt;
   if(andy.blinking){andy.blinkTime-=dt;if(andy.blinkTime<=0)andy.blinking=false;}
   if(!andy.moving&&!andy.digging){

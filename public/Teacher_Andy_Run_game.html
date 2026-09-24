@@ -129,6 +129,13 @@ function winTapHandoff() {
 }
 window.addEventListener("mousedown", winTapHandoff, { once: false });
 window.addEventListener("touchstart", winTapHandoff, { once: false });
+let loseHandoffSent = false;
+function loseHandoff() {
+    if (!loseHandoffSent) {
+        loseHandoffSent = true;
+        try { window.parent.postMessage({ type: "MPE_RUN_LOSE" }, "*"); } catch (e) {}
+    }
+}
 window.addEventListener("keydown", function (e) { if ((e.key === " " || e.key === "Enter") && !e.repeat && gameState === "win" && performance.now() - winKeyAt > 1000) winTapHandoff(); });
 
 // --- event sound effects (embedded MP3s) ---
@@ -585,7 +592,7 @@ function hurtPlayer() {
     lives--;
     shakeTimer = 0.3;
     if (lives <= 0) {
-        gameState = "gameover";
+        gameState = "gameover"; loseHandoff();
         duckMusic(0, 400);          // fade music out
         playSound(sndGameOver);     // game-over jingle
         return;
@@ -772,7 +779,7 @@ function splashPlayer(w) {
     }
     lives--;
     if (lives <= 0) {
-        gameState = "gameover";
+        gameState = "gameover"; loseHandoff();
         duckMusic(0, 400);
         playSound(sndGameOver);
         return;
