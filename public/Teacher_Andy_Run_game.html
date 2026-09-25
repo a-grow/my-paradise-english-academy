@@ -1,6 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+/* MPE mute: the page around the game sends {type:"MPE_MUTE", muted:true/false}.
+   Mutes ALL sound (audio files + Web Audio beeps). Same block in all 4 grammar games. */
+(function(){
+  var muted = false, media = new Set(), ctxs = [];
+  var mp = HTMLMediaElement.prototype, origPlay = mp.play;
+  mp.play = function(){
+    if(!media.has(this)){ media.add(this); var el = this; this.addEventListener('ended', function(){ if(!el.loop) media.delete(el); }); }
+    this.muted = muted;
+    return origPlay.apply(this, arguments);
+  };
+  if(window.AudioNode){
+    var origConnect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest){
+      if(window.AudioDestinationNode && dest instanceof AudioDestinationNode){
+        var c = dest.context;
+        if(!c.__mpeGain){ c.__mpeGain = c.createGain(); c.__mpeGain.gain.value = muted ? 0 : 1; origConnect.call(c.__mpeGain, dest); ctxs.push(c); }
+        var args = Array.prototype.slice.call(arguments); args[0] = c.__mpeGain;
+        return origConnect.apply(this, args);
+      }
+      return origConnect.apply(this, arguments);
+    };
+  }
+  window.addEventListener('message', function(e){
+    if(!e.data || e.data.type !== 'MPE_MUTE') return;
+    muted = !!e.data.muted;
+    media.forEach(function(m){ m.muted = muted; });
+    var tags = document.getElementsByTagName('audio'); for(var i = 0; i < tags.length; i++) tags[i].muted = muted;
+    ctxs.forEach(function(c){ c.__mpeGain.gain.value = muted ? 0 : 1; });
+  });
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grammar Adventure</title>

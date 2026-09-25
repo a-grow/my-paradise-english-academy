@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { saveJarToCloud } from "@/lib/cloudSave";
+import GrammarGameBar from "@/components/GrammarGameBar";
 
 export default function GrammarSwim() {
   const { code, studentName, level } = useParams();
@@ -13,6 +14,9 @@ export default function GrammarSwim() {
   const [tryKey, setTryKey] = useState(0);
   const claimed = useRef(false);
   const frameRef = useRef<HTMLIFrameElement>(null);
+  const [muted, setMuted] = useState(false);
+  const sendMute = (m: boolean) =>
+    frameRef.current?.contentWindow?.postMessage({ type: "MPE_MUTE", muted: m }, "*");
 
   useEffect(() => {
     function onMsg(e: MessageEvent) {
@@ -35,14 +39,24 @@ export default function GrammarSwim() {
   }, [kidCode, kidName]);
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "#000" }}>
+    <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex", flexDirection: "column" }}>
+      <GrammarGameBar
+        onBack={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
+        muted={muted}
+        onToggleMute={() => {
+          const m = !muted;
+          setMuted(m);
+          sendMute(m);
+          frameRef.current?.contentWindow?.focus(); // keep arrow keys working after the click
+        }}
+      />
       <iframe
         key={tryKey}
         ref={frameRef}
-        onLoad={() => frameRef.current?.contentWindow?.focus()}
+        onLoad={() => { frameRef.current?.contentWindow?.focus(); sendMute(muted); }}
         src={`/Teacher_Andy_Swim_game.html?level=${level || 1}`}
         title="Teacher Andy Swim"
-        style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+        style={{ width: "100%", flex: 1, minHeight: 0, border: "none", display: "block" }}
       />
       {won && (
         <div
