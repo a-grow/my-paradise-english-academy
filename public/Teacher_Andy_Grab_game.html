@@ -533,9 +533,8 @@ function draw(){
     ctx.restore();
   }
 
-  // Hearts (top-left)
+  // (hearts now shown in the shared top bar)
   ctx.font='44px sans-serif'; ctx.textAlign='left'; ctx.textBaseline='top';
-  for(let i=0;i<hearts;i++){ ctx.fillStyle='#e0466f'; ctx.fillText('\u2665', 24+i*46, 20); }
 
 
   // Progress METER — small factory gauge, CENTERED just UNDER the sentence banner
@@ -650,6 +649,11 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+/* MPE stats -> shared top bar (COINS / LIVES / SOLVED). Posts only when something changes. */
+(function(){ var last=''; setInterval(function(){
+  var st={type:'MPE_STATS', coins:0, lives:hearts, solved:wins, total:WIN_TARGET};
+  var k=JSON.stringify(st); if(k!==last){ last=k; try{ window.parent.postMessage(st,'*'); }catch(e){} }
+}, 150); })();
 </script>
 </body>
 </html>

@@ -77,7 +77,7 @@
 <canvas id="game" width="1200" height="675"></canvas>
 
 <div id="help">
-    &larr; &rarr; MOVE &nbsp; | &nbsp; SPACE / &uarr; JUMP &nbsp; | &nbsp; R RESTART &nbsp; | &nbsp; click once for sound
+    &larr; &rarr; MOVE &nbsp; | &nbsp; SPACE / &uarr; JUMP
 </div>
 
 <script>
@@ -309,7 +309,7 @@ window.addEventListener("keyup", function (e) { keys[e.code] = false; });
    GAME STATE
 --------------------------------------------------------- */
 
-let player, platforms, waters, questionSets, coins, enemies, crows, particles;
+let player, platforms, waters, questionSets, coins, enemies, crows, particles, floatTexts;
 let decor, islands, bonusBlocks;
 let cameraX, score, coinCount, lives;
 let gameState, solvedCount;
@@ -337,6 +337,7 @@ function resetGame() {
     bannerText = "";
     bannerColor = "#fff";
     particles = [];
+    floatTexts = [];
 
     player = {
         x: 80, y: 440,
@@ -757,7 +758,8 @@ function updatePlayer(dt) {
                     spawnParticles(s.bonus.x + s.bonus.width / 2, s.bonus.y, 12, "#ffd24a");
                 } else {
                     // normal coins
-                    coinCount += 3;
+                    coinCount += 2;
+                    floatTexts.push({ x: s.bonus.x + s.bonus.width / 2, y: s.bonus.y - 12, t: 0, text: "2x" });
                     score += 150;
                     sfxCoin();
                     spawnParticles(s.bonus.x + s.bonus.width / 2, s.bonus.y, 14, "#ffe36b");
@@ -913,6 +915,9 @@ function update(dt) {
         p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 800 * dt; p.life -= dt;
     }
     particles = particles.filter(p => p.life > 0);
+    // floating "2x" over a bumped coin block
+    for (const f of floatTexts) f.t += dt;
+    floatTexts = floatTexts.filter(f => f.t < 1.6);
 
     if (bannerTimer > 0) bannerTimer -= dt;
 
@@ -1290,6 +1295,22 @@ function drawWorld() {
     }
     ctx.globalAlpha = 1;
 
+    // floating "2x": fades in, drifts up, holds, fades out (1.6s)
+    for (const f of floatTexts) {
+        const a = f.t < 0.25 ? f.t / 0.25 : (f.t > 1.1 ? Math.max(0, (1.6 - f.t) / 0.5) : 1);
+        const y = f.y - Math.min(1, f.t / 0.6) * 40;
+        ctx.globalAlpha = a;
+        ctx.font = "bold 40px monospace";
+        ctx.textAlign = "center";
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = "rgba(0,0,0,.55)";
+        ctx.strokeText(f.text, f.x, y);
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(f.text, f.x, y);
+        ctx.textAlign = "left";
+    }
+    ctx.globalAlpha = 1;
+
     ctx.restore();
 }
 
@@ -1511,32 +1532,7 @@ function drawHeart(cx, cy, r, filled) {
 }
 
 function drawHUD() {
-    ctx.fillStyle = "rgba(18,20,28,.82)";
-    ctx.fillRect(0, 0, SCREEN_WIDTH, 54);
-    ctx.fillStyle = "#fff";
-    ctx.font = "bold 20px monospace";
-    ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-
-    // left cluster
-    ctx.fillText("SCORE " + String(score).padStart(6, "0"), 20, 28);
-    ctx.fillText("COINS \u00d7" + String(coinCount).padStart(2, "0"), 245, 28);
-
-    // hearts for lives (with shine)
-    const heartsX = 430;
-    ctx.fillText("LIVES", heartsX, 28);
-    for (let i = 0; i < lives; i++) {
-        drawHeart(heartsX + 78 + i * 30, 27, 11, true);
-    }
-
-    // right cluster (spaced well apart, no overlap)
-    ctx.textAlign = "right";
-    ctx.fillText("SOLVED " + solvedCount + "/" + QUESTIONS.length, SCREEN_WIDTH - 20, 28);
-    ctx.textAlign = "center";
-    ctx.fillText("GRAMMAR 1-1", SCREEN_WIDTH - 230, 28);
-    ctx.textAlign = "left";
-    ctx.textBaseline = "alphabetic";
-
+    // Stats (COINS / LIVES / SOLVED) now live in the shared top bar (MPE_STATS below).
     if (bannerTimer > 0) {
         ctx.globalAlpha = Math.min(1, bannerTimer * 2);
         ctx.font = "bold 46px monospace";
@@ -1605,6 +1601,15 @@ function gameLoop(t) {
 }
 
 resetGame();
+/* MPE stats -> shared top bar (COINS / LIVES / SOLVED). Posts only when something changes. */
+(function () {
+    var last = "";
+    setInterval(function () {
+        var st = { type: "MPE_STATS", coins: coinCount, lives: lives, solved: solvedCount, total: QUESTIONS.length };
+        var k = JSON.stringify(st);
+        if (k !== last) { last = k; try { window.parent.postMessage(st, "*"); } catch (e) {} }
+    }, 150);
+})();
 requestAnimationFrame(gameLoop);
 
 </script>

@@ -2,12 +2,34 @@ import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 // Shared top bar for the 4 grammar games: Back (left) + fullscreen + sound on/off (right).
-// Stats (COINS / LIVES / SOLVED) will go in the middle later.
+// Middle: COINS / LIVES / SOLVED, sent up by each game as {type:"MPE_STATS", coins, lives, solved, total}.
+export type GameStats = { coins: number; lives: number; solved: number; total: number };
 type Props = {
   onBack: () => void;
   muted: boolean;
   onToggleMute: () => void;
+  stats?: GameStats | null;
 };
+
+// Run-style heart (red with a white shine) and Run-style coin, drawn as SVG.
+function Heart() {
+  return (
+    <svg width="24" height="22" viewBox="0 0 24 22" style={{ display: "block" }}>
+      <path d="M12 11.5C12 4 2 3 2 9C2 14 12 17 12 19.5C12 17 22 14 22 9C22 3 12 4 12 11.5Z" fill="#e8425b" />
+      <ellipse cx="8" cy="7.5" rx="2.2" ry="3.2" transform="rotate(-29 8 7.5)" fill="rgba(255,255,255,0.85)" />
+    </svg>
+  );
+}
+function Coin() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" style={{ display: "block" }}>
+      <circle cx="12" cy="12" r="10" fill="#ffcf33" stroke="#e0a91e" strokeWidth="2" />
+      <circle cx="8.5" cy="8.5" r="3.5" fill="#fff3b0" />
+    </svg>
+  );
+}
+const statLabel: CSSProperties = { opacity: 0.85, marginRight: 8 };
+const statGroup: CSSProperties = { display: "flex", alignItems: "center", whiteSpace: "nowrap" };
 
 const btn: CSSProperties = {
   background: "rgba(255,255,255,0.12)",
@@ -50,7 +72,7 @@ function toggleFullscreen() {
   document.querySelector("iframe")?.contentWindow?.focus();
 }
 
-export default function GrammarGameBar({ onBack, muted, onToggleMute }: Props) {
+export default function GrammarGameBar({ onBack, muted, onToggleMute, stats }: Props) {
   const [isFs, setIsFs] = useState(fsActive());
   useEffect(() => {
     const onChange = () => setIsFs(fsActive());
@@ -72,6 +94,36 @@ export default function GrammarGameBar({ onBack, muted, onToggleMute }: Props) {
       <button onClick={onBack} style={{ ...btn, fontSize: 18, padding: "6px 16px" }}>
         {"←"} Back
       </button>
+      {stats && (
+        <div
+          style={{
+            display: "flex", alignItems: "center", gap: 28, color: "#fff",
+            fontFamily: "Fredoka, sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: 0.5,
+          }}
+        >
+          <div style={statGroup}>
+            <span style={statLabel}>COINS</span>
+            <Coin />
+            <span style={{ marginLeft: 6 }}>{"\u00d7"}{String(stats.coins).padStart(2, "0")}</span>
+          </div>
+          <div style={statGroup}>
+            <span style={statLabel}>LIVES</span>
+            {stats.lives <= 6 ? (
+              <span style={{ display: "flex", gap: 4 }}>
+                {Array.from({ length: stats.lives }, (_, i) => <Heart key={i} />)}
+              </span>
+            ) : (
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Heart /> {"\u00d7"}{stats.lives}
+              </span>
+            )}
+          </div>
+          <div style={statGroup}>
+            <span style={statLabel}>SOLVED</span>
+            <span>{stats.solved}/{stats.total}</span>
+          </div>
+        </div>
+      )}
       <div style={{ display: "flex", gap: 10 }}>
         {fsSupported() && (
           <button

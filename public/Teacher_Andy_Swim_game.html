@@ -245,7 +245,7 @@ function draw(){
  // sentence
  ctx.textBaseline='middle';ctx.fillStyle='rgba(0,0,0,0.6)';rr(W*0.5-280,18,560,58,18);ctx.fill();
  ctx.fillStyle='#fff';ctx.font='600 29px Fredoka';ctx.fillText(BANK[qi].s,W*0.5,47);
- ctx.textAlign='left';ctx.font='24px Fredoka';if(lives<=8){for(let i=0;i<lives;i++){ctx.fillStyle='#ff5b6e';ctx.fillText('♥',16+i*30,42);}}else{ctx.fillStyle='#ff5b6e';ctx.fillText('♥',16,42);ctx.fillStyle='#fff';ctx.font='700 22px Fredoka';ctx.fillText('×'+lives,46,42);}
+ ctx.textAlign='left';ctx.font='24px Fredoka';
  if(!(P.inv>0&&Math.floor(P.inv*10)%2)){const img=swim[P.frame];if(img.complete){ctx.save();ctx.translate(P.x,P.y);if(P.face<0)ctx.scale(-1,1);ctx.drawImage(img,-P.w/2,-P.h/2,P.w,P.h);ctx.restore();}}
  if(msgT>0){ctx.textAlign='center';ctx.fillStyle=msg==='Correct!'?'#46d782':'#ffcf3a';ctx.font='700 52px Fredoka';ctx.fillText(msg,W*0.5,H*0.5);}
  // WIN SCREEN
@@ -311,4 +311,9 @@ addEventListener('keydown',e=>{ if((e.key===' '||e.key==='Enter')&&!e.repeat&&wo
 let last=performance.now();
 function loop(t){const dt=Math.min(0.05,(t-last)/1000);last=t;update(dt);draw();requestAnimationFrame(loop);}
 requestAnimationFrame(loop);
+/* MPE stats -> shared top bar (COINS / LIVES / SOLVED). Posts only when something changes. */
+(function(){ var last=''; setInterval(function(){
+  var st={type:'MPE_STATS', coins:0, lives:lives, solved:correctCount, total:TOTAL_Q};
+  var k=JSON.stringify(st); if(k!==last){ last=k; try{ window.parent.postMessage(st,'*'); }catch(e){} }
+}, 150); })();
 </script></body></html>

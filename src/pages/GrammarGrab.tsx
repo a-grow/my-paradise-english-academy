@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { saveJarToCloud } from "@/lib/cloudSave";
 import GrammarGameBar from "@/components/GrammarGameBar";
+import type { GameStats } from "@/components/GrammarGameBar";
 
 export default function GrammarGrab() {
   const { code, studentName, level } = useParams();
@@ -15,6 +16,7 @@ export default function GrammarGrab() {
   const claimed = useRef(false);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [muted, setMuted] = useState(false);
+  const [stats, setStats] = useState<GameStats | null>(null);
   const sendMute = (m: boolean) =>
     frameRef.current?.contentWindow?.postMessage({ type: "MPE_MUTE", muted: m }, "*");
 
@@ -30,6 +32,10 @@ export default function GrammarGrab() {
         saveJarToCloud(kidCode, kidName, newTotal);
         setWon(true);
       }
+      if (e.data && e.data.type === "MPE_STATS") {
+        const d = e.data;
+        setStats({ coins: Number(d.coins) || 0, lives: Number(d.lives) || 0, solved: Number(d.solved) || 0, total: Number(d.total) || 0 });
+      }
       if (e.data && e.data.type === "MPE_GRAB_LOSE" && !claimed.current) {
         setLost(true);
       }
@@ -43,6 +49,7 @@ export default function GrammarGrab() {
       <GrammarGameBar
         onBack={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
         muted={muted}
+        stats={stats}
         onToggleMute={() => {
           const m = !muted;
           setMuted(m);
@@ -102,7 +109,7 @@ export default function GrammarGrab() {
           <div style={{ fontSize: 44, fontWeight: 700 }}>Out of hearts!</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <button
-              onClick={() => { setLost(false); setTryKey((k) => k + 1); }}
+              onClick={() => { setLost(false); setStats(null); setTryKey((k) => k + 1); }}
               style={{
                 fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
                 background: "#86efac", color: "#003", fontWeight: 700, cursor: "pointer",
