@@ -188,17 +188,77 @@ let btnPressed = 0;       // >0 = show pressed sprite (frames of press feedback)
 
 // ---------- Make ONE random box (Andy's flowing-belt design) ----------
 const DECOY_WORDS = ["cat","dog","apple","egg","is","are"];
+// ---- COIN BOXES: ORANGE glowing box with Run's bright coin + "x2/x3/x5". ~1 in 5 boxes while the per-game COIN DECK lasts. Grabbing one adds coins; never costs a heart or touches the meter. ----
+let coinCount = 0, coinFloats = [], coinCtx = null, coinGlowT0 = 0;
+function isCoinLabel(l){ return typeof l==='string' && l.indexOf('COIN')===0; }
+function coinValue(l){ return parseInt(l.slice(4),10) || 0; }
+// Per-game COIN DECK (Try Again reloads = fresh deck): 6 x1, 5 x2, 5 x3, 3 x5 = 19 boxes, 46 coins max.
+// A coin box is taken from the deck when it appears; if it rolls away unclaimed it goes back. When the deck is empty, no more coin boxes.
+const coinDeck = { 1: 6, 2: 5, 3: 5, 5: 3 };
+function rollCoinLabel(){
+  const pool = []; for(const v in coinDeck) for(let i = 0; i < coinDeck[v]; i++) pool.push(+v);
+  if(!pool.length) return null;
+  const v = pool[(Math.random()*pool.length)|0]; coinDeck[v]--; return 'COIN' + v;
+}
+function returnCoinToDeck(label){ if(isCoinLabel(label)) coinDeck[coinValue(label)]++; }
+let orangeBoxCanvas = null;                    // Grab's yellow box, tinted orange once (keeps its shading)
+function orangeBox(){
+  if(orangeBoxCanvas) return orangeBoxCanvas;
+  const im = IMG.box_yellow; if(!im || !im.complete || !im.naturalWidth) return null;
+  const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+  const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+  x.globalCompositeOperation = 'source-atop'; x.fillStyle = 'rgba(255,120,0,0.55)'; x.fillRect(0, 0, c.width, c.height);
+  orangeBoxCanvas = c; return c;
+}
+function drawGlowingCoinBox(x, y, w, h){      // orange box with a bright pulsing golden-orange glow
+  const img = orangeBox() || IMG.box_yellow; if(!img) return;
+  const pulse = 0.5 + 0.5*Math.sin(performance.now()/250);
+  ctx.save(); ctx.shadowColor = 'rgba(255,170,40,1)'; ctx.shadowBlur = 26 + pulse*24;
+  ctx.drawImage(img, x, y, w, h); ctx.drawImage(img, x, y, w, h);   // drawn twice = stronger glow
+  ctx.restore();
+}
+function sfxCoin(){ try{                       // Run's coin ding (two quick square beeps)
+  if(!coinCtx) coinCtx = new (window.AudioContext||window.webkitAudioContext)(); if(coinCtx.state==='suspended') coinCtx.resume();
+  [[988,0],[1319,0.07]].forEach(([f,d])=>{ const o=coinCtx.createOscillator(), gn=coinCtx.createGain(); o.type='square'; o.frequency.value=f;
+    const t0=coinCtx.currentTime+d; gn.gain.setValueAtTime(0.12,t0); gn.gain.exponentialRampToValueAtTime(0.001,t0+0.12);
+    o.connect(gn); gn.connect(coinCtx.destination); o.start(t0); o.stop(t0+0.13); });
+}catch(e){} }
+function drawCoinBoxFace(label, cx, cy, k){      // k = scale (1 on the belt, smaller in the claw)
+  const r = 19*k, x = cx - 24*k;
+  ctx.save();
+  ctx.fillStyle='#ffcf33'; ctx.beginPath(); ctx.arc(x,cy,r,0,7); ctx.fill();
+  ctx.strokeStyle='#e0a91e'; ctx.lineWidth=3*k; ctx.beginPath(); ctx.arc(x,cy,r,0,7); ctx.stroke();
+  ctx.fillStyle='#fff3b0'; ctx.beginPath(); ctx.arc(x-r*0.3,cy-r*0.3,r*0.35,0,7); ctx.fill();
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.font="bold "+Math.round(36*k)+"px 'Baloo 2','Arial Rounded MT Bold',sans-serif";
+  ctx.fillStyle='#3a2a12'; ctx.fillText('×'+coinValue(label), cx + 22*k, cy);
+  ctx.restore();
+}
+function drawCoinFloats(){                      // floating "x3" after grabbing a coin box (fades in, drifts up, fades out)
+  const now = performance.now();
+  coinFloats = coinFloats.filter(f => now - f.t0 < 1600);
+  for(const f of coinFloats){ const t=(now-f.t0)/1000;
+    const a = t<0.25 ? t/0.25 : (t>1.1 ? Math.max(0,(1.6-t)/0.5) : 1), fy = f.y - Math.min(1,t/0.6)*40;
+    ctx.save(); ctx.globalAlpha=a; ctx.font="bold 56px 'Baloo 2','Arial Rounded MT Bold',sans-serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.lineWidth=8; ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.strokeText(f.text,f.x,fy); ctx.fillStyle='#fff'; ctx.fillText(f.text,f.x,fy); ctx.restore(); }
+}
 const PASTELS = ['box_blue','box_green','box_yellow','box_purple'];
 let lastLabel = null, sameCount = 0;
 function boxWord(w){ return w==='I' ? 'I' : w.toLowerCase(); }  // word boxes always lowercase (except "I"); green banner keeps the capital
 function rollLabel(){
   const r = Math.random();
   if(r < 0.40)      return boxWord(SENTENCES[level].correct);
-  else if(r < 0.65) return boxWord(SENTENCES[level].options.find(o=>o!==SENTENCES[level].correct));
-  else if(r < 0.85) return DECOY_WORDS[(Math.random()*DECOY_WORDS.length)|0];
+  else if(r < 0.62) return boxWord(SENTENCES[level].options.find(o=>o!==SENTENCES[level].correct));   // other answer 22%
+  else if(r < 0.65) return DECOY_WORDS[(Math.random()*DECOY_WORDS.length)|0];                         // junk decoy 3%
+  else if(r < 0.85) return rollCoinLabel() || (Math.random() < 0.7        // coin box 20% (deck empty -> other answer / decoy instead)
+                            ? boxWord(SENTENCES[level].options.find(o=>o!==SENTENCES[level].correct))
+                            : DECOY_WORDS[(Math.random()*DECOY_WORDS.length)|0]);
   else if(r < 0.95) return 'SKULL';
   else              return 'HEART';
 }
+let boxesMade = 0, firstCoinShown = false, boxesSinceCoin = 0;
+const COIN_EVERY = 3;   // never more than 3 non-coin boxes in a row (while the coin deck lasts)
+const FIRST_COIN_AT = 3 + ((Math.random()*2)|0);   // the 3rd or 4th box is always a coin box, so kids see coins right away
 let lastCorrectTime = 0;   // ms timestamp of the last correct-word box we made
 function makeBox(x){
   const correctWord = boxWord(SENTENCES[level].correct);
@@ -212,13 +272,19 @@ function makeBox(x){
     label = rollLabel();
     // never repeat the same label back-to-back, and never two CORRECT answers in a row
     let tries = 0;
-    while(tries < 8 && (label === lastLabel || (label === correctWord && lastLabel === correctWord))){ label = rollLabel(); tries++; }
+    while(tries < 8 && (label === lastLabel || (label === correctWord && lastLabel === correctWord))){ returnCoinToDeck(label); label = rollLabel(); tries++; }
   }
+  boxesMade++;
+  const forcedCorrect = (label === correctWord && now - lastCorrectTime > 5000 && !correctOnBelt);   // the 5s correct-box safeguard wins
+  const coinDue = boxesSinceCoin >= COIN_EVERY || (!firstCoinShown && boxesMade === FIRST_COIN_AT);
+  if(coinDue && !forcedCorrect && !isCoinLabel(label)){ const c = rollCoinLabel(); if(c) label = c; }
+  if(isCoinLabel(label)){ firstCoinShown = true; boxesSinceCoin = 0; } else boxesSinceCoin++;
   if(label === correctWord) lastCorrectTime = now;
   lastLabel = label;
   let sprite;
   if(label==='SKULL') sprite='box_x';
   else if(label==='HEART') sprite='box_heart';
+  else if(isCoinLabel(label)) sprite='box_yellow';
   else sprite = PASTELS[(Math.random()*PASTELS.length)|0];
   return { x, label, sprite };
 }
@@ -306,6 +372,14 @@ function resolveHeld(){
     hearts++;
     setAndy('correct', 1.2);
     playSfx('correct', 0.9);
+  } else if(isCoinLabel(hit.label)){
+    // coin box: add coins, ding, floating xN. No heart lost, meter untouched.
+    const v = coinValue(hit.label);
+    coinCount += v;
+    sfxCoin();
+    setAndy('correct', 1.0);
+    coinFloats.push({ x: claw.x, y: 300, t0: performance.now(), text: '\u00d7' + v });
+    coinGlowT0 = performance.now();          // sentence banner frame glows gold for ~2s
   } else if(hit.label === 'SKULL'){
     // poison: lose a heart AND wipe ALL meter progress
     hearts--;
@@ -392,6 +466,7 @@ function update(dt){
       if(b.x < -120){
         const maxX = Math.max(...boxes.map(bb=>bb.x));
         const spawnX = Math.max(maxX, BASE_W) + 200 + Math.random()*320;   // always off the right edge
+        returnCoinToDeck(b.label);       // an unclaimed coin box that rolled away goes back in the deck
         const fresh = makeBox(spawnX);   // random gap on wrap, spawns off-screen
         b.x = fresh.x; b.label = fresh.label; b.sprite = fresh.sprite;
       }
@@ -454,12 +529,14 @@ function draw(){
     if(!im || !im.complete) continue;
     const baseH = 108;                       // drawn box height
     let bw = baseH;                          // square by default
-    const isWord = (b.label!=='SKULL' && b.label!=='HEART');
+    const isCoin = isCoinLabel(b.label);
+    const isWord = (b.label!=='SKULL' && b.label!=='HEART' && !isCoin);
+    if(isCoin) bw = baseH*1.35;
     if(isWord && b.label.length > 3){
       bw = baseH * (1 + (b.label.length-3)*0.36);   // stretch horizontally
     }
     const top = BOX_Y - baseH;
-    ctx.drawImage(im, b.x-bw/2, top, bw, baseH);
+    if(isCoin) drawGlowingCoinBox(b.x-bw/2, top, bw, baseH); else ctx.drawImage(im, b.x-bw/2, top, bw, baseH);
     // word text on pastel boxes — straight + centered
     if(isWord){
       ctx.save();
@@ -469,6 +546,7 @@ function draw(){
       ctx.fillStyle='#3a2a12'; ctx.fillText(b.label, b.x, top+baseH*0.42);
       ctx.restore();
     }
+    if(isCoin) drawCoinBoxFace(b.label, b.x, top+baseH*0.42, 1);
   }
 
   // Claw: closed while holding or lifting, open otherwise
@@ -486,23 +564,29 @@ function draw(){
   if(claw.holding){
     const b = claw.holding;
     const im = IMG[b.sprite];
-    const isWord = (b.label!=='SKULL' && b.label!=='HEART');
+    const isCoin = isCoinLabel(b.label);
+    const isWord = (b.label!=='SKULL' && b.label!=='HEART' && !isCoin);
     const bh = 96;
     let bw = bh;
+    if(isCoin) bw = bh*1.35;
     if(isWord && b.label.length>3) bw = bh*(1+(b.label.length-3)*0.36);
     const cy = claw.dropY + clawH*0.62;   // sit box in the claw's mouth
-    if(im && im.complete) ctx.drawImage(im, claw.x-bw/2, cy-bh/2, bw, bh);
+    if(isCoin) drawGlowingCoinBox(claw.x-bw/2, cy-bh/2, bw, bh);
+    else if(im && im.complete) ctx.drawImage(im, claw.x-bw/2, cy-bh/2, bw, bh);
     if(isWord){
       ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.font="bold 36px 'Baloo 2','Arial Rounded MT Bold',sans-serif";
       ctx.fillStyle='#3a2a12'; ctx.fillText(b.label, claw.x, cy);
       ctx.restore();
     }
+    if(isCoin) drawCoinBoxFace(b.label, claw.x, cy, bh/108);
   }
   // claw head
   if(clawImg && clawImg.complete){
     ctx.drawImage(clawImg, claw.x-clawW/2, claw.dropY, clawW, clawH);
   }
+
+  drawCoinFloats();
 
   // Sentence banner (top) — shakes + turns red on a wrong answer
   ctx.save();
@@ -531,6 +615,20 @@ function draw(){
     ctx.font="bold 46px 'Courier New','Lucida Console',monospace";
     ctx.fillText(solvedBanner.text, BASE_W/2, SENTENCE_Y);
     ctx.restore();
+  }
+
+  // Coin reward: the sentence banner's gold frame glows big + bright for ~2s (quick fade in, quick fade out)
+  if(coinGlowT0){
+    const t = (performance.now() - coinGlowT0)/1000;
+    if(t > 2){ coinGlowT0 = 0; }
+    else {
+      const a = t < 0.2 ? t/0.2 : (t > 1.6 ? Math.max(0, (2 - t)/0.4) : 1);
+      ctx.save(); ctx.globalAlpha = a;
+      ctx.strokeStyle = '#ffe066'; ctx.shadowColor = 'rgba(255,200,40,1)'; ctx.shadowBlur = 60; ctx.lineWidth = 12;
+      ctx.strokeRect(BASE_W*0.15, SENTENCE_Y-46, BASE_W*0.70, 92);
+      ctx.strokeRect(BASE_W*0.15, SENTENCE_Y-46, BASE_W*0.70, 92);   // twice = brighter glow
+      ctx.restore();
+    }
   }
 
   // (hearts now shown in the shared top bar)
@@ -651,7 +749,7 @@ function frame(now){
 requestAnimationFrame(frame);
 /* MPE stats -> shared top bar (COINS / LIVES / SOLVED). Posts only when something changes. */
 (function(){ var last=''; setInterval(function(){
-  var st={type:'MPE_STATS', coins:0, lives:hearts, solved:wins, total:WIN_TARGET};
+  var st={type:'MPE_STATS', coins:coinCount, lives:hearts, solved:wins, total:WIN_TARGET};
   var k=JSON.stringify(st); if(k!==last){ last=k; try{ window.parent.postMessage(st,'*'); }catch(e){} }
 }, 150); })();
 </script>

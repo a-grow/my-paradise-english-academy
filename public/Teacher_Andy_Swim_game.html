@@ -120,6 +120,24 @@ const P={x:0,y:0,vx:0,vy:0,w:130,h:100,face:1,frame:0,ft:0,inv:0};
 function reset(){P.x=W/2;P.y=H/2;P.vx=P.vy=0;P.inv=1.0;}
 function nextQ(){qi=(qi+1)%BANK.length;layout();armed=false;}
 resize();layout();spawnEnemies();reset();
+// ---- COINS (Run's coin shape, muted underwater gold): 36 per play = 24 x1, 8 x2, 4 x3 (max 52). Screen fractions (resize-safe). ----
+let coinCount=0, coins=[], coinFloats=[];
+function coinR(v){ const r=Math.max(11,Math.min(W,H)*0.016); return v>1?r*1.3:r; }
+function coinInTopBox(x,y){ return Math.abs(x-W*0.5)<330 && y<185; }            // sentence + meter stay clear
+function coinNearBubble(x,y){ for(const t of targets){ if(Math.hypot(x-t.cx,y-t.cy)<ZR+coinR(2)+12) return true; } return false; }
+function spawnCoins(){
+  coins=[]; const vals=[]; for(let i=0;i<24;i++)vals.push(1); for(let i=0;i<8;i++)vals.push(2); for(let i=0;i<4;i++)vals.push(3); swimShuffle(vals);
+  const x0=0.04, x1=0.96, y0=0.13, y1=0.93;                                        // the whole scene
+  const gap=Math.min(90,Math.sqrt((x1-x0)*W*(y1-y0)*H/vals.length)*0.75);
+  let tries=0;
+  while(coins.length<vals.length && tries<6000){ tries++;
+    const fx=x0+Math.random()*(x1-x0), fy=y0+Math.random()*(y1-y0), px=fx*W, py=fy*H;
+    let ok=!coinInTopBox(px,py) && Math.hypot(px-W*0.5,py-H*0.5)>=70;              // not on the start spot
+    for(const c of coins){ if(Math.hypot((c.fx-fx)*W,(c.fy-fy)*H)<gap){ok=false;break;} }
+    if(ok) coins.push({fx,fy,v:vals[coins.length],ph:Math.random()*6.28});
+  }
+}
+spawnCoins();
 
 const keys={};addEventListener('keydown',e=>keys[e.key]=true);addEventListener('keyup',e=>keys[e.key]=false);
 let tx=null,ty=null;
@@ -155,6 +173,10 @@ function update(dt){
  if(heartBub){ heartBub.x+=heartBub.vx*dt; heartBub.y+=heartBub.vy*dt;
    if(heartBub.y<-60||heartBub.x<-60||heartBub.x>W+60){heartBub=null;heartTimer=5+Math.random()*6;}
    else if(Math.hypot(P.x-heartBub.x,P.y-heartBub.y)<heartBub.r+40){ lives++; sfxCorrect(); heartBub=null; heartTimer=6+Math.random()*6; } }
+ // coins: swim through one to collect it
+ for(let i=coins.length-1;i>=0;i--){const c=coins[i],cx=c.fx*W,cy=c.fy*H;
+   if(!coinNearBubble(cx,cy)&&Math.hypot(P.x-cx,P.y-cy)<coinR(c.v)+P.w*0.3){coins.splice(i,1);coinCount+=c.v;sfxCoin();if(c.v>1)coinFloats.push({x:cx,y:cy,t:0,text:'\u00d7'+c.v});}}
+ for(const f of coinFloats)f.t+=dt; coinFloats=coinFloats.filter(f=>f.t<1.6);
  if(msgT>0){msgT-=dt;if(msgT<=0&&msg==='Correct!'&&!chestOpen)nextQ();return;}
  {let inAny=false;for(const t of targets){if(Math.hypot(P.x-t.cx,P.y-t.cy)<ZR){inAny=true;if(armed)judge(t.val);break;}}if(!inAny)armed=true;}
 }
@@ -182,11 +204,20 @@ function draw(){
  ctx.fillStyle='rgba(200,235,255,0.35)';for(const b of bubs){b.y-=b.s*0.016;if(b.y<-10){b.y=H+10;b.x=Math.random()*W;}ctx.beginPath();ctx.arc(b.x%W,b.y,b.r,0,7);ctx.fill();}
  // glowing targets
  ctx.textAlign='center';ctx.textBaseline='middle';
- for(const t of targets){const tr=t.label==='TRUE';const gl=(Math.sin(T*2+t.ph)*0.5+0.5);const col=tr?'70,215,130':'240,105,105';
-  const flare=t.hitGlow||0; ctx.save();ctx.shadowBlur=25+gl*20+flare*60;ctx.shadowColor='rgba('+col+',0.9)';
-  ctx.beginPath();ctx.arc(t.cx,t.cy,ZR,0,7);ctx.fillStyle='rgba('+col+',0.15)';ctx.fill();
-  ctx.lineWidth=5+flare*6;ctx.strokeStyle='rgba('+col+','+Math.min(1,0.7+gl*0.3+flare)+')';ctx.stroke();ctx.restore();
-  ctx.font='700 38px Fredoka';ctx.fillStyle=tr?'#7ef2ab':'#ff9a9a';ctx.fillText(t.label,t.cx,t.cy);}
+ for(const t of targets){const tr=t.label==='TRUE';const gl=(Math.sin(T*2+t.ph)*0.5+0.5);const col=tr?'40,245,120':'255,60,85';
+  const flare=t.hitGlow||0; ctx.save();ctx.shadowBlur=40+gl*35+flare*60;ctx.shadowColor='rgba('+col+',1)';
+  ctx.beginPath();ctx.arc(t.cx,t.cy,ZR,0,7);ctx.fillStyle='rgba('+col+',0.22)';ctx.fill();
+  ctx.lineWidth=9+flare*6;ctx.strokeStyle='rgba('+col+','+Math.min(1,0.9+gl*0.1+flare)+')';ctx.stroke();ctx.shadowBlur=0;ctx.lineWidth=2;ctx.strokeStyle='rgba(255,255,255,'+(0.35+gl*0.3)+')';ctx.beginPath();ctx.arc(t.cx,t.cy,ZR-6,0,7);ctx.stroke();ctx.restore();
+  ctx.font='700 40px Fredoka';ctx.lineWidth=5;ctx.strokeStyle='rgba(0,40,30,0.55)';ctx.strokeText(t.label,t.cx,t.cy);ctx.fillStyle=tr?'#a6ffc9':'#ffb0b8';ctx.fillText(t.label,t.cx,t.cy);}
+ // coins (Run's coin shape, muted so the sentence + TRUE/FALSE stay the stars; hidden while under a bubble)
+ ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=0.88;
+ for(const c of coins){const r=coinR(c.v),x=c.fx*W,y0=c.fy*H;if(coinNearBubble(x,y0))continue;const y=y0+Math.sin(T*2+c.ph)*2;
+  ctx.fillStyle='#dcbd5c';ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();
+  ctx.strokeStyle='#a8863a';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.stroke();
+  ctx.fillStyle='rgba(255,244,205,0.75)';ctx.beginPath();
+  if(c.v>1)ctx.arc(x-r*0.55,y-r*0.5,r*0.18,0,7);else ctx.arc(x-r*0.3,y-r*0.3,r*0.35,0,7);ctx.fill();
+  if(c.v>1){ctx.fillStyle='#6b4a14';ctx.font='700 '+Math.round(r*0.95)+'px Fredoka';ctx.fillText('\u00d7'+c.v,x,y+r*0.06);}}
+ ctx.restore();
  // enemies (shark faces RIGHT; flip when moving LEFT)
  for(const e of enemies){
   if(e.type==='shark'){const img=sharkF[e.fr];if(!img.complete)continue;ctx.save();ctx.translate(e.x,e.y);
@@ -247,6 +278,10 @@ function draw(){
  ctx.fillStyle='#fff';ctx.font='600 29px Fredoka';ctx.fillText(BANK[qi].s,W*0.5,47);
  ctx.textAlign='left';ctx.font='24px Fredoka';
  if(!(P.inv>0&&Math.floor(P.inv*10)%2)){const img=swim[P.frame];if(img.complete){ctx.save();ctx.translate(P.x,P.y);if(P.face<0)ctx.scale(-1,1);ctx.drawImage(img,-P.w/2,-P.h/2,P.w,P.h);ctx.restore();}}
+ // floating \u00d72 / \u00d73 when a bonus coin is collected (fades in, drifts up, fades out)
+ for(const f of coinFloats){const a=f.t<0.25?f.t/0.25:(f.t>1.1?Math.max(0,(1.6-f.t)/0.5):1),fy=f.y-Math.min(1,f.t/0.6)*40;
+  ctx.save();ctx.globalAlpha=a;ctx.font='700 40px Fredoka';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.lineWidth=6;ctx.strokeStyle='rgba(0,0,0,.55)';ctx.strokeText(f.text,f.x,fy);ctx.fillStyle='#fff';ctx.fillText(f.text,f.x,fy);ctx.restore();}
  if(msgT>0){ctx.textAlign='center';ctx.fillStyle=msg==='Correct!'?'#46d782':'#ffcf3a';ctx.font='700 52px Fredoka';ctx.fillText(msg,W*0.5,H*0.5);}
  // WIN SCREEN
  if(won){
@@ -296,6 +331,7 @@ function beep(freqs, dur, type, vol){
 function sfxCorrect(){ beep([660,880,1180],0.28,'sine',0.35); }   // happy rising chime
 function sfxWrong(){ beep([300,220],0.25,'sawtooth',0.22); }       // soft descending buzz
 function sfxHit(){ beep([160,90],0.3,'square',0.32); }
+function sfxCoin(){ beep([988,1319],0.12,'square',0.12); }   // Run's coin ding
 function sfxChest(){ beep([523,659,784,1047,1319],0.5,'triangle',0.34); setTimeout(()=>beep([784,1047,1319],0.6,'sine',0.28),160); }             // thud when hit
 // unlock audio on first input
 function unlock(){ initAudio(); if(actx&&actx.state==='suspended')actx.resume(); if(bgm&&bgm.paused){bgm.play().catch(()=>{});} }
@@ -313,7 +349,7 @@ function loop(t){const dt=Math.min(0.05,(t-last)/1000);last=t;update(dt);draw();
 requestAnimationFrame(loop);
 /* MPE stats -> shared top bar (COINS / LIVES / SOLVED). Posts only when something changes. */
 (function(){ var last=''; setInterval(function(){
-  var st={type:'MPE_STATS', coins:0, lives:lives, solved:correctCount, total:TOTAL_Q};
+  var st={type:'MPE_STATS', coins:coinCount, lives:lives, solved:correctCount, total:TOTAL_Q};
   var k=JSON.stringify(st); if(k!==last){ last=k; try{ window.parent.postMessage(st,'*'); }catch(e){} }
 }, 150); })();
 </script></body></html>

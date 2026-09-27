@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { saveJarToCloud } from "@/lib/cloudSave";
-import GrammarGameBar from "@/components/GrammarGameBar";
+import GrammarGameBar, { Coin } from "@/components/GrammarGameBar";
 import type { GameStats } from "@/components/GrammarGameBar";
 
 export default function GrammarDig() {
@@ -72,9 +72,16 @@ export default function GrammarDig() {
             alignItems: "center", justifyContent: "center",
             background: "rgba(0,0,0,0.75)", color: "#fff", textAlign: "center", gap: 24,
             fontFamily: "Fredoka, sans-serif",
+            backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
           }}
         >
-          <div style={{ fontSize: 44, fontWeight: 700 }}>You won 2 treats!</div>
+          <div style={{ fontSize: 44, fontWeight: 700, textShadow: "0 4px 0 rgba(0,0,0,0.35)" }}>You won 2 treats!</div>
+          {(stats?.coins ?? 0) > 0 && (
+            <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 40, fontWeight: 700, color: "#ffd84a", textShadow: "0 3px 0 rgba(0,0,0,0.35)" }}>
+              <Coin size={44} />
+              <span>{"\u00d7"}{stats?.coins}</span>
+            </div>
+          )}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <button
               onClick={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
@@ -104,9 +111,10 @@ export default function GrammarDig() {
             alignItems: "center", justifyContent: "center",
             background: "rgba(0,0,0,0.75)", color: "#fff", textAlign: "center", gap: 24,
             fontFamily: "Fredoka, sans-serif",
+            backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
           }}
         >
-          <div style={{ fontSize: 44, fontWeight: 700 }}>Out of hearts!</div>
+          <div style={{ fontSize: 44, fontWeight: 700, textShadow: "0 4px 0 rgba(0,0,0,0.35)" }}>Out of hearts!</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <button
               onClick={() => { setLost(false); setStats(null); setTryKey((k) => k + 1); }}

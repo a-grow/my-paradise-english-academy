@@ -20,9 +20,9 @@ function Heart() {
     </svg>
   );
 }
-function Coin() {
+export function Coin({ size = 24 }: { size?: number }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" style={{ display: "block" }}>
+    <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "block" }}>
       <circle cx="12" cy="12" r="10" fill="#ffcf33" stroke="#e0a91e" strokeWidth="2" />
       <circle cx="8.5" cy="8.5" r="3.5" fill="#fff3b0" />
     </svg>
