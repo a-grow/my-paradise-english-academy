@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { saveJarToCloud } from "@/lib/cloudSave";
-import GrammarGameBar, { Coin } from "@/components/GrammarGameBar";
+import GrammarGameBar from "@/components/GrammarGameBar";
+import WinCelebration from "@/components/WinCelebration";
 import type { GameStats } from "@/components/GrammarGameBar";
 
 export default function GrammarGrab() {
@@ -30,7 +31,11 @@ export default function GrammarGrab() {
         const newTotal = current + 2;
         localStorage.setItem(jarKey, String(newTotal));
         saveJarToCloud(kidCode, kidName, newTotal);
-        setWon(true);
+        // let the game's own ending (fireworks / chest / last grab) play, then show the celebration
+        window.setTimeout(() => {
+          setWon(true);
+          frameRef.current?.contentWindow?.postMessage({ type: "MPE_FADE_OUT", ms: 400 }, "*"); // quick fade of the game's music
+        }, 2000);
       }
       if (e.data && e.data.type === "MPE_STATS") {
         const d = e.data;
@@ -66,43 +71,14 @@ export default function GrammarGrab() {
         style={{ width: "100%", flex: 1, minHeight: 0, border: "none", display: "block" }}
       />
       {won && (
-        <div
-          style={{
-            position: "fixed", inset: 0, display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center",
-            background: "rgba(0,0,0,0.75)", color: "#fff", textAlign: "center", gap: 24,
-            fontFamily: "Fredoka, sans-serif",
-            backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
-          }}
-        >
-          <div style={{ fontSize: 44, fontWeight: 700, textShadow: "0 4px 0 rgba(0,0,0,0.35)" }}>You won 2 treats!</div>
-          {(stats?.coins ?? 0) > 0 && (
-            <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 40, fontWeight: 700, color: "#ffd84a", textShadow: "0 3px 0 rgba(0,0,0,0.35)" }}>
-              <Coin size={44} />
-              <span>{"\u00d7"}{stats?.coins}</span>
-            </div>
-          )}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <button
-              onClick={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
-              style={{
-                fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
-                background: "#fde047", color: "#003", fontWeight: 700, cursor: "pointer",
-              }}
-            >
-              Choose Game
-            </button>
-            <button
-              onClick={() => navigate(`/world/${kidCode}/${kidName}`)}
-              style={{
-                fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
-                background: "#5ce0ff", color: "#003", fontWeight: 700, cursor: "pointer",
-              }}
-            >
-              Return to World
-            </button>
-          </div>
-        </div>
+        <WinCelebration
+          coinsWon={stats?.coins ?? 0}
+          startTotal={0}
+          muted={muted}
+          fanfare
+          onChooseGame={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
+          onReturnToWorld={() => navigate(`/world/${kidCode}/${kidName}`)}
+        />
       )}
       {lost && !won && (
         <div

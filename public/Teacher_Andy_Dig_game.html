@@ -4,11 +4,11 @@
 /* MPE mute: the page around the game sends {type:"MPE_MUTE", muted:true/false}.
    Mutes ALL sound (audio files + Web Audio beeps). Same block in all 4 grammar games. */
 (function(){
-  var muted = false, media = new Set(), ctxs = [];
+  var muted = false, faded = false, media = new Set(), ctxs = [];
   var mp = HTMLMediaElement.prototype, origPlay = mp.play;
   mp.play = function(){
     if(!media.has(this)){ media.add(this); var el = this; this.addEventListener('ended', function(){ if(!el.loop) media.delete(el); }); }
-    this.muted = muted;
+    this.muted = muted || faded;
     return origPlay.apply(this, arguments);
   };
   if(window.AudioNode){
@@ -16,19 +16,32 @@
     AudioNode.prototype.connect = function(dest){
       if(window.AudioDestinationNode && dest instanceof AudioDestinationNode){
         var c = dest.context;
-        if(!c.__mpeGain){ c.__mpeGain = c.createGain(); c.__mpeGain.gain.value = muted ? 0 : 1; origConnect.call(c.__mpeGain, dest); ctxs.push(c); }
+        if(!c.__mpeGain){ c.__mpeGain = c.createGain(); c.__mpeGain.gain.value = (muted || faded) ? 0 : 1; origConnect.call(c.__mpeGain, dest); ctxs.push(c); }
         var args = Array.prototype.slice.call(arguments); args[0] = c.__mpeGain;
         return origConnect.apply(this, args);
       }
       return origConnect.apply(this, arguments);
     };
   }
+  // {type:"MPE_FADE_OUT", ms}: quickly fade out ALL game sound and keep it silent (used when the app's win screen appears)
+  window.addEventListener('message', function(e){
+    if(!e.data || e.data.type !== 'MPE_FADE_OUT' || faded) return;
+    faded = true;
+    var ms = e.data.ms || 400, t0 = performance.now(), vols = new Map();
+    media.forEach(function(m){ vols.set(m, m.volume); });
+    ctxs.forEach(function(c){ try{ c.__mpeGain.gain.setTargetAtTime(0, c.currentTime, ms / 3000); }catch(err){ c.__mpeGain.gain.value = 0; } });
+    (function step(){
+      var k = Math.max(0, 1 - (performance.now() - t0) / ms);
+      vols.forEach(function(v, m){ m.volume = v * k; });
+      if(k > 0) requestAnimationFrame(step); else vols.forEach(function(v, m){ m.pause(); });
+    })();
+  });
   window.addEventListener('message', function(e){
     if(!e.data || e.data.type !== 'MPE_MUTE') return;
     muted = !!e.data.muted;
-    media.forEach(function(m){ m.muted = muted; });
-    var tags = document.getElementsByTagName('audio'); for(var i = 0; i < tags.length; i++) tags[i].muted = muted;
-    ctxs.forEach(function(c){ c.__mpeGain.gain.value = muted ? 0 : 1; });
+    media.forEach(function(m){ m.muted = muted || faded; });
+    var tags = document.getElementsByTagName('audio'); for(var i = 0; i < tags.length; i++) tags[i].muted = muted || faded;
+    ctxs.forEach(function(c){ c.__mpeGain.gain.value = (muted || faded) ? 0 : 1; });
   });
 })();
 </script>
@@ -445,11 +458,13 @@ function drawWin(){
   ctx.font='900 '+fs+'px "Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif';
   const grad=ctx.createLinearGradient(cx-200,cy-fs,cx+200,cy+fs);
   grad.addColorStop(0,'#ffd54a');grad.addColorStop(0.5,'#ffa726');grad.addColorStop(1,'#ff7a1a');
-  ctx.lineWidth=fs*0.14;ctx.strokeStyle='#7a3a00';ctx.lineJoin='round';ctx.strokeText('You did it!',cx,cy);
-  ctx.fillStyle=grad;ctx.fillText('You did it!',cx,cy);
+  ctx.lineJoin='round';
+  if(sentencesDone<WIN_TARGET){ctx.lineWidth=fs*0.14;ctx.strokeStyle='#7a3a00';ctx.strokeText('You did it!',cx,cy);
+  ctx.fillStyle=grad;ctx.fillText('You did it!',cx,cy);}
   const fs2=stageH*0.055;ctx.font='800 '+fs2+'px "Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif';
   ctx.lineWidth=fs2*0.14;ctx.strokeStyle='#7a3a00';ctx.strokeText(joinSentence(SENTENCE),cx,stageH*0.50);
   ctx.fillStyle='#fff3d6';ctx.fillText(joinSentence(SENTENCE),cx,stageH*0.50);
+  if(sentencesDone>=WIN_TARGET){nextBtnRect=null;ctx.restore();return;} // last sentence: no button, the app's win screen follows
   // ---- Next Sentence BUTTON (rock sprite base, wiggle) ----
   const label='Next Sentence';
   const wob=Math.sin(winWiggle*4)*0.05; // wiggle rotation

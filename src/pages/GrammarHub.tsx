@@ -98,7 +98,8 @@ export default function GrammarHub() {
         titleFont: "'Bangers','Nunito',cursive",
         gradient: "linear-gradient(180deg,#fff7cc 0%,#fde047 35%,#f97316 80%,#c2410c 100%)",
         italic: false,
-        titleSize: "clamp(2.3rem, 8vw, 4rem)",
+        // phone: one big card per row; md (768px+) = 2x2 grid, smaller title to fit the half-width card
+        titleClass: "text-[length:clamp(2.3rem,8vw,4rem)] md:text-[length:clamp(1.4rem,3.2vw,3.2rem)]",
       },
       {
         id: "swim",
@@ -108,7 +109,7 @@ export default function GrammarHub() {
         titleFont: "'Luckiest Guy','Nunito',cursive",
         gradient: "linear-gradient(180deg,#e0f2fe 0%,#67e8f9 40%,#0ea5e9 80%,#0369a1 100%)",
         italic: false,
-        titleSize: "clamp(1.7rem, 6vw, 2.9rem)",
+        titleClass: "text-[length:clamp(1.7rem,6vw,2.9rem)] md:text-[length:clamp(1.05rem,2.3vw,2.3rem)]",
       },
       { id: "dig", title: "", img: "/grammar-dig-btn.png", ready: true },
       { id: "grab", title: "", img: "/grammar-grab-btn.png", ready: true },
@@ -177,9 +178,14 @@ export default function GrammarHub() {
           style={{
             position: "relative",
             zIndex: 10,
-            maxWidth: 640,
+            maxWidth: 1040,   // wide enough for the 2x2 game grid
             margin: "0 auto",
             padding: "72px 16px 40px",
+            minHeight: "100%",            // fill the screen height...
+            boxSizing: "border-box",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",     // ...and center the title + game cards vertically
           }}
         >
           <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
@@ -208,7 +214,8 @@ export default function GrammarHub() {
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+          {/* phone: 1 column; 768px+: 2x2 (Run + Swim on top, Dig + Grab below) */}
+          <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: "1.1rem" }}>
             {cards.map((c) => (
               <button
                 key={c.id}
@@ -254,9 +261,9 @@ export default function GrammarHub() {
                       }}
                     >
                       <span
+                        className={c.titleClass}
                         style={{
                           fontFamily: c.titleFont,
-                          fontSize: c.titleSize,
                           lineHeight: 1.02,
                           letterSpacing: "1px",
                           whiteSpace: "pre-line",
