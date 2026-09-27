@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { FUN3D_CSS, Word3D, word3DDone } from "@/components/Fun3D";
 
-// Win screen for the grammar games: Teacher Andy cheers, won coins fly up into the coin-total pill
-// (sparkles + rising pop sound), then Andy gives a thumbs-up and the buttons wake up.
+// Win screen for the grammar games: big 3D "Great Job!" pops in letter by letter, then the won coins fly up into the
+// coin-total pill (sparkles + rising pop sound). Andy starts hopping when the FIRST coin lands; after the last one he gives a
+// thumbs-up, "You won 2 treats!" glows, the coin row twinkles, and the buttons wake up.
 // VISUAL ONLY: it saves nothing. startTotal = the kid's coin total before this win (0 until the coin jar exists).
 type Props = {
   coinsWon: number;
@@ -29,7 +31,16 @@ const STAR_SVG =
   '<svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><path d="M12 0 L14.3 9.7 L24 12 L14.3 14.3 L12 24 L9.7 14.3 L0 12 L9.7 9.7Z" fill="#fff8c4"/></svg>';
 
 const MAX_FLYERS = 14;   // never more than 14 coins on screen, however many were won
-const START = 1100;      // ms after the screen opens before coins leave
+const GREAT = "Great Job!";
+const GREAT_DELAY = 150;  // ms before the first letter pops
+const START = word3DDone(GREAT, GREAT_DELAY) + 80; // coins leave right after the last letter lands (~1.4s)
+
+// twinkle dots/stars around the coin row (percent of the row box), fixed so they never jump around
+const TWINKLES = Array.from({ length: 20 }, (_, i) => {
+  const a = (i / 20) * Math.PI * 2 + (i % 3) * 0.13;
+  return { left: 50 + Math.cos(a) * (58 + ((i * 37) % 17)), top: 50 + Math.sin(a) * (72 + ((i * 53) % 29)),
+    size: 7 + ((i * 7) % 9), delay: (i * 173) % 1400, star: i % 3 === 0 };
+});
 const GAP = 62;          // ms between coins
 const POP = 260;         // ms burst outward
 const FLIGHT = 620;      // ms curve up to the pill
@@ -44,20 +55,32 @@ function CoinFill() {
 }
 
 const CSS = `
-.wc-root { position:fixed; inset:0; z-index:60; --u:min(1vh,0.75vw); overflow:hidden; color:#fff;
+.wc-root { position:fixed; inset:0; z-index:60; --u:min(1vh,0.75vw);
+  /* text + buttons sit centered; only when the screen is too narrow for Andy, everything slides right just enough */
+  --shift:max(0px, calc(var(--u) * 45 + 165px - 50vw)); overflow:hidden; color:#fff;
   background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); font-family:Fredoka, sans-serif; }
-.wc-center { position:absolute; inset:0; padding-left:calc(var(--u) * 35); display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:24px; text-align:center; }
+.wc-center { position:absolute; inset:0; padding-left:calc(var(--shift) * 2); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:20px; text-align:center; }
+.wc-great { font-size:max(58px, calc(var(--u) * 10.5)); }
 .wc-title { font-size:max(44px, calc(var(--u) * 5.6)); font-weight:700; text-shadow:0 4px 0 rgba(0,0,0,.35);
-  animation:wc-popIn .5s cubic-bezier(.3,1.7,.5,1) both; }
+  animation:wc-popIn .5s .95s cubic-bezier(.3,1.7,.5,1) both; }
+.wc-glowtxt.on { animation:wc-glow 1.6s ease-in-out infinite; }
 .wc-row { position:relative; display:flex; align-items:center; gap:12px; font-size:max(44px, calc(var(--u) * 5.4));
-  font-weight:700; color:#ffd84a; text-shadow:0 3px 0 rgba(0,0,0,.35); animation:wc-popIn .5s .25s cubic-bezier(.3,1.7,.5,1) both; }
+  font-weight:700; color:#ffd84a; text-shadow:0 3px 0 rgba(0,0,0,.35); animation:wc-popIn .5s 1.1s cubic-bezier(.3,1.7,.5,1) both;
+  isolation:isolate; }
+.wc-row.shine::before { content:""; position:absolute; left:-32%; right:-32%; top:-50%; bottom:-50%; z-index:-1; border-radius:50%;
+  background:radial-gradient(closest-side, rgba(255,214,80,.55), rgba(255,214,80,0)); animation:wc-halo 1.8s ease-in-out infinite; }
+.wc-tw { position:absolute; inset:0; pointer-events:none; }
+.wc-tw i { position:absolute; border-radius:50%; opacity:0; animation:wc-twinkle 1.4s ease-in-out infinite both;
+  background:radial-gradient(circle, #fff 0%, #fff6b0 35%, rgba(255,210,80,0) 70%); }
+.wc-tw i.st { border-radius:0; background:#fff8c4; filter:drop-shadow(0 0 4px #ffd84a);
+  clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%); }
 .wc-src { width:max(58px, calc(var(--u) * 7)); height:max(58px, calc(var(--u) * 7)); }
 .wc-row.drain .wc-src { animation:wc-shake .15s linear infinite; }
 .wc-plus { position:absolute; left:100%; margin-left:14px; top:50%; transform:translateY(-50%); color:#8dff5c;
   -webkit-text-stroke:2px #1e5c12; paint-order:stroke fill; text-shadow:0 3px 0 rgba(0,0,0,.4); opacity:0; white-space:nowrap; }
 .wc-plus.go { animation:wc-plus 1.4s ease-out forwards; }
-.wc-btns { display:flex; flex-direction:column; gap:16px; animation:wc-popIn .4s .45s both; }
+.wc-btns { display:flex; flex-direction:column; gap:22px; animation:wc-popIn .4s 1.25s both; }
 .wc-btn { font-family:inherit; font-size:max(22px, calc(var(--u) * 2.8)); padding:.64em 1.3em; border-radius:16px; border:none;
   font-weight:700; color:#003; cursor:pointer; transition:opacity .25s, filter .25s; }
 .wc-btn:disabled { opacity:.45; filter:grayscale(.6); cursor:default; }
@@ -71,16 +94,17 @@ const CSS = `
 .wc-pill.show { opacity:1; transform:none; }
 .wc-pillcoin { position:absolute; left:-14px; top:50%; width:74px; height:74px; margin-top:-37px; }
 
-.wc-andy { position:absolute; right:calc(50% - var(--u) * 11.5 + 165px); bottom:calc(var(--u) * -30);
+.wc-andy { position:absolute; right:calc(50% + var(--u) * 6 + 165px - var(--shift)); bottom:calc(var(--u) * -30);
   height:calc(var(--u) * 84); aspect-ratio:559/1201; pointer-events:none; transform:translateY(110%); }
 .wc-andy.in { animation:wc-andyIn .75s cubic-bezier(.25,1.45,.45,1) forwards; }
 .wc-sway { width:100%; height:100%; transform-origin:50% 100%; animation:wc-sway 3.4s ease-in-out infinite; }
 .wc-breathe { width:100%; height:100%; transform-origin:50% 100%; animation:wc-breathe 2.2s ease-in-out infinite; }
 .wc-hop { position:relative; width:100%; height:100%; transform-origin:50% 100%; }
-.wc-hop.bounce { animation:wc-hop .34s ease-in-out infinite; }
+.wc-hop.bounce { animation:wc-hop .42s ease-in-out infinite; }
 .wc-andy img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; user-select:none;
   filter:drop-shadow(0 10px 18px rgba(0,0,0,.45)); }
 @media (max-width:560px) { .wc-andy { display:none; } .wc-center { padding-left:0; } }
+@media (max-height:520px) { .wc-center { gap:10px; } .wc-great { font-size:46px; } .wc-title { font-size:32px; } .wc-row { font-size:34px; } .wc-btns { gap:14px; } }
 
 .wc-fly { position:absolute; left:0; top:0; width:40px; height:40px; margin:-20px 0 0 -20px; pointer-events:none; z-index:5; }
 .wc-fly > div { width:100%; height:100%; animation:wc-tumble .35s linear infinite; filter:drop-shadow(0 3px 3px rgba(0,0,0,.4)); }
@@ -100,6 +124,10 @@ const CSS = `
 @keyframes wc-hop { 0%,100%{transform:translateY(0) scale(1,1)} 15%{transform:translateY(0) scale(1.03,.96)}
   50%{transform:translateY(-4%) scale(.98,1.03)} 85%{transform:translateY(0) scale(1.02,.98)} }
 @keyframes wc-tumble { 0%{transform:scaleX(1)} 50%{transform:scaleX(.25)} 100%{transform:scaleX(1)} }
+@keyframes wc-glow { 0%,100%{ color:#fff; text-shadow:0 4px 0 rgba(0,0,0,.35), 0 0 6px rgba(255,220,90,.3); }
+  50%{ color:#fff6c8; text-shadow:0 4px 0 rgba(0,0,0,.35), 0 0 22px rgba(255,220,90,1), 0 0 44px rgba(255,190,40,.8); } }
+@keyframes wc-halo { 0%,100%{opacity:.55; transform:scale(.95)} 50%{opacity:1; transform:scale(1.05)} }
+@keyframes wc-twinkle { 0%,100%{opacity:0; transform:scale(.3) rotate(0deg)} 50%{opacity:1; transform:scale(1.3) rotate(45deg)} }
 `;
 
 export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = false, onChooseGame, onReturnToWorld }: Props) {
@@ -110,6 +138,8 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
   const [pillIn, setPillIn] = useState(false);
   const [andyIn, setAndyIn] = useState(false);
   const [flying, setFlying] = useState(false);
+  const [hop, setHop] = useState(false);       // Andy hops from the first coin landing until the last
+  const [shine, setShine] = useState(false);   // treats text glows + coin row twinkles after the coins land
   const [thumbs, setThumbs] = useState(false);
   const [eyesShut, setEyesShut] = useState(false);
   const [ready, setReady] = useState(won === 0);
@@ -177,6 +207,8 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
 
     const finish = () => {
       setFlying(false);
+      setHop(false);
+      setShine(true);
       setThumbs(true);
       hopRef.current?.animate(
         [{ transform: "scale(1.06,.92)" }, { transform: "scale(.97,1.05)", offset: 0.6 }, { transform: "scale(1)" }],
@@ -186,9 +218,9 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
       if (a && a.width > 0) sparkBurst(a.left + a.width * 0.12, a.top + a.height * 0.24, 14, 70, false);
     };
 
-    if (won === 0) return cleanup;
+    if (won === 0) { later(() => setShine(true), START); return cleanup; }
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      later(() => { setTotal(start + won); setThumbs(true); setReady(true); }, 700);
+      later(() => { setTotal(start + won); setThumbs(true); setShine(true); setReady(true); }, 700);
       return cleanup;
     }
 
@@ -199,6 +231,7 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
 
     const land = () => {
       arrived++;
+      if (arrived === 1) setHop(true);
       setTotal(start + Math.round((won * arrived) / flyers)); // lands exactly on start + won
       pillCoinRef.current?.animate(
         [{ transform: "scale(1)" }, { transform: "scale(1.22)", offset: 0.4 }, { transform: "scale(1)" }],
@@ -269,11 +302,11 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
 
   return (
     <div ref={rootRef} className="wc-root">
-      <style>{CSS}</style>
+      <style>{FUN3D_CSS + CSS}</style>
 
       <div className={`wc-andy${andyIn ? " in" : ""}`} ref={andyRef}>
         <div className="wc-sway"><div className="wc-breathe">
-          <div className={`wc-hop${flying ? " bounce" : ""}`} ref={hopRef}>
+          <div className={`wc-hop${hop ? " bounce" : ""}`} ref={hopRef}>
             <img src={IMG.cheer} alt="" draggable={false} style={{ opacity: thumbs ? 0 : 1 }} />
             <img src={IMG.blink} alt="" draggable={false} style={{ opacity: !thumbs && eyesShut ? 1 : 0 }} />
             <img src={IMG.thumbs} alt="" draggable={false} style={{ opacity: thumbs ? 1 : 0 }} />
@@ -287,19 +320,28 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
       </div>
 
       <div className="wc-center">
-        <div className="wc-title">You won 2 treats!</div>
+        <div className="wc-great"><Word3D text={GREAT} delay={GREAT_DELAY} /></div>
+        <div className="wc-title"><span className={`wc-glowtxt${shine ? " on" : ""}`}>You won 2 treats!</span></div>
         {won > 0 && (
-          <div className={`wc-row${flying ? " drain" : ""}`}>
+          <div className={`wc-row${flying ? " drain" : ""}${shine ? " shine" : ""}`}>
+            {shine && (
+              <div className="wc-tw">
+                {TWINKLES.map((t, i) => (
+                  <i key={i} className={t.star ? "st" : ""} style={{ left: `${t.left}%`, top: `${t.top}%`, width: t.size * (t.star ? 2 : 1),
+                    height: t.size * (t.star ? 2 : 1), marginLeft: -t.size * (t.star ? 1 : 0.5), marginTop: -t.size * (t.star ? 1 : 0.5), animationDelay: `${t.delay}ms` }} />
+                ))}
+              </div>
+            )}
             <div className="wc-src" ref={srcRef}><CoinFill /></div>
             <span>{"×"}{won}</span>
             <span className={`wc-plus${flying ? " go" : ""}`}>+{won}</span>
           </div>
         )}
         <div className={`wc-btns${ready && won > 0 ? " ready" : ""}`}>
-          <button className="wc-btn" disabled={!ready} onClick={onChooseGame} style={{ background: "#fde047" }}>
+          <button className="f3-btn f3-yellow" disabled={!ready} onClick={onChooseGame}>
             Choose Game
           </button>
-          <button className="wc-btn" disabled={!ready} onClick={onReturnToWorld} style={{ background: "#5ce0ff" }}>
+          <button className="f3-btn f3-cyan" disabled={!ready} onClick={onReturnToWorld}>
             Return to World
           </button>
         </div>

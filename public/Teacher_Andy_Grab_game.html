@@ -733,7 +733,7 @@ function draw(){
   }
 
   // Win / Lose overlay (standalone only — wrapper handles real screens later)
-  if(gameWon && andyState!=='win'){   // win: no overlay, the app's win screen follows
+  if(gameWon && andyState!=='win' && !loseHandoffSent){   // win AND lose: no overlay, the app shows its own screens
     ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(0,0,BASE_W,BASE_H);
     ctx.textAlign='center'; ctx.textBaseline='middle';
     if(andyState==='win'){

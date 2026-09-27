@@ -1594,8 +1594,7 @@ function draw() {
     if (gameState === "win") {
         drawFireworks();
     }
-    if (gameState === "gameover")
-        drawEndScreen("TRY AGAIN!", "You ran out of lives.", "#ff9a9a");
+    // lose: no in-game "TRY AGAIN!" screen any more - the app shows its own lose screen on top
 }
 
 

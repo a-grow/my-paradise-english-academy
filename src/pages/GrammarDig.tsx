@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { saveJarToCloud } from "@/lib/cloudSave";
 import GrammarGameBar from "@/components/GrammarGameBar";
 import WinCelebration from "@/components/WinCelebration";
+import LoseScreen from "@/components/LoseScreen";
 import type { GameStats } from "@/components/GrammarGameBar";
 
 export default function GrammarDig() {
@@ -43,6 +44,7 @@ export default function GrammarDig() {
       }
       if (e.data && e.data.type === "MPE_DIG_LOSE" && !claimed.current) {
         setLost(true);
+        frameRef.current?.contentWindow?.postMessage({ type: "MPE_FADE_OUT", ms: 400 }, "*"); // game music out, game-over sting in
       }
     }
     window.addEventListener("message", onMsg);
@@ -81,46 +83,12 @@ export default function GrammarDig() {
         />
       )}
       {lost && !won && (
-        <div
-          style={{
-            position: "fixed", inset: 0, display: "flex", flexDirection: "column",
-            alignItems: "center", justifyContent: "center",
-            background: "rgba(0,0,0,0.75)", color: "#fff", textAlign: "center", gap: 24,
-            fontFamily: "Fredoka, sans-serif",
-            backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
-          }}
-        >
-          <div style={{ fontSize: 44, fontWeight: 700, textShadow: "0 4px 0 rgba(0,0,0,0.35)" }}>Out of hearts!</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <button
-              onClick={() => { setLost(false); setStats(null); setTryKey((k) => k + 1); }}
-              style={{
-                fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
-                background: "#86efac", color: "#003", fontWeight: 700, cursor: "pointer",
-              }}
-            >
-              Try Again
-            </button>
-            <button
-              onClick={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
-              style={{
-                fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
-                background: "#fde047", color: "#003", fontWeight: 700, cursor: "pointer",
-              }}
-            >
-              Choose Game
-            </button>
-            <button
-              onClick={() => navigate(`/world/${kidCode}/${kidName}`)}
-              style={{
-                fontSize: 22, padding: "14px 28px", borderRadius: 16, border: "none",
-                background: "#5ce0ff", color: "#003", fontWeight: 700, cursor: "pointer",
-              }}
-            >
-              Return to World
-            </button>
-          </div>
-        </div>
+        <LoseScreen
+          muted={muted}
+          onTryAgain={() => { setLost(false); setStats(null); setTryKey((k) => k + 1); }}
+          onChooseGame={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
+          onReturnToWorld={() => navigate(`/world/${kidCode}/${kidName}`)}
+        />
       )}
     </div>
   );
