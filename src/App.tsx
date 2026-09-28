@@ -16,6 +16,7 @@ import Grammar from "./pages/Grammar";
 
 import NotFound from "./pages/NotFound";
 import TeacherHQ from "./pages/TeacherHQ";
+import VersionWatcher from "./components/VersionWatcher";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <VersionWatcher />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/blog" element={<Blog />} />
