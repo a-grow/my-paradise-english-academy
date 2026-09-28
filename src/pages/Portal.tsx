@@ -391,7 +391,8 @@ const Dashboard = () => {
           {family.students.map((student) => (
             <div key={student.name} className="text-center w-full">
               <button onClick={() => {
-                const path = `/world/${family.code}/${student.name.toLowerCase()}`;
+                const name = student.name.toLowerCase();
+                const path = localStorage.getItem(`mpe_world_${family.code}_${name}`) === "dino" ? `/dino/${family.code}/${name}` : `/world/${family.code}/${name}`;
                 if (localStorage.getItem(`mpe_worldnotice_seen_${family.code}`) === "true") {
                   navigate(path);
                 } else {

@@ -7,6 +7,9 @@ const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 const MASTER_CODE = "1006";
 
 // ── ANIMALS — add a new animal here, nothing else needs to change ────────────
+// If a .webp picture can't load (very old iPads), fall back to the old .png once.
+const pngFallback = (e: { currentTarget: HTMLImageElement }) => { const el = e.currentTarget; if (el.src.endsWith(".webp")) el.src = el.src.replace(/\.webp$/, ".png"); };
+
 interface AnimalStage { name: string; nameZh: string; min: number; img: string; }
 interface Animal {
   id: string; name: string; nameZh: string; emoji: string;
@@ -24,10 +27,10 @@ const ANIMALS: Animal[] = [
   {
     id: "turtle", name: "Sea Turtle", nameZh: "海龜", emoji: "🐢",
     stages: [
-      { name: "Egg",   nameZh: "蛋",      min: 0,  img: "/creatures/turtle-egg.png" },
-      { name: "Baby",  nameZh: "小海龜",   min: 15, img: "/creatures/turtle-baby.png" },
-      { name: "Young", nameZh: "少年海龜", min: 30, img: "/creatures/turtle-young.png" },
-      { name: "Grown", nameZh: "成年海龜", min: 45, img: "/creatures/turtle-grown.png" },
+      { name: "Egg",   nameZh: "蛋",      min: 0,  img: "/creatures/turtle-egg.webp" },
+      { name: "Baby",  nameZh: "小海龜",   min: 15, img: "/creatures/turtle-baby.webp" },
+      { name: "Young", nameZh: "少年海龜", min: 30, img: "/creatures/turtle-young.webp" },
+      { name: "Grown", nameZh: "成年海龜", min: 45, img: "/creatures/turtle-grown.webp" },
     ],
     unlockCondition: "default",
     collectionBg: "#0891b2", collectionBorder: "rgba(255,215,0,0.6)", collectionGlow: "rgba(255,215,0,0.35)",
@@ -45,10 +48,10 @@ const ANIMALS: Animal[] = [
   {
     id: "dolphin", name: "Dolphin", nameZh: "海豚", emoji: "🐬",
     stages: [
-      { name: "Blanket", nameZh: "小毯子",     min: 0,  img: "/creatures/dolphin-blanket.png" },
-      { name: "Young", nameZh: "少年海豚", min: 15, img: "/creatures/dolphin-baby.png" },
-      { name: "Teen",  nameZh: "少年海豚", min: 30, img: "/creatures/dolphin-young.png" },
-      { name: "Grown", nameZh: "成年海豚", min: 45, img: "/creatures/dolphin-grown.png" },
+      { name: "Blanket", nameZh: "小毯子",     min: 0,  img: "/creatures/dolphin-blanket.webp" },
+      { name: "Young", nameZh: "少年海豚", min: 15, img: "/creatures/dolphin-baby.webp" },
+      { name: "Teen",  nameZh: "少年海豚", min: 30, img: "/creatures/dolphin-young.webp" },
+      { name: "Grown", nameZh: "成年海豚", min: 45, img: "/creatures/dolphin-grown.webp" },
     ],
     unlockCondition: "turtle_grown_video_watched",
     collectionBg: "#0077b6", collectionBorder: "rgba(100,200,255,0.7)", collectionGlow: "rgba(100,200,255,0.4)",
@@ -67,10 +70,10 @@ const ANIMALS: Animal[] = [
   {
     id: "octopus", name: "Octopus", nameZh: "章魚", emoji: "🐙",
     stages: [
-      { name: "Egg",   nameZh: "",   min: 0,  img: "/creatures/octopus-egg.png" },
-      { name: "Baby",  nameZh: "小章魚",   min: 15, img: "/creatures/octopus-egg-baby.png" },
-      { name: "Young", nameZh: "少年章魚", min: 30, img: "/creatures/octopus-young.png" },
-      { name: "Grown", nameZh: "成年章魚", min: 45, img: "/creatures/octopus-grown.png" },
+      { name: "Egg",   nameZh: "",   min: 0,  img: "/creatures/octopus-egg.webp" },
+      { name: "Baby",  nameZh: "小章魚",   min: 15, img: "/creatures/octopus-egg-baby.webp" },
+      { name: "Young", nameZh: "少年章魚", min: 30, img: "/creatures/octopus-young.webp" },
+      { name: "Grown", nameZh: "成年章魚", min: 45, img: "/creatures/octopus-grown.webp" },
     ],
     unlockCondition: "dolphin_grown_video_watched",
     collectionBg: "#581c87", collectionBorder: "rgba(216,180,254,0.7)", collectionGlow: "rgba(168,85,247,0.5)",
@@ -88,10 +91,10 @@ const ANIMALS: Animal[] = [
   {
     id: "shark", name: "Great White Shark", nameZh: "大白鯊", emoji: "🦈",
     stages: [
-      { name: "Blanket", nameZh: "小毯子",     min: 0,  img: "/creatures/shark-blanket.png" },
-      { name: "Baby",  nameZh: "小鯊魚",   min: 15, img: "/creatures/shark-baby.png" },
-      { name: "Young", nameZh: "少年鯊魚", min: 30, img: "/creatures/shark-young.png" },
-      { name: "Grown", nameZh: "成年鯊魚", min: 45, img: "/creatures/shark-grown.png" },
+      { name: "Blanket", nameZh: "小毯子",     min: 0,  img: "/creatures/shark-blanket.webp" },
+      { name: "Baby",  nameZh: "小鯊魚",   min: 15, img: "/creatures/shark-baby.webp" },
+      { name: "Young", nameZh: "少年鯊魚", min: 30, img: "/creatures/shark-young.webp" },
+      { name: "Grown", nameZh: "成年鯊魚", min: 45, img: "/creatures/shark-grown.webp" },
     ],
     unlockCondition: "octopus_grown_video_watched",
     collectionBg: "#1e3a5f", collectionBorder: "rgba(200,220,255,0.7)", collectionGlow: "rgba(96,165,250,0.4)",
@@ -109,10 +112,10 @@ const ANIMALS: Animal[] = [
   {
     id: "clownfish", name: "Clownfish", nameZh: "小丑魚", emoji: "🐠",
     stages: [
-      { name: "Egg",   nameZh: "",     min: 0,  img: "/creatures/clownfish-egg.png" },
-      { name: "Baby",  nameZh: "小小丑魚", min: 15, img: "/creatures/clownfish-baby.png" },
-      { name: "Young", nameZh: "少年小丑魚", min: 30, img: "/creatures/clownfish-young.png" },
-      { name: "Grown", nameZh: "成年小丑魚", min: 45, img: "/creatures/clownfish-grown.png" },
+      { name: "Egg",   nameZh: "",     min: 0,  img: "/creatures/clownfish-egg.webp" },
+      { name: "Baby",  nameZh: "小小丑魚", min: 15, img: "/creatures/clownfish-baby.webp" },
+      { name: "Young", nameZh: "少年小丑魚", min: 30, img: "/creatures/clownfish-young.webp" },
+      { name: "Grown", nameZh: "成年小丑魚", min: 45, img: "/creatures/clownfish-grown.webp" },
     ],
     unlockCondition: "shark_grown_video_watched",
     collectionBg: "#c2410c", collectionBorder: "rgba(251,146,60,0.7)", collectionGlow: "rgba(249,115,22,0.45)",
@@ -130,10 +133,10 @@ const ANIMALS: Animal[] = [
   {
     id: "mantaray", name: "Manta Ray", nameZh: "魟魚", emoji: "🐟",
     stages: [
-      { name: "Blanket", nameZh: "小毯子",       min: 0,  img: "/creatures/mantaray-blanket.png" },
-      { name: "Baby",    nameZh: "小魟魚",     min: 15, img: "/creatures/mantaray-baby.png" },
-      { name: "Young",   nameZh: "少年魟魚",   min: 30, img: "/creatures/mantaray-young.png" },
-      { name: "Grown",   nameZh: "成年魟魚",   min: 45, img: "/creatures/mantaray-grown.png" },
+      { name: "Blanket", nameZh: "小毯子",       min: 0,  img: "/creatures/mantaray-blanket.webp" },
+      { name: "Baby",    nameZh: "小魟魚",     min: 15, img: "/creatures/mantaray-baby.webp" },
+      { name: "Young",   nameZh: "少年魟魚",   min: 30, img: "/creatures/mantaray-young.webp" },
+      { name: "Grown",   nameZh: "成年魟魚",   min: 45, img: "/creatures/mantaray-grown.webp" },
     ],
     unlockCondition: "clownfish_grown_video_watched",
     collectionBg: "#1e3a8a", collectionBorder: "rgba(147,197,253,0.7)", collectionGlow: "rgba(96,165,250,0.45)",
@@ -401,7 +404,7 @@ const LevelUpOverlay = ({ animal, stageIdx, onDismiss }: { animal: Animal; stage
         <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.75)", marginBottom: "1rem" }}>{msg.zh}</div>
         <div style={{ position: "relative", display: "inline-block", animation: "cReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both" }}>
           <div style={{ position: "absolute", inset: -20, borderRadius: "50%", background: "radial-gradient(circle,rgba(255,215,0,0.4) 0%,transparent 70%)", animation: "goldPulse 1s ease-in-out infinite" }} />
-          <img src={newImg} alt="New stage!" style={{ width: 150, height: 130, objectFit: "contain", filter: "drop-shadow(0 0 20px rgba(255,215,0,0.9))" }} />
+          <img onError={pngFallback} src={newImg} alt="New stage!" style={{ width: 150, height: 130, objectFit: "contain", filter: "drop-shadow(0 0 20px rgba(255,215,0,0.9))" }} />
         </div>
         <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1.2rem", color: "#fbbf24", margin: "0.75rem 0 0.25rem", textShadow: "0 2px 6px rgba(0,0,0,0.3)" }}>
           {msg.sub}
@@ -623,14 +626,14 @@ const OceanCollection = ({ fedTreatsMap, videoWatched, videoWatchedMap, unlockSe
               animation: isClickable ? "dolphinPulse 1.2s ease-in-out infinite" : undefined }}>
             {isUnlocked && (unlockSeen || animal.unlockCondition === "default") ? (
               <>
-                <img src={currentImg} alt={animal.name} style={{ width: 62, height: 62, objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))", display: "block", margin: "0 auto", animation: "bobAnim 3s ease-in-out infinite" }} />
+                <img onError={pngFallback} src={currentImg} alt={animal.name} style={{ width: 62, height: 62, objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.3))", display: "block", margin: "0 auto", animation: "bobAnim 3s ease-in-out infinite" }} />
                 <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "0.85rem", color: "#fbbf24", marginTop: "0.35rem", textAlign: "center", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>{animal.name}</div>
                 <div style={{ position: "absolute", inset: -3, borderRadius: "1.4rem", border: "2px solid rgba(255,215,0,0.4)", animation: "gP 2s ease-in-out infinite", pointerEvents: "none" }} />
               </>
             ) : isClickable ? (
               <>
                 {unlockSeen ? (
-                  <img src={animal.stages[0].img} alt={animal.name} style={{ width: 62, height: 62, objectFit: "contain", filter: `drop-shadow(0 4px 12px ${animal.collectionGlow})`, display: "block", margin: "0 auto", animation: "bobAnim 2s ease-in-out infinite" }} />
+                  <img onError={pngFallback} src={animal.stages[0].img} alt={animal.name} style={{ width: 62, height: 62, objectFit: "contain", filter: `drop-shadow(0 4px 12px ${animal.collectionGlow})`, display: "block", margin: "0 auto", animation: "bobAnim 2s ease-in-out infinite" }} />
                 ) : (
                   <div style={{ width: 56, height: 52, borderRadius: "30% 40% 35% 45%", background: animal.collectionBorder, margin: "0 auto", position: "relative", display: "flex", alignItems: "center", justifyContent: "center", animation: "bobAnim 2s ease-in-out infinite", boxShadow: `0 0 24px ${animal.collectionBorder}` }}>
                     <div style={{ width: 34, height: 30, borderRadius: "40% 35% 45% 30%", background: animal.collectionBg }} />
@@ -923,6 +926,7 @@ const KidsWorld = () => {
         const mantarayGrownCloud = mantarayObj ? getAnimalStageIdx(mantarayObj, mantarayFedCloud) === 3 : false;
         const mantarayVideoCloud = newVideoWatched["mantaray"] ?? false;
         if (!isMaster && mantarayGrownCloud && mantarayVideoCloud) {
+          localStorage.setItem(`mpe_world_${code}_${studentName}`, "dino");
           navigate(`/dino/${code}/${studentName}`, { replace: true });
           return;
         }
@@ -951,7 +955,7 @@ const KidsWorld = () => {
     const mantarayVideoWatched = videoWatchedMap["mantaray"] ?? false;
     const alreadySeen = localStorage.getItem(`mpe_oceancomplete_${code}_${studentName}`) === "1";
     if (mantarayGrown && mantarayVideoWatched && !alreadySeen && !showVideo && !levelUpStage) {
-      setTimeout(() => {
+      const t = setTimeout(() => {
         setShowOceanComplete(true);
         if (audioRef.current) audioRef.current.volume = 0.02;
         if (!completeRef.current) completeRef.current = new Audio("/completedworld-music.mp3");
@@ -962,6 +966,7 @@ const KidsWorld = () => {
           document.addEventListener("pointerdown", tryPlay, { once: true });
         });
       }, 2500);
+      return () => clearTimeout(t);
     }
   }, [fedTreatsState, videoWatchedMap, showVideo, levelUpStage]);
 
@@ -1230,6 +1235,7 @@ const KidsWorld = () => {
                 setShowOceanComplete(false);
                 if (completeRef.current) { completeRef.current.pause(); completeRef.current.currentTime = 0; }
                 if (audioRef.current) audioRef.current.volume = volume * 0.5;
+                localStorage.setItem(`mpe_world_${code}_${studentName}`, "dino");
                 navigate(`/dino/${code}/${studentName}`);
               }}
               style={{ background: "linear-gradient(180deg,#ff4444 0%,#cc0000 50%,#990000 100%)", border: "none", borderRadius: "999px", padding: "1.1rem 2.8rem", cursor: "pointer", boxShadow: "0 8px 0px #660000, 0 12px 24px rgba(0,0,0,0.5), 0 0 30px rgba(255,60,60,0.5)", transform: "translateY(0)", transition: "transform 0.08s, box-shadow 0.08s", fontFamily: "'Fredoka One',cursive", fontSize: "1.5rem", color: "white", textShadow: "0 2px 4px rgba(0,0,0,0.4)", display: "flex", flexDirection: "column", alignItems: "center", gap: "0.2rem" }}
@@ -1284,7 +1290,7 @@ const KidsWorld = () => {
               <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1.1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1rem" }}>{ov.titleZh}</div>
               <div style={{ position: "relative", display: "inline-block", animation: "cReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both" }}>
                 <div style={{ position: "absolute", inset: -20, borderRadius: "50%", background: `radial-gradient(circle,${ov.glowColor} 0%,transparent 70%)`, animation: "goldPulse 1s ease-in-out infinite" }} />
-                <img src={a.stages[0].img} alt={a.name} style={{ width: 150, height: 140, objectFit: "contain", filter: `drop-shadow(0 0 24px ${ov.glowColor})` }} />
+                <img onError={pngFallback} src={a.stages[0].img} alt={a.name} style={{ width: 150, height: 140, objectFit: "contain", filter: `drop-shadow(0 0 24px ${ov.glowColor})` }} />
               </div>
               <div style={{ fontFamily: "'Fredoka One',cursive", fontSize: "1.3rem", color: "white", margin: "0.75rem 0 0.2rem" }}>{ov.eggLine}</div>
               <div style={{ fontFamily: "Noto Sans TC, sans-serif", fontSize: "1rem", color: "rgba(255,255,255,0.7)", marginBottom: "0.5rem" }}>{ov.eggLineZh}</div>
@@ -1423,7 +1429,7 @@ const KidsWorld = () => {
               onClick={isEgg ? handleEggTap : handlePet}
               style={{ width: "min(250px,65vw)", height: "min(210px,55vw)", display: "flex", alignItems: "center", justifyContent: "center", filter: sad ? "saturate(0.4) brightness(0.75)" : "none", position: "relative", transition: "filter 0.5s ease", pointerEvents: "auto" }}>
               {isEgg && activeAnimal.isEggType && <EggCracks treats={fedTreats} />}
-              <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))", transform: activeAnimal.scale && activeAnimal.scale !== 1 && (activeAnimal.isEggType || stageIdx > 0) ? `scale(${activeAnimal.scale})` : "none", transformOrigin: "center center" }} draggable={false} />
+              <img onError={pngFallback} src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: sad ? "none" : "drop-shadow(0 8px 20px rgba(0,0,0,0.3))", transform: activeAnimal.scale && activeAnimal.scale !== 1 && (activeAnimal.isEggType || stageIdx > 0) ? `scale(${activeAnimal.scale})` : "none", transformOrigin: "center center" }} draggable={false} />
             </div>
 
             {/* Instructional hints — bilingual */}

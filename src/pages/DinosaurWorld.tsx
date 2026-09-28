@@ -6,6 +6,9 @@ import { saveDataToCloud, loadDataFromCloud } from "@/lib/cloudSave";
 const MASTER_CODE = "1006";
 
 // ── ANIMALS ──────────────────────────────────────────────────────────────────
+// If a .webp picture can't load (very old iPads), fall back to the old .png once.
+const pngFallback = (e: { currentTarget: HTMLImageElement }) => { const el = e.currentTarget; if (el.src.endsWith(".webp")) el.src = el.src.replace(/\.webp$/, ".png"); };
+
 interface AnimalStage { name: string; nameZh: string; min: number; img: string; }
 interface Animal {
   id: string; name: string; nameZh: string; emoji: string;
@@ -24,10 +27,10 @@ const ANIMALS: Animal[] = [
   {
     id: "triceratops", name: "Triceratops", nameZh: "三角龍", emoji: "🦕",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/triceratop-egg.png" },
-      { name: "Baby", nameZh: "小三角龍", min: 15, img: "/creatures/triceratop-baby.png" },
-      { name: "Young", nameZh: "年輕三角龍", min: 30, img: "/creatures/triceratop-young.png" },
-      { name: "Grown", nameZh: "成年三角龍", min: 45, img: "/creatures/triceratop-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/triceratop-egg.webp" },
+      { name: "Baby", nameZh: "小三角龍", min: 15, img: "/creatures/triceratop-baby.webp" },
+      { name: "Young", nameZh: "年輕三角龍", min: 30, img: "/creatures/triceratop-young.webp" },
+      { name: "Grown", nameZh: "成年三角龍", min: 45, img: "/creatures/triceratop-grown.webp" },
     ],
     unlockCondition: "default",
     collectionBg: "#7c4a1a", collectionBorder: "rgba(218,165,32,0.7)", collectionGlow: "rgba(218,165,32,0.4)",
@@ -45,10 +48,10 @@ const ANIMALS: Animal[] = [
   {
     id: "pterodactyl", name: "Pterodactyl", nameZh: "翼龍", emoji: "🦅",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/pterodactyl-egg.png" },
-      { name: "Baby", nameZh: "小翼龍", min: 15, img: "/creatures/pterodactyl-baby.png" },
-      { name: "Young", nameZh: "年輕翼龍", min: 30, img: "/creatures/pterodactyl-young.png" },
-      { name: "Grown", nameZh: "成年翼龍", min: 45, img: "/creatures/pterodactyl-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/pterodactyl-egg.webp" },
+      { name: "Baby", nameZh: "小翼龍", min: 15, img: "/creatures/pterodactyl-baby.webp" },
+      { name: "Young", nameZh: "年輕翼龍", min: 30, img: "/creatures/pterodactyl-young.webp" },
+      { name: "Grown", nameZh: "成年翼龍", min: 45, img: "/creatures/pterodactyl-grown.webp" },
     ],
     unlockCondition: "triceratops_grown_video_watched",
     collectionBg: "#5c3d11", collectionBorder: "rgba(210,105,30,0.7)", collectionGlow: "rgba(210,105,30,0.4)",
@@ -66,10 +69,10 @@ const ANIMALS: Animal[] = [
   {
     id: "velociraptor", name: "Velociraptor", nameZh: "迅猛龍", emoji: "🦖",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/velociraptor-egg.png" },
-      { name: "Baby", nameZh: "小迅猛龍", min: 15, img: "/creatures/velociraptor-baby.png" },
-      { name: "Young", nameZh: "年輕迅猛龍", min: 30, img: "/creatures/velociraptor-young.png" },
-      { name: "Grown", nameZh: "成年迅猛龍", min: 45, img: "/creatures/velociraptor-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/velociraptor-egg.webp" },
+      { name: "Baby", nameZh: "小迅猛龍", min: 15, img: "/creatures/velociraptor-baby.webp" },
+      { name: "Young", nameZh: "年輕迅猛龍", min: 30, img: "/creatures/velociraptor-young.webp" },
+      { name: "Grown", nameZh: "成年迅猛龍", min: 45, img: "/creatures/velociraptor-grown.webp" },
     ],
     unlockCondition: "pterodactyl_grown_video_watched",
     collectionBg: "#4a5c1a", collectionBorder: "rgba(107,142,35,0.7)", collectionGlow: "rgba(107,142,35,0.4)",
@@ -87,10 +90,10 @@ const ANIMALS: Animal[] = [
   {
     id: "brontosaurus", name: "Brontosaurus", nameZh: "雷龍", emoji: "🦕",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/brontosaurus-egg.png" },
-      { name: "Baby", nameZh: "小雷龍", min: 15, img: "/creatures/brontosaurus-baby.png" },
-      { name: "Young", nameZh: "年輕雷龍", min: 30, img: "/creatures/brontosaurus-young.png" },
-      { name: "Grown", nameZh: "成年雷龍", min: 45, img: "/creatures/brontosaurus-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/brontosaurus-egg.webp" },
+      { name: "Baby", nameZh: "小雷龍", min: 15, img: "/creatures/brontosaurus-baby.webp" },
+      { name: "Young", nameZh: "年輕雷龍", min: 30, img: "/creatures/brontosaurus-young.webp" },
+      { name: "Grown", nameZh: "成年雷龍", min: 45, img: "/creatures/brontosaurus-grown.webp" },
     ],
     unlockCondition: "velociraptor_grown_video_watched",
     collectionBg: "#3d5c2a", collectionBorder: "rgba(154,205,50,0.7)", collectionGlow: "rgba(154,205,50,0.4)",
@@ -108,10 +111,10 @@ const ANIMALS: Animal[] = [
   {
     id: "dilophosaurus", name: "Dilophosaurus", nameZh: "雙冠龍", emoji: "🦎",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/dilophosaurus-egg.png" },
-      { name: "Baby", nameZh: "小雙冠龍", min: 15, img: "/creatures/dilophosaurus-baby.png" },
-      { name: "Young", nameZh: "年輕雙冠龍", min: 30, img: "/creatures/dilophosaurus-young.png" },
-      { name: "Grown", nameZh: "成年雙冠龍", min: 45, img: "/creatures/dilophosaurus-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/dilophosaurus-egg.webp" },
+      { name: "Baby", nameZh: "小雙冠龍", min: 15, img: "/creatures/dilophosaurus-baby.webp" },
+      { name: "Young", nameZh: "年輕雙冠龍", min: 30, img: "/creatures/dilophosaurus-young.webp" },
+      { name: "Grown", nameZh: "成年雙冠龍", min: 45, img: "/creatures/dilophosaurus-grown.webp" },
     ],
     unlockCondition: "brontosaurus_grown_video_watched",
     collectionBg: "#7c2d12", collectionBorder: "rgba(234,88,12,0.7)", collectionGlow: "rgba(234,88,12,0.4)",
@@ -129,10 +132,10 @@ const ANIMALS: Animal[] = [
   {
     id: "trex", name: "T-Rex", nameZh: "暴龍", emoji: "🦖",
     stages: [
-      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/trex-egg.png" },
-      { name: "Baby", nameZh: "小暴龍", min: 15, img: "/creatures/trex-baby.png" },
-      { name: "Young", nameZh: "年輕暴龍", min: 30, img: "/creatures/trex-young.png" },
-      { name: "Grown", nameZh: "成年暴龍", min: 45, img: "/creatures/trex-grown.png" },
+      { name: "Egg", nameZh: "蛋", min: 0, img: "/creatures/trex-egg.webp" },
+      { name: "Baby", nameZh: "小暴龍", min: 15, img: "/creatures/trex-baby.webp" },
+      { name: "Young", nameZh: "年輕暴龍", min: 30, img: "/creatures/trex-young.webp" },
+      { name: "Grown", nameZh: "成年暴龍", min: 45, img: "/creatures/trex-grown.webp" },
     ],
     unlockCondition: "dilophosaurus_grown_video_watched",
     collectionBg: "#6b1a1a", collectionBorder: "rgba(220,38,38,0.7)", collectionGlow: "rgba(220,38,38,0.4)",
@@ -359,7 +362,7 @@ const LevelUpOverlay = ({ animal, stageIdx, onDismiss }: { animal: Animal; stage
         <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "1.1rem", color: "rgba(245,230,200,0.75)", marginBottom: "1rem" }}>{msg.zh}</div>
         <div style={{ position: "relative", display: "inline-block", animation: "cReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both" }}>
           <div style={{ position: "absolute", inset: -20, borderRadius: "50%", background: "radial-gradient(circle,rgba(218,165,32,0.4) 0%,transparent 70%)", animation: "goldPulse 1s ease-in-out infinite" }} />
-          <img src={newImg} alt="New stage!" style={{ width: 150, height: 130, objectFit: "contain", filter: "drop-shadow(0 0 20px rgba(218,165,32,0.9))" }} />
+          <img onError={pngFallback} src={newImg} alt="New stage!" style={{ width: 150, height: 130, objectFit: "contain", filter: "drop-shadow(0 0 20px rgba(218,165,32,0.9))" }} />
         </div>
         <div style={{ fontFamily: "'Titan One',cursive", fontSize: "1.1rem", color: "#DAA520", margin: "0.75rem 0 0.25rem" }}>{msg.sub}</div>
         <div style={{ fontFamily: "Nunito,sans-serif", fontSize: "1rem", color: "rgba(245,230,200,0.65)", marginBottom: "1.25rem" }}>{msg.subZh}</div>
@@ -475,7 +478,7 @@ const DinoCollection = ({ fedTreatsMap, videoWatchedMap, unlockSeenMap, onAnimal
             }}>
             {isUnlocked && (unlockSeen || animal.unlockCondition === "default") ? (
               <>
-                <img src={currentImg} alt={animal.name} style={{ width: 62, height: 62, objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.4))", display: "block", margin: "0 auto", animation: "bobAnim 3s ease-in-out infinite" }} />
+                <img onError={pngFallback} src={currentImg} alt={animal.name} style={{ width: 62, height: 62, objectFit: "contain", filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.4))", display: "block", margin: "0 auto", animation: "bobAnim 3s ease-in-out infinite" }} />
                 <div style={{ fontFamily: "'Titan One',cursive", fontSize: "0.75rem", color: "#DAA520", marginTop: "0.35rem", textAlign: "center", textShadow: "0 1px 4px rgba(0,0,0,0.5)" }}>{animal.name}</div>
                 <div style={{ position: "absolute", inset: -3, borderRadius: "1.4rem", border: "2px solid rgba(218,165,32,0.4)", animation: "gP 2s ease-in-out infinite", pointerEvents: "none" }} />
               </>
@@ -581,7 +584,12 @@ const DinosaurWorld = () => {
     return s?.name ?? (n.charAt(0).toUpperCase() + n.slice(1));
   })();
 
-  const [activeAnimalId, setActiveAnimalId] = useState("triceratops");
+  const [activeAnimalId, setActiveAnimalId] = useState(() => {
+    if (isMaster) return "triceratops";
+    let furthest = "triceratops";
+    for (const a of ANIMALS) { if (localStorage.getItem(`mpe_dino_unlkseen_${a.id}_${code}_${studentName}`) === "1") furthest = a.id; }
+    return furthest;
+  });
   const activeAnimal = ANIMALS.find(a => a.id === activeAnimalId) ?? ANIMALS[0];
   const videoWatched = videoWatchedMap[activeAnimalId] ?? false;
   const fedTreats = fedTreatsState[activeAnimalId] ?? 0;
@@ -711,7 +719,7 @@ const DinosaurWorld = () => {
     const trexVideoWatched = videoWatchedMap["trex"] ?? false;
     const alreadySeen = localStorage.getItem(`mpe_dinocomplete_${code}_${studentName}`) === "1";
     if (trexGrown && trexVideoWatched && !alreadySeen && !showVideo) {
-      setTimeout(() => {
+      const t = setTimeout(() => {
         setShowDinoComplete(true);
         if (audioRef.current) audioRef.current.volume = 0.02;
         if (!completeRef.current) completeRef.current = new Audio("/completedworld-music.mp3");
@@ -722,6 +730,7 @@ const DinosaurWorld = () => {
           document.addEventListener("pointerdown", tryPlay, { once: true });
         });
       }, 800);
+      return () => clearTimeout(t);
     }
   }, [fedTreatsState, videoWatchedMap, showVideo]);
 
@@ -1036,7 +1045,7 @@ const DinosaurWorld = () => {
               <div style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "1.1rem", color: "rgba(245,230,200,0.8)", marginBottom: "1rem" }}>{ov.titleZh}</div>
               <div style={{ position: "relative", display: "inline-block", animation: "cReveal 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both" }}>
                 <div style={{ position: "absolute", inset: -20, borderRadius: "50%", background: `radial-gradient(circle,${ov.glowColor} 0%,transparent 70%)`, animation: "goldPulse 1s ease-in-out infinite" }} />
-                <img src={a.stages[0].img} alt={a.name} style={{ width: 150, height: 140, objectFit: "contain", filter: `drop-shadow(0 0 24px ${ov.glowColor})` }} />
+                <img onError={pngFallback} src={a.stages[0].img} alt={a.name} style={{ width: 150, height: 140, objectFit: "contain", filter: `drop-shadow(0 0 24px ${ov.glowColor})` }} />
               </div>
               <div style={{ fontFamily: "'Titan One',cursive", fontSize: "1.2rem", color: "#f5e6c8", margin: "0.75rem 0 0.2rem" }}>{ov.eggLine}</div>
               <div style={{ fontFamily: "Noto Sans TC,sans-serif", fontSize: "1rem", color: "rgba(245,230,200,0.7)", marginBottom: "0.5rem" }}>{ov.eggLineZh}</div>
@@ -1172,7 +1181,7 @@ const DinosaurWorld = () => {
               onClick={isEgg ? handleEggTap : handlePet}
               style={{ width: "min(250px,65vw)", height: "min(210px,55vw)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", transition: "filter 0.5s ease", pointerEvents: "auto", marginTop: activeAnimal.scale && activeAnimal.scale > 1 && stageIdx > 0 ? `${Math.round((activeAnimal.scale - 1) * 0.5 * 210)}px` : undefined, marginBottom: activeAnimal.scale && activeAnimal.scale > 1 && stageIdx > 0 ? `${Math.round((activeAnimal.scale - 1) * 0.5 * 210)}px` : undefined }}>
               {isEgg && <EggCracks treats={fedTreats} />}
-              <img src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.5))", transform: activeAnimal.scale && activeAnimal.scale !== 1 && stageIdx > 0 ? `scale(${activeAnimal.scale})` : "none", transformOrigin: "center center" }} draggable={false} />
+              <img onError={pngFallback} src={creatureImg} alt={stage.name} style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", filter: "drop-shadow(0 8px 20px rgba(0,0,0,0.5))", transform: activeAnimal.scale && activeAnimal.scale !== 1 && stageIdx > 0 ? `scale(${activeAnimal.scale})` : "none", transformOrigin: "center center" }} draggable={false} />
             </div>
 
             {isEgg && !nearHatch && (
