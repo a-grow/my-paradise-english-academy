@@ -84,6 +84,23 @@ export const useWorldBrain = (world: WorldConfig) => {
   const lullabyRef = useRef<HTMLAudioElement | null>(null);
   const tadaRef = useRef<HTMLAudioElement | null>(null);
   const completeRef = useRef<HTMLAudioElement | null>(null);
+  // Waiting "start music on first tap" listeners (browser blocked autoplay). Removed when the page closes,
+  // so an old world's music can never start inside the next world after a jump (Ocean -> Dino).
+  const tapStartRef = useRef<(() => void)[]>([]);
+  const pageClosedRef = useRef(false);
+  const waitForTap = (fn: () => void) => {
+    if (pageClosedRef.current) return;
+    tapStartRef.current.push(fn);
+    document.addEventListener("pointerdown", fn, { once: true });
+  };
+  useEffect(() => {
+    pageClosedRef.current = false;
+    return () => {
+      pageClosedRef.current = true;
+      tapStartRef.current.forEach(fn => document.removeEventListener("pointerdown", fn));
+      tapStartRef.current = [];
+    };
+  }, []);
   const ctxRef = useRef<AudioContext | null>(null);
   const prevStageRef = useRef<number | null>(null);
   const levelUpFiredRef = useRef<Record<string, Set<number>>>(
@@ -123,7 +140,7 @@ export const useWorldBrain = (world: WorldConfig) => {
   useEffect(() => {
     if (!audioRef.current) { audioRef.current = new Audio(K.music); audioRef.current.loop = true; }
     audioRef.current.volume = volume * 0.5;
-    if (musicOn) { audioRef.current.play().catch(() => { const tryPlay = () => { audioRef.current?.play().catch(() => { }); }; document.addEventListener("pointerdown", tryPlay, { once: true }); }); }
+    if (musicOn) { audioRef.current.play().catch(() => { const tryPlay = () => { audioRef.current?.play().catch(() => { }); }; waitForTap(tryPlay); }); }
     else audioRef.current.pause();
     localStorage.setItem(S.music, musicOn ? "on" : "off");
     return () => { audioRef.current?.pause(); };
@@ -275,7 +292,7 @@ export const useWorldBrain = (world: WorldConfig) => {
         completeRef.current.volume = 0.5;
         completeRef.current.play().catch(() => {
           const tryPlay = () => { completeRef.current?.play().catch(() => {}); };
-          document.addEventListener("pointerdown", tryPlay, { once: true });
+          waitForTap(tryPlay);
         });
       }, K.completeDelayMs);
       return () => clearTimeout(t);
@@ -447,11 +464,19 @@ export const useWorldBrain = (world: WorldConfig) => {
 
 export type WorldView = ReturnType<typeof useWorldBrain>;
 
-const WorldPage = ({ world }: { world: WorldConfig }) => {
+const WorldScreen = ({ world }: { world: WorldConfig }) => {
   const v = useWorldBrain(world);
   const K = world.skin;
   if (v.loading) return <K.Loading v={v} />;
   return <K.Page v={v} />;
+};
+
+// NAME TAG: a different world or kid = a brand-new page (fresh state + its own cloud read-back).
+// Without it React would REUSE the page when e.g. /world (Ocean) jumps to /dino (both are WorldPage).
+const WorldPage = ({ world }: { world: WorldConfig }) => {
+  const { code, studentName } = useParams<{ code: string; studentName: string }>();
+  const tag = `${world.id}_${(code ?? "").toUpperCase()}_${(studentName ?? "").toLowerCase()}`;
+  return <WorldScreen key={tag} world={world} />;
 };
 
 export default WorldPage;

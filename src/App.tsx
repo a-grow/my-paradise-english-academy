@@ -38,7 +38,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/portal" element={<Portal />} />
-              <Route path="/world/:code/:studentName" element={<KidsWorld />} />
+              <Route path="/world/:code/:studentName" element={<WorldPage world={OCEAN_WORLD} />} />
+              <Route path="/ocean/:code/:studentName" element={<WorldPage world={OCEAN_WORLD} />} />
 <Route path="/game/:world/:code/:studentName/:book" element={<GamePage />} />
 <Route path="/game/:code/:studentName/:book" element={<GamePage />} />
 {/* <Route path="/grammar/:code/:studentName/:book" element={<Grammar />} /> */}
@@ -51,7 +52,7 @@ const App = () => (
 <Route path="/world-test/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
 <Route path="/world-test/ocean/:code/:studentName" element={<WorldPage world={OCEAN_WORLD} />} />
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
-              <Route path="/dino/:code/:studentName" element={<DinosaurWorld />} />
+              <Route path="/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="/mpe-teacher-secret-hq" element={<TeacherHQ />} />
               <Route path="*" element={<NotFound />} />
