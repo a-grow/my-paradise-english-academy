@@ -18,6 +18,8 @@ import GrammarSwim from "./pages/GrammarSwim";
 import GrammarDig from "./pages/GrammarDig";
 import GrammarGrab from "./pages/GrammarGrab";
 import CookieJarPreview from "./pages/CookieJarPreview";
+import WorldPage from "./pages/WorldPage";
+import { DINO_WORLD } from "./worlds";
 import GrammarHub from "./pages/GrammarHub";
 import NotFound from "./pages/NotFound";
 import TeacherHQ from "./pages/TeacherHQ";
@@ -46,6 +48,7 @@ const App = () => (
 <Route path="/grammar-grab/:code/:studentName/:level?" element={<GrammarGrab />} />
 <Route path="/grammar-hub/:code/:studentName/:level?" element={<GrammarHub />} />
 <Route path="/cookie-jar-preview" element={<CookieJarPreview />} />
+<Route path="/world-test/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<DinosaurWorld />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
