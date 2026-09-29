@@ -48,6 +48,21 @@ export async function addTreats(code: string, studentName: string, delta: number
   }
 }
 
+// COINS: add a grammar win's coins (delta 0 = just read). The database (function mpe_add_coins) adds it
+// in one step and returns the kid's coin total (won - spent). number = total, null = no row, undefined = failed.
+export async function addCoins(code: string, studentName: string, delta: number): Promise<number | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_add_coins", { p_code: code, p_name: studentName, p_delta: delta });
+    if (error) { console.error("[cloudSave] addCoins failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] coins +" + delta, "->", data, code, studentName);
+    return Number(data);
+  } catch (e) {
+    console.error("[cloudSave] addCoins threw:", e);
+    return undefined;
+  }
+}
+
 // ONE DAILY TREAT per kid per day (Taiwan date), whatever the device or world. The database
 // (function mpe_claim_daily) refuses a second claim the same day. Returns the jar total like addTreats.
 export async function claimDailyTreat(code: string, studentName: string): Promise<number | null | undefined> {

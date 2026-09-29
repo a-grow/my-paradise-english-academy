@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { addTreats } from "@/lib/cloudSave";
+import { addTreats, addCoins } from "@/lib/cloudSave";
 import GrammarGameBar from "@/components/GrammarGameBar";
 import WinCelebration from "@/components/WinCelebration";
 import LoseScreen from "@/components/LoseScreen";
@@ -19,6 +19,13 @@ export default function GrammarRun() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [muted, setMuted] = useState(false);
   const [stats, setStats] = useState<GameStats | null>(null);
+  // COINS: latest coin count from the game, what this win banked, and the kid's coin total before this win
+  const coinsNow = useRef(0);
+  const [coinsWon, setCoinsWon] = useState(0);
+  const [coinStart, setCoinStart] = useState(0);
+  useEffect(() => {
+    addCoins(kidCode, kidName, 0).then(t => { if (typeof t === "number") setCoinStart(t); });
+  }, [kidCode, kidName]);
   const sendMute = (m: boolean) =>
     frameRef.current?.contentWindow?.postMessage({ type: "MPE_MUTE", muted: m }, "*");
 
@@ -26,6 +33,10 @@ export default function GrammarRun() {
     function onMsg(e: MessageEvent) {
       if (e.data && e.data.type === "MPE_RUN_WIN" && !claimed.current) {
         claimed.current = true;
+        // COINS: bank this game's coins right now (only on a WIN), sent as "+N" like treats
+        const won = coinsNow.current;
+        setCoinsWon(won);
+        if (won > 0) addCoins(kidCode, kidName, won).then(t => { if (typeof t === "number") setCoinStart(t - won); });
         // Mirror Grammar.tsx: read jar from localStorage, +2, write back, push to cloud.
         const jarKey = `mpe_jar_${kidCode}_${kidName}`;
         const current = parseInt(localStorage.getItem(jarKey) || "0");
@@ -38,6 +49,7 @@ export default function GrammarRun() {
       }
       if (e.data && e.data.type === "MPE_STATS") {
         const d = e.data;
+        coinsNow.current = Number(d.coins) || 0;
         setStats({ coins: Number(d.coins) || 0, lives: Number(d.lives) || 0, solved: Number(d.solved) || 0, total: Number(d.total) || 0 });
       }
       if (e.data && e.data.type === "MPE_RUN_LOSE" && !claimed.current) {
@@ -72,8 +84,8 @@ export default function GrammarRun() {
       />
       {won && (
         <WinCelebration
-          coinsWon={stats?.coins ?? 0}
-          startTotal={0}
+          coinsWon={coinsWon}
+          startTotal={coinStart}
           muted={muted}
           onChooseGame={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
           onReturnToWorld={() => navigate(`/world/${kidCode}/${kidName}`)}
