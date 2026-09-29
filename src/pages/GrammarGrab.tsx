@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { saveJarToCloud } from "@/lib/cloudSave";
+import { addTreats } from "@/lib/cloudSave";
 import GrammarGameBar from "@/components/GrammarGameBar";
 import WinCelebration from "@/components/WinCelebration";
 import LoseScreen from "@/components/LoseScreen";
@@ -31,7 +31,8 @@ export default function GrammarGrab() {
         const current = parseInt(localStorage.getItem(jarKey) || "0");
         const newTotal = current + 2;
         localStorage.setItem(jarKey, String(newTotal));
-        saveJarToCloud(kidCode, kidName, newTotal);
+        // ONE JAR: send only "+2" - the database adds it (never the device's whole number).
+        addTreats(kidCode, kidName, 2).then(total => { if (typeof total === "number") localStorage.setItem(jarKey, String(total)); });
         // let the game's own ending (fireworks / chest / last grab) play, then show the celebration
         window.setTimeout(() => {
           setWon(true);
