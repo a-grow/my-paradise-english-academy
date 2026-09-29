@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { saveDataToCloud, loadDataFromCloud } from "@/lib/cloudSave";
+import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, addTreats, claimDailyTreat, dailyClaimedToday } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
 
@@ -521,13 +521,16 @@ const DinosaurWorld = () => {
 
   const isMaster = code === MASTER_CODE;
 
-  const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_dino_jar_${code}_${studentName}`) || "0"));
+  // ONE JAR (2026-09-29): Dino uses the same jar as every world (treats column / local key mpe_jar_).
+  const [jarTreats, setJarTreats] = useState(() => isMaster ? 99 : parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
+  // The OLD Dino jar (data.dino.jar) is kept frozen as a record - never changed, never deleted.
+  const oldDinoJar = useRef<number>(parseInt(localStorage.getItem(`mpe_dino_jar_${code}_${studentName}`) || "0"));
   const visitDaysKey = `mpe_dino_visitdays_${code}_${studentName}`;
   const visit5ClaimedKey = `mpe_dino_visit5claimed_${code}_${studentName}`;
   const getVisitDays = (): string[] => { try { return JSON.parse(localStorage.getItem(visitDaysKey) || "[]"); } catch { return []; } };
   const [visitDaysCount, setVisitDaysCount] = useState<number>(() => { const today = new Date().toDateString(); const days = getVisitDays(); if (!days.includes(today)) { const updated = [...days, today]; localStorage.setItem(visitDaysKey, JSON.stringify(updated)); return updated.length; } return days.length; });
   const [visit5Claimed, setVisit5Claimed] = useState<boolean>(() => { const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); const sets = Math.floor(visitDaysCount / 5); return claimed >= sets && sets > 0; });
-  const handleVisit5Days = () => { if (isMaster) return; const days = getVisitDays(); const sets = Math.floor(days.length / 5); const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); if (sets > claimed) { const newJar = jarTreats + 3; setJarTreats(newJar); localStorage.setItem(`mpe_dino_jar_${code}_${studentName}`, String(newJar)); localStorage.setItem(visit5ClaimedKey, String(sets)); setVisit5Claimed(true); playSfx("stomp"); } };
+  const handleVisit5Days = () => { if (isMaster) return; const days = getVisitDays(); const sets = Math.floor(days.length / 5); const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); if (sets > claimed) { const newJar = jarTreats + 3; setJarTreats(newJar); localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(newJar)); sendTreats(3); localStorage.setItem(visit5ClaimedKey, String(sets)); setVisit5Claimed(true); playSfx("stomp"); } };
   const [fedTreatsState, setFedTreatsState] = useState<Record<string, number>>(() =>
     isMaster ? { triceratops: 45, pterodactyl: 45, velociraptor: 45, brontosaurus: 45, dilophosaurus: 45 } :
       Object.fromEntries(ANIMALS.map(a => [a.id, parseInt(localStorage.getItem(`mpe_dino_fed_${a.id}_${code}_${studentName}`) || "0")]))
@@ -632,7 +635,7 @@ const DinosaurWorld = () => {
     });
     return {
       dino: {
-        jar: jarTreats,
+        jar: oldDinoJar.current, // OLD Dino jar record only (ONE JAR lives in the treats column)
         activePet: activeAnimalId,
         animals,
         visitDays: getVisitDays(),
@@ -644,7 +647,45 @@ const DinosaurWorld = () => {
     if (isMaster) return;
     if (!dataCloudReady.current) { dataCloudReady.current = true; return; }
     saveDataToCloud(code, studentName, activeAnimalId, gatherDinoBlob());
-  }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, jarTreats, activeAnimalId, visitDaysCount, visit5Claimed]);
+  }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, activeAnimalId, visitDaysCount, visit5Claimed]);
+
+  // ONE JAR: same as Ocean - only "+N" / "-1" through the database adder, one call after another.
+  const jarQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const jarQueued = useRef(0);
+  const queueJar = (call: () => Promise<number | null | undefined>) => {
+    if (isMaster) return;
+    jarQueued.current++;
+    jarQueue.current = jarQueue.current.then(async () => {
+      const total = await call();
+      jarQueued.current--;
+      if (typeof total === "number" && jarQueued.current === 0) {
+        setJarTreats(total);
+        localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(total));
+      }
+    });
+  };
+  const sendTreats = (delta: number) => queueJar(() => addTreats(code, studentName, delta));
+
+  // Jar read-back on mount. addTreats(0) = read the one jar (first time also moves the old Dino jar in).
+  useEffect(() => {
+    if (isMaster) return;
+    let cancelled = false;
+    jarQueued.current++;
+    jarQueue.current = jarQueue.current.then(async () => {
+      const cloud = await addTreats(code, studentName, 0);
+      jarQueued.current--;
+      if (cancelled) return;
+      if (cloud === null) {
+        // No cloud row yet: push device jar UP first. Device wins. (first time ever only)
+        await saveJarToCloud(code, studentName, parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
+      } else if (typeof cloud === "number" && jarQueued.current === 0) {
+        setJarTreats(cloud);
+        localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(cloud));
+      }
+      // undefined = the call failed: keep the device number, send nothing.
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   // Cloud read-back for Dino on mount (device-wins-first). Runs once.
   // TRAP: cannot use result.data === null — a kid who finished Ocean has {ocean:...}, not null.
@@ -686,9 +727,10 @@ const DinosaurWorld = () => {
         setPetNameMap(newPetNames);
         setVideoWatchedMap(newVideoWatched);
         setUnlockSeenMap(newUnlockSeen);
-        const jar = dino.jar ?? 0;
-        setJarTreats(jar);
-        localStorage.setItem(`mpe_dino_jar_${code}_${studentName}`, String(jar));
+        // ONE JAR: dino.jar is only an old record now (the database moved it into the one jar, once).
+        const oldJar = typeof dino.jar === "number" ? dino.jar : 0;
+        oldDinoJar.current = oldJar;
+        localStorage.setItem(`mpe_dino_jar_${code}_${studentName}`, String(oldJar));
         if (dino.activePet) setActiveAnimalId(dino.activePet);
         const cloudVisitDays = Array.isArray(dino.visitDays) ? dino.visitDays : [];
         const today = new Date().toDateString();
@@ -823,8 +865,14 @@ const DinosaurWorld = () => {
     const lastGift = localStorage.getItem(`mpe_dino_gift_${code}_${studentName}`);
     const shownKey = `mpe_dino_gift_shown_${code}_${studentName}_${new Date().toDateString()}`;
     if (lastGift !== new Date().toDateString() && !localStorage.getItem(shownKey)) {
-      localStorage.setItem(shownKey, "true");
-      setTimeout(() => { setShowDailyGift(true); }, 1800);
+      // ONE DAILY TREAT: ask the cloud first - if today's treat was already taken on another
+      // device or in another world, don't show the gift here. (Can't check = show as before;
+      // the database still refuses a second treat.)
+      dailyClaimedToday(code, studentName).then(done => {
+        if (done === true) { localStorage.setItem(`mpe_dino_gift_${code}_${studentName}`, new Date().toDateString()); return; }
+        localStorage.setItem(shownKey, "true");
+        setTimeout(() => { setShowDailyGift(true); }, 1800);
+      });
     }
   }, []);
 
@@ -841,9 +889,10 @@ const DinosaurWorld = () => {
     setJarTreats(newJar);
     setFedTreatsState(m => ({ ...m, [activeAnimalId]: newFed }));
     if (!isMaster) {
-      localStorage.setItem(`mpe_dino_jar_${code}_${studentName}`, String(newJar));
+      localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(newJar));
       localStorage.setItem(`mpe_dino_fed_${activeAnimalId}_${code}_${studentName}`, String(newFed));
     }
+    sendTreats(-1);
     playSfx("treat");
     const id = feedId.current++;
     const jarX = window.innerWidth / 2 - 80;
@@ -883,7 +932,8 @@ const DinosaurWorld = () => {
     playSfx("daily");
     setShowDailyGift(false);
     localStorage.setItem(`mpe_dino_gift_${code}_${studentName}`, new Date().toDateString());
-    if (!isMaster) localStorage.setItem(`mpe_dino_jar_${code}_${studentName}`, String(newJar));
+    if (!isMaster) localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(newJar));
+    queueJar(() => claimDailyTreat(code, studentName)); // database pays at most 1 per day
     setTimeout(() => setJustEarned(0), 2500);
   };
 

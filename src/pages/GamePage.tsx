@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import GameTest from "./GameTest";
-import { saveJarToCloud, saveDinoJarToCloud } from "@/lib/cloudSave";
+import { addTreats } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
@@ -16,7 +16,7 @@ const GamePage = () => {
 
   const gameWorld = world || "ocean";
   const fromDino = gameWorld === "dino";
-  const jarKey = gameWorld === "dino" ? `mpe_dino_jar_${code}_${studentName}` : `mpe_jar_${code}_${studentName}`;
+  const jarKey = `mpe_jar_${code}_${studentName}`; // ONE JAR for every world (2026-09-29)
   const capKey = `mpe_arcade_cap_${code}_${studentName}_${today}`;
   const comboKey = (unitId: number, gameId: string, diff: string) =>
     `mpe_arcade_${code}_${studentName}_u${unitId}_${gameId}_${diff}_${today}`;
@@ -116,9 +116,8 @@ const GamePage = () => {
     const current = parseInt(localStorage.getItem(jarKey) || "0");
     const newJarTotal = current + treats;
     localStorage.setItem(jarKey, String(newJarTotal));
-    // Push fresh jar total to cloud so the World doesn't reload a stale value.
-    if (gameWorld === "dino") saveDinoJarToCloud(code, studentName, newJarTotal);
-    else saveJarToCloud(code, studentName, newJarTotal);
+    // ONE JAR: send only "+treats" - the database adds it (never the device's whole number).
+    addTreats(code, studentName, treats).then(total => { if (typeof total === "number") localStorage.setItem(jarKey, String(total)); });
 
     // Update state — both updates trigger GameTest re-render with fresh claimState
     setTreatsEarnedToday(newTotal);

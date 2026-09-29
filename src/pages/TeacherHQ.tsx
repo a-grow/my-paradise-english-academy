@@ -83,6 +83,14 @@ function lineForWorld(
   };
 }
 
+// ONE JAR (2026-09-29): every world shares the `treats` column. A kid who hasn't opened a world
+// since the change still has an old Dino jar waiting to be moved in (dino_jar_moved = null) ->
+// count it too, so HQ shows what the kid will actually see.
+function oneJar(r: { treats: number | null; data: any; dino_jar_moved?: number | null }): number {
+  const waiting = r.dino_jar_moved == null && typeof r.data?.dino?.jar === "number" ? Math.max(0, r.data.dino.jar) : 0;
+  return (r.treats ?? 0) + waiting;
+}
+
 function worldLines(data: any, treats: number | null, activePetCol: string | null) {
   if (!data) return [];
   const out: any[] = [];
@@ -90,7 +98,7 @@ function worldLines(data: any, treats: number | null, activePetCol: string | nul
     || (data.ocean?.animals?.[activePetCol ?? ""] ? activePetCol : null);
   const o = lineForWorld(data.ocean, "ocean", OCEAN_ORDER, treats ?? 0, oceanActive);
   if (o) out.push(o);
-  const d = lineForWorld(data.dino, "dino", DINO_ORDER, data.dino?.jar ?? null, activePetCol);
+  const d = lineForWorld(data.dino, "dino", DINO_ORDER, treats ?? 0, activePetCol);
   if (d) out.push(d);
   return out;
 }
@@ -221,10 +229,8 @@ function checkHealth(data: any, treats: number | null, activePetCol: string | nu
 
   // YELLOW (only if not already flagged red): jar unusually high, worth a glance
   if (level !== "red") {
-    const oceanJar = treats ?? 0;
-    const dinoJar = typeof data?.dino?.jar === "number" ? data.dino.jar : 0;
-    if (oceanJar >= 50) { level = level === "green" ? "yellow" : level; reasons.push(`Ocean jar unusually high (${oceanJar}) — worth a glance`); }
-    if (dinoJar >= 50) { level = level === "green" ? "yellow" : level; reasons.push(`Dino jar unusually high (${dinoJar}) — worth a glance`); }
+    const jar = treats ?? 0; // ONE JAR (all worlds)
+    if (jar >= 50) { level = level === "green" ? "yellow" : level; reasons.push(`Treat jar unusually high (${jar}) — worth a glance`); }
   }
 
   return { level, reasons };
@@ -236,6 +242,7 @@ type Row = {
   treats: number | null;
   active_pet: string | null;
   data: any;
+  dino_jar_moved?: number | null;
 };
 
 export default function TeacherHQ() {
@@ -267,7 +274,7 @@ export default function TeacherHQ() {
     setLoading(true);
     supabase
       .from("student_progress")
-      .select("code, student_name, treats, active_pet, data, last_login")
+      .select("code, student_name, treats, active_pet, data, last_login, dino_jar_moved")
       .then(({ data, error }) => {
         if (error) setErr(error.message);
         else setRows((data as Row[]) || []);
@@ -330,7 +337,7 @@ export default function TeacherHQ() {
 
   const withMeta = rows.map((r) => {
     const seen = lastSeenDate(r.last_login);
-    return { r, seen, health: checkHealth(r.data, r.treats, r.active_pet) };
+    return { r, seen, health: checkHealth(r.data, oneJar(r), r.active_pet) };
   });
 
   const sorted = [...withMeta].sort((a, b) => {
@@ -378,7 +385,7 @@ export default function TeacherHQ() {
 
         <div style={{ display: "grid", gap: 12 }}>
           {sorted.map(({ r, seen, health }) => {
-            const lines = worldLines(r.data, r.treats, r.active_pet);
+            const lines = worldLines(r.data, oneJar(r), r.active_pet);
             const days = daysSince(seen);
             const { grown, total } = grownCount(r.data);
             const oceanStrip = fedStrip(r.data?.ocean, OCEAN_ORDER, OCEAN_NAMES);

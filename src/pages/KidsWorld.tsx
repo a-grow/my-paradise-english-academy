@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { saveJarToCloud, loadJarFromCloud, saveDataToCloud, loadDataFromCloud } from "@/lib/cloudSave";
+import { saveJarToCloud, addTreats, claimDailyTreat, dailyClaimedToday, saveDataToCloud, loadDataFromCloud } from "@/lib/cloudSave";
 
 const SHEETDB_URL = "https://sheetdb.io/api/v1/9ctz2zljbz6wx";
 const MASTER_CODE = "1006";
@@ -719,7 +719,7 @@ const KidsWorld = () => {
   const getVisitDays = (): string[] => { try { return JSON.parse(localStorage.getItem(visitDaysKey) || "[]"); } catch { return []; } };
   const [visitDaysCount, setVisitDaysCount] = useState<number>(() => { const today = new Date().toDateString(); const days = getVisitDays(); if (!days.includes(today)) { const updated = [...days, today]; localStorage.setItem(visitDaysKey, JSON.stringify(updated)); return updated.length; } return days.length; });
   const [visit5Claimed, setVisit5Claimed] = useState<boolean>(() => { const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); const sets = Math.floor(visitDaysCount / 5); return claimed >= sets && sets > 0; });
-  const handleVisit5Days = () => { if (isMaster) return; const days = getVisitDays(); const sets = Math.floor(days.length / 5); const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); if (sets > claimed) { const newJar = jarTreats + 3; setJarTreats(newJar); localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(newJar)); localStorage.setItem(visit5ClaimedKey, String(sets)); setVisit5Claimed(true); playSfx("chirp"); } };
+  const handleVisit5Days = () => { if (isMaster) return; const days = getVisitDays(); const sets = Math.floor(days.length / 5); const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); if (sets > claimed) { const newJar = jarTreats + 3; setJarTreats(newJar); localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(newJar)); sendTreats(3); localStorage.setItem(visit5ClaimedKey, String(sets)); setVisit5Claimed(true); playSfx("chirp"); } };
   const [petNameMap, setPetNameMap] = useState<Record<string,string>>(() =>
     Object.fromEntries(ANIMALS.map(a => [a.id, localStorage.getItem(`mpe_petname_${a.id}_${code}_${studentName}`) || ""]))
   );
@@ -809,13 +809,25 @@ const KidsWorld = () => {
   useEffect(() => { if (audioRef.current) audioRef.current.volume = volume * 0.5; localStorage.setItem("mpe_volume", String(volume)); }, [volume]);
   useEffect(() => { localStorage.setItem("mpe_sfx", sfxOn ? "on" : "off"); }, [sfxOn]);
 
-  // Cloud save: mirror jar to Supabase whenever it changes (write-only for now)
-  const jarCloudReady = useRef(false);
-  useEffect(() => {
+  // ONE JAR (2026-09-29): the jar lives in the `treats` column for EVERY world. We never send the
+  // device's whole number any more - only "+N" / "-1" through the database adder (addTreats).
+  // Calls go one after another (queue) so answers arrive in order; the screen takes the cloud total
+  // only when no other call is waiting (so it also picks up treats earned on another device).
+  const jarQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const jarQueued = useRef(0);
+  const queueJar = (call: () => Promise<number | null | undefined>) => {
     if (isMaster) return;
-    if (!jarCloudReady.current) { jarCloudReady.current = true; return; }
-    saveJarToCloud(code, studentName, jarTreats);
-  }, [jarTreats]);
+    jarQueued.current++;
+    jarQueue.current = jarQueue.current.then(async () => {
+      const total = await call();
+      jarQueued.current--;
+      if (typeof total === "number" && jarQueued.current === 0) {
+        setJarTreats(total);
+        localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(total));
+      }
+    });
+  };
+  const sendTreats = (delta: number) => queueJar(() => addTreats(code, studentName, delta));
 
   // Cloud save: mirror all Ocean progress (except jar) to Supabase on change
   const dataCloudReady = useRef(false);
@@ -848,23 +860,26 @@ const KidsWorld = () => {
     saveDataToCloud(code, studentName, activeAnimalId, gatherOceanBlob());
   }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, videoButtonSeen, visitDaysCount, visit5Claimed]);
 
-  // Cloud read-back on mount (device-wins-first). Runs once.
+  // Jar read-back on mount (device-wins-first). Runs once. addTreats(0) = read the one jar
+  // (the database also moves an old Dino jar in, once).
   useEffect(() => {
-    if (isMaster) { jarCloudReady.current = true; return; }
+    if (isMaster) return;
     let cancelled = false;
-    (async () => {
-      const cloud = await loadJarFromCloud(code, studentName);
+    jarQueued.current++;
+    jarQueue.current = jarQueue.current.then(async () => {
+      const cloud = await addTreats(code, studentName, 0);
+      jarQueued.current--;
       if (cancelled) return;
       if (cloud === null) {
-        // No cloud row yet: push device jar UP first. Device wins.
-        await saveJarToCloud(code, studentName, jarTreats);
-      } else {
+        // No cloud row yet: push device jar UP first. Device wins. (first time ever only)
+        await saveJarToCloud(code, studentName, parseInt(localStorage.getItem(`mpe_jar_${code}_${studentName}`) || "0"));
+      } else if (typeof cloud === "number" && jarQueued.current === 0) {
         // Real cloud value (including 0): cloud wins.
         setJarTreats(cloud);
         localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(cloud));
       }
-      jarCloudReady.current = true;
-    })();
+      // undefined = the call failed: keep the device number, send nothing.
+    });
     return () => { cancelled = true; };
   }, []);
 
@@ -1039,8 +1054,14 @@ const KidsWorld = () => {
     const lastGift = localStorage.getItem(`mpe_gift_${code}_${studentName}`);
     const shownKey = `mpe_gift_shown_${code}_${studentName}_${new Date().toDateString()}`;
     if (lastGift !== new Date().toDateString() && !localStorage.getItem(shownKey)) {
-      localStorage.setItem(shownKey, "true");
-      setTimeout(() => { setShowDailyGift(true); }, 1800);
+      // ONE DAILY TREAT: ask the cloud first - if today's treat was already taken on another
+      // device or in another world, don't show the gift here. (Can't check = show as before;
+      // the database still refuses a second treat.)
+      dailyClaimedToday(code, studentName).then(done => {
+        if (done === true) { localStorage.setItem(`mpe_gift_${code}_${studentName}`, new Date().toDateString()); return; }
+        localStorage.setItem(shownKey, "true");
+        setTimeout(() => { setShowDailyGift(true); }, 1800);
+      });
     }
   }, []);
 
@@ -1064,6 +1085,7 @@ const KidsWorld = () => {
       const lsKey = activeAnimalId === "turtle" ? `mpe_fed_${code}_${studentName}` : `mpe_fed_${activeAnimalId}_${code}_${studentName}`;
       localStorage.setItem(lsKey, String(newFed));
     }
+    sendTreats(-1);
     playSfx("treat");
     const id = feedId.current++;
     const jarX = window.innerWidth / 2 - 80;
@@ -1104,6 +1126,7 @@ const KidsWorld = () => {
     setShowDailyGift(false);
     localStorage.setItem(`mpe_gift_${code}_${studentName}`, new Date().toDateString());
     if (!isMaster) localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(newJar));
+    queueJar(() => claimDailyTreat(code, studentName)); // database pays at most 1 per day
     setTimeout(() => setJustEarned(0), 2500);
   };
 

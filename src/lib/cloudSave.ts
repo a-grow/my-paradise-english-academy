@@ -31,6 +31,56 @@ export async function loadJarFromCloud(code: string, studentName: string): Promi
   }
 }
 
+// ONE JAR (2026-09-29): ask Supabase to add (or take 1) in ONE step inside the database
+// (function mpe_add_treats). The first call for a kid also moves their old Dino jar in, once.
+// Returns: the new jar total | null = this kid has no row yet | undefined = the call failed.
+// delta 0 = just read the total (and do the one-time Dino move).
+export async function addTreats(code: string, studentName: string, delta: number): Promise<number | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_add_treats", { p_code: code, p_name: studentName, p_delta: delta });
+    if (error) { console.error("[cloudSave] addTreats failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] treats", delta >= 0 ? "+" + delta : delta, "->", data, code, studentName);
+    return Number(data);
+  } catch (e) {
+    console.error("[cloudSave] addTreats threw:", e);
+    return undefined;
+  }
+}
+
+// ONE DAILY TREAT per kid per day (Taiwan date), whatever the device or world. The database
+// (function mpe_claim_daily) refuses a second claim the same day. Returns the jar total like addTreats.
+export async function claimDailyTreat(code: string, studentName: string): Promise<number | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_claim_daily", { p_code: code, p_name: studentName });
+    if (error) { console.error("[cloudSave] daily claim failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] daily claim ->", data, code, studentName);
+    return Number(data);
+  } catch (e) {
+    console.error("[cloudSave] daily claim threw:", e);
+    return undefined;
+  }
+}
+
+// Has this kid already had today's daily treat (on ANY device / world)? true / false, undefined = could not check.
+export async function dailyClaimedToday(code: string, studentName: string): Promise<boolean | undefined> {
+  try {
+    const { data, error } = await supabase
+      .from("student_progress")
+      .select("daily_claimed")
+      .eq("code", code)
+      .eq("student_name", studentName)
+      .maybeSingle();
+    if (error) return undefined;
+    if (!data) return false;
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" }); // YYYY-MM-DD
+    return data.daily_claimed === today;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function saveDataToCloud(
   code: string,
   studentName: string,
