@@ -119,7 +119,7 @@ export const useWorldBrain = (world: WorldConfig) => {
   const [activeAnimalId, setActiveAnimalId] = useState(() => {
     if (isMaster) return ANIMALS[0].id;
     const saved = S.active ? localStorage.getItem(S.active) : null; // Ocean remembers its last animal in its own key
-    if (saved) return saved;
+    if (saved && ANIMALS.some(a => a.id === saved)) return saved; // PHANTOM FIX: ignore another world's animal
     let furthest = ANIMALS[0].id;
     for (const a of ANIMALS) { if (localStorage.getItem(S.unlkseen(a.id)) === "1") furthest = a.id; }
     if (S.active && furthest !== ANIMALS[0].id) localStorage.setItem(S.active, furthest);
@@ -246,7 +246,13 @@ export const useWorldBrain = (world: WorldConfig) => {
         setUnlockSeenMap(newUnlockSeen);
         // ONE JAR: the old Dino jar is only a record now (the database moved it into the one jar, once).
         if (S.oldDinoJar) { oldDinoJar.current = r.oldDinoJar ?? 0; localStorage.setItem(S.oldDinoJar, String(r.oldDinoJar ?? 0)); }
-        if (r.activePet) { setActiveAnimalId(r.activePet); if (S.active) localStorage.setItem(S.active, r.activePet); }
+        // PHANTOM FIX: the active_pet COLUMN is shared by all worlds (Dino writes its dinosaur there).
+        // Only take an animal that belongs to THIS world; otherwise use this world's furthest unlocked animal.
+        if (r.activePet) {
+          let pet = r.activePet;
+          if (!ANIMALS.some(a => a.id === pet)) { pet = ANIMALS[0].id; for (const a of ANIMALS) { if (newUnlockSeen[a.id]) pet = a.id; } }
+          setActiveAnimalId(pet); if (S.active) localStorage.setItem(S.active, pet);
+        }
         if (S.videoSeen) { setVideoButtonSeen(!!r.videoSeen); localStorage.setItem(S.videoSeen, r.videoSeen ? "1" : "0"); }
         const cloudVisitDays = r.visitDays;
         const today = new Date().toDateString();
