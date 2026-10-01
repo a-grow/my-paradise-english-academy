@@ -103,24 +103,14 @@ export async function saveDataToCloud(
   data: Record<string, any>
 ) {
   try {
-    // Merge: read existing blob first so a second world does not wipe the first.
-    const { data: existing } = await supabase
-      .from("student_progress")
-      .select("data")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .maybeSingle();
-    const merged = { ...(existing?.data ?? {}), ...data };
-    const row: Record<string, any> = { code, student_name: studentName, data: merged };
-    if (activePet !== null) row.active_pet = activePet;
-    const { error } = await supabase
-      .from("student_progress")
-      .upsert(
-        row,
-        { onConflict: "code,student_name" }
-      );
+    // SAVE ONLY ONE WORLD (2026-10-01): the database merges ONLY the sections sent (data = data || parts)
+    // in one step - no read-then-write gap, so two devices/worlds can't overwrite each other.
+    // No row yet -> the database creates it (device wins first). Also sets last_login. active_pet only if not null.
+    const { error } = await supabase.rpc("mpe_save_world", {
+      p_code: code, p_name: studentName, p_parts: data, p_active_pet: activePet,
+    });
     if (error) console.error("[cloudSave] data save failed:", error.message);
-    else { console.log("[cloudSave] data saved:", code, studentName); await updateLastLogin(code, studentName); }
+    else console.log("[cloudSave] data saved:", code, studentName);
   } catch (e) {
     console.error("[cloudSave] data save threw:", e);
   }
