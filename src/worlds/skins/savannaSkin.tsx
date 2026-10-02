@@ -13,6 +13,8 @@ import { useEffect, useRef, useState } from "react";
 import type { WorldSkin } from "../skin";
 import type { WorldView } from "@/pages/WorldPage";
 import CookieJar from "@/components/CookieJar";
+import GrowUpParty, { type Prize, type PrizeKind } from "./GrowUpParty";
+import VideoTheater, { type TheaterWorld } from "./VideoTheater";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 
 const W = "/worlds/savanna";
@@ -59,14 +61,29 @@ const thumb = (img: string) => img.replace(/\.webp$/, "-t.webp");
 const SPARK = (() => {
   let seed = 11;
   const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
-  // dots: [angle deg, distance px, size px, seconds, delay seconds]
-  const dots = Array.from({ length: 90 }, () => [r() * 360, 150 + r() * 120, 2 + r() * 2.5, 0.7 + r() * 0.7, -r() * 1.4]);
-  // streaks: [angle deg, distance px, length px, seconds, delay seconds]
-  const streaks = Array.from({ length: 26 }, () => [r() * 360, 150 + r() * 90, 18 + r() * 22, 0.5 + r() * 0.4, -r() * 0.9]);
-  // twinkle stars: [angle deg, distance px, size px, seconds, delay seconds]
-  const stars = Array.from({ length: 16 }, () => [r() * 360, 140 + r() * 90, 12 + r() * 10, 0.8 + r() * 0.6, -r() * 1.4]);
-  return { dots, streaks, stars };
+  // SLOW MOTION (Andy 15:14): about 2.2x slower; no star shapes, 20 more round dots instead.
+  // dots: [angle deg, distance px, size px, seconds, delay seconds, start spot 0-1]
+  const dots = Array.from({ length: 110 }, () => [r() * 360, 150 + r() * 120, 2 + r() * 2.5, 1.6 + r() * 1.5, -r() * 3.1, r()]);
+  // streaks: [angle deg, distance px, length px, seconds, delay seconds, start spot 0-1]
+  const streaks = Array.from({ length: 26 }, () => [r() * 360, 150 + r() * 90, 18 + r() * 22, 1.1 + r() * 0.9, -r() * 2.0, r()]);
+  return { dots, streaks };
 })();
+
+// The sparkler: breathing yellow halo + dots and thin streaks shooting out from (cx,cy) inside its box, non-stop.
+// spread = dots start anywhere along a line this wide (wide buttons); k = distance scale.
+const Sparkler = ({ className, style, cx, cy, spread = 0, k = 1, halo = [380, 340] }: {
+  className: string; style?: React.CSSProperties; cx: number; cy: number; spread?: number; k?: number; halo?: [number, number];
+}) => (
+  <div className={"sv-sparkler " + className} aria-hidden="true" style={{ ...style, ["--cx" as string]: `${cx}px`, ["--cy" as string]: `${cy}px` }}>
+    <div className="sv-halo" style={{ width: halo[0], height: halo[1], margin: `${-halo[1] / 2}px 0 0 ${-halo[0] / 2}px` }} />
+    {SPARK.dots.map((d, i) => (
+      <i key={"d" + i} className="sv-sd" style={{ width: d[2], height: d[2], margin: -d[2] / 2, ["--ox" as string]: `${(d[5] - 0.5) * spread}px`, ["--a" as string]: `${d[0]}deg`, ["--d" as string]: `${d[1] * k}px`, animationDuration: `${d[3]}s`, animationDelay: `${d[4]}s` }} />
+    ))}
+    {SPARK.streaks.map((t, i) => (
+      <b key={"s" + i} className="sv-ss" style={{ width: t[2], ["--ox" as string]: `${(t[5] - 0.5) * spread}px`, ["--a" as string]: `${t[0]}deg`, ["--d" as string]: `${t[1] * k}px`, animationDuration: `${t[3]}s`, animationDelay: `${t[4]}s` }} />
+    ))}
+  </div>
+);
 
 const Loading = () => (
   <div style={{ position: "fixed", inset: 0, background: "#2d4a1c", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "'Titan One', sans-serif", fontSize: 32 }}>
@@ -96,7 +113,62 @@ const Page = ({ v }: { v: WorldView }) => {
   // Watch the video: animal grown + its video not watched yet. The button takes the Feed spot.
   // TEST ONLY ?v=1 = pretend the video is not watched. Test views never mark a video as watched (nothing saved).
   const testVid = testView || (onTest && q.get("v") === "1");
-  const watchReady = grown && !!animal.video && (!v.videoWatchedMap[animal.id] || (onTest && q.get("v") === "1"));
+  const [testWatched, setTestWatched] = useState(false); // TEST ONLY: ?v=1 'watched' after closing (nothing saved)
+  const watchReady = grown && !!animal.video && !testWatched && (!v.videoWatchedMap[animal.id] || (onTest && q.get("v") === "1"));
+
+  // GROW-UP PARTY (Andy 15:14): the animal reaches its last stage -> Congratulations + prizes fly to their places,
+  // then a red dot on Video Theater. DISPLAY ONLY for now (placeholder numbers, nothing saved) - step 5.4 makes
+  // coins / treats / puzzle pieces real. TEST ONLY ?g=1 = play the party on load (add &v=1 to see the Watch button after).
+  const PRIZES: Prize[] = [
+    { kind: "coin", n: 15, img: `${UI}/coin.webp`, flyers: 10, size: 70 },
+    { kind: "treat", n: 10, img: `${UI}/treat.webp`, flyers: 10, size: 64 },
+    { kind: "piece", n: 5, img: `${UI}/i_puzzle.webp`, flyers: 5, size: 66 },
+  ];
+  const [party, setParty] = useState<null | "on" | "fly" | "out">(null);
+  const [coinShown, setCoinShown] = useState(0);
+  const [bump, setBump] = useState<Record<string, number>>({});
+  const [newIds, setNewIds] = useState<string[]>([]); // videos new in the Video Theater (red dots; in-memory until 5.4)
+  const stageRef = useRef<HTMLDivElement>(null);
+  const coinRef = useRef<HTMLDivElement>(null);
+  const puzzleRef = useRef<HTMLDivElement>(null);
+  const jarRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (onTest && q.get("g") === "1") setParty("on"); }, []);
+  useEffect(() => {
+    const lu = v.levelUpStage;
+    if (lu && lu.stageIdx === lu.animal.stages.length - 1) setParty(p => p ?? "on");
+  }, [v.levelUpStage]);
+  const partyWas = useRef(false);
+  useEffect(() => { // music quiet during the party, back after
+    const a = v.audioRef.current, full = v.K.musicVolume ?? v.volume * 0.5;
+    if (a && party && !partyWas.current) a.volume = full * 0.15;
+    if (a && !party && partyWas.current) a.volume = full;
+    partyWas.current = !!party;
+  }, [party]);
+  const at = (el: HTMLElement | null, fx: number, fy: number) => {
+    const st = stageRef.current;
+    if (!el || !st) return null;
+    const a = st.getBoundingClientRect(), r = el.getBoundingClientRect();
+    return { x: (r.left + r.width * fx - a.left) / s, y: (r.top + r.height * fy - a.top) / s };
+  };
+  const partyTarget = (k: PrizeKind) =>
+    k === "coin" ? at(coinRef.current, 0.2, 0.5) : k === "treat" ? at(jarRef.current, 0.5, 0.1) : at(puzzleRef.current, 0.17, 0.5);
+  const partyLand = (k: PrizeKind, add: number) => {
+    if (k === "coin") setCoinShown(c => c + add);
+    setBump(b => ({ ...b, [k]: (b[k] ?? 0) + 1 }));
+  };
+  const partyLanded = () => {
+    setJarShown(j => j + PRIZES[1].n); // the jar's own fill-up animation (display only)
+    window.setTimeout(() => setParty("out"), 3000);
+    window.setTimeout(() => { setParty(null); v.setLevelUpStage(null); }, 3550);
+  };
+  // Video closed: if it counted as watched (brain: 1 second), the Watch button is gone and Video Theater gets its red dot.
+  const closeVid = () => {
+    const done = testVid || !!v.videoWatchedMap[animal.id];
+    v.closeVideo();
+    if (done) { setNewIds(ids => ids.includes(animal.id) ? ids : [...ids, animal.id]); if (testVid) setTestWatched(true); }
+  };
+  const lift = party === "fly" || party === "out" ? " sv-lift" : "";
+  const bumpStyle = (k: string) => (bump[k] ? { animation: `sv-bump${bump[k] % 2} .3s ease-out` } : undefined);
 
   // My Animals: same unlock rule as today's worlds (previous animal grown + its video watched,
   // and that animal itself opened unless it is the first one).
@@ -125,7 +197,27 @@ const Page = ({ v }: { v: WorldView }) => {
   const toastT = useRef(0);
   const toast = (t: string) => { setToastMsg(t); window.clearTimeout(toastT.current); toastT.current = window.setTimeout(() => setToastMsg(""), 1700); };
   const soon = () => toast("Coming soon!");
-  const [panel, setPanel] = useState<null | "animals" | "exit">(null);
+  const [panel, setPanel] = useState<null | "animals" | "exit" | "theater">(null);
+
+  // VIDEO THEATER (Andy 16:34): Savanna cards from the brain (won = grown + video watched); Ocean + Dino = 'Coming soon!'
+  // until step 7. Playing a video there saves nothing. TEST ONLY ?t=1 = open it on load, first won video marked new.
+  const theaterWorlds: TheaterWorld[] = [
+    { key: "ocean", title: "Ocean World", cards: null },
+    { key: "dino", title: "Dino World", cards: null },
+    {
+      key: "savanna", title: "Savanna World", cards: v.ANIMALS.map(a => ({
+        id: a.id, name: v.petNameMap[a.id] || a.name, poster: a.stages[a.stages.length - 1].img, video: a.video ?? null,
+        won: getAnimalStageIdx(a, v.fedTreatsState[a.id] ?? 0) === a.stages.length - 1 && !!v.videoWatchedMap[a.id] && !!a.video,
+      })),
+    },
+  ];
+  useEffect(() => {
+    if (!(onTest && q.get("t") === "1")) return;
+    const first = theaterWorlds[2].cards?.find(c => c.won);
+    if (first) setNewIds(ids => ids.includes(first.id) ? ids : [...ids, first.id]);
+    setPanel("theater");
+  }, []);
+  const theaterMusic = (quiet: boolean) => { const a = v.audioRef.current; if (a) a.volume = quiet ? 0.02 : (v.K.musicVolume ?? v.volume * 0.5); };
   const [dailyGone, setDailyGone] = useState(false);
   const [jarPoke, setJarPoke] = useState(0);
   // Treats won while away (games) FALL INTO the jar: the jar starts at the count this device last showed,
@@ -192,7 +284,7 @@ const Page = ({ v }: { v: WorldView }) => {
   return (
     <div className="sv-root" onPointerDown={onPointerDown}>
       <style>{FONTS + CSS}</style>
-      <div className="sv-stage" style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
+      <div className="sv-stage" ref={stageRef} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
         <div className="sv-fill"><img src={`${W}/far.jpg`} alt="" /></div>
         <div className="sv-scene" style={{ left: cx - STAGE_W / 2 }}>
           <img className="sv-bg" src={`${W}/far.jpg`} alt="" />
@@ -235,6 +327,9 @@ const Page = ({ v }: { v: WorldView }) => {
           </div>
         )}
 
+        {watchReady && !party && !v.showVideo && (
+          <Sparkler className="sv-spk-watch" style={{ left: cx - 265 }} cx={265} cy={51} spread={420} k={0.75} halo={[700, 260]} />
+        )}
         {watchReady
           ? <div className="sv-watch sv-tap" onClick={v.openVideo}><img src={`${UI}/btn_watch.webp`} alt="" /><span>Watch the video!</span></div>
           : <div className={"sv-feed sv-ptr" + (canFeed ? "" : " off")} onClick={feed}><img src={`${UI}/btn_feed.webp`} alt="Feed!" /></div>}
@@ -246,7 +341,7 @@ const Page = ({ v }: { v: WorldView }) => {
 
         {/* top corners */}
         <div className="sv-rb sv-tap" style={{ left: 22 }} onClick={() => toast("How to play - coming soon!")}><img src={`${UI}/rb_help.webp`} alt="Help" /></div>
-        <div className="sv-coins"><span>0</span></div>
+        <div ref={coinRef} className={"sv-coins" + lift} style={bumpStyle("coin")}><span>{coinShown}</span></div>
         <div className={"sv-rb sv-tap" + (v.musicOn ? "" : " muted")} style={{ right: 100 }} onClick={() => v.setMusicOn(!v.musicOn)}><img src={`${UI}/rb_music.webp`} alt="Music" /></div>
         <div className="sv-rb sv-tap" style={{ right: 22 }} onClick={() => setPanel("exit")}><img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
 
@@ -254,16 +349,18 @@ const Page = ({ v }: { v: WorldView }) => {
         <div className="sv-left">
           <div className="sv-imgbtn sv-tap" onClick={soon}><img src={`${UI}/btn_vocab.webp`} alt="Vocab Games" /></div>
           <div className="sv-imgbtn sv-tap" onClick={soon}><img src={`${UI}/btn_grammar.webp`} alt="Grammar Games" /></div>
-          <div className="sv-imgbtn sv-tap" onClick={soon}><img src={`${UI}/btn_puzzle.webp`} alt="Puzzle Activity" /></div>
-          <div className="sv-imgbtn sv-tap" onClick={soon}><img src={`${UI}/btn_video.webp`} alt="Video Theater" /></div>
+          <div ref={puzzleRef} className={"sv-imgbtn sv-tap" + lift} style={bumpStyle("piece")} onClick={soon}><img src={`${UI}/btn_puzzle.webp`} alt="Puzzle Activity" /></div>
+          <div className="sv-imgbtn sv-tap" onClick={() => setPanel("theater")}>
+            <img src={`${UI}/btn_video.webp`} alt="Video Theater" />{newIds.length > 0 && <span className="sv-dot" />}
+          </div>
         </div>
 
         {/* bottom left: the real jar (new treat), Daily Treat, Visit 5 days */}
-        <div className="sv-jar" onClick={() => setJarPoke(p => p + 1)}>
+        <div ref={jarRef} className={"sv-jar" + lift} onClick={() => setJarPoke(p => p + 1)}>
           <CookieJar count={jarShown} width="200px" cookie={`${UI}/treat.webp`} muted={!v.sfxOn} flyOut={false} poke={jarPoke} style={{ position: "absolute", left: 0, bottom: 0 }} />
-          <div className="sv-jarcount">{v.jarTreats}</div>
+          <div className="sv-jarcount">{Math.max(v.jarTreats, jarShown)}</div>
         </div>
-        <img className="sv-jarlbl" src={`${UI}/lbl_treats.webp`} alt="My Treats" />
+        <img className={"sv-jarlbl" + lift} src={`${UI}/lbl_treats.webp`} alt="My Treats" />
         {showDaily && !dailyGone && <div className="sv-daily sv-tap" onClick={claimDaily}><img src={`${UI}/btn_daily.webp`} alt="Daily Treat!" /></div>}
         <div className={"sv-visit sv-tap" + (visitReady ? " ready" : "")} onClick={visit5}>
           Visit 5 days
@@ -272,20 +369,9 @@ const Page = ({ v }: { v: WorldView }) => {
 
         {/* right: cards (pre-built gold frames, never CSS border-image) */}
         {newReady && panel !== "animals" && (
-          <div className="sv-sparkler" aria-hidden="true">
-            <div className="sv-halo" />
-            {SPARK.dots.map((d, i) => (
-              <i key={"d" + i} className="sv-sd" style={{ width: d[2], height: d[2], margin: -d[2] / 2, ["--a" as string]: `${d[0]}deg`, ["--d" as string]: `${d[1]}px`, animationDuration: `${d[3]}s`, animationDelay: `${d[4]}s` }} />
-            ))}
-            {SPARK.streaks.map((t, i) => (
-              <b key={"s" + i} className="sv-ss" style={{ width: t[2], ["--a" as string]: `${t[0]}deg`, ["--d" as string]: `${t[1]}px`, animationDuration: `${t[3]}s`, animationDelay: `${t[4]}s` }} />
-            ))}
-            {SPARK.stars.map((t, i) => (
-              <img key={"t" + i} className="sv-st" src={`${UI}/sparkle.webp`} alt="" style={{ width: t[2], height: t[2], margin: -t[2] / 2, ["--a" as string]: `${t[0]}deg`, ["--d" as string]: `${t[1]}px`, animationDuration: `${t[3]}s`, animationDelay: `${t[4]}s` }} />
-            ))}
-          </div>
+          <Sparkler className="sv-spk-animals" cx={131} cy={95} />
         )}
-        <div className={"sv-card sv-animals sv-tap" + (newReady && panel !== "animals" ? " beacon" : "")} onClick={() => setPanel("animals")}>
+                <div className={"sv-card sv-animals sv-tap" + (newReady && panel !== "animals" ? " beacon" : "")} onClick={() => setPanel("animals")}>
           {newReady && <span className="sv-new">NEW!</span>}
           <div className="sv-grid">
             {slots.map(x => (
@@ -342,11 +428,24 @@ const Page = ({ v }: { v: WorldView }) => {
         {v.showVideo && animal.video && (
           <div className={"sv-ov sv-vov" + (v.videoFadingOut ? " out" : "")}>
             <div className="sv-ovcard sv-vcard">
-              <div className="sv-x sv-tap" onClick={v.closeVideo}><img src={`${UI}/rb_exit.webp`} alt="Close" /></div>
+              <div className="sv-x sv-tap" onClick={closeVid}><img src={`${UI}/rb_exit.webp`} alt="Close" /></div>
               <video className="sv-video" src={animal.video} autoPlay loop playsInline controls controlsList="nodownload noplaybackrate" disablePictureInPicture
                 onTimeUpdate={testVid ? undefined : v.onVideoTime} />
             </div>
           </div>
+        )}
+
+        {panel === "theater" && (
+          <VideoTheater cx={cx} sh={sh} worlds={theaterWorlds} start={2} newIds={newIds}
+            onPlay={id => { theaterMusic(true); setNewIds(ids => ids.filter(x => x !== id)); }}
+            onStop={() => theaterMusic(false)} onClose={() => setPanel(null)} />
+        )}
+
+        {party && (
+          <GrowUpParty phase={party} cx={cx} sh={sh} prizes={PRIZES} sfxOn={v.sfxOn} target={partyTarget}
+            animalImg={animal.stages[animal.stages.length - 1].img}
+            line={name ? `${name} is all grown up!` : `Your ${animal.name.toLowerCase()} is all grown up!`}
+            onLand={partyLand} onAllLanded={partyLanded} onOk={() => setParty("fly")} />
         )}
 
         {/* exit: our own popup, never a system box */}
@@ -405,7 +504,7 @@ const CSS = `
 .sv-coins{position:absolute;left:104px;top:16px;width:230px;height:90px;padding-left:96px;display:flex;align-items:center;justify-content:center;
  background:url(${UI}/pill_coin.webp) center/100% 100% no-repeat;font-size:34px;color:#8a4a10;filter:drop-shadow(0 8px 8px rgba(0,0,0,.3))}
 .sv-left{position:absolute;left:22px;top:104px;width:270px;display:flex;flex-direction:column;gap:14px}
-.sv-imgbtn{width:270px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
+.sv-imgbtn{position:relative;width:270px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
 .sv-jar{position:absolute;left:55px;bottom:52px;width:200px;height:258px}
 .sv-jarcount{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);z-index:3;background:#6b3a12;color:#fff;font-size:30px;line-height:36px;border-radius:20px;padding:0 18px;border:4px solid #ffd43b}
 .sv-jarlbl{position:absolute;left:55px;bottom:14px;width:200px;height:36px;object-fit:contain;filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));pointer-events:none}
@@ -427,19 +526,19 @@ const CSS = `
 .sv-animals.beacon{animation:sv-peek 2.6s ease-in-out infinite,sv-goldglow 1.3s ease-in-out infinite;transform-origin:50% 90%}
 @keyframes sv-peek{0%,52%,100%{transform:rotate(0)}56%{transform:rotate(-2.4deg)}61%{transform:rotate(2.2deg)}66%{transform:rotate(-1.8deg)}71%{transform:rotate(1.2deg)}76%{transform:rotate(0)}}
 @keyframes sv-goldglow{0%,100%{filter:brightness(1.08) drop-shadow(0 0 3px #fff36b) drop-shadow(0 0 8px #ffd000) drop-shadow(0 0 16px rgba(255,190,0,.9))}50%{filter:brightness(1.22) drop-shadow(0 0 5px #fffbb0) drop-shadow(0 0 14px #ffe000) drop-shadow(0 0 28px rgba(255,200,0,1))}}
-.sv-sparkler{position:absolute;right:30px;top:112px;width:262px;height:191px;pointer-events:none}
-.sv-halo{position:absolute;left:131px;top:95px;width:380px;height:340px;margin:-170px 0 0 -190px;border-radius:50%;
+.sv-sparkler{position:absolute;pointer-events:none}
+.sv-spk-animals{right:30px;top:112px;width:262px;height:191px}
+.sv-spk-watch{top:892px;width:530px;height:102px}
+.sv-halo{position:absolute;left:var(--cx);top:var(--cy);border-radius:50%;
  background:radial-gradient(closest-side,rgba(255,240,120,1) 0%,rgba(255,218,20,1) 55%,rgba(255,196,0,.75) 70%,rgba(255,170,0,.35) 85%,rgba(255,160,0,0) 100%);animation:sv-halo 1.6s ease-in-out infinite}
 @keyframes sv-halo{0%,100%{opacity:.85;transform:scale(.95)}50%{opacity:1;transform:scale(1.07)}}
-.sv-sd,.sv-ss,.sv-st{position:absolute;left:131px;top:95px;opacity:0;animation-iteration-count:infinite}
+.sv-sd,.sv-ss{position:absolute;left:calc(var(--cx) + var(--ox, 0px));top:var(--cy);opacity:0;animation-iteration-count:infinite}
 .sv-sd{border-radius:50%;background:#fffde6;box-shadow:0 0 2px 1px #fff27a,0 0 6px 2px #ffd000,0 0 10px 3px rgba(255,170,0,.7);
  animation-name:sv-sd;animation-timing-function:cubic-bezier(.2,.75,.35,1)}
 @keyframes sv-sd{0%{opacity:0;transform:rotate(var(--a)) translateX(0) scale(1)}15%{opacity:1}70%{opacity:1}85%{opacity:.4}92%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scale(.5)}}
 .sv-ss{height:2px;margin-top:-1px;border-radius:2px;transform-origin:0 50%;background:linear-gradient(90deg,rgba(255,220,60,0),#ffe24a 60%,#fffde6);
  box-shadow:0 0 4px 1px rgba(255,200,0,.8);animation-name:sv-ss;animation-timing-function:ease-out}
 @keyframes sv-ss{0%{opacity:0;transform:rotate(var(--a)) translateX(60px) scaleX(.3)}20%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scaleX(1)}}
-.sv-st{animation-name:sv-st;animation-timing-function:ease-out;filter:drop-shadow(0 0 4px #ffd000)}
-@keyframes sv-st{0%{opacity:0;transform:rotate(var(--a)) translateX(calc(var(--d)*.6)) rotate(calc(var(--a)*-1)) scale(.2)}30%{opacity:1;transform:rotate(var(--a)) translateX(calc(var(--d)*.85)) rotate(calc(var(--a)*-1)) scale(1.15)}60%{opacity:.6}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) rotate(calc(var(--a)*-1 + 90deg)) scale(.4)}}
 .sv-ptr{cursor:pointer}
 .sv-new{position:absolute;top:-14px;right:-8px;z-index:2;background:#ff3d7f;color:#fff;font-size:18px;border-radius:14px;padding:3px 10px;border:3px solid #fff;transform:rotate(8deg)}
 .sv-badges{top:353px;height:122px;background-image:url(${UI}/frame_badges.webp)}
@@ -503,13 +602,21 @@ const CSS = `
 .sv-btn3:active{transform:translateY(6px);box-shadow:inset 0 5px 0 rgba(255,255,255,.55),0 0 0 3px #8f4f00,0 2px 0 3px #7a4100,0 4px 8px rgba(0,0,0,.4)}
 .sv-btn3.green{--t:#b8ffb0;--m:#45e06a;--b:#14a840;--e:#0a5e28}
 .sv-btn3.pink{--t:#ffb8d8;--m:#ff4f9a;--b:#e0186c;--e:#8f0f45}
-.sv-watch{position:absolute;left:50%;top:892px;width:530px;transform:translateX(-50%);animation:sv-watchPulse 1.6s ease-in-out infinite}
+.sv-watch{position:absolute;left:50%;top:892px;width:530px;transform:translateX(-50%);animation:sv-watchPulse 1.3s ease-in-out infinite}
 .sv-watch img{display:block;width:100%;height:auto;pointer-events:none}
 .sv-watch span{position:absolute;left:16%;right:4%;top:50%;transform:translateY(-54%);text-align:center;white-space:nowrap;pointer-events:none;
  font-family:'Titan One',sans-serif;font-size:40px;color:#fff;
  text-shadow:3px 0 0 #4b0f5c,-3px 0 0 #4b0f5c,0 3px 0 #4b0f5c,0 -3px 0 #4b0f5c,2px 2px 0 #4b0f5c,-2px 2px 0 #4b0f5c,2px -2px 0 #4b0f5c,-2px -2px 0 #4b0f5c,0 5px 0 #4b0f5c}
-@keyframes sv-watchPulse{0%,100%{transform:translateX(-50%) scale(1);filter:drop-shadow(0 8px 8px rgba(0,0,0,.35)) drop-shadow(0 0 0 rgba(255,225,90,0))}
- 50%{transform:translateX(-50%) scale(1.05);filter:drop-shadow(0 8px 8px rgba(0,0,0,.35)) drop-shadow(0 0 18px rgba(255,225,90,.95))}}
+@keyframes sv-watchPulse{0%,100%{transform:translateX(-50%) scale(1);filter:brightness(1.08) drop-shadow(0 0 3px #fff36b) drop-shadow(0 0 8px #ffd000) drop-shadow(0 0 16px rgba(255,190,0,.9))}
+ 50%{transform:translateX(-50%) scale(1.05);filter:brightness(1.22) drop-shadow(0 0 5px #fffbb0) drop-shadow(0 0 14px #ffe000) drop-shadow(0 0 28px rgba(255,200,0,1))}}
+.sv-lift{z-index:61;pointer-events:none}
+@keyframes sv-bump0{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes sv-bump1{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.sv-dot{position:absolute;right:-6px;top:-8px;width:36px;height:36px;border-radius:50%;border:4px solid #fff;box-sizing:border-box;
+ background:radial-gradient(circle at 35% 30%,#ff8a80,#e5221b 60%,#b3120d);box-shadow:0 3px 6px rgba(0,0,0,.4);
+ animation:sv-dotIn .5s cubic-bezier(.25,1.6,.45,1) both,sv-dotPulse 1.6s .6s ease-in-out infinite}
+@keyframes sv-dotIn{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes sv-dotPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 .sv-vov{animation:sv-vin .3s ease-out;transition:opacity .4s ease-out;background:rgba(10,5,0,.8)}
 .sv-vov.out{opacity:0}
 @keyframes sv-vin{from{opacity:0}to{opacity:1}}
