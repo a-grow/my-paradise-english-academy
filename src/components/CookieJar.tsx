@@ -70,7 +70,7 @@ const TWINKLES = Array.from({ length: 28 }, (_, i) => {
 
 type Engine = { earn: (n: number) => void; feed: (n: number) => void; destroy: () => void };
 
-function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: number, isMuted: () => boolean): Engine {
+function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: number, isMuted: () => boolean, cookieSrc: string): Engine {
   cv.width = W + 2 * PADX; cv.height = H + LIFT;
   const ctx = cv.getContext("2d")!;
   const off = document.createElement("canvas"); off.width = W; off.height = H;
@@ -340,8 +340,8 @@ function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: nu
     ctx.restore();
   }
 
-  const load = (f: string) => new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = DIR + f; });
-  Promise.all([load("jar_back.webp"), load("jar_front.webp"), load("jar_lid.webp"), load("jar_mask.webp"), load("cookie.webp")])
+  const load = (f: string) => new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = f.startsWith("/") ? f : DIR + f; });
+  Promise.all([load("jar_back.webp"), load("jar_front.webp"), load("jar_lid.webp"), load("jar_mask.webp"), load(cookieSrc)])
     .then(([back, front, lidImg, mask, cookie]) => {
       if (dead) return;
       IMG = { back, front, lid: lidImg, mask, cookie };
@@ -368,10 +368,11 @@ type Props = {
   count: number;          // the kid's real treat count (never capped)
   muted?: boolean;        // true = no jar sounds
   width?: string;         // jar width (CSS); default fits phones
+  cookie?: string;        // treat picture (full path, e.g. the new world look's /worlds/ui/treat.webp); default = the jar's own cookie
   style?: CSSProperties;
 };
 
-export default function CookieJar({ count, muted = false, width = "min(290px, 62vw)", style }: Props) {
+export default function CookieJar({ count, muted = false, width = "min(290px, 62vw)", style, cookie = "cookie.webp" }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engine = useRef<Engine | null>(null);
@@ -380,7 +381,7 @@ export default function CookieJar({ count, muted = false, width = "min(290px, 62
   mutedRef.current = muted;
 
   useEffect(() => {
-    const e = makeEngine(canvasRef.current!, stageRef.current!, shown.current, () => mutedRef.current);
+    const e = makeEngine(canvasRef.current!, stageRef.current!, shown.current, () => mutedRef.current, cookie);
     engine.current = e;
     return () => { e.destroy(); engine.current = null; };
   }, []);
