@@ -7,6 +7,8 @@ import { DINO_ANIMALS } from "./dino";
 import { OCEAN_ANIMALS } from "./ocean";
 import { DINO_SKIN } from "./skins/dinoSkin";
 import { OCEAN_SKIN } from "./skins/oceanSkin";
+import { SAVANNA_ANIMALS } from "./savanna";
+import { SAVANNA_SKIN } from "./skins/savannaSkin";
 
 export interface WorldConfig {
   id: string;                                           // "dino" (cloud blob key + save names)
@@ -36,6 +38,19 @@ export const DINO_WORLD: WorldConfig = {
   makeSave: (code, name) => standardSave("dino", code, name, DINO_ANIMALS.map(a => a.id)),
   gamePath: "/game/dino",
   skin: DINO_SKIN,
+  nextWorld: null,
+  masterAllGrown: false,
+  legacyMasterCleanup: false,
+};
+
+// WORLD 3 (step 5.3, 2026-10-02): STANDARD storage (mpe_savanna_..., cloud data.savanna). Only on the test route for now.
+// gamePath: GamePage has no savanna return yet - check before Play a Game is wired (step 5.4).
+export const SAVANNA_WORLD: WorldConfig = {
+  id: "savanna",
+  animals: SAVANNA_ANIMALS,
+  makeSave: (code, name) => standardSave("savanna", code, name, SAVANNA_ANIMALS.map(a => a.id)),
+  gamePath: "/game/savanna",
+  skin: SAVANNA_SKIN,
   nextWorld: null,
   masterAllGrown: false,
   legacyMasterCleanup: false,

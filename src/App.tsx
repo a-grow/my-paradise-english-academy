@@ -20,6 +20,7 @@ import GrammarGrab from "./pages/GrammarGrab";
 import CookieJarPreview from "./pages/CookieJarPreview";
 import WorldPage from "./pages/WorldPage";
 import { DINO_WORLD, OCEAN_WORLD } from "./worlds";
+import WorldTestSavanna from "./pages/WorldTestSavanna";
 import GrammarHub from "./pages/GrammarHub";
 import NotFound from "./pages/NotFound";
 import TeacherHQ from "./pages/TeacherHQ";
@@ -51,6 +52,7 @@ const App = () => (
 <Route path="/cookie-jar-preview" element={<CookieJarPreview />} />
 <Route path="/world-test/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
 <Route path="/world-test/ocean/:code/:studentName" element={<WorldPage world={OCEAN_WORLD} />} />
+<Route path="/world-test/savanna/:code/:studentName" element={<WorldTestSavanna />} />
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
