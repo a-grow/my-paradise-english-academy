@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, addTreats, claimDailyTreat, dailyClaimedToday } from "@/lib/cloudSave";
+import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, addTreats, addCoins, claimPrize, claimDailyTreat, dailyClaimedToday } from "@/lib/cloudSave";
 import { getAnimalStage, getAnimalStageIdx, type Animal } from "@/worlds/types";
 import type { WorldConfig } from "@/worlds";
 
@@ -149,6 +149,9 @@ export const useWorldBrain = (world: WorldConfig) => {
   useEffect(() => { if (audioRef.current) audioRef.current.volume = musicVol(); localStorage.setItem("mpe_volume", String(volume)); }, [volume]);
   useEffect(() => { localStorage.setItem("mpe_sfx", sfxOn ? "on" : "off"); }, [sfxOn]);
 
+  // LEVEL-UP SAVE FIX (2026-10-02): a level-up bumps this so the save below runs once more with the new stage in
+  // levelup (the feed's own save runs BEFORE the level-up is written down, so the LAST stage was never saved).
+  const [levelupSaves, setLevelupSaves] = useState(0);
   // Cloud save: mirror this world's progress to Supabase on change (the jar is NOT in here - see ONE JAR below)
   const dataCloudReady = useRef(false);
   const gatherBlob = () => {
@@ -171,7 +174,7 @@ export const useWorldBrain = (world: WorldConfig) => {
     saveDataToCloud(code, studentName, activeAnimalId, gatherBlob());
     // Ocean (keeps its last animal in its own key) never saved on an animal switch; the other worlds keep
     // activePet in their blob, so they do. The list keeps a fixed length: null = never changes.
-  }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, videoButtonSeen, S.active ? null : activeAnimalId, visitDaysCount, visit5Claimed]);
+  }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, videoButtonSeen, S.active ? null : activeAnimalId, visitDaysCount, visit5Claimed, levelupSaves]);
 
   // ONE JAR: same as Ocean - only "+N" / "-1" through the database adder, one call after another.
   const jarQueue = useRef<Promise<unknown>>(Promise.resolve());
@@ -189,6 +192,22 @@ export const useWorldBrain = (world: WorldConfig) => {
     });
   };
   const sendTreats = (delta: number) => queueJar(() => addTreats(code, studentName, delta));
+
+  // COINS + PRIZES (step 5.4, 2026-10-02). coins = the kid's coin total (null = not read yet / teacher code).
+  // claimPrizeNow("savanna:giraffe:grown"): the DATABASE decides the amounts and pays each prize once per kid;
+  // it goes through the jar queue so it never races a feed. Teacher code 1006 = nothing saved (queueJar skips it).
+  const [coins, setCoins] = useState<number | null>(null);
+  useEffect(() => {
+    if (isMaster) return;
+    addCoins(code, studentName, 0).then(t => { if (typeof t === "number") setCoins(t); }); // 0 = read only
+  }, []);
+  const claimPrizeNow = (prize: string) => queueJar(async () => {
+    const res = await claimPrize(code, studentName, prize);
+    if (!res || !res.paid) return undefined; // not paid (already had it / failed): change nothing
+    const t = await addCoins(code, studentName, 0); // read the real coin total back
+    if (typeof t === "number") setCoins(t);
+    return typeof res.jar === "number" ? res.jar : undefined;
+  });
 
   // Jar read-back on mount. addTreats(0) = read the one jar (first time also moves the old Dino jar in).
   useEffect(() => {
@@ -239,7 +258,11 @@ export const useWorldBrain = (world: WorldConfig) => {
           localStorage.setItem(S.petName(a.id), av.petName);
           localStorage.setItem(S.videoWatched(a.id), av.videoWatched ? "1" : "0");
           localStorage.setItem(S.unlkseen(a.id), av.unlkseen ? "1" : "0");
-          localStorage.setItem(S.levelup(a.id), JSON.stringify(av.levelup));
+          // Level-ups already seen = cloud + this device together (merge, never overwrite), and the brain's own list
+          // learns them too, so a fresh device never replays an old level-up / party (fix 2026-10-02).
+          const seenUps = new Set<number>([...(levelUpFiredRef.current[a.id] ?? []), ...av.levelup]);
+          levelUpFiredRef.current[a.id] = seenUps;
+          localStorage.setItem(S.levelup(a.id), JSON.stringify([...seenUps]));
         });
         setFedTreatsState(newFed);
         setPetNameMap(newPetNames);
@@ -336,6 +359,7 @@ export const useWorldBrain = (world: WorldConfig) => {
       animalFired.add(stageIdx);
       levelUpFiredRef.current[activeAnimalId] = animalFired;
       localStorage.setItem(S.levelup(activeAnimalId), JSON.stringify([...animalFired]));
+      setLevelupSaves(n => n + 1); // save again so the cloud gets this stage too
       setLevelUpStage({ animal: activeAnimal, stageIdx });
       if (K.levelUpMusic) {
         if (!tadaRef.current) tadaRef.current = new Audio(K.levelUpMusic);
@@ -466,7 +490,7 @@ export const useWorldBrain = (world: WorldConfig) => {
 
   const creatureImg = activeAnimal.stages[stageIdx]?.img ?? activeAnimal.stages[0].img;
 
-  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg };
+  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg, coins, claimPrize: claimPrizeNow };
 };
 
 export type WorldView = ReturnType<typeof useWorldBrain>;

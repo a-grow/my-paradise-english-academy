@@ -3,7 +3,7 @@
 // LOOK ONLY: every rule and every save stays in the brain (src/pages/WorldPage.tsx).
 // PART 1: full-screen scene, title, growth bar, animal, name, Feed picture (not wired yet).
 // PART 2a: top corners, left buttons, real CookieJar (new treat) + Daily Treat + Visit 5, right cards, My Worlds.
-//          Coins show 0 and badges are grey placeholders.
+//          Badges are grey placeholders. (5.4: coins pill = the kid's REAL coins.)
 // PART 2b: taps wired through the brain's own handlers (feed, name, daily, visit 5, unlock, switch animal, music);
 //          exit popup (Stay/Leave, never a system box), click sound, flying treat + hop. Left buttons / help / badges /
 //          album / worlds = 'Coming soon!' for now (Vocab needs a savanna return in GamePage first - step 5.4).
@@ -117,13 +117,15 @@ const Page = ({ v }: { v: WorldView }) => {
   const watchReady = grown && !!animal.video && !testWatched && (!v.videoWatchedMap[animal.id] || (onTest && q.get("v") === "1"));
 
   // GROW-UP PARTY (Andy 15:14): the animal reaches its last stage -> Congratulations + prizes fly to their places,
-  // then a red dot on Video Theater. DISPLAY ONLY for now (placeholder numbers, nothing saved) - step 5.4 makes
-  // coins / treats / puzzle pieces real. TEST ONLY ?g=1 = play the party on load (add &v=1 to see the Watch button after).
+  // then a red dot on Video Theater. STEP 5.4 (Andy 21:04): REAL prizes = 15 coins + 10 treats (puzzle pieces later).
+  // The DATABASE pays them (mpe_claim_prize, once per kid; amounts live there - keep these numbers the same).
+  // TEST ONLY ?g=1 = play the party on load (display only, claims nothing; add &v=1 to see the Watch button after).
   const PRIZES: Prize[] = [
     { kind: "coin", n: 15, img: `${UI}/coin.webp`, flyers: 10, size: 70 },
     { kind: "treat", n: 10, img: `${UI}/treat.webp`, flyers: 10, size: 64 },
-    { kind: "piece", n: 5, img: `${UI}/i_puzzle.webp`, flyers: 5, size: 66 },
   ];
+  const claimed = useRef<Set<string>>(new Set()); // each prize asked for once per page (the database also refuses repeats)
+  const askPrize = (id: string) => { if (claimed.current.has(id)) return; claimed.current.add(id); v.claimPrize(id); };
   const [party, setParty] = useState<null | "on" | "fly" | "out">(null);
   // WORLD FINISHED (Andy 17:03): brain's showComplete (last animal grown + video watched, once per device) -> same
   // celebration: 'World Complete!', all 6 grown animals, coins x50 + a Savanna badge into My Badges (DISPLAY ONLY).
@@ -131,17 +133,20 @@ const Page = ({ v }: { v: WorldView }) => {
   const [done, setDone] = useState<null | "on" | "fly" | "out">(null);
   const [badgesShown, setBadgesShown] = useState(0);
   const badgesRef = useRef<HTMLDivElement>(null);
-  const DONE_PRIZES: Prize[] = [
+  const DONE_PRIZES: Prize[] = [ // STEP 5.4 (Andy 21:04): REAL = 50 coins + 15 treats + the badge (database: '<world>:complete')
     { kind: "coin", n: 50, img: `${UI}/coin.webp`, flyers: 12, size: 70 },
+    { kind: "treat", n: 15, img: `${UI}/treat.webp`, flyers: 10, size: 64 },
     { kind: "badge", n: 1, img: "/worlds/badges/savanna.webp", flyers: 1, size: 64, label: "New badge!" },
   ];
   useEffect(() => { if (onTest && q.get("c") === "1") setDone("on"); }, []);
   useEffect(() => {
     if (!v.showComplete) return;
     v.completeRef.current?.pause(); // the celebration plays the music itself
+    askPrize(`${v.world.id}:complete`); // REAL prize (database pays once)
     setDone(d => d ?? "on");
   }, [v.showComplete]);
   const doneLanded = () => {
+    setJarShown(j => j + (DONE_PRIZES.find(p => p.kind === "treat")?.n ?? 0)); // the jar's own fill-up animation
     window.setTimeout(() => setDone("out"), 1200);
     window.setTimeout(() => { setDone(null); if (v.showComplete) v.closeComplete(); }, 1750);
   };
@@ -155,7 +160,10 @@ const Page = ({ v }: { v: WorldView }) => {
   useEffect(() => { if (onTest && q.get("g") === "1") setParty("on"); }, []);
   useEffect(() => {
     const lu = v.levelUpStage;
-    if (lu && lu.stageIdx === lu.animal.stages.length - 1) setParty(p => p ?? "on");
+    if (lu && lu.stageIdx === lu.animal.stages.length - 1) {
+      askPrize(`${v.world.id}:${lu.animal.id}:grown`); // REAL prize (database pays once)
+      setParty(p => p ?? "on");
+    }
   }, [v.levelUpStage]);
   const partyWas = useRef(false);
   useEffect(() => { // music quiet during the party, back after
@@ -180,7 +188,7 @@ const Page = ({ v }: { v: WorldView }) => {
     setBump(b => ({ ...b, [k]: (b[k] ?? 0) + 1 }));
   };
   const partyLanded = () => {
-    setJarShown(j => j + PRIZES[1].n); // the jar's own fill-up animation (display only)
+    setJarShown(j => j + (PRIZES.find(p => p.kind === "treat")?.n ?? 0)); // the jar's own fill-up animation
     window.setTimeout(() => setParty("out"), 3000);
     window.setTimeout(() => { setParty(null); v.setLevelUpStage(null); }, 3550);
   };
@@ -191,6 +199,10 @@ const Page = ({ v }: { v: WorldView }) => {
     if (done) { setNewIds(ids => ids.includes(animal.id) ? ids : [...ids, animal.id]); if (testVid) setTestWatched(true); }
   };
   const lift = party === "fly" || party === "out" || done === "fly" || done === "out" ? " sv-lift" : "";
+  // While a celebration is on, the coin pill + jar HOLD their old numbers; the flying prizes add them as they land.
+  // Afterwards both follow the real numbers again (= the database's, so a prize that was not paid shows nothing).
+  const holding = !!(party || done);
+  useEffect(() => { if (!holding) setCoinShown(v.coins ?? 0); }, [v.coins, holding]);
   const bumpStyle = (k: string) => (bump[k] ? { animation: `sv-bump${bump[k] % 2} .3s ease-out` } : undefined);
 
   // My Animals: same unlock rule as today's worlds (previous animal grown + its video watched,
@@ -254,12 +266,13 @@ const Page = ({ v }: { v: WorldView }) => {
   });
   const firstJar = useRef(true);
   useEffect(() => {
+    if (holding && v.jarTreats > jarShown) return; // a celebration is on: prizes fill the jar when they land (a feed still shows at once)
     localStorage.setItem(seenKey, String(v.jarTreats));
     const wait = firstJar.current && jarShown < v.jarTreats ? 900 : 0; // first time: let the page settle, then drop them in
     firstJar.current = false;
     const t = window.setTimeout(() => setJarShown(v.jarTreats), wait);
     return () => window.clearTimeout(t);
-  }, [v.jarTreats]);
+  }, [v.jarTreats, holding]);
 
   // Feed: the brain feeds (jar -1, fed +1, saves); here a treat flies jar -> animal, then the animal hops.
   const [flying, setFlying] = useState<number[]>([]);
@@ -381,7 +394,7 @@ const Page = ({ v }: { v: WorldView }) => {
         {/* bottom left: the real jar (new treat), Daily Treat, Visit 5 days */}
         <div ref={jarRef} className={"sv-jar" + lift} onClick={() => setJarPoke(p => p + 1)}>
           <CookieJar count={jarShown} width="200px" cookie={`${UI}/treat.webp`} muted={!v.sfxOn} flyOut={false} poke={jarPoke} style={{ position: "absolute", left: 0, bottom: 0 }} />
-          <div className="sv-jarcount">{Math.max(v.jarTreats, jarShown)}</div>
+          <div className="sv-jarcount">{holding ? jarShown : Math.max(v.jarTreats, jarShown)}</div>
         </div>
         <img className={"sv-jarlbl" + lift} src={`${UI}/lbl_treats.webp`} alt="My Treats" />
         {showDaily && !dailyGone && <div className="sv-daily sv-tap" onClick={claimDaily}><img src={`${UI}/btn_daily.webp`} alt="Daily Treat!" /></div>}

@@ -63,6 +63,22 @@ export async function addCoins(code: string, studentName: string, delta: number)
   }
 }
 
+// PRIZES (step 5.4, 2026-10-02): ask the database for a prize by NAME (e.g. "savanna:giraffe:grown").
+// The database (function mpe_claim_prize) decides the amounts and pays each prize ONCE per kid.
+// Returns {paid, coins, treats, jar} | null = no row yet | undefined = the call failed.
+export async function claimPrize(code: string, studentName: string, prize: string): Promise<{ paid: boolean; coins?: number; treats?: number; jar?: number } | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_claim_prize", { p_code: code, p_name: studentName, p_prize: prize });
+    if (error) { console.error("[cloudSave] claimPrize failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] prize", prize, "->", data, code, studentName);
+    return data as { paid: boolean; coins?: number; treats?: number; jar?: number };
+  } catch (e) {
+    console.error("[cloudSave] claimPrize threw:", e);
+    return undefined;
+  }
+}
+
 // ONE DAILY TREAT per kid per day (Taiwan date), whatever the device or world. The database
 // (function mpe_claim_daily) refuses a second claim the same day. Returns the jar total like addTreats.
 export async function claimDailyTreat(code: string, studentName: string): Promise<number | null | undefined> {
