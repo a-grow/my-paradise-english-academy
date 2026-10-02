@@ -8,6 +8,7 @@ export interface WorldSkin {
   Page: ComponentType<{ v: WorldView }>;         // the whole world page
   makeSounds: (ctx: AudioContext) => Record<string, () => void>; // sound effects by name
   music: string;                                 // background music file
+  musicVolume?: number;                          // fixed music volume 0-1 (new look); unset = the old volume * 0.5
   snd: { visit5: string; levelUp: string; rename: string }; // which sound the brain plays for these
   levelUpMusic: string | null;                   // music file on level-up (null = snd.levelUp)
   renameMusic: string | null;                    // music file after naming a pet (null = snd.rename)

@@ -72,6 +72,7 @@ export const useWorldBrain = (world: WorldConfig) => {
   const [musicOn, setMusicOn] = useState(() => localStorage.getItem(S.music) !== "off");
   const [sfxOn, setSfxOn] = useState(() => localStorage.getItem("mpe_sfx") !== "off");
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.25"));
+  const musicVol = () => K.musicVolume ?? volume * 0.5; // new look sets its own; Ocean/Dino skins = unchanged
   const [feedingTreats, setFeedingTreats] = useState<{ id: number; x: number; y: number }[]>([]);
 
   const heartId = useRef(0);
@@ -139,13 +140,13 @@ export const useWorldBrain = (world: WorldConfig) => {
   // Music
   useEffect(() => {
     if (!audioRef.current) { audioRef.current = new Audio(K.music); audioRef.current.loop = true; }
-    audioRef.current.volume = volume * 0.5;
+    audioRef.current.volume = musicVol();
     if (musicOn) { audioRef.current.play().catch(() => { const tryPlay = () => { audioRef.current?.play().catch(() => { }); }; waitForTap(tryPlay); }); }
     else audioRef.current.pause();
     localStorage.setItem(S.music, musicOn ? "on" : "off");
     return () => { audioRef.current?.pause(); };
   }, [musicOn]);
-  useEffect(() => { if (audioRef.current) audioRef.current.volume = volume * 0.5; localStorage.setItem("mpe_volume", String(volume)); }, [volume]);
+  useEffect(() => { if (audioRef.current) audioRef.current.volume = musicVol(); localStorage.setItem("mpe_volume", String(volume)); }, [volume]);
   useEffect(() => { localStorage.setItem("mpe_sfx", sfxOn ? "on" : "off"); }, [sfxOn]);
 
   // Cloud save: mirror this world's progress to Supabase on change (the jar is NOT in here - see ONE JAR below)
@@ -321,7 +322,7 @@ export const useWorldBrain = (world: WorldConfig) => {
     setVideoFadingOut(true);
     setTimeout(() => {
       setShowVideo(false); setVideoFadingOut(false);
-      if (audioRef.current) audioRef.current.volume = volume * 0.5;
+      if (audioRef.current) audioRef.current.volume = musicVol();
       if (ANIMALS.slice(1).some(a => !unlockSeenMap[a.id]))
         setTimeout(() => setShowLookBelow(true), 300);
     }, 400);
@@ -453,13 +454,13 @@ export const useWorldBrain = (world: WorldConfig) => {
     setActiveAnimalId(id);
     if (S.active) localStorage.setItem(S.active, id);
     if (lullabyRef.current) { lullabyRef.current.pause(); lullabyRef.current.currentTime = 0; }
-    if (audioRef.current) audioRef.current.volume = volume * 0.5;
+    if (audioRef.current) audioRef.current.volume = musicVol();
   };
   const closeComplete = () => {
     localStorage.setItem(S.complete, "1");
     setShowComplete(false);
     if (completeRef.current) { completeRef.current.pause(); completeRef.current.currentTime = 0; }
-    if (audioRef.current) audioRef.current.volume = volume * 0.5;
+    if (audioRef.current) audioRef.current.volume = musicVol();
     if (world.nextWorld) { localStorage.setItem(`mpe_world_${code}_${studentName}`, world.nextWorld.id); navigate(`${world.nextWorld.path}/${code}/${studentName}`); }
   };
 

@@ -18,7 +18,7 @@ const MAX_ANIMATED = 20;                 // most falling cookies for one big jum
 const DIR = "/cookiejar/";
 const SOUNDS: Record<string, string> = {
   open: "snd_open.mp3", close: "snd_close.mp3", drop1: "snd_drop1.mp3", drop2: "snd_drop2.mp3",
-  many: "snd_many.mp3", chime: "snd_chime.mp3", jump: "snd_jump.mp3", tink: "snd_tink.mp3",
+  many: "snd_many.mp3", chime: "snd_chime.mp3", jump: "snd_jump.mp3", tink: "snd_tink.mp3", tap: "snd_tap.mp3",
 };
 
 // Pile spots (fractions of the jar): x centre, y = bottom of the cookie, resting tilt in degrees.
@@ -68,9 +68,9 @@ const TWINKLES = Array.from({ length: 28 }, (_, i) => {
   };
 });
 
-type Engine = { earn: (n: number) => void; feed: (n: number) => void; destroy: () => void };
+type Engine = { earn: (n: number) => void; feed: (n: number) => void; poke: () => void; destroy: () => void };
 
-function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: number, isMuted: () => boolean, cookieSrc: string): Engine {
+function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: number, isMuted: () => boolean, cookieSrc: string, flyOut: boolean): Engine {
   cv.width = W + 2 * PADX; cv.height = H + LIFT;
   const ctx = cv.getContext("2d")!;
   const off = document.createElement("canvas"); off.width = W; off.height = H;
@@ -131,6 +131,7 @@ function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: nu
   let lid = 0, lidWant = 0, closePending = false;
   const jarSq = { x: 0, v: 0 }, jarRot = { x: 0, v: 0 }, hop = { y: 0, v: 0 }, sway = { x: 0, v: 0, to: 0 };
   let singleHop = false, wiggleSide = 1, energy = 0;
+  let lidHold = 0; // flyOut=false feed: keep the lid open until this time (ms)
   let IMG: Record<string, HTMLImageElement> | null = null;
   // cookies already in the jar when it first appears (drawn at rest, no animation)
   for (let i = 0; i < Math.min(count, MAX); i++) pile.push({ slot: i, y: SLOTS[i].y, vy: 0, rot: SLOTS[i].rot, state: "rest", squash: 0, bounces: 0 });
@@ -203,11 +204,29 @@ function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: nu
   }
   function feedOne() {
     if (count <= 0) return;
+    if (!flyOut) { // new world look: the page flies its own treat to the animal - lid pops open, jar jumps + wiggles
+      play("jump", 0.6);
+      lidHold = performance.now() + 450;
+      hopOnce();
+      if (!reduce) { wiggleSide = -wiggleSide; jarRot.v += 7 * wiggleSide; }
+      kick();
+      count--;
+      if (count < pile.length) { const t = topCookie(); if (t) pile.splice(pile.indexOf(t), 1); }
+      render();
+      return;
+    }
     play("jump", 0.6);
     hopOnce(); kick();
     count--;
     sendOneOut();
     render();
+  }
+  function poke() { // a tap on the jar: one short wiggle + Andy's glass "tink!" (snd_tap.mp3)
+    unlockAudio();
+    play("tap", 0.5);
+    if (reduce) return;
+    wiggleSide = -wiggleSide; jarRot.v += 9 * wiggleSide; jarSq.v -= 3;
+    kick();
   }
   function feed(n: number) {
     unlockAudio();
@@ -269,7 +288,8 @@ function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: nu
     for (let i = extras.length - 1; i >= 0; i--) if (extras[i].alpha <= 0) extras.splice(i, 1);
     const falling = pile.some(c => c.state === "fall") || extras.some(e => e.kind === "hide");
     if (!falling && tinks.length) stopTinks(); // cookies stopped falling: tinks off
-    const needLid = pile.some(c => c.state === "fall" && c.y < LID_Y + 60) || extras.some(e => e.kind === "leave" || e.y < LID_Y + 60);
+    const needLid = pile.some(c => c.state === "fall" && c.y < LID_Y + 60) || extras.some(e => e.kind === "leave" || e.y < LID_Y + 60) || performance.now() < lidHold;
+    if (performance.now() < lidHold) busy = true;
     const target = needLid ? 1 : 0;
     if (target === 1 && lidWant === 0) { if (lid < 0.3) play("open", 0.8); closePending = false; }
     if (target === 0 && lidWant === 1) closePending = true;
@@ -352,6 +372,7 @@ function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: nu
   return {
     earn,
     feed,
+    poke,
     destroy() {
       dead = true;
       cancelAnimationFrame(raf);
@@ -368,11 +389,13 @@ type Props = {
   count: number;          // the kid's real treat count (never capped)
   muted?: boolean;        // true = no jar sounds
   width?: string;         // jar width (CSS); default fits phones
+  flyOut?: boolean;       // feed: false = no cookie flying up out of the jar (the page shows its own); default true
+  poke?: number;          // change this number = one short wiggle + glass tink (e.g. the kid tapped the jar)
   cookie?: string;        // treat picture (full path, e.g. the new world look's /worlds/ui/treat.webp); default = the jar's own cookie
   style?: CSSProperties;
 };
 
-export default function CookieJar({ count, muted = false, width = "min(290px, 62vw)", style, cookie = "cookie.webp" }: Props) {
+export default function CookieJar({ count, muted = false, width = "min(290px, 62vw)", style, cookie = "cookie.webp", flyOut = true, poke = 0 }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engine = useRef<Engine | null>(null);
@@ -381,7 +404,7 @@ export default function CookieJar({ count, muted = false, width = "min(290px, 62
   mutedRef.current = muted;
 
   useEffect(() => {
-    const e = makeEngine(canvasRef.current!, stageRef.current!, shown.current, () => mutedRef.current, cookie);
+    const e = makeEngine(canvasRef.current!, stageRef.current!, shown.current, () => mutedRef.current, cookie, flyOut);
     engine.current = e;
     return () => { e.destroy(); engine.current = null; };
   }, []);
@@ -393,6 +416,8 @@ export default function CookieJar({ count, muted = false, width = "min(290px, 62
     if (!engine.current || d === 0) return;
     if (d > 0) engine.current.earn(d); else engine.current.feed(-d);
   }, [count]);
+
+  useEffect(() => { if (poke && engine.current) engine.current.poke(); }, [poke]);
 
   return (
     <div ref={stageRef} className="cj-stage" style={{ width, ...style }}>
