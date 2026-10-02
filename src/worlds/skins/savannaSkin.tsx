@@ -93,6 +93,10 @@ const Page = ({ v }: { v: WorldView }) => {
   const onTest = window.location.pathname.startsWith("/world-test/");
   const q = new URLSearchParams(window.location.search);
   const showDaily = v.showDailyGift || (onTest && q.get("d") === "1");
+  // Watch the video: animal grown + its video not watched yet. The button takes the Feed spot.
+  // TEST ONLY ?v=1 = pretend the video is not watched. Test views never mark a video as watched (nothing saved).
+  const testVid = testView || (onTest && q.get("v") === "1");
+  const watchReady = grown && !!animal.video && (!v.videoWatchedMap[animal.id] || (onTest && q.get("v") === "1"));
 
   // My Animals: same unlock rule as today's worlds (previous animal grown + its video watched,
   // and that animal itself opened unless it is the first one).
@@ -231,7 +235,9 @@ const Page = ({ v }: { v: WorldView }) => {
           </div>
         )}
 
-        <div className={"sv-feed sv-ptr" + (canFeed ? "" : " off")} onClick={feed}><img src={`${UI}/btn_feed.webp`} alt="Feed!" /></div>
+        {watchReady
+          ? <div className="sv-watch sv-tap" onClick={v.openVideo}><img src={`${UI}/btn_watch.webp`} alt="" /><span>Watch the video!</span></div>
+          : <div className={"sv-feed sv-ptr" + (canFeed ? "" : " off")} onClick={feed}><img src={`${UI}/btn_feed.webp`} alt="Feed!" /></div>}
         {flying.map(id => (
           <div key={id} className="sv-fly" style={{ ["--x0" as string]: "123px", ["--x1" as string]: `${cx - 32}px`, ["--y0" as string]: `${sh - 300}px`, ["--ym" as string]: `${(sh - 300 + 480) / 2 - 260}px`, ["--y1" as string]: "480px" }}>
             <img src={`${UI}/treat.webp`} alt="" />
@@ -328,6 +334,17 @@ const Page = ({ v }: { v: WorldView }) => {
                     <div key={x.a.id} className="sv-big locked"><div className="sv-q">?</div><p>???</p></div>);
                 })}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* video player: the brain marks it watched after 1 second (onVideoTime) and turns the music down/up */}
+        {v.showVideo && animal.video && (
+          <div className={"sv-ov sv-vov" + (v.videoFadingOut ? " out" : "")}>
+            <div className="sv-ovcard sv-vcard">
+              <div className="sv-x sv-tap" onClick={v.closeVideo}><img src={`${UI}/rb_exit.webp`} alt="Close" /></div>
+              <video className="sv-video" src={animal.video} autoPlay loop playsInline controls controlsList="nodownload noplaybackrate" disablePictureInPicture
+                onTimeUpdate={testVid ? undefined : v.onVideoTime} />
             </div>
           </div>
         )}
@@ -486,6 +503,20 @@ const CSS = `
 .sv-btn3:active{transform:translateY(6px);box-shadow:inset 0 5px 0 rgba(255,255,255,.55),0 0 0 3px #8f4f00,0 2px 0 3px #7a4100,0 4px 8px rgba(0,0,0,.4)}
 .sv-btn3.green{--t:#b8ffb0;--m:#45e06a;--b:#14a840;--e:#0a5e28}
 .sv-btn3.pink{--t:#ffb8d8;--m:#ff4f9a;--b:#e0186c;--e:#8f0f45}
+.sv-watch{position:absolute;left:50%;top:892px;width:530px;transform:translateX(-50%);animation:sv-watchPulse 1.6s ease-in-out infinite}
+.sv-watch img{display:block;width:100%;height:auto;pointer-events:none}
+.sv-watch span{position:absolute;left:16%;right:4%;top:50%;transform:translateY(-54%);text-align:center;white-space:nowrap;pointer-events:none;
+ font-family:'Titan One',sans-serif;font-size:40px;color:#fff;
+ text-shadow:3px 0 0 #4b0f5c,-3px 0 0 #4b0f5c,0 3px 0 #4b0f5c,0 -3px 0 #4b0f5c,2px 2px 0 #4b0f5c,-2px 2px 0 #4b0f5c,2px -2px 0 #4b0f5c,-2px -2px 0 #4b0f5c,0 5px 0 #4b0f5c}
+@keyframes sv-watchPulse{0%,100%{transform:translateX(-50%) scale(1);filter:drop-shadow(0 8px 8px rgba(0,0,0,.35)) drop-shadow(0 0 0 rgba(255,225,90,0))}
+ 50%{transform:translateX(-50%) scale(1.05);filter:drop-shadow(0 8px 8px rgba(0,0,0,.35)) drop-shadow(0 0 18px rgba(255,225,90,.95))}}
+.sv-vov{animation:sv-vin .3s ease-out;transition:opacity .4s ease-out;background:rgba(10,5,0,.8)}
+.sv-vov.out{opacity:0}
+@keyframes sv-vin{from{opacity:0}to{opacity:1}}
+.sv-vcard{width:1040px;padding:30px}
+.sv-vcard .sv-x{right:-36px;top:-36px;z-index:2}
+.sv-video{display:block;width:100%;aspect-ratio:16/9;border-radius:24px;background:#000}
+@media (prefers-reduced-motion: reduce){.sv-watch{animation:none;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}}
 @media (prefers-reduced-motion: reduce){.sv-animals.beacon{animation:sv-goldglow 1.3s ease-in-out infinite}.sv-sd,.sv-ss,.sv-st{display:none}.sv-halo{animation:none}.sv-animal,.sv-animal.egg,.sv-nametag,.sv-daily,.sv-animals.glow,.sv-hop.go,.sv-big.ready{animation:none}}
 `;
 
