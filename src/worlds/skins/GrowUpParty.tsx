@@ -5,21 +5,17 @@
 // (coins -> coin total, treats -> jar, puzzle pieces -> Puzzle button). The parent then fills the jar and closes it.
 // Andy 15:31: + the grown animal big in the middle with turning light rays + 'X is all grown up!', a confetti burst
 // when the word lands, a soft plop as each treat lands (coins stay silent for now).
+// Andy 17:03: ALSO the WORLD-FINISHED screen (word 'World Complete!', all the world's grown animals in a row,
+// its own music, coins + a badge that flies into My Badges) - same component, different props.
 // VISUAL ONLY: this file saves nothing. The numbers are placeholders until step 5.4 wires real coins/pieces/treats.
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { FUN3D_CSS, Word3D, word3DDone } from "@/components/Fun3D";
 
-export type PrizeKind = "coin" | "treat" | "piece";
-export interface Prize { kind: PrizeKind; n: number; img: string; flyers: number; size: number }
+export type PrizeKind = "coin" | "treat" | "piece" | "badge";
+export interface Prize { kind: PrizeKind; n: number; img: string; flyers: number; size: number; label?: string }
 type Pt = { x: number; y: number };
 
-const WORD = "Congratulations!";
 const WORD_DELAY = 350, STAGGER = 70, FONT = 120;
-const WORD_DONE = word3DDone(WORD, WORD_DELAY, STAGGER);
-const ANIMAL_AT = WORD_DONE - 250;                             // grown animal + rays pop in
-const LINE_AT = ANIMAL_AT + 400;                               // 'X is all grown up!'
-const PRIZES_AT = LINE_AT + 600;                               // first prize pops in
-const MUSIC_MS = 6800;                                         // win_fanfare.mp3 is 6.7s
 const PRIZE_GAP = 260;                                         // ms between prizes
 const FLY_MS = 950;                                            // one flight
 
@@ -27,7 +23,7 @@ const FLY_MS = 950;                                            // one flight
 const rnd = (seed: number) => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
 const R = rnd(7);
 // per letter: [angle deg, distance px, size px, seconds]
-const BURSTS = Array.from(WORD).map(() => Array.from({ length: 6 }, () => [R() * 360, 60 + R() * 80, 3 + R() * 3.5, 0.8 + R() * 0.6]));
+const BURSTS = Array.from({ length: 24 }, () => Array.from({ length: 6 }, () => [R() * 360, 60 + R() * 80, 3 + R() * 3.5, 0.8 + R() * 0.6]));
 // embers: [x 0-1 along the word, y 0-1 band around it, size px, seconds, delay seconds]
 const EMBERS = Array.from({ length: 22 }, () => [R(), R(), 3 + R() * 3.5, 3.6 + R() * 3, -R() * 6.5]);
 // prize twinkles: [angle deg, distance px, size px, seconds, delay seconds]
@@ -39,14 +35,22 @@ const TWINKLE = Array.from({ length: 16 }, () => [R() * 360, 80 + R() * 50, 2.5 
 type Flyer = { id: number; kind: PrizeKind; img: string; size: number; x0: number; y0: number; x1: number; y1: number; delay: number };
 type Burst = { id: number; x: number; y: number };
 
-export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, animalImg, line, target, onLand, onAllLanded, onOk }: {
+export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, heroImgs, line, target, onLand, onAllLanded, onOk,
+  word = "Congratulations!", music = { file: "celebration/win_fanfare.mp3", ms: 6800 } }: {
   phase: "on" | "fly" | "out"; cx: number; sh: number; prizes: Prize[]; sfxOn: boolean;
-  animalImg: string; line: string;              // the grown animal + 'X is all grown up!' 
+  heroImgs: string[]; line: string;             // 1 image = the grown animal big; more = a row (world finished)
+  word?: string;                                // the big 3D word
+  music?: { file: string; ms: number };         // path under public/ + its length (OK waits for it)
   target: (k: PrizeKind) => Pt | null;          // where each kind flies to (stage px)
   onLand: (k: PrizeKind, add: number) => void;  // one flyer landed (add = how much it carries)
   onAllLanded: () => void;                      // every flyer landed
   onOk: () => void;                             // kid tapped OK
 }) {
+  const WORD = word, MUSIC_MS = music.ms;
+  const WORD_DONE = word3DDone(WORD, WORD_DELAY, STAGGER);
+  const ANIMAL_AT = WORD_DONE - 250;                                        // hero + rays pop in
+  const LINE_AT = ANIMAL_AT + 400 + (heroImgs.length - 1) * 150;           // the line under the hero
+  const PRIZES_AT = LINE_AT + 600;                                          // first prize pops in
   const wordTop = sh / 2 - 470, heroY = sh / 2 - 135, lineTop = sh / 2 + 40, rowY = sh / 2 + 205, okTop = sh / 2 + 335;
   const tileX = (i: number) => cx + (i - (prizes.length - 1) / 2) * 300;
   const okAt = PRIZES_AT + prizes.length * PRIZE_GAP + 450;
@@ -70,8 +74,8 @@ export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, animalImg, l
   };
   useEffect(() => {
     play("celebration/win_pop.mp3", 0.7);
-    const music = play("celebration/win_fanfare.mp3", 0.5); // Andy 16:53: back to the win-screen fanfare until he finds a better one
-    music?.addEventListener("ended", () => setMusicDone(true));
+    const tune = play(music.file, 0.5); // grow-up: the win-screen fanfare (Andy 16:53); world finished: its own music
+    tune?.addEventListener("ended", () => setMusicDone(true));
     const ts = [
       window.setTimeout(() => setMusicDone(true), MUSIC_MS), // sound off / blocked: same wait
       window.setTimeout(() => setEmbers(true), WORD_DONE),
@@ -121,7 +125,7 @@ export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, animalImg, l
 
       <div className="gu-wordrow" style={{ top: wordTop }}>
         <span ref={wordRef} className="gu-word"><Word3D text={WORD} delay={WORD_DELAY} stagger={STAGGER} style={{ fontSize: FONT }} /></span>
-        {wb && Array.from(WORD).map((ch, i) => ch === " " ? null : BURSTS[i].map((b, k) => (
+        {wb && Array.from(WORD).map((ch, i) => ch === " " ? null : BURSTS[i % BURSTS.length].map((b, k) => (
           <i key={i + "-" + k} className="gu-bd" style={{
             left: wb.x + (i + 0.5) * (wb.w / WORD.length), top: FONT * 0.55, width: b[2], height: b[2], margin: -b[2] / 2,
             ["--a" as string]: `${b[0]}deg`, ["--d" as string]: `${b[1]}px`, animationDuration: `${b[3]}s`,
@@ -140,7 +144,11 @@ export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, animalImg, l
       <div className="gu-hero" style={{ left: cx, top: heroY, animationDelay: `${ANIMAL_AT}ms` }}>
         <div className="gu-hglow" />
         <div className="gu-rays" />
-        <img className="gu-himg" src={animalImg} alt="" />
+        {heroImgs.length === 1
+          ? <img className="gu-himg" src={heroImgs[0]} alt="" />
+          : <div className="gu-hrow">
+              {heroImgs.map((src, i) => <img key={i} className="gu-hsm" src={src} alt="" style={{ animationDelay: `${i * 150}ms` }} />)}
+            </div>}
       </div>
       <div className="gu-line" style={{ top: lineTop, animationDelay: `${LINE_AT}ms` }}>{line}</div>
       </div>
@@ -161,7 +169,7 @@ export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, animalImg, l
             <i key={k} className="gu-tw" style={{ width: t[2], height: t[2], margin: -t[2] / 2, ["--a" as string]: `${t[0]}deg`, ["--d" as string]: `${t[1]}px`, animationDuration: `${t[3]}s`, animationDelay: `${t[4]}s` } as CSSProperties} />
           ))}
           <img className="gu-pimg" src={p.img} alt="" style={{ width: p.size * 1.8 }} />
-          <div className="gu-pn">x{p.n}</div>
+          <div className="gu-pn" style={p.label ? { fontSize: 42, marginTop: 8 } : undefined}>{p.label ?? `x${p.n}`}</div>
           </div>
         </div>
       ))}
@@ -242,7 +250,9 @@ const CSS = `
 @keyframes gu-tw{0%{opacity:0;transform:rotate(var(--a)) translateX(30px) scale(1)}20%{opacity:1}75%{opacity:.9}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scale(.4)}}
 .gu-pimg{position:relative;display:block;max-width:none;animation:gu-glow 1.4s ease-in-out infinite}
 @keyframes gu-glow{0%,100%{filter:brightness(1.05) drop-shadow(0 0 4px #fff36b) drop-shadow(0 0 12px #ffd000)}50%{filter:brightness(1.22) drop-shadow(0 0 7px #fffbb0) drop-shadow(0 0 22px #ffe000)}}
-.gu-pn{position:relative;margin-top:2px;font-family:'Titan One',sans-serif;font-size:58px;line-height:1;color:#fff;
+.gu-hrow{position:absolute;left:0;top:0;transform:translate(-50%,-50%);display:flex;align-items:flex-end;gap:4px}
+.gu-hsm{height:200px;width:auto;max-width:none;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45));animation:gu-pop .6s cubic-bezier(.25,1.6,.45,1) both}
+.gu-pn{position:relative;white-space:nowrap;margin-top:2px;font-family:'Titan One',sans-serif;font-size:58px;line-height:1;color:#fff;
  text-shadow:3px 0 0 #6b3a00,-3px 0 0 #6b3a00,0 3px 0 #6b3a00,0 -3px 0 #6b3a00,2px 2px 0 #6b3a00,-2px 2px 0 #6b3a00,2px -2px 0 #6b3a00,-2px -2px 0 #6b3a00,0 6px 0 #6b3a00}
 .gu-ok{position:absolute;transform:translateX(-50%);font-size:44px;min-width:5.5em;animation:gu-okin .45s cubic-bezier(.25,1.6,.45,1) both;transition:opacity .4s}
 .gu-ok:disabled{opacity:1;filter:saturate(.45) brightness(.88);cursor:default}

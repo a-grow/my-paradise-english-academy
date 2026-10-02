@@ -125,6 +125,26 @@ const Page = ({ v }: { v: WorldView }) => {
     { kind: "piece", n: 5, img: `${UI}/i_puzzle.webp`, flyers: 5, size: 66 },
   ];
   const [party, setParty] = useState<null | "on" | "fly" | "out">(null);
+  // WORLD FINISHED (Andy 17:03): brain's showComplete (last animal grown + video watched, once per device) -> same
+  // celebration: 'World Complete!', all 6 grown animals, coins x50 + a Savanna badge into My Badges (DISPLAY ONLY).
+  // TEST ONLY ?c=1 = play it on load (saves nothing, never calls closeComplete).
+  const [done, setDone] = useState<null | "on" | "fly" | "out">(null);
+  const [badgesShown, setBadgesShown] = useState(0);
+  const badgesRef = useRef<HTMLDivElement>(null);
+  const DONE_PRIZES: Prize[] = [
+    { kind: "coin", n: 50, img: `${UI}/coin.webp`, flyers: 12, size: 70 },
+    { kind: "badge", n: 1, img: "/worlds/badges/savanna.webp", flyers: 1, size: 64, label: "New badge!" },
+  ];
+  useEffect(() => { if (onTest && q.get("c") === "1") setDone("on"); }, []);
+  useEffect(() => {
+    if (!v.showComplete) return;
+    v.completeRef.current?.pause(); // the celebration plays the music itself
+    setDone(d => d ?? "on");
+  }, [v.showComplete]);
+  const doneLanded = () => {
+    window.setTimeout(() => setDone("out"), 1200);
+    window.setTimeout(() => { setDone(null); if (v.showComplete) v.closeComplete(); }, 1750);
+  };
   const [coinShown, setCoinShown] = useState(0);
   const [bump, setBump] = useState<Record<string, number>>({});
   const [newIds, setNewIds] = useState<string[]>([]); // videos new in the Video Theater (red dots; in-memory until 5.4)
@@ -140,10 +160,11 @@ const Page = ({ v }: { v: WorldView }) => {
   const partyWas = useRef(false);
   useEffect(() => { // music quiet during the party, back after
     const a = v.audioRef.current, full = v.K.musicVolume ?? v.volume * 0.5;
-    if (a && party && !partyWas.current) a.volume = full * 0.15;
-    if (a && !party && partyWas.current) a.volume = full;
-    partyWas.current = !!party;
-  }, [party]);
+    const on = !!(party || done);
+    if (a && on && !partyWas.current) a.volume = full * 0.15;
+    if (a && !on && partyWas.current) a.volume = full;
+    partyWas.current = on;
+  }, [party, done]);
   const at = (el: HTMLElement | null, fx: number, fy: number) => {
     const st = stageRef.current;
     if (!el || !st) return null;
@@ -151,9 +172,11 @@ const Page = ({ v }: { v: WorldView }) => {
     return { x: (r.left + r.width * fx - a.left) / s, y: (r.top + r.height * fy - a.top) / s };
   };
   const partyTarget = (k: PrizeKind) =>
-    k === "coin" ? at(coinRef.current, 0.2, 0.5) : k === "treat" ? at(jarRef.current, 0.5, 0.1) : at(puzzleRef.current, 0.17, 0.5);
+    k === "coin" ? at(coinRef.current, 0.2, 0.5) : k === "treat" ? at(jarRef.current, 0.5, 0.1)
+      : k === "badge" ? at(badgesRef.current, 0.22, 0.38) : at(puzzleRef.current, 0.17, 0.5);
   const partyLand = (k: PrizeKind, add: number) => {
     if (k === "coin") setCoinShown(c => c + add);
+    if (k === "badge") setBadgesShown(b => b + 1);
     setBump(b => ({ ...b, [k]: (b[k] ?? 0) + 1 }));
   };
   const partyLanded = () => {
@@ -167,7 +190,7 @@ const Page = ({ v }: { v: WorldView }) => {
     v.closeVideo();
     if (done) { setNewIds(ids => ids.includes(animal.id) ? ids : [...ids, animal.id]); if (testVid) setTestWatched(true); }
   };
-  const lift = party === "fly" || party === "out" ? " sv-lift" : "";
+  const lift = party === "fly" || party === "out" || done === "fly" || done === "out" ? " sv-lift" : "";
   const bumpStyle = (k: string) => (bump[k] ? { animation: `sv-bump${bump[k] % 2} .3s ease-out` } : undefined);
 
   // My Animals: same unlock rule as today's worlds (previous animal grown + its video watched,
@@ -380,8 +403,8 @@ const Page = ({ v }: { v: WorldView }) => {
           </div>
           <img className="sv-cardlbl" style={{ top: 179, height: 46 }} src={`${UI}/lbl_animals.webp`} alt="My Animals" />
         </div>
-        <div className="sv-card sv-badges sv-tap" onClick={soon}>
-          <div className="sv-medals">{[0, 1, 2].map(i => <img key={i} className="sv-medal off" src={`${UI}/medal.webp`} alt="" />)}</div>
+        <div ref={badgesRef} className={"sv-card sv-badges sv-tap" + lift} style={bumpStyle("badge")} onClick={soon}>
+          <div className="sv-medals">{[0, 1, 2].map(i => <img key={i} className={"sv-medal" + (i < badgesShown ? " won" : " off")} src={i < badgesShown ? "/worlds/badges/savanna.webp" : `${UI}/medal.webp`} alt="" />)}</div>
           <img className="sv-cardlbl" style={{ top: 111, height: 45 }} src={`${UI}/lbl_badges.webp`} alt="My Badges" />
         </div>
         <div className="sv-card sv-album sv-tap" onClick={soon}>
@@ -443,9 +466,16 @@ const Page = ({ v }: { v: WorldView }) => {
 
         {party && (
           <GrowUpParty phase={party} cx={cx} sh={sh} prizes={PRIZES} sfxOn={v.sfxOn} target={partyTarget}
-            animalImg={animal.stages[animal.stages.length - 1].img}
+            heroImgs={[animal.stages[animal.stages.length - 1].img]}
             line={name ? `${name} is all grown up!` : `Your ${animal.name.toLowerCase()} is all grown up!`}
             onLand={partyLand} onAllLanded={partyLanded} onOk={() => setParty("fly")} />
+        )}
+
+        {done && (
+          <GrowUpParty phase={done} cx={cx} sh={sh} prizes={DONE_PRIZES} sfxOn={v.sfxOn} target={partyTarget}
+            word="World Complete!" music={{ file: "completedworld-music.mp3", ms: 4300 }}
+            heroImgs={v.ANIMALS.map(a => a.stages[a.stages.length - 1].img)} line="You finished Savanna World!"
+            onLand={partyLand} onAllLanded={doneLanded} onOk={() => setDone("fly")} />
         )}
 
         {/* exit: our own popup, never a system box */}
