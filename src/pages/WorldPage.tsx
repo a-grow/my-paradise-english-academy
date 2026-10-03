@@ -41,7 +41,7 @@ export const useWorldBrain = (world: WorldConfig) => {
   const [visit5Claimed, setVisit5Claimed] = useState<boolean>(() => { const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); const sets = Math.floor(visitDaysCount / 5); return claimed >= sets && sets > 0; });
   const handleVisit5Days = () => { if (isMaster) return; const days = getVisitDays(); const sets = Math.floor(days.length / 5); const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); if (sets > claimed) { const newJar = jarTreats + 3; setJarTreats(newJar); localStorage.setItem(`mpe_jar_${code}_${studentName}`, String(newJar)); sendTreats(3); localStorage.setItem(visit5ClaimedKey, String(sets)); setVisit5Claimed(true); playSfx(K.snd.visit5); } };
   const [fedTreatsState, setFedTreatsState] = useState<Record<string, number>>(() =>
-    isMaster ? Object.fromEntries((world.masterAllGrown ? ANIMALS : ANIMALS.slice(0, -1)).map(a => [a.id, 45])) :
+    isMaster ? Object.fromEntries((world.masterAllGrown ? ANIMALS : ANIMALS.slice(0, -1)).map(a => [a.id, a.stages[a.stages.length - 1].min])) : // teacher view: grown = the animal's own last stage
       Object.fromEntries(ANIMALS.map(a => [a.id, parseInt(localStorage.getItem(S.fed(a.id)) || "0")]))
   );
   const [loading, setLoading] = useState(!isMaster);
@@ -134,7 +134,7 @@ export const useWorldBrain = (world: WorldConfig) => {
   const stageIdx = getAnimalStageIdx(activeAnimal, fedTreats);
   const nextStage = activeAnimal.stages[stageIdx + 1] ?? null;
   const isEgg = stageIdx === 0;
-  const nearHatch = isEgg && fedTreats >= 12;
+  const nearHatch = isEgg && fedTreats >= (activeAnimal.stages[1]?.min ?? 15) - 3; // 3 treats before hatching (Ocean/Dino: 12 as before)
   const progress = nextStage ? Math.round(((fedTreats - stage.min) / (nextStage.min - stage.min)) * 100) : 100;
 
   // Music

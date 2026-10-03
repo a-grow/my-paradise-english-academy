@@ -162,8 +162,23 @@ const Page = ({ v }: { v: WorldView }) => {
   const puzzleRef = useRef<HTMLDivElement>(null);
   const jarRef = useRef<HTMLDivElement>(null);
   useEffect(() => { if (onTest && q.get("g") === "1") setParty("on"); }, []);
+  // SMALL STAGE PRIZE (Andy 2026-10-03): baby +5 coins, young +10 coins (database pays once: '<world>:<animal>:baby|young').
+  // A gold '+5' pops over the animal and a few coins float into the coin pill. No dark screen, nothing to tap (~1.6s).
+  const MINI_COINS = [0, 5, 10];
+  const [mini, setMini] = useState<null | { id: number; n: number; x1: number; y1: number }>(null);
   useEffect(() => {
     const lu = v.levelUpStage;
+    if (lu && lu.stageIdx > 0 && lu.stageIdx < lu.animal.stages.length - 1) {
+      const n = MINI_COINS[lu.stageIdx] ?? 0;
+      askPrize(`${v.world.id}:${lu.animal.id}:${lu.stageIdx === 1 ? "baby" : "young"}`); // REAL prize (database pays once)
+      const to = at(coinRef.current, 0.2, 0.5) ?? { x: 160, y: 60 };
+      const id = Date.now();
+      setMini({ id, n, x1: to.x, y1: to.y });
+      const k = Math.min(n, 6);
+      for (let i = 0; i < k; i++) window.setTimeout(() => partyLand("coin", Math.floor(n / k) + (i < n % k ? 1 : 0)), 500 + i * 90 + 750);
+      window.setTimeout(() => { setMini(m => (m && m.id === id ? null : m)); v.setLevelUpStage(null); }, 500 + k * 90 + 900);
+      return;
+    }
     if (lu && lu.stageIdx === lu.animal.stages.length - 1) {
       askPrize(`${v.world.id}:${lu.animal.id}:grown`); // REAL prize (database pays once)
       setParty(p => p ?? "on");
@@ -205,7 +220,7 @@ const Page = ({ v }: { v: WorldView }) => {
   const lift = party === "fly" || party === "out" || done === "fly" || done === "out" ? " sv-lift" : "";
   // While a celebration is on, the coin pill + jar HOLD their old numbers; the flying prizes add them as they land.
   // Afterwards both follow the real numbers again (= the database's, so a prize that was not paid shows nothing).
-  const holding = !!(party || done);
+  const holding = !!(party || done || mini);
   useEffect(() => { if (!holding) setCoinShown(v.coins ?? 0); }, [v.coins, holding]);
   // MY BADGES (step 5.4): one badge per finished world = '<world>:complete' in the kid's prize list (from the cloud).
   // During the world-finished party the new badge flies in first, then lights up (same hold as coins / jar).
@@ -485,6 +500,17 @@ const Page = ({ v }: { v: WorldView }) => {
             onStop={() => theaterMusic(false)} onClose={() => setPanel(null)} />
         )}
 
+        {mini && (
+          <div key={mini.id} style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 40 }}>
+            <div className="sv-mini" style={{ left: cx, top: 380 }}>+{mini.n}</div>
+            {Array.from({ length: Math.min(mini.n, 6) }, (_, i) => (
+              <img key={i} className="sv-minicoin" src={`${UI}/coin.webp`} alt=""
+                style={{ left: cx + (i % 3 - 1) * 26, top: 450, animationDelay: `${500 + i * 90}ms`,
+                  ["--dx" as string]: `${mini.x1 - (cx + (i % 3 - 1) * 26)}px`, ["--dy" as string]: `${mini.y1 - 450}px` } as React.CSSProperties} />
+            ))}
+          </div>
+        )}
+
         {party && (
           <GrowUpParty phase={party} cx={cx} sh={sh} prizes={PRIZES} sfxOn={v.sfxOn} target={partyTarget}
             heroImgs={[animal.stages[animal.stages.length - 1].img]}
@@ -663,6 +689,12 @@ const CSS = `
 .sv-lift{z-index:61;pointer-events:none}
 @keyframes sv-bump0{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
 @keyframes sv-bump1{0%{transform:scale(1)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+.sv-mini{position:absolute;transform:translate(-50%,-50%);font-family:'Titan One',sans-serif;font-size:72px;line-height:1;color:#ffd84a;
+  text-shadow:0 5px 0 #b36b00,0 0 22px rgba(255,210,80,.85);animation:sv-miniUp 1.7s ease-out forwards;white-space:nowrap}
+@keyframes sv-miniUp{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}25%{transform:translate(-50%,-50%) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-120%) scale(1)}}
+.sv-minicoin{position:absolute;width:56px;height:56px;margin:-28px 0 0 -28px;opacity:0;filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));
+  animation:sv-miniFly .75s cubic-bezier(.5,0,.6,1) forwards}
+@keyframes sv-miniFly{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:1;transform:translate(0,-34px) scale(1)}90%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.7)}}
 .sv-dot{position:absolute;right:-6px;top:-8px;width:36px;height:36px;border-radius:50%;border:4px solid #fff;box-sizing:border-box;
  background:radial-gradient(circle at 35% 30%,#ff8a80,#e5221b 60%,#b3120d);box-shadow:0 3px 6px rgba(0,0,0,.4);
  animation:sv-dotIn .5s cubic-bezier(.25,1.6,.45,1) both,sv-dotPulse 1.6s .6s ease-in-out infinite}

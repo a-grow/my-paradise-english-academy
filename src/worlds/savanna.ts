@@ -1,6 +1,8 @@
 // SAVANNA WORLD (World 3) animals, order = unlock order (Andy 2026-10-01 21:21). Zebra = last animal (finishes the world;
 // also in the database lock list). English only this version (no Chinese). Only fields the new look uses really matter;
-// the old-skin fields are filled with plain values. Videos: elephant/lion/zebra still missing (launch blocker).
+// the old-skin fields are filled with plain values.
+// STAGE PRICES (Andy 2026-10-03 13:27): treats per stage giraffe 25, hippo 30, ostrich 30, elephant 35, lion 35, zebra 40
+// (stage mins 0, p, 2p, 3p). Zebra grown = 120 = the database lock's 'savanna finished' number - change BOTH together. Videos: elephant/lion/zebra still missing (launch blocker).
 import type { Animal } from "./types";
 
 const P = "/worlds/savanna";
@@ -10,9 +12,9 @@ export const SAVANNA_ANIMALS: Animal[] = [
     id: "giraffe", name: "Giraffe", nameZh: "", emoji: "",
     stages: [
       { name: "Blanket", nameZh: "", min: 0, img: `${P}/giraffe-egg.webp` },
-      { name: "Baby", nameZh: "", min: 15, img: `${P}/giraffe-baby.webp` },
-      { name: "Young", nameZh: "", min: 30, img: `${P}/giraffe-young.webp` },
-      { name: "Grown", nameZh: "", min: 45, img: `${P}/giraffe-grown.webp` },
+      { name: "Baby", nameZh: "", min: 25, img: `${P}/giraffe-baby.webp` },
+      { name: "Young", nameZh: "", min: 50, img: `${P}/giraffe-young.webp` },
+      { name: "Grown", nameZh: "", min: 75, img: `${P}/giraffe-grown.webp` },
     ],
     unlockCondition: "default",
     collectionBg: "#c98a2b", collectionBorder: "rgba(255,200,80,0.8)", collectionGlow: "rgba(255,200,80,0.4)",
@@ -31,9 +33,9 @@ export const SAVANNA_ANIMALS: Animal[] = [
     id: "hippo", name: "Hippo", nameZh: "", emoji: "",
     stages: [
       { name: "Blanket", nameZh: "", min: 0, img: `${P}/hippo-egg.webp` },
-      { name: "Baby", nameZh: "", min: 15, img: `${P}/hippo-baby.webp` },
-      { name: "Young", nameZh: "", min: 30, img: `${P}/hippo-young.webp` },
-      { name: "Grown", nameZh: "", min: 45, img: `${P}/hippo-grown.webp` },
+      { name: "Baby", nameZh: "", min: 30, img: `${P}/hippo-baby.webp` },
+      { name: "Young", nameZh: "", min: 60, img: `${P}/hippo-young.webp` },
+      { name: "Grown", nameZh: "", min: 90, img: `${P}/hippo-grown.webp` },
     ],
     unlockCondition: "giraffe_grown_video_watched",
     collectionBg: "#c98a2b", collectionBorder: "rgba(255,200,80,0.8)", collectionGlow: "rgba(255,200,80,0.4)",
@@ -52,9 +54,9 @@ export const SAVANNA_ANIMALS: Animal[] = [
     id: "ostrich", name: "Ostrich", nameZh: "", emoji: "",
     stages: [
       { name: "Egg", nameZh: "", min: 0, img: `${P}/ostrich-egg.webp` },
-      { name: "Baby", nameZh: "", min: 15, img: `${P}/ostrich-baby.webp` },
-      { name: "Young", nameZh: "", min: 30, img: `${P}/ostrich-young.webp` },
-      { name: "Grown", nameZh: "", min: 45, img: `${P}/ostrich-grown.webp` },
+      { name: "Baby", nameZh: "", min: 30, img: `${P}/ostrich-baby.webp` },
+      { name: "Young", nameZh: "", min: 60, img: `${P}/ostrich-young.webp` },
+      { name: "Grown", nameZh: "", min: 90, img: `${P}/ostrich-grown.webp` },
     ],
     unlockCondition: "hippo_grown_video_watched",
     collectionBg: "#c98a2b", collectionBorder: "rgba(255,200,80,0.8)", collectionGlow: "rgba(255,200,80,0.4)",
@@ -73,9 +75,9 @@ export const SAVANNA_ANIMALS: Animal[] = [
     id: "elephant", name: "Elephant", nameZh: "", emoji: "",
     stages: [
       { name: "Blanket", nameZh: "", min: 0, img: `${P}/elephant-egg.webp` },
-      { name: "Baby", nameZh: "", min: 15, img: `${P}/elephant-baby.webp` },
-      { name: "Young", nameZh: "", min: 30, img: `${P}/elephant-young.webp` },
-      { name: "Grown", nameZh: "", min: 45, img: `${P}/elephant-grown.webp` },
+      { name: "Baby", nameZh: "", min: 35, img: `${P}/elephant-baby.webp` },
+      { name: "Young", nameZh: "", min: 70, img: `${P}/elephant-young.webp` },
+      { name: "Grown", nameZh: "", min: 105, img: `${P}/elephant-grown.webp` },
     ],
     unlockCondition: "ostrich_grown_video_watched",
     collectionBg: "#c98a2b", collectionBorder: "rgba(255,200,80,0.8)", collectionGlow: "rgba(255,200,80,0.4)",
@@ -94,9 +96,9 @@ export const SAVANNA_ANIMALS: Animal[] = [
     id: "lion", name: "Lion", nameZh: "", emoji: "",
     stages: [
       { name: "Blanket", nameZh: "", min: 0, img: `${P}/lion-egg.webp` },
-      { name: "Baby", nameZh: "", min: 15, img: `${P}/lion-baby.webp` },
-      { name: "Young", nameZh: "", min: 30, img: `${P}/lion-young.webp` },
-      { name: "Grown", nameZh: "", min: 45, img: `${P}/lion-grown.webp` },
+      { name: "Baby", nameZh: "", min: 35, img: `${P}/lion-baby.webp` },
+      { name: "Young", nameZh: "", min: 70, img: `${P}/lion-young.webp` },
+      { name: "Grown", nameZh: "", min: 105, img: `${P}/lion-grown.webp` },
     ],
     unlockCondition: "elephant_grown_video_watched",
     collectionBg: "#c98a2b", collectionBorder: "rgba(255,200,80,0.8)", collectionGlow: "rgba(255,200,80,0.4)",
@@ -115,9 +117,9 @@ export const SAVANNA_ANIMALS: Animal[] = [
     id: "zebra", name: "Zebra", nameZh: "", emoji: "",
     stages: [
       { name: "Blanket", nameZh: "", min: 0, img: `${P}/zebra-egg.webp` },
-      { name: "Baby", nameZh: "", min: 15, img: `${P}/zebra-baby.webp` },
-      { name: "Young", nameZh: "", min: 30, img: `${P}/zebra-young.webp` },
-      { name: "Grown", nameZh: "", min: 45, img: `${P}/zebra-grown.webp` },
+      { name: "Baby", nameZh: "", min: 40, img: `${P}/zebra-baby.webp` },
+      { name: "Young", nameZh: "", min: 80, img: `${P}/zebra-young.webp` },
+      { name: "Grown", nameZh: "", min: 120, img: `${P}/zebra-grown.webp` },
     ],
     unlockCondition: "lion_grown_video_watched",
     collectionBg: "#c98a2b", collectionBorder: "rgba(255,200,80,0.8)", collectionGlow: "rgba(255,200,80,0.4)",
