@@ -79,6 +79,25 @@ export async function claimPrize(code: string, studentName: string, prize: strin
   }
 }
 
+// PRIZES: the kid's list of prizes already paid (also = badges won, e.g. "savanna:complete").
+// Returns the list | null = no row yet | undefined = could not read.
+export async function loadPrizes(code: string, studentName: string): Promise<string[] | null | undefined> {
+  try {
+    const { data, error } = await supabase
+      .from("student_progress")
+      .select("prizes_claimed")
+      .eq("code", code)
+      .eq("student_name", studentName)
+      .maybeSingle();
+    if (error) { console.error("[cloudSave] prizes load failed:", error.message); return undefined; }
+    if (!data) return null;
+    return Array.isArray(data.prizes_claimed) ? data.prizes_claimed : [];
+  } catch (e) {
+    console.error("[cloudSave] prizes load threw:", e);
+    return undefined;
+  }
+}
+
 // ONE DAILY TREAT per kid per day (Taiwan date), whatever the device or world. The database
 // (function mpe_claim_daily) refuses a second claim the same day. Returns the jar total like addTreats.
 export async function claimDailyTreat(code: string, studentName: string): Promise<number | null | undefined> {

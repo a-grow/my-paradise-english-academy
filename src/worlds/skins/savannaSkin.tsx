@@ -142,9 +142,13 @@ const Page = ({ v }: { v: WorldView }) => {
   useEffect(() => {
     if (!v.showComplete) return;
     v.completeRef.current?.pause(); // the celebration plays the music itself
+    // NO REPLAY (step 5.4): the brain's 'seen' flag is per device. The prize list is in the cloud: if this world's
+    // prize was already paid (any device, cleared cache...), just close quietly - no second celebration.
+    if (v.prizes === null && !v.isMaster) return; // prize list not read yet: wait (this runs again when it arrives)
+    if (done === null && (v.prizes ?? []).includes(`${v.world.id}:complete`)) { v.closeComplete(); return; }
     askPrize(`${v.world.id}:complete`); // REAL prize (database pays once)
     setDone(d => d ?? "on");
-  }, [v.showComplete]);
+  }, [v.showComplete, v.prizes]);
   const doneLanded = () => {
     setJarShown(j => j + (DONE_PRIZES.find(p => p.kind === "treat")?.n ?? 0)); // the jar's own fill-up animation
     window.setTimeout(() => setDone("out"), 1200);
@@ -203,6 +207,10 @@ const Page = ({ v }: { v: WorldView }) => {
   // Afterwards both follow the real numbers again (= the database's, so a prize that was not paid shows nothing).
   const holding = !!(party || done);
   useEffect(() => { if (!holding) setCoinShown(v.coins ?? 0); }, [v.coins, holding]);
+  // MY BADGES (step 5.4): one badge per finished world = '<world>:complete' in the kid's prize list (from the cloud).
+  // During the world-finished party the new badge flies in first, then lights up (same hold as coins / jar).
+  const wonBadges = (v.prizes ?? []).filter(p => /^[a-z]+:complete$/.test(p)).map(p => p.split(":")[0]);
+  useEffect(() => { if (!holding) setBadgesShown(wonBadges.length); }, [wonBadges.length, holding]);
   const bumpStyle = (k: string) => (bump[k] ? { animation: `sv-bump${bump[k] % 2} .3s ease-out` } : undefined);
 
   // My Animals: same unlock rule as today's worlds (previous animal grown + its video watched,
@@ -417,7 +425,7 @@ const Page = ({ v }: { v: WorldView }) => {
           <img className="sv-cardlbl" style={{ top: 179, height: 46 }} src={`${UI}/lbl_animals.webp`} alt="My Animals" />
         </div>
         <div ref={badgesRef} className={"sv-card sv-badges sv-tap" + lift} style={bumpStyle("badge")} onClick={soon}>
-          <div className="sv-medals">{[0, 1, 2].map(i => <img key={i} className={"sv-medal" + (i < badgesShown ? " won" : " off")} src={i < badgesShown ? "/worlds/badges/savanna.webp" : `${UI}/medal.webp`} alt="" />)}</div>
+          <div className="sv-medals">{[0, 1, 2].map(i => <img key={i} className={"sv-medal" + (i < badgesShown ? " won" : " off")} src={i < badgesShown ? `/worlds/badges/${wonBadges[i] ?? v.world.id}.webp` : `${UI}/medal.webp`} alt="" />)}</div>
           <img className="sv-cardlbl" style={{ top: 111, height: 45 }} src={`${UI}/lbl_badges.webp`} alt="My Badges" />
         </div>
         <div className="sv-card sv-album sv-tap" onClick={soon}>
