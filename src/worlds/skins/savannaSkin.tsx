@@ -15,6 +15,7 @@ import type { WorldView } from "@/pages/WorldPage";
 import CookieJar from "@/components/CookieJar";
 import GrowUpParty, { type Prize, type PrizeKind } from "./GrowUpParty";
 import VideoTheater, { type TheaterWorld } from "./VideoTheater";
+import DailyPrize, { type DailyKind } from "./DailyPrize";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 
 const W = "/worlds/savanna";
@@ -220,12 +221,31 @@ const Page = ({ v }: { v: WorldView }) => {
   const lift = party === "fly" || party === "out" || done === "fly" || done === "out" ? " sv-lift" : "";
   // While a celebration is on, the coin pill + jar HOLD their old numbers; the flying prizes add them as they land.
   // Afterwards both follow the real numbers again (= the database's, so a prize that was not paid shows nothing).
-  const holding = !!(party || done || mini);
+  const [dailyDay, setDailyDay] = useState(0); // DAILY PRIZE on screen = today's box 1-7 (0 = not showing)
+  // TEST ONLY (?dp=): nothing is saved, so after the test prize the jar + coin pill KEEP the shown numbers
+  // (going back to the real number made the jar open again with the feed sound - Andy 14:19).
+  const [testKeep, setTestKeep] = useState(false);
+  const holding = !!(party || done || mini || dailyDay || testKeep);
   useEffect(() => { if (!holding) setCoinShown(v.coins ?? 0); }, [v.coins, holding]);
   // MY BADGES (step 5.4): one badge per finished world = '<world>:complete' in the kid's prize list (from the cloud).
   // During the world-finished party the new badge flies in first, then lights up (same hold as coins / jar).
   const wonBadges = (v.prizes ?? []).filter(p => /^[a-z]+:complete$/.test(p)).map(p => p.split(":")[0]);
   useEffect(() => { if (!holding) setBadgesShown(wonBadges.length); }, [wonBadges.length, holding]);
+  // DAILY PRIZE (Andy 2026-10-03): rises in ~1.2s after the world opens when today's box is not taken yet (any device).
+  // TEST ONLY ?dp=1..7 on /world-test/ = show it as that day (display only - claims nothing).
+  const testDp = onTest ? parseInt(q.get("dp") ?? "", 10) : NaN;
+  const isTestDp = Number.isFinite(testDp) && testDp >= 1 && testDp <= 7;
+  const dailyReady = isTestDp ? testDp : (v.dailyPrize && !v.dailyPrize.claimedToday ? v.dailyPrize.day : 0);
+  const dailyShown = useRef(false);
+  useEffect(() => {
+    if (!dailyReady || dailyShown.current || party || done) return;
+    const t = window.setTimeout(() => { dailyShown.current = true; setDailyDay(dailyReady); }, 1200);
+    return () => window.clearTimeout(t);
+  }, [dailyReady, party, done]);
+  const dailyLand = (k: DailyKind, add: number) => {
+    if (k === "treat") { setJarShown(j => j + add); setBump(b => ({ ...b, treat: (b.treat ?? 0) + 1 })); }
+    else partyLand(k, add);
+  };
   const bumpStyle = (k: string) => (bump[k] ? { animation: `sv-bump${bump[k] % 2} .3s ease-out` } : undefined);
 
   // My Animals: same unlock rule as today's worlds (previous animal grown + its video watched,
@@ -289,7 +309,7 @@ const Page = ({ v }: { v: WorldView }) => {
   });
   const firstJar = useRef(true);
   useEffect(() => {
-    if (holding && v.jarTreats > jarShown) return; // a celebration is on: prizes fill the jar when they land (a feed still shows at once)
+    if (testKeep || (holding && v.jarTreats > jarShown)) return; // a celebration is on: prizes fill the jar when they land (a feed still shows at once)
     localStorage.setItem(seenKey, String(v.jarTreats));
     const wait = firstJar.current && jarShown < v.jarTreats ? 900 : 0; // first time: let the page settle, then drop them in
     firstJar.current = false;
@@ -420,11 +440,7 @@ const Page = ({ v }: { v: WorldView }) => {
           <div className="sv-jarcount">{holding ? jarShown : Math.max(v.jarTreats, jarShown)}</div>
         </div>
         <img className={"sv-jarlbl" + lift} src={`${UI}/lbl_treats.webp`} alt="My Treats" />
-        {showDaily && !dailyGone && <div className="sv-daily sv-tap" onClick={claimDaily}><img src={`${UI}/btn_daily.webp`} alt="Daily Treat!" /></div>}
-        <div className={"sv-visit sv-tap" + (visitReady ? " ready" : "")} onClick={visit5}>
-          Visit 5 days
-          <div className="sv-dots">{[0, 1, 2, 3, 4].map(i => <i key={i} className={i < lit ? "on" : ""} />)}</div>
-        </div>
+        {/* Daily Treat button + Visit 5 days REMOVED (Andy 2026-10-03): the Daily Prize box replaces both. */}
 
         {/* right: cards (pre-built gold frames, never CSS border-image) */}
         {newReady && panel !== "animals" && (
@@ -498,6 +514,12 @@ const Page = ({ v }: { v: WorldView }) => {
           <VideoTheater cx={cx} sh={sh} worlds={theaterWorlds} start={2} newIds={newIds}
             onPlay={id => { theaterMusic(true); setNewIds(ids => ids.filter(x => x !== id)); }}
             onStop={() => theaterMusic(false)} onClose={() => setPanel(null)} />
+        )}
+
+        {dailyDay > 0 && (
+          <DailyPrize cx={cx} sh={sh} day={dailyDay} sfxOn={v.sfxOn}
+            onClaim={() => (isTestDp ? Promise.resolve({ paid: true }) : v.claimDailyPrize())}
+            target={k => partyTarget(k)} onLand={dailyLand} onDone={() => { if (isTestDp) setTestKeep(true); setDailyDay(0); }} />
         )}
 
         {mini && (

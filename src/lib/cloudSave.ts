@@ -98,6 +98,40 @@ export async function loadPrizes(code: string, studentName: string): Promise<str
   }
 }
 
+// DAILY PRIZE (2026-10-03): open today's box (database mpe_claim_daily_prize: one per Taiwan day, any device/world,
+// amounts live there). Returns {paid, day, treats, coins, pieces, jar} | null = no row | undefined = failed.
+export async function claimDailyPrize(code: string, studentName: string): Promise<{ paid: boolean; day?: number; treats?: number; coins?: number; pieces?: number; jar?: number } | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_claim_daily_prize", { p_code: code, p_name: studentName });
+    if (error) { console.error("[cloudSave] daily prize failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] daily prize ->", data, code, studentName);
+    return data as { paid: boolean; day?: number; treats?: number; coins?: number; pieces?: number; jar?: number };
+  } catch (e) {
+    console.error("[cloudSave] daily prize threw:", e);
+    return undefined;
+  }
+}
+
+// DAILY PRIZE status: today's box number (1-7) + already taken today? | null = no row | undefined = could not read.
+export async function loadDailyPrize(code: string, studentName: string): Promise<{ day: number; claimedToday: boolean } | null | undefined> {
+  try {
+    const { data, error } = await supabase
+      .from("student_progress")
+      .select("daily_claimed, daily_box")
+      .eq("code", code)
+      .eq("student_name", studentName)
+      .maybeSingle();
+    if (error) return undefined;
+    if (!data) return null;
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" }); // YYYY-MM-DD
+    const box = typeof data.daily_box === "number" ? data.daily_box : 0;
+    return { day: (box % 7) + 1, claimedToday: data.daily_claimed === today };
+  } catch {
+    return undefined;
+  }
+}
+
 // ONE DAILY TREAT per kid per day (Taiwan date), whatever the device or world. The database
 // (function mpe_claim_daily) refuses a second claim the same day. Returns the jar total like addTreats.
 export async function claimDailyTreat(code: string, studentName: string): Promise<number | null | undefined> {
