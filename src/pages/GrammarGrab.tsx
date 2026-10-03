@@ -23,6 +23,7 @@ export default function GrammarGrab() {
   const coinsNow = useRef(0);
   const [coinsWon, setCoinsWon] = useState(0);
   const [coinStart, setCoinStart] = useState(0);
+  const [treatsAfter, setTreatsAfter] = useState<number | null>(null); // treat total after this win (win screen jar)
   useEffect(() => {
     addCoins(kidCode, kidName, 0).then(t => { if (typeof t === "number") setCoinStart(t); });
   }, [kidCode, kidName]);
@@ -42,8 +43,9 @@ export default function GrammarGrab() {
         const current = parseInt(localStorage.getItem(jarKey) || "0");
         const newTotal = current + 2;
         localStorage.setItem(jarKey, String(newTotal));
+        setTreatsAfter(newTotal); // this device's number until the database answers
         // ONE JAR: send only "+2" - the database adds it (never the device's whole number).
-        addTreats(kidCode, kidName, 2).then(total => { if (typeof total === "number") localStorage.setItem(jarKey, String(total)); });
+        addTreats(kidCode, kidName, 2).then(total => { if (typeof total === "number") { localStorage.setItem(jarKey, String(total)); setTreatsAfter(total); } });
         // let the game's own ending (fireworks / chest / last grab) play, then show the celebration
         window.setTimeout(() => {
           setWon(true);
@@ -89,6 +91,7 @@ export default function GrammarGrab() {
         <WinCelebration
           coinsWon={coinsWon}
           startTotal={coinStart}
+          treatsTotal={treatsAfter}
           muted={muted}
           fanfare
           onChooseGame={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}

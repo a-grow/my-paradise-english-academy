@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import WinCelebration from "@/components/WinCelebration";
+import LoseScreen from "@/components/LoseScreen";
 import book1Data from "@/data/oxford-discover-book1.json";
 import book2Data from "@/data/oxford-discover-book2.json";
 import book3Data from "@/data/oxford-discover-book3.json";
@@ -227,115 +229,28 @@ const CountdownOverlay = ({onDone}:{onDone:()=>void}) => {
 // ── UNIT CLEAR / WINNER SCREEN ────────────────────────────────────────────────
 // Three zones only: celebration → reward → buttons. No stars, no points.
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
-const UnitClearScreen = ({unit,onBack,onPlay,onClaim,onBackToWorld,claimState,diff,treatsEarnedToday=0,fromDino=false}:{unit:UnitData;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;onBackToWorld?:()=>void;claimState?:"available"|"claimed"|"capped";diff?:string;treatsEarnedToday?:number;fromDino?:boolean}) => {
+const UnitClearScreen = ({unit,onBack,onClaim,onBackToWorld,claimState,diff}:{unit:UnitData;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;onBackToWorld?:()=>void;claimState?:"available"|"claimed"|"capped";diff?:string;treatsEarnedToday?:number;fromDino?:boolean}) => {
+  // WIN SCREEN (Andy 2026-10-04): the grammar games' win screen. The treats are paid the moment the kid wins (no
+  // '+N Treats!' button to tap any more); they fly to the bottom-left. Vocab games have no coins yet = no coin row/pill.
   const treatCount = TREATS_BY_DIFF[diff??""] ?? 2;
-  const play=useAudio();
-  useEffect(()=>{play("win");},[]);
+  const [shown] = useState(() => (onClaim && claimState==="available" ? treatCount : 0)); // frozen: claiming changes the props
+  const paid = useRef(false);
+  useEffect(()=>{ if(!paid.current && claimState==="available" && onClaim){ paid.current=true; onClaim(); } },[]);
   return (
-    <div style={{minHeight:"100vh",background:`radial-gradient(ellipse at center, ${unit.color}55 0%, #0f0c29 70%)`,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",overflow:"hidden",position:"relative"}}>
-      <style>{`
-        @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-        @keyframes trophyBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-20px) scale(1.12)}}
-        @keyframes clearIn{0%{transform:scale(0.75) translateY(40px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
-        @keyframes claimPulse{0%,100%{box-shadow:0 0 20px rgba(251,191,36,0.5),0 6px 24px rgba(0,0,0,0.3)}50%{box-shadow:0 0 50px rgba(251,191,36,1),0 6px 24px rgba(0,0,0,0.3)}}
-        @keyframes cookiePop{0%{transform:scale(0) rotate(-15deg);opacity:0}70%{transform:scale(1.2) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0deg);opacity:1}}
-      `}</style>
-      {/* Confetti */}
-      {[...Array(36)].map((_,i)=>(
-        <div key={i} style={{position:"fixed",left:`${(i*137.5)%100}%`,top:"-24px",width:10+i%8,height:10+i%8,borderRadius:i%3===0?"50%":"3px",background:["#fbbf24","#f97316","#ef4444","#a855f7","#3b82f6","#22c55e","#ec4899"][i%7],animation:`confettiFall ${2.2+i%3*0.5}s ease-in ${i*0.1}s both`,pointerEvents:"none"}}/>
-      ))}
-      <div style={{background:"rgba(255,255,255,0.08)",backdropFilter:"blur(28px)",borderRadius:"2.5rem",padding:"2.5rem 1.5rem",textAlign:"center",maxWidth:380,width:"100%",border:`3px solid ${unit.color}`,boxShadow:`0 0 60px ${unit.glow},0 24px 60px rgba(0,0,0,0.5)`,animation:"clearIn 0.65s cubic-bezier(0.34,1.56,0.64,1)"}}>
-
-        {/* ZONE 1 — Celebration */}
-        <div style={{fontSize:"5.5rem",animation:"trophyBounce 1.5s ease-in-out infinite",lineHeight:1}}>🏆</div>
-        <div style={{fontFamily:F,fontWeight:900,fontSize:"2.6rem",color:"#fbbf24",textShadow:"0 0 30px rgba(251,191,36,0.9)",margin:"0.4rem 0",lineHeight:1}}>YOU DID IT!</div>
-        <div style={{fontFamily:F,fontWeight:700,fontSize:"1rem",color:"rgba(255,255,255,0.6)",marginBottom:"1.5rem"}}>Unit {unit.unit} · {unit.topic}</div>
-
-        {/* ZONE 2 — Reward (only shown when arcade treat logic is active) */}
-        {onClaim && (
-          <div style={{marginBottom:"1.25rem"}}>
-            {claimState==="available" && (
-              <button onClick={onClaim} style={{width:"100%",padding:"1.1rem",background:"linear-gradient(135deg,#fbbf24,#f97316)",border:"none",borderRadius:"1.5rem",color:"white",fontFamily:F,fontWeight:900,fontSize:"1.35rem",cursor:"pointer",animation:"claimPulse 1.4s ease-in-out infinite",display:"flex",alignItems:"center",justifyContent:"center",gap:"0.5rem"}}>
-                {fromDino
-                  ? <svg width="36" height="36" viewBox="0 0 36 36" style={{animation:"cookiePop 0.5s ease-out both",flexShrink:0}}><ellipse cx="18" cy="18" rx="14" ry="7" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="9" cy="18" rx="5" ry="4" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="27" cy="18" rx="5" ry="4" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/></svg>
-                  : <svg width="36" height="36" viewBox="0 0 36 36" style={{animation:"cookiePop 0.5s ease-out both",flexShrink:0}}><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
-                }
-                <span>+{treatCount} {treatCount === 1 ? "Treat" : "Treats"}!</span>
-              </button>
-            )}
-            {claimState==="claimed" && (
-              <div style={{background:"rgba(74,222,128,0.15)",border:"2px solid rgba(74,222,128,0.4)",borderRadius:"1.25rem",padding:"0.85rem 1rem"}}>
-                <div style={{fontFamily:F,fontWeight:800,fontSize:"1.1rem",color:"#4ade80",display:"flex",alignItems:"center",justifyContent:"center",gap:"0.4rem"}}>
-                  {fromDino
-                    ? <svg width="22" height="22" viewBox="0 0 36 36"><ellipse cx="18" cy="18" rx="11" ry="5.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="8" cy="18" rx="4" ry="3.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/><ellipse cx="28" cy="18" rx="4" ry="3.5" fill="#e8d5b0" stroke="#b8965a" strokeWidth="1.5"/></svg>
-                    : <svg width="22" height="22" viewBox="0 0 36 36"><circle cx="18" cy="18" r="14" fill="#d4b483" stroke="#b8965a" strokeWidth="1.5"/><circle cx="13" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><circle cx="23" cy="15" r="2" fill="#7a5c2e" opacity="0.85"/><path d="M12,21 Q18,27 24,21" stroke="#7a5c2e" strokeWidth="2" fill="none" strokeLinecap="round"/></svg>
-                  }
-                  Treats added! · 點心加好了！
-                </div>
-                <div style={{fontFamily:F,fontWeight:700,fontSize:"0.82rem",color:"rgba(255,255,255,0.5)",marginTop:"0.2rem"}}>Go feed your animal! · 去餵你的動物吧！</div>
-              </div>
-            )}
-            {claimState==="capped" && (
-              <div style={{background:"rgba(255,255,255,0.08)",border:"2px solid rgba(255,255,255,0.15)",borderRadius:"1.25rem",padding:"0.85rem 1rem"}}>
-                <div style={{fontFamily:F,fontWeight:800,fontSize:"1rem",color:"rgba(255,255,255,0.7)"}}>You got all your treats today! · 今天的點心全部拿到了！</div>
-                <div style={{fontFamily:F,fontWeight:700,fontSize:"0.82rem",color:"rgba(255,255,255,0.45)",marginTop:"0.2rem"}}>Come back tomorrow for more! · 明天再來拿更多！</div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ZONE 3 — Buttons. available: none (claim button only). claimed: Choose Game + Back to World. fallback: original two. */}
-        {claimState==="available" ? null : claimState==="claimed" ? (
-        <div style={{display:"flex",flexDirection:"column",gap:"0.65rem"}}>
-          <button onClick={onBack} style={{padding:"0.9rem",background:"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:"pointer",transition:"all 0.3s"}}>
-            Choose Game · 選擇遊戲
-          </button>
-          {onBackToWorld && (
-          <button onClick={onBackToWorld} style={{padding:"0.9rem",background:`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:"pointer",boxShadow:`0 0 20px ${unit.glow}`,transition:"all 0.3s"}}>
-            {fromDino ? "🦕" : "🌊"} Back to World! · 回到世界！
-          </button>
-          )}
-        </div>
-        ) : (
-        <div style={{display:"flex",flexDirection:"column",gap:"0.65rem"}}>
-          <button onClick={onPlay} style={{padding:"0.9rem",background:`linear-gradient(135deg,${unit.color},${unit.color}99)`,border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:"pointer",boxShadow:`0 0 20px ${unit.glow}`,transition:"all 0.3s"}}>
-            Play Again! · 再玩一次！
-          </button>
-          <button onClick={onBack} style={{padding:"0.9rem",background:"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:"pointer",transition:"all 0.3s"}}>
-            Choose Game · 選擇遊戲
-          </button>
-        </div>
-        )}
-      </div>
+    <div style={{minHeight:"100vh",background:`radial-gradient(ellipse at center, ${unit.color}55 0%, #0f0c29 70%)`}}>
+      <WinCelebration coinsWon={0} startTotal={null} treatsWon={shown} muted={false} fanfare
+        onChooseGame={onBack} onReturnToWorld={onBackToWorld ?? onBack}/>
     </div>
   );
 };
 
 // ── RESULT SCREEN (time up / game over) ───────────────────────────────────────
-const ResultScreen = ({score,total,onBack,onPlay,reason,onBackToWorld,fromDino=false}:{score:number;total:number;onBack:()=>void;onPlay:()=>void;reason?:"timeout"|"lives";onBackToWorld?:()=>void;fromDino?:boolean}) => {
-  const pct=total>0?Math.round((score/total)*100):0;
-  const stars=pct>=80?3:pct>=50?2:1;
-  const heading = reason==="timeout" ? "⏰ Out of Time!" : reason==="lives" ? "💔 No More Hearts!" : "Game Over!";
-  const msgs=[["Keep going! 💪","繼續加油！"],["Nice try! 🎉","繼續練習！"],["So close! 🌟","快成功了！"]];
-  const [msg,zh]=msgs[stars-1];
-  return (
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#1e1b4b,#312e81,#4c1d95)",display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem"}}>
-      <div style={{background:"rgba(255,255,255,0.1)",backdropFilter:"blur(24px)",borderRadius:"2.5rem",padding:"2.5rem 2rem",textAlign:"center",maxWidth:360,width:"100%",border:"2px solid rgba(255,255,255,0.2)",animation:"popIn 0.5s cubic-bezier(0.34,1.56,0.64,1)"}}>
-        <div style={{fontFamily:F,fontWeight:900,fontSize:"2rem",color:"white",marginBottom:"0.75rem"}}>{heading}</div>
-        <div style={{fontFamily:F,fontWeight:800,fontSize:"1.3rem",color:"white",margin:"0.75rem 0"}}>{msg}</div>
-        <div style={{fontFamily:F,fontWeight:700,fontSize:"1.05rem",color:"rgba(255,255,255,0.65)",marginBottom:"1.5rem"}}>{zh}</div>
-        <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
-          <button onClick={onPlay} style={{padding:"0.9rem",background:"linear-gradient(135deg,#4ade80,#22d3ee)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"1rem",cursor:"pointer"}}>Play Again!</button>
-          <button onClick={onBack} style={{padding:"0.9rem",background:"linear-gradient(135deg,#f97316,#fbbf24)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:"pointer"}}>Choose Game</button>
-          {onBackToWorld && (
-          <button onClick={onBackToWorld} style={{padding:"0.9rem",background:"linear-gradient(135deg,#6366f1,#a855f7)",border:"none",borderRadius:999,color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",cursor:"pointer"}}>{fromDino ? "🦕" : "🌊"} Back to World! · 回到世界！</button>
-          )}
-        </div>
-      </div>
-      <style>{`@keyframes popIn{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}@keyframes starPop2{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}`}</style>
-    </div>
-  );
-};
+// LOSE SCREEN (Andy 2026-10-04): the grammar games' lose screen (Try Again / Choose Game / Return to World). Saves nothing.
+const ResultScreen = ({onBack,onPlay,onBackToWorld,reason}:{score:number;total:number;onBack:()=>void;onPlay:()=>void;reason?:"timeout"|"lives";onBackToWorld?:()=>void;fromDino?:boolean}) => (
+  <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#1e1b4b,#312e81,#4c1d95)"}}>
+    <LoseScreen muted={false} title={reason==="timeout" ? "Out of time!" : undefined} onTryAgain={onPlay} onChooseGame={onBack} onReturnToWorld={onBackToWorld ?? onBack}/>
+  </div>
+);
 
 // ── RESTART BUTTON ────────────────────────────────────────────────────────────
 // ── HUD PILL ──────────────────────────────────────────────────────────────────

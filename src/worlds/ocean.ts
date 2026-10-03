@@ -27,8 +27,8 @@ export const OCEAN_ANIMALS: Animal[] = [
     id: "dolphin", name: "Dolphin", nameZh: "海豚", emoji: "🐬",
     stages: [
       { name: "Blanket", nameZh: "小毯子",     min: 0,  img: "/creatures/dolphin-blanket.webp" },
-      { name: "Young", nameZh: "少年海豚", min: 15, img: "/creatures/dolphin-baby.webp" },
-      { name: "Teen",  nameZh: "少年海豚", min: 30, img: "/creatures/dolphin-young.webp" },
+      { name: "Baby", nameZh: "少年海豚", min: 15, img: "/creatures/dolphin-baby.webp" },
+      { name: "Young", nameZh: "少年海豚", min: 30, img: "/creatures/dolphin-young.webp" },
       { name: "Grown", nameZh: "成年海豚", min: 45, img: "/creatures/dolphin-grown.webp" },
     ],
     unlockCondition: "turtle_grown_video_watched",

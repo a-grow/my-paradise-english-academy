@@ -4,11 +4,15 @@ import { FUN3D_CSS, Word3D, word3DDone } from "@/components/Fun3D";
 // Win screen for the grammar games: big 3D "Great Job!" pops in letter by letter, then the won coins fly up into the
 // coin-total pill (sparkles + rising pop sound). Andy starts hopping when the FIRST coin lands; after the last one he gives a
 // thumbs-up, "You won 2 treats!" glows, the coin row twinkles, and the buttons wake up.
+// TREATS (Andy 2026-10-04): the treat row sits beside the coin row; the treats fly to the BOTTOM-LEFT corner at the same
+// time as the coins fly to the pill, and vanish in a bright yellow flash (puzzle pieces will do the same later).
 // VISUAL ONLY: it saves nothing. startTotal = the kid's coin total before this win (0 until the coin jar exists).
 type Props = {
   coinsWon: number;
-  startTotal: number;
+  startTotal: number | null;  // null = no coin pill (the vocab games have no coins yet)
   muted: boolean;
+  treatsTotal?: number | null; // NOT SHOWN since 2026-10-04 (jar removed) - kept so the game pages need no change
+  treatsWon?: number;          // treats this win paid (grammar: 2)
   fanfare?: boolean;   // play Run's win fanfare when the screen opens (Swim/Dig/Grab; Run already had it at the flag)
   onChooseGame: () => void;
   onReturnToWorld: () => void;
@@ -19,14 +23,16 @@ const IMG = { cheer: ART + "andy_cheer.webp", blink: ART + "andy_blink.webp", th
 const SFX = ART + "rising_pop.mp3";        // coins flying up
 const WIN_SFX = ART + "win_pop.mp3";       // the moment the win screen pops up
 const FANFARE = ART + "win_fanfare.mp3";   // Run's victory fanfare
+const TREAT_IMG = "/worlds/ui/treat.webp";  // the new treat (same as the world page)
+const TREAT_HTML = `<img src="${TREAT_IMG}" alt="" style="display:block;width:100%;height:100%;object-fit:contain">`;
 
 // Load the art as soon as a game page loads, so Andy is ready the moment a kid wins.
 if (typeof window !== "undefined") {
   Object.values(IMG).forEach((src) => { const i = new Image(); i.src = src; });
 }
 
-const COIN_SVG =
-  '<svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><circle cx="12" cy="12" r="10" fill="#ffcf33" stroke="#e0a91e" stroke-width="2"/><circle cx="8.5" cy="8.5" r="3.5" fill="#fff3b0"/></svg>';
+const COIN_IMG = "/worlds/ui/coin.webp";  // the world page's NEW coin (Andy 2026-10-03)
+const COIN_SVG = `<img src="${COIN_IMG}" alt="" style="display:block;width:100%;height:100%;object-fit:contain">`; // flying coin (name kept)
 const STAR_SVG =
   '<svg viewBox="0 0 24 24" width="100%" height="100%" style="display:block"><path d="M12 0 L14.3 9.7 L24 12 L14.3 14.3 L12 24 L9.7 14.3 L0 12 L9.7 9.7Z" fill="#fff8c4"/></svg>';
 
@@ -41,16 +47,23 @@ const TWINKLES = Array.from({ length: 20 }, (_, i) => {
   return { left: 50 + Math.cos(a) * (58 + ((i * 37) % 17)), top: 50 + Math.sin(a) * (72 + ((i * 53) % 29)),
     size: 7 + ((i * 7) % 9), delay: (i * 173) % 1400, star: i % 3 === 0 };
 });
+// the treat row's twinkles: their OWN pseudo-random spots/sizes/timing, so they never mirror the coin row's
+const TWINKLES2 = (() => {
+  let seed = 97;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  return Array.from({ length: 18 }, () => {
+    const a = rnd() * Math.PI * 2, d = 0.55 + rnd() * 0.5;
+    return { left: 50 + Math.cos(a) * 66 * d * 1.25, top: 50 + Math.sin(a) * 80 * d * 1.25, size: 6 + Math.floor(rnd() * 10),
+      delay: Math.floor(rnd() * 1600), star: rnd() < 0.3 };
+  });
+})();
 const GAP = 62;          // ms between coins
 const POP = 260;         // ms burst outward
 const FLIGHT = 620;      // ms curve up to the pill
 
 function CoinFill() {
   return (
-    <svg viewBox="0 0 24 24" width="100%" height="100%" style={{ display: "block" }}>
-      <circle cx="12" cy="12" r="10" fill="#ffcf33" stroke="#e0a91e" strokeWidth="2" />
-      <circle cx="8.5" cy="8.5" r="3.5" fill="#fff3b0" />
-    </svg>
+    <img src={COIN_IMG} alt="" draggable={false} style={{ display: "block", width: "100%", height: "100%", objectFit: "contain" }} />
   );
 }
 
@@ -65,7 +78,7 @@ const CSS = `
 .wc-title { font-size:max(44px, calc(var(--u) * 5.6)); font-weight:700; text-shadow:0 4px 0 rgba(0,0,0,.35);
   animation:wc-popIn .5s .95s cubic-bezier(.3,1.7,.5,1) both; }
 .wc-glowtxt.on { animation:wc-glow 1.6s ease-in-out infinite; }
-.wc-row { position:relative; display:flex; align-items:center; gap:12px; font-size:max(44px, calc(var(--u) * 5.4));
+.wc-row { position:relative; display:flex; align-items:center; gap:16px; font-size:max(64px, calc(var(--u) * 8.4));
   font-weight:700; color:#ffd84a; text-shadow:0 3px 0 rgba(0,0,0,.35); animation:wc-popIn .5s 1.1s cubic-bezier(.3,1.7,.5,1) both;
   isolation:isolate; }
 .wc-row.shine::before { content:""; position:absolute; left:-32%; right:-32%; top:-50%; bottom:-50%; z-index:-1; border-radius:50%;
@@ -75,8 +88,12 @@ const CSS = `
   background:radial-gradient(circle, #fff 0%, #fff6b0 35%, rgba(255,210,80,0) 70%); }
 .wc-tw i.st { border-radius:0; background:#fff8c4; filter:drop-shadow(0 0 4px #ffd84a);
   clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%); }
-.wc-src { width:max(58px, calc(var(--u) * 7)); height:max(58px, calc(var(--u) * 7)); }
+.wc-src { width:max(86px, calc(var(--u) * 11)); height:max(86px, calc(var(--u) * 11)); }
 .wc-row.drain .wc-src { animation:wc-shake .15s linear infinite; }
+.wc-rows { display:flex; align-items:center; justify-content:center; gap:max(150px, calc(var(--u) * 19)); margin:calc(var(--u) * 2.5) 0; }
+.wc-row.t2 { animation-delay:1.2s; }
+.wc-src img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
+.wc-fly.wc-tfly { width:60px; height:60px; margin:-30px 0 0 -30px; }
 .wc-plus { position:absolute; left:100%; margin-left:14px; top:50%; transform:translateY(-50%); color:#8dff5c;
   -webkit-text-stroke:2px #1e5c12; paint-order:stroke fill; text-shadow:0 3px 0 rgba(0,0,0,.4); opacity:0; white-space:nowrap; }
 .wc-plus.go { animation:wc-plus 1.4s ease-out forwards; }
@@ -93,6 +110,10 @@ const CSS = `
   opacity:0; transform:translateY(-20px); transition:opacity .35s, transform .35s cubic-bezier(.3,1.6,.5,1); z-index:2; }
 .wc-pill.show { opacity:1; transform:none; }
 .wc-pillcoin { position:absolute; left:-14px; top:50%; width:74px; height:74px; margin-top:-37px; }
+.wc-flash { position:absolute; left:0; top:0; width:110px; height:110px; margin:-55px 0 0 -55px; border-radius:50%; pointer-events:none; z-index:7;
+  background:radial-gradient(circle, #fff 0%, #fffbe0 16%, #ffef5a 38%, rgba(255,222,40,.6) 58%, rgba(255,210,0,0) 72%); }
+.wc-treat { position:absolute; left:0; top:0; width:60px; height:auto; margin:-30px 0 0 -30px; pointer-events:none; z-index:6;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.4)); }
 
 .wc-andy { position:absolute; right:calc(50% + var(--u) * 6 + 165px - var(--shift)); bottom:calc(var(--u) * -30);
   height:calc(var(--u) * 84); aspect-ratio:559/1201; pointer-events:none; transform:translateY(110%); }
@@ -104,9 +125,9 @@ const CSS = `
 .wc-andy img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; user-select:none;
   filter:drop-shadow(0 10px 18px rgba(0,0,0,.45)); }
 @media (max-width:560px) { .wc-andy { display:none; } .wc-center { padding-left:0; } }
-@media (max-height:520px) { .wc-center { gap:10px; } .wc-great { font-size:46px; } .wc-title { font-size:32px; } .wc-row { font-size:34px; } .wc-btns { gap:14px; } }
+@media (max-height:520px) { .wc-center { gap:10px; } .wc-great { font-size:46px; } .wc-title { font-size:32px; } .wc-row { font-size:48px; } .wc-src { width:64px; height:64px; } .wc-btns { gap:14px; } }
 
-.wc-fly { position:absolute; left:0; top:0; width:40px; height:40px; margin:-20px 0 0 -20px; pointer-events:none; z-index:5; }
+.wc-fly { position:absolute; left:0; top:0; width:52px; height:52px; margin:-26px 0 0 -26px; pointer-events:none; z-index:5; }
 .wc-fly > div { width:100%; height:100%; animation:wc-tumble .35s linear infinite; filter:drop-shadow(0 3px 3px rgba(0,0,0,.4)); }
 .wc-spark { position:absolute; left:0; top:0; width:16px; height:16px; margin:-8px 0 0 -8px; pointer-events:none; z-index:6;
   filter:drop-shadow(0 0 4px #ffe680); }
@@ -130,7 +151,7 @@ const CSS = `
 @keyframes wc-twinkle { 0%,100%{opacity:0; transform:scale(.3) rotate(0deg)} 50%{opacity:1; transform:scale(1.3) rotate(45deg)} }
 `;
 
-export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = false, onChooseGame, onReturnToWorld }: Props) {
+export default function WinCelebration({ coinsWon, startTotal, treatsTotal = null, treatsWon = 2, muted, fanfare = false, onChooseGame, onReturnToWorld }: Props) {
   const won = Math.max(0, Math.floor(Number(coinsWon) || 0));
   const start = Math.max(0, Math.floor(Number(startTotal) || 0));
 
@@ -142,7 +163,13 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
   const [shine, setShine] = useState(false);   // treats text glows + coin row twinkles after the coins land
   const [thumbs, setThumbs] = useState(false);
   const [eyesShut, setEyesShut] = useState(false);
-  const [ready, setReady] = useState(won === 0);
+  const [ready, setReady] = useState(false);   // buttons wake up after the treats are in the jar
+  const [treatsIn, setTreatsIn] = useState(0); // treats landed in the jar so far
+  const jarRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const treatSrcRef = useRef<HTMLDivElement>(null);
+  const treatsTotalRef = useRef(treatsTotal);
+  treatsTotalRef.current = treatsTotal;
 
   const rootRef = useRef<HTMLDivElement>(null);
   const pillRef = useRef<HTMLDivElement>(null);
@@ -167,7 +194,7 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
       if (sfx) sfx.pause();
       winSfx.pause();
       fanfareSfx?.pause();
-      root.querySelectorAll(".wc-fly,.wc-spark,.wc-ring").forEach((e) => e.remove());
+      root.querySelectorAll(".wc-fly,.wc-spark,.wc-ring,.wc-treat,.wc-flash").forEach((e) => e.remove());
     };
 
     const sparkBurst = (x: number, y: number, count: number, dist: number, big: boolean) => {
@@ -218,16 +245,18 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
       if (a && a.width > 0) sparkBurst(a.left + a.width * 0.12, a.top + a.height * 0.24, 14, 70, false);
     };
 
-    if (won === 0) { later(() => setShine(true), START); return cleanup; }
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      later(() => { setTotal(start + won); setThumbs(true); setShine(true); setReady(true); }, 700);
+      later(() => { setTotal(start + won); setThumbs(true); setShine(true); setTreatsIn(treatsWon); setReady(true); }, 700);
       return cleanup;
     }
 
     sfx = new Audio(SFX);
     sfx.preload = "auto";
     const flyers = Math.min(won, MAX_FLYERS);
-    let arrived = 0;
+    const tFlyers = Math.min(Math.max(0, treatsWon), 6);
+    let arrived = 0, tArrived = 0, coinsDone = flyers === 0, treatsDone = tFlyers === 0, ended = false;
+    // both done (coins in the pill + treats in the jar) -> thumbs-up, glow, buttons
+    const allDone = () => { if (ended || !coinsDone || !treatsDone) return; ended = true; later(finish, 250); later(() => setReady(true), 500); };
 
     const land = () => {
       arrived++;
@@ -250,15 +279,33 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
             { duration: 1000, easing: "ease-out" },
           );
         }, 120);
-        later(finish, 250);
-        later(() => setReady(true), 500);
+        coinsDone = true; allDone();
       }
     };
+    // a treat reaches the bottom-left corner: bright yellow flash, gone
+    let treatDst = { x: 0, y: 0 };
+    const flash = (x: number, y: number) => {
+      const f = document.createElement("div");
+      f.className = "wc-flash";
+      root.appendChild(f);
+      f.animate([
+        { transform: `translate(${x}px,${y}px) scale(.2)`, opacity: 1 },
+        { transform: `translate(${x}px,${y}px) scale(1.5)`, opacity: 1, offset: 0.35 },
+        { transform: `translate(${x}px,${y}px) scale(2.3)`, opacity: 0 },
+      ], { duration: 650, easing: "ease-out" }).onfinish = () => f.remove();
+    };
+    const landTreat = () => {
+      flash(treatDst.x, treatDst.y);
+      tArrived++;
+      if (tArrived === 1 && flyers === 0) setHop(true);
+      setTreatsIn(Math.round((treatsWon * tArrived) / tFlyers));
+      if (tArrived === tFlyers) { treatsDone = true; allDone(); }
+    };
 
-    const launch = (src: { x: number; y: number }, dst: { x: number; y: number }) => {
+    const launch = (src: { x: number; y: number }, dst: { x: number; y: number }, html: string, onLand: () => void, cls = "") => {
       const c = document.createElement("div");
-      c.className = "wc-fly";
-      c.innerHTML = `<div>${COIN_SVG}</div>`;
+      c.className = "wc-fly" + cls;
+      c.innerHTML = `<div>${html}</div>`;
       root.appendChild(c);
       const a = Math.random() * Math.PI * 2;
       const r = 50 + Math.random() * 60;
@@ -278,7 +325,7 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
           x = m * m * p1.x + 2 * m * k * ctrl.x + k * k * dst.x;
           y = m * m * p1.y + 2 * m * k * ctrl.y + k * k * dst.y;
           s = 1.2 - 0.45 * k;
-          if (u >= 1) { c.remove(); land(); return; }
+          if (u >= 1) { c.remove(); onLand(); return; }
         }
         c.style.transform = `translate(${x}px,${y}px) scale(${s})`;
         rafs.push(requestAnimationFrame(step));
@@ -286,13 +333,25 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
       rafs.push(requestAnimationFrame(step));
     };
 
+    // coins -> coin pill AND treats -> jar, at the same time
     later(() => {
-      if (!srcRef.current || !pillCoinRef.current) { setTotal(start + won); setReady(true); finish(); return; }
-      const src = center(srcRef.current);
-      const dst = center(pillCoinRef.current);
+      const coinOk = flyers > 0 && !!srcRef.current && !!pillCoinRef.current;
+      const treatOk = tFlyers > 0 && !!treatSrcRef.current;
+      if (!coinOk) { setTotal(start + won); coinsDone = true; }
+      if (!treatOk) { setTreatsIn(treatsWon); treatsDone = true; }
+      if (!coinOk && !treatOk) { allDone(); return; }
       setFlying(true);
-      later(() => { if (sfx && !mutedRef.current) { sfx.currentTime = 0; sfx.play().catch(() => {}); } }, POP + FLIGHT - 100);
-      for (let i = 0; i < flyers; i++) later(() => launch(src, dst), i * GAP);
+      if (coinOk) {
+        const src = center(srcRef.current!), dst = center(pillCoinRef.current!);
+        later(() => { if (sfx && !mutedRef.current) { sfx.currentTime = 0; sfx.play().catch(() => {}); } }, POP + FLIGHT - 100);
+        for (let i = 0; i < flyers; i++) later(() => launch(src, dst, COIN_SVG, land), i * GAP);
+      }
+      if (treatOk) {
+        const src = center(treatSrcRef.current!), rr = root.getBoundingClientRect();
+        const dst = { x: rr.left + 70, y: rr.bottom - 70 }; // bottom-left corner
+        treatDst = dst;
+        for (let i = 0; i < tFlyers; i++) later(() => launch(src, dst, TREAT_HTML, landTreat, " wc-tfly"), 60 + i * 160);
+      }
     }, START);
 
     return cleanup;
@@ -314,14 +373,14 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
         </div></div>
       </div>
 
-      <div className={`wc-pill${pillIn ? " show" : ""}`} ref={pillRef}>
+      <div className={`wc-pill${pillIn ? " show" : ""}`} ref={pillRef} style={startTotal === null ? { display: "none" } : undefined}>
         <div className="wc-pillcoin" ref={pillCoinRef}><CoinFill /></div>
         <span>{total}</span>
       </div>
 
       <div className="wc-center">
         <div className="wc-great"><Word3D text={GREAT} delay={GREAT_DELAY} /></div>
-        <div className="wc-title"><span className={`wc-glowtxt${shine ? " on" : ""}`}>You won 2 treats!</span></div>
+        <div className="wc-rows">
         {won > 0 && (
           <div className={`wc-row${flying ? " drain" : ""}${shine ? " shine" : ""}`}>
             {shine && (
@@ -337,7 +396,23 @@ export default function WinCelebration({ coinsWon, startTotal, muted, fanfare = 
             <span className={`wc-plus${flying ? " go" : ""}`}>+{won}</span>
           </div>
         )}
-        <div className={`wc-btns${ready && won > 0 ? " ready" : ""}`}>
+        {treatsWon > 0 && (
+          <div className={`wc-row t2${flying ? " drain" : ""}${shine ? " shine" : ""}`}>
+            {shine && (
+              <div className="wc-tw">
+                {TWINKLES2.map((t, i) => (
+                  <i key={i} className={t.star ? "st" : ""} style={{ left: `${t.left}%`, top: `${t.top}%`, width: t.size * (t.star ? 2 : 1),
+                    height: t.size * (t.star ? 2 : 1), marginLeft: -t.size * (t.star ? 1 : 0.5), marginTop: -t.size * (t.star ? 1 : 0.5), animationDelay: `${t.delay}ms` }} />
+                ))}
+              </div>
+            )}
+            <div className="wc-src" ref={treatSrcRef}><img src={TREAT_IMG} alt="" draggable={false} /></div>
+            <span>{"×"}{treatsWon}</span>
+            <span className={`wc-plus${flying ? " go" : ""}`}>+{treatsWon}</span>
+          </div>
+        )}
+        </div>
+        <div className={`wc-btns${ready ? " ready" : ""}`}>
           <button className="f3-btn f3-yellow" disabled={!ready} onClick={onChooseGame}>
             Choose Game
           </button>

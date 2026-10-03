@@ -5,10 +5,12 @@ import { standardSave, oceanSave, type WorldSave } from "./storage";
 import type { WorldSkin } from "./skin";
 import { DINO_ANIMALS } from "./dino";
 import { OCEAN_ANIMALS } from "./ocean";
-import { DINO_SKIN } from "./skins/dinoSkin";
-import { OCEAN_SKIN } from "./skins/oceanSkin";
+// import { DINO_SKIN } from "./skins/dinoSkin";   // old look, kept for rollback (step 6)
+// import { OCEAN_SKIN } from "./skins/oceanSkin"; // old look, kept for rollback (step 6)
 import { SAVANNA_ANIMALS } from "./savanna";
 import { SAVANNA_SKIN } from "./skins/savannaSkin";
+import { OCEAN_LOOK } from "./skins/oceanLook";
+import { DINO_LOOK } from "./skins/dinoLook";
 
 export interface WorldConfig {
   id: string;                                           // "dino" (cloud blob key + save names)
@@ -26,7 +28,7 @@ export const OCEAN_WORLD: WorldConfig = {
   animals: OCEAN_ANIMALS,
   makeSave: (code, name) => oceanSave(code, name, OCEAN_ANIMALS.map(a => a.id)),
   gamePath: "/game/ocean",
-  skin: OCEAN_SKIN,
+  skin: OCEAN_LOOK,                                     // step 6 (2026-10-03): new shared look (old: OCEAN_SKIN)
   nextWorld: { id: "dino", path: "/dino" },
   masterAllGrown: true,
   legacyMasterCleanup: true,
@@ -37,11 +39,16 @@ export const DINO_WORLD: WorldConfig = {
   animals: DINO_ANIMALS,
   makeSave: (code, name) => standardSave("dino", code, name, DINO_ANIMALS.map(a => a.id)),
   gamePath: "/game/dino",
-  skin: DINO_SKIN,
+  skin: DINO_LOOK,                                      // step 6 (2026-10-03): new shared look (old: DINO_SKIN)
   nextWorld: null,
   masterAllGrown: false,
   legacyMasterCleanup: false,
 };
+
+// STEP 6 (2026-10-03): Ocean + Dino on the NEW shared look - same animals, same save places, only the look differs.
+// Test routes only (/world-test/ocean + /world-test/dino) until the old-vs-new save proof passes; then the real routes switch.
+export const OCEAN_WORLD_NEW: WorldConfig = { ...OCEAN_WORLD, skin: OCEAN_LOOK };
+export const DINO_WORLD_NEW: WorldConfig = { ...DINO_WORLD, skin: DINO_LOOK };
 
 // WORLD 3 (step 5.3, 2026-10-02): STANDARD storage (mpe_savanna_..., cloud data.savanna). Only on the test route for now.
 // gamePath: GamePage has no savanna return yet - check before Play a Game is wired (step 5.4).

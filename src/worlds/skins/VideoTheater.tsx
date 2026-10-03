@@ -79,10 +79,11 @@ export default function VideoTheater({ cx, sh, worlds, start, newIds, onPlay, on
         </div>
       )}
 
-      <div className={"tv-arrow l sv-tap" + (wi === 0 ? " off" : "")} style={{ left: left + SCR.x - 190, top: top + SCR.y + SCR.h / 2 - 50 }}
-        onClick={() => wi > 0 && setWi(wi - 1)}><i /></div>
-      <div className={"tv-arrow r sv-tap" + (wi === worlds.length - 1 ? " off" : "")} style={{ left: left + SCR.x + SCR.w + 90, top: top + SCR.y + SCR.h / 2 - 50 }}
-        onClick={() => wi < worlds.length - 1 && setWi(wi + 1)}><i /></div>
+      {/* Andy 2026-10-03: no arrow at all at the ends (first world = no left arrow, last world = no right arrow) */}
+      {wi > 0 && <div className="tv-arrow l sv-tap" style={{ left: left + SCR.x - 190, top: top + SCR.y + SCR.h / 2 - 50 }}
+        onClick={() => setWi(wi - 1)}><i /></div>}
+      {wi < worlds.length - 1 && <div className="tv-arrow r sv-tap" style={{ left: left + SCR.x + SCR.w + 90, top: top + SCR.y + SCR.h / 2 - 50 }}
+        onClick={() => setWi(wi + 1)}><i /></div>}
 
       {/* popcorn: box hops, 3 popcorn pop out and stay on the floor */}
       <i className="tv-cs box" style={{ left: boxLeft + BOX_W / 2, top: floor, width: BOX_W * 0.95, height: 14 }} />

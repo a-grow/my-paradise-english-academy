@@ -96,7 +96,7 @@ const GamePage = () => {
       const comboId = `u${unitId}_${gameId}_${diff}`;
       setClaimedCombos(prev => new Set([...prev, comboId]));
       setLastTreats(TREATS_BY_DIFF[diff] ?? 2);
-      playCelebrate();
+      // playCelebrate(); // the win screen has its own sounds now (2026-10-04)
       setShowCelebration(true);
       return;
     }
@@ -123,7 +123,7 @@ const GamePage = () => {
     setTreatsEarnedToday(newTotal);
 
     setLastTreats(treats);
-    playCelebrate();
+    // playCelebrate(); // the win screen has its own sounds now (2026-10-04)
     setShowCelebration(true);
   }, [isMaster, capKey, jarKey, playCelebrate]);
 

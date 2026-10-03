@@ -9,6 +9,7 @@ type Props = {
   onTryAgain: () => void;
   onChooseGame: () => void;
   onReturnToWorld: () => void;
+  title?: string;   // default 'Out of hearts!' (vocab games: 'Out of time!' when the clock ran out - 2026-10-04)
 };
 
 const ART = "/celebration/";
@@ -50,7 +51,7 @@ const CSS = `
 @media (prefers-reduced-motion: reduce) { .ls-sway, .ls-breathe, .ls-head { animation:none; } .ls-andy.in { animation:none; transform:none; } }
 `;
 
-export default function LoseScreen({ muted, onTryAgain, onChooseGame, onReturnToWorld }: Props) {
+export default function LoseScreen({ muted, onTryAgain, onChooseGame, onReturnToWorld, title = TITLE }: Props) {
   const [andyIn, setAndyIn] = useState(false);
   useEffect(() => {
     const t = window.setTimeout(() => setAndyIn(true), 150);
@@ -74,7 +75,7 @@ export default function LoseScreen({ muted, onTryAgain, onChooseGame, onReturnTo
       </div>
 
       <div className="ls-center">
-        <div className="ls-title"><Word3D text={TITLE} palette="blue" delay={150} stagger={45} /></div>
+        <div className="ls-title"><Word3D text={title} palette="blue" delay={150} stagger={45} /></div>
         <div className="ls-btns">
           <button className="f3-btn f3-green" onClick={onTryAgain}>Try Again</button>
           <button className="f3-btn f3-yellow" onClick={onChooseGame}>Choose Game</button>

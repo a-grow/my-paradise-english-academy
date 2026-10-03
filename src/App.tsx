@@ -19,7 +19,7 @@ import GrammarDig from "./pages/GrammarDig";
 import GrammarGrab from "./pages/GrammarGrab";
 import CookieJarPreview from "./pages/CookieJarPreview";
 import WorldPage from "./pages/WorldPage";
-import { DINO_WORLD, OCEAN_WORLD } from "./worlds";
+import { DINO_WORLD, OCEAN_WORLD, DINO_WORLD_NEW, OCEAN_WORLD_NEW } from "./worlds";
 import WorldTestSavanna from "./pages/WorldTestSavanna";
 import GrammarHub from "./pages/GrammarHub";
 import NotFound from "./pages/NotFound";
@@ -50,8 +50,8 @@ const App = () => (
 <Route path="/grammar-grab/:code/:studentName/:level?" element={<GrammarGrab />} />
 <Route path="/grammar-hub/:code/:studentName/:level?" element={<GrammarHub />} />
 <Route path="/cookie-jar-preview" element={<CookieJarPreview />} />
-<Route path="/world-test/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
-<Route path="/world-test/ocean/:code/:studentName" element={<WorldPage world={OCEAN_WORLD} />} />
+<Route path="/world-test/dino/:code/:studentName" element={<WorldTestSavanna world={DINO_WORLD_NEW} />} />
+<Route path="/world-test/ocean/:code/:studentName" element={<WorldTestSavanna world={OCEAN_WORLD_NEW} />} />
 <Route path="/world-test/savanna/:code/:studentName" element={<WorldTestSavanna />} />
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
