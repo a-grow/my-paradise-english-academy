@@ -48,14 +48,17 @@ const CSS = `
 .cj-stage.cj-shine .cj-tw { opacity: 1; }
 .cj-tw i { position: absolute; border-radius: 50%; opacity: 0; animation: cj-twinkle 1.4s ease-in-out infinite both;
   background: radial-gradient(circle, #fff 0%, #fff6b0 35%, rgba(255,210,80,0) 70%); }
-.cj-tw i.cj-st { border-radius: 0; background: #fffbe0; filter: drop-shadow(0 0 8px #ffd84a) drop-shadow(0 0 3px #fff);
-  clip-path: polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%); }
+/* NO star shapes (Andy 2026-10-03): the big twinkles are round glowing dots too */
+.cj-tw i.cj-st { background: radial-gradient(circle, #fff 0%, #fff3a0 28%, rgba(255,214,90,.55) 52%, rgba(255,210,80,0) 72%); }
+.cj-tw b { position: absolute; border-radius: 50%; opacity: 0; background: #fff6b8;
+  box-shadow: 0 0 5px 2px rgba(255,214,80,.95), 0 0 10px 3px rgba(255,200,60,.55); animation: cj-fairy 1.5s ease-in-out infinite both; }
+@keyframes cj-fairy { 0%,100% { opacity: 0; transform: translateY(4px) scale(.4); } 45% { opacity: 1; transform: translateY(-3px) scale(1); } 70% { opacity: .5; } }
 @keyframes cj-twinkle { 0%,100% { opacity: 0; transform: scale(.3) rotate(0deg); } 50% { opacity: 1; transform: scale(1.35) rotate(45deg); } }
 @keyframes cj-halo { 0%,100% { opacity: .75; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.04); } }
-@media (prefers-reduced-motion: reduce) { .cj-tw i, .cj-stage.cj-shine .cj-halo { animation: none; } .cj-tw i { opacity: .9; } }
+@media (prefers-reduced-motion: reduce) { .cj-tw i, .cj-tw b, .cj-stage.cj-shine .cj-halo { animation: none; } .cj-tw i, .cj-tw b { opacity: .9; } }
 `;
 
-// 28 twinkles in a ring around the jar (every 3rd one is a 4-point star)
+// 28 twinkles in a ring around the jar (every 3rd one is a BIGGER round glow - no star shapes, Andy 2026-10-03)
 const TWINKLES = Array.from({ length: 28 }, (_, i) => {
   const a = (i / 28) * Math.PI * 2 + (i % 3) * 0.13;
   const star = i % 3 === 0, size = (14 + ((i * 7) % 13)) * (star ? 2.1 : 1);
@@ -67,6 +70,21 @@ const TWINKLES = Array.from({ length: 28 }, (_, i) => {
     },
   };
 });
+
+// FAIRY DUST (Andy 2026-10-03): 40 tiny yellow glowing specks twinkling around the jar while it shines (round, no stars).
+// Fixed pseudo-random so it looks the same every time.
+const FAIRY = (() => {
+  let seed = 23;
+  const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  return Array.from({ length: 40 }, () => {
+    const a = r() * Math.PI * 2, rad = 0.62 + r() * 0.5, size = 3 + r() * 3.5;
+    return {
+      left: `${50 + Math.cos(a) * 52 * rad}%`, top: `${55 + Math.sin(a) * 42 * rad}%`,
+      width: size, height: size, marginLeft: -size / 2, marginTop: -size / 2,
+      animationDuration: `${0.9 + r() * 1.3}s`, animationDelay: `${-r() * 2.2}s`,
+    };
+  });
+})();
 
 type Engine = { earn: (n: number) => void; feed: (n: number) => void; poke: () => void; destroy: () => void };
 
@@ -426,6 +444,7 @@ export default function CookieJar({ count, muted = false, width = "min(290px, 62
       <canvas ref={canvasRef} role="img" aria-label="Glass treat jar with chocolate cookies inside" />
       <div className="cj-tw" aria-hidden="true">
         {TWINKLES.map((t, i) => <i key={i} className={t.star ? "cj-st" : undefined} style={t.style} />)}
+        {FAIRY.map((f, i) => <b key={"f" + i} style={f} />)}
       </div>
     </div>
   );

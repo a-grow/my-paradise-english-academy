@@ -22,7 +22,7 @@ const items = (i: number) => {
   return ([["treat", r.t], ["coin", r.c], ["piece", r.p]] as [DailyKind, number][]).filter(([, n]) => n > 0);
 };
 
-const BW = 1000, BH = Math.round(1000 * 762 / 1212);   // board size on the stage (art 1212 x 762)
+const BW = 1000, BH = Math.round(1000 * 809 / 1270);   // board size on the stage (DARK teal art 1270 x 809, Andy 19:19)
 const TW = 150, TH = 155, GAP = 15;                    // day boxes
 const GX = 130, GY = 208;                              // grid top-left inside the board
 const GIFT_X = GX + 3 * TW + 2 * GAP + 30, GIFT_W = 230;
@@ -30,6 +30,27 @@ const FLY_MS = 800;
 
 const SPARKS = [[-40, 120, 46, 3.6, 0], [1030, 90, 40, 4.2, 1.1], [-20, 470, 34, 3.9, 2.0], [1020, 430, 50, 4.6, 0.6],
   [180, -30, 36, 4.0, 1.6], [820, -40, 42, 3.7, 2.6], [520, 655, 38, 4.4, 0.3], [90, 640, 30, 3.8, 2.9], [930, 630, 34, 4.1, 1.9]];
+
+// MAGIC GLOW (yellow since Andy 20:38; was pink) behind the Day 7 present when it is today (Andy 19:11): very bright vibrant pink glow + slow pink and
+// white sparkles drifting out (the board is cream/yellow, so gold did not show). Fixed pseudo-random = same every load.
+// dots: [angle deg, distance px, size px, seconds, delay seconds, white 0/1]; stars: [angle deg, radius px, size px, seconds, delay s]
+const PINK = (() => {
+  let seed = 7;
+  const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const dots = Array.from({ length: 46 }, () => [r() * 360, 115 + r() * 85, 3 + r() * 4, 3.4 + r() * 2.6, -r() * 6, r() < 0.35 ? 1 : 0]);
+  const stars = Array.from({ length: 9 }, (_, i) => [i * 40 + r() * 20, 105 + r() * 45, 26 + r() * 16, 3 + r() * 1.8, -r() * 4]);
+  return { dots, stars };
+})();
+const PinkMagic = ({ x, y }: { x: number; y: number }) => (
+  <div className="dp-pink" style={{ left: x, top: y }} aria-hidden="true">
+    <div className="dp-pinkhalo" />
+    <div className="dp-rays" /> {/* turning yellow light rays, like the grow-up party (Andy 21:23) - only a little past the present */}
+    {PINK.dots.map((d, i) => (
+      <i key={"d" + i} className={"dp-pd" + (d[5] ? " w" : "")}
+        style={{ width: d[2], height: d[2], margin: -d[2] / 2, ["--a" as string]: `${d[0]}deg`, ["--d" as string]: `${d[1]}px`, animationDuration: `${d[3]}s`, animationDelay: `${d[4]}s` } as CSSProperties} />
+    ))}
+  </div>
+);
 
 export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand, onDone }: {
   cx: number; sh: number;
@@ -93,14 +114,11 @@ export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand
       <div className="dp-dim" />
       <div className="dp-board" style={{ left, top, width: BW, height: BH }}>
         <div className="dp-glow" />
-        {SPARKS.map(([x, y, sz, sec, dl], i) => (
-          <img key={i} className="dp-spark" src={`${UI}/sparkle.webp`} alt=""
-            style={{ left: x, top: y, width: sz, height: sz, animationDuration: `${sec}s`, animationDelay: `${dl}s` }} />
-        ))}
+        {/* star-shaped sparkles REMOVED everywhere in the Daily Prize (Andy 19:19: no emoji-like sparkles) */}
         <img className="dp-art" src={`${D}/board.webp`} alt="" />
         <div className="dp-shine" />
         <svg className="dp-title" width={BW} height={200} viewBox={`0 0 ${BW} 200`} aria-label="Daily Prize">
-          <path id="dp-arc" d="M270,126 Q500,86 730,126" fill="none" />
+          <path id="dp-arc" d="M290,116 Q500,64 710,116" fill="none" /> {/* measured on the dark board: ribbon middle ~y71 centre, ~y87 at x315/670 */}
           <text textAnchor="middle"><textPath href="#dp-arc" startOffset="50%">Daily Prize</textPath></text>
         </svg>
         {DAILY_TABLE.map((_, i) => {
@@ -111,10 +129,15 @@ export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand
           if (i === 6) {
             return (
               <div key={i} className={"dp-tile dp-gift" + (today ? " today" : "")} style={{ left: p.x, top: p.y, width: p.w, height: p.h }}>
+                {today && <PinkMagic x={GIFT_W / 2} y={118} />}
                 {done
                   ? <img src={`${D}/tile_done.webp`} alt="" style={{ position: "absolute", left: 25, top: 40, width: 180 }} />
-                  : <img src={`${D}/tile_gift.webp`} alt="" style={{ position: "absolute", left: 0, top: 0, width: GIFT_W }} />}
-                {!done && label("7", { left: 113, width: 60, top: 104, fontSize: 34, textAlign: "center", color: "#7a3d00", textShadow: "none", WebkitTextStroke: "0" })}
+                  : (
+                    <div className="dp-giftbox" style={{ position: "absolute", left: 0, top: 0, width: GIFT_W, height: 240 }}>
+                      <img src={`${D}/tile_gift.webp`} alt="" style={{ position: "absolute", left: 0, top: 0, width: GIFT_W }} />
+                      {label("7", { left: 113, width: 60, top: 104, fontSize: 34, textAlign: "center", color: "#7a3d00", textShadow: "none", WebkitTextStroke: "0" })}
+                    </div>
+                  )}
                 {today && <div className="dp-chips" style={{ top: 248 }}>
                   {its.map(([k, n]) => <span key={k}><img src={ICON[k]} alt="" />x{n}</span>)}
                 </div>}
@@ -161,7 +184,32 @@ const CSS = `
 .dp-title{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;filter:drop-shadow(0 4px 0 #3a1a05)}
 .dp-title text{font-family:'Titan One',sans-serif;font-size:56px;fill:#fff;stroke:#4a2408;stroke-width:6px;stroke-linejoin:round;paint-order:stroke fill}
 .dp-tile{position:absolute}
+/* soft drop shadow under every box + the present (Andy 20:40) - on the img, so the 'today' glow animation keeps its own filter */
+.dp-tile > img,.dp-giftbox > img{filter:drop-shadow(0 6px 6px rgba(0,0,0,.38))}
 .dp-tile.today{animation:dp-today 2.6s ease-in-out infinite}
+/* Day 7 gift when it is today: ONLY the present wiggles (Andy 14:49 - not the prizes under it), same peek-wiggle as
+   the My Animals card (Andy 14:43) + soft gold glow */
+.dp-tile.dp-gift.today{animation:none}
+.dp-gift.today .dp-giftbox{animation:dp-peek 2.6s ease-in-out infinite;transform-origin:50% 80%} /* no gold glow (Andy 19:11) */
+.dp-pink{position:absolute;width:0;height:0;pointer-events:none}
+.dp-pinkhalo{position:absolute;left:-190px;top:-190px;width:380px;height:380px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(255,226,90,.95),rgba(255,206,60,.62) 42%,rgba(255,220,110,.25) 70%,rgba(255,220,110,0) 100%); /* YELLOW (Andy 20:38, was pink) */
+  animation:dp-pinkbreathe 3.4s ease-in-out infinite}
+.dp-rays{position:absolute;left:-185px;top:-185px;width:370px;height:370px;border-radius:50%;
+  background:repeating-conic-gradient(rgba(255,226,110,0) 0deg,rgba(255,226,110,.8) 9deg,rgba(255,226,110,0) 18deg,rgba(255,226,110,0) 45deg);filter:blur(5px); /* 8 even rays, a bit wider (Andy 21:25) */
+  -webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent 100%);mask-image:radial-gradient(closest-side,#000 30%,transparent 100%);
+  animation:dp-spin 40s linear infinite}
+@keyframes dp-spin{to{transform:rotate(360deg)}}
+.dp-pd{position:absolute;left:0;top:0;border-radius:50%;background:#ffd93a;opacity:0;
+  box-shadow:0 0 8px 3px rgba(255,217,58,.95),0 0 20px 7px rgba(255,200,60,.6);animation:dp-pdrift linear infinite}
+.dp-pd.w{background:#fffbe6;box-shadow:0 0 8px 3px rgba(255,255,230,.95),0 0 18px 7px rgba(255,210,70,.75)}
+.dp-pstar{position:absolute;opacity:0;filter:hue-rotate(275deg) saturate(2.2) brightness(1.15) drop-shadow(0 0 8px #ff3fcf);
+  animation:dp-pstar ease-in-out infinite}
+@keyframes dp-pinkbreathe{0%,100%{opacity:.82;transform:scale(.94)}50%{opacity:1;transform:scale(1.07)}}
+@keyframes dp-pdrift{0%{opacity:0;transform:rotate(var(--a)) translateX(35px) scale(.4)}18%{opacity:1}75%{opacity:.9}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scale(1)}}
+@keyframes dp-pstar{0%,100%{opacity:0;transform:scale(.3) rotate(0deg)}45%{opacity:1;transform:scale(1) rotate(30deg)}70%{opacity:.55}}
+@keyframes dp-peek{0%,52%,100%{transform:rotate(0)}56%{transform:rotate(-2.4deg)}61%{transform:rotate(2.2deg)}66%{transform:rotate(-1.8deg)}71%{transform:rotate(1.2deg)}76%{transform:rotate(0)}}
+@keyframes dp-giftglow{0%,100%{filter:drop-shadow(0 0 6px rgba(255,220,90,.7))}50%{filter:drop-shadow(0 0 18px rgba(255,220,90,1))}}
 .dp-face{position:absolute;left:14px;right:14px;top:40px;bottom:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   font-family:'Titan One',sans-serif;color:#5a2d08;font-size:20px}
 .dp-face span{display:flex;align-items:center;gap:4px}
@@ -185,5 +233,5 @@ const CSS = `
 @keyframes dp-twinkle{0%,100%{opacity:0;transform:scale(.4) rotate(0deg)}45%{opacity:.95;transform:scale(1) rotate(25deg)}70%{opacity:.5}}
 @keyframes dp-today{0%,100%{transform:scale(1);filter:drop-shadow(0 0 6px rgba(255,220,90,.7))}50%{transform:scale(1.05);filter:drop-shadow(0 0 18px rgba(255,220,90,1))}}
 @keyframes dp-fly{0%{opacity:0;transform:translate(0,0) scale(.5)}12%{opacity:1;transform:translate(0,-40px) scale(1.05)}90%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.7)}}
-@media (prefers-reduced-motion: reduce){.dp-glow,.dp-shine,.dp-spark,.dp-tile.today{animation:none}}
+@media (prefers-reduced-motion: reduce){.dp-glow,.dp-shine,.dp-spark,.dp-tile.today,.dp-gift.today .dp-giftbox,.dp-pinkhalo,.dp-pstar,.dp-rays{animation:none}.dp-pd{display:none}}
 `;

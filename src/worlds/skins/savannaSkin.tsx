@@ -157,7 +157,7 @@ const Page = ({ v }: { v: WorldView }) => {
   };
   const [coinShown, setCoinShown] = useState(0);
   const [bump, setBump] = useState<Record<string, number>>({});
-  const [newIds, setNewIds] = useState<string[]>([]); // videos new in the Video Theater (red dots; in-memory until 5.4)
+  const [newIds, setNewIds] = useState<string[]>([]); // EXTRA red dots in this page only (test flags ?v=1 / ?t=1, just watched)
   const stageRef = useRef<HTMLDivElement>(null);
   const coinRef = useRef<HTMLDivElement>(null);
   const puzzleRef = useRef<HTMLDivElement>(null);
@@ -295,6 +295,11 @@ const Page = ({ v }: { v: WorldView }) => {
     if (first) setNewIds(ids => ids.includes(first.id) ? ids : [...ids, first.id]);
     setPanel("theater");
   }, []);
+  // RED DOTS (5.4, Andy 14:28 choice a): every WON video not yet played in the Video Theater = red dot on its card + the
+  // button. 'Played' is saved in the cloud (v.seen 'theater:<world>:<animal>'), so the dot is gone on every device.
+  const myCards = theaterWorlds.find(w => w.key === v.world.id)?.cards ?? [];
+  const realNew = v.seen ? myCards.filter(c => c.won && !v.seen!.includes(`theater:${v.world.id}:${c.id}`)).map(c => c.id) : [];
+  const allNew = [...new Set([...realNew, ...newIds])];
   const theaterMusic = (quiet: boolean) => { const a = v.audioRef.current; if (a) a.volume = quiet ? 0.02 : (v.K.musicVolume ?? v.volume * 0.5); };
   const [dailyGone, setDailyGone] = useState(false);
   const [jarPoke, setJarPoke] = useState(0);
@@ -401,7 +406,8 @@ const Page = ({ v }: { v: WorldView }) => {
           <div key={"b" + burst} className="sv-burst" style={{ left: cx }}>
             {Array.from({ length: 18 }, (_, i) => {
               const ang = (Math.PI * 2 * i) / 18, d = 150 + (i % 3) * 45;
-              return <img key={i} src={`${UI}/sparkle.webp`} alt="" style={{ ["--dx" as string]: `${Math.cos(ang) * d}px`, ["--dy" as string]: `${Math.sin(ang) * d * 0.55}px`, width: 22 + (i % 4) * 7, animationDelay: `${(i % 5) * 25}ms` }} />;
+              const w = 14 + (i % 4) * 5; // round glowing dots - no star shapes (Andy 2026-10-03)
+              return <i key={i} style={{ ["--dx" as string]: `${Math.cos(ang) * d}px`, ["--dy" as string]: `${Math.sin(ang) * d * 0.55}px`, width: w, height: w, marginLeft: -w / 2, marginTop: -w / 2, animationDelay: `${(i % 5) * 25}ms` }} />;
             })}
           </div>
         )}
@@ -430,7 +436,7 @@ const Page = ({ v }: { v: WorldView }) => {
           <div className="sv-imgbtn sv-tap" onClick={soon}><img src={`${UI}/btn_grammar.webp`} alt="Grammar Games" /></div>
           <div ref={puzzleRef} className={"sv-imgbtn sv-tap" + lift} style={bumpStyle("piece")} onClick={soon}><img src={`${UI}/btn_puzzle.webp`} alt="Puzzle Activity" /></div>
           <div className="sv-imgbtn sv-tap" onClick={() => setPanel("theater")}>
-            <img src={`${UI}/btn_video.webp`} alt="Video Theater" />{newIds.length > 0 && <span className="sv-dot" />}
+            <img src={`${UI}/btn_video.webp`} alt="Video Theater" />{allNew.length > 0 && <span className="sv-dot" />}
           </div>
         </div>
 
@@ -511,8 +517,8 @@ const Page = ({ v }: { v: WorldView }) => {
         )}
 
         {panel === "theater" && (
-          <VideoTheater cx={cx} sh={sh} worlds={theaterWorlds} start={2} newIds={newIds}
-            onPlay={id => { theaterMusic(true); setNewIds(ids => ids.filter(x => x !== id)); }}
+          <VideoTheater cx={cx} sh={sh} worlds={theaterWorlds} start={2} newIds={allNew}
+            onPlay={id => { theaterMusic(true); setNewIds(ids => ids.filter(x => x !== id)); v.markSeen(`theater:${v.world.id}:${id}`); }}
             onStop={() => theaterMusic(false)} onClose={() => setPanel(null)} />
         )}
 
@@ -665,7 +671,8 @@ const CSS = `
  box-shadow:0 0 0 4px rgba(255,210,58,.85),0 0 24px rgba(255,210,58,.6)}
 .sv-nameinput::placeholder{color:rgba(255,255,255,.75)}
 .sv-burst{position:absolute;top:850px;width:0;height:0;z-index:25;pointer-events:none}
-.sv-burst img{position:absolute;left:0;top:0;margin:-14px 0 0 -14px;opacity:0;animation:sv-spk 1s ease-out forwards}
+.sv-burst i{position:absolute;left:0;top:0;border-radius:50%;opacity:0;animation:sv-spk 1s ease-out forwards;
+  background:radial-gradient(circle,#fff 0%,#fff3a0 30%,rgba(255,214,90,.6) 55%,rgba(255,210,80,0) 72%)}
 @keyframes sv-spk{0%{opacity:0;transform:translate(0,0) scale(.3) rotate(0)}25%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(160deg)}}
 .sv-fly{position:absolute;left:0;top:0;z-index:20;pointer-events:none;animation:sv-flyx .65s linear forwards}
 @keyframes sv-flyx{from{transform:translateX(var(--x0))}to{transform:translateX(var(--x1))}}

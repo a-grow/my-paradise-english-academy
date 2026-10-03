@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, addTreats, addCoins, claimPrize, loadPrizes, claimDailyPrize, loadDailyPrize, claimDailyTreat, dailyClaimedToday } from "@/lib/cloudSave";
+import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, addTreats, addCoins, claimPrize, loadPrizes, claimDailyPrize, loadDailyPrize, loadSeen, markSeen, claimDailyTreat, dailyClaimedToday } from "@/lib/cloudSave";
 import { getAnimalStage, getAnimalStageIdx, type Animal } from "@/worlds/types";
 import type { WorldConfig } from "@/worlds";
 
@@ -204,7 +204,15 @@ export const useWorldBrain = (world: WorldConfig) => {
     addCoins(code, studentName, 0).then(t => { if (typeof t === "number") setCoins(t); }); // 0 = read only
     loadPrizes(code, studentName).then(list => { if (Array.isArray(list)) setPrizes(list); }); // read only
     loadDailyPrize(code, studentName).then(d => { if (d) setDailyPrize(d); }); // read only
+    loadSeen(code, studentName).then(list => { if (Array.isArray(list)) setSeen(list); }); // read only
   }, []);
+  // SEEN FLAGS (2026-10-03): e.g. "theater:savanna:giraffe" = played in the Video Theater (red dot off everywhere).
+  // null = not read yet / teacher code. markSeenNow adds it here at once and in the cloud (add-only list).
+  const [seen, setSeen] = useState<string[] | null>(null);
+  const markSeenNow = (flag: string) => {
+    setSeen(s => ((s ?? []).includes(flag) ? s : [...(s ?? []), flag]));
+    if (!isMaster) markSeen(code, studentName, flag);
+  };
   // DAILY PRIZE (2026-10-03, new look): today's box + already taken? null = not read yet / teacher code.
   // claimDailyPrizeNow(): the DATABASE opens today's box (one per day) - through the jar queue like every jar change.
   const [dailyPrize, setDailyPrize] = useState<{ day: number; claimedToday: boolean } | null>(null);
@@ -511,7 +519,7 @@ export const useWorldBrain = (world: WorldConfig) => {
 
   const creatureImg = activeAnimal.stages[stageIdx]?.img ?? activeAnimal.stages[0].img;
 
-  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg, coins, prizes, claimPrize: claimPrizeNow, dailyPrize, claimDailyPrize: claimDailyPrizeNow };
+  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg, coins, prizes, claimPrize: claimPrizeNow, dailyPrize, claimDailyPrize: claimDailyPrizeNow, seen, markSeen: markSeenNow };
 };
 
 export type WorldView = ReturnType<typeof useWorldBrain>;

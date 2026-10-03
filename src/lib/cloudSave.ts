@@ -132,6 +132,33 @@ export async function loadDailyPrize(code: string, studentName: string): Promise
   }
 }
 
+// SEEN FLAGS (2026-10-03): things a kid has already seen, e.g. "theater:savanna:giraffe" (red dot off on every device).
+export async function loadSeen(code: string, studentName: string): Promise<string[] | null | undefined> {
+  try {
+    const { data, error } = await supabase
+      .from("student_progress")
+      .select("seen_flags")
+      .eq("code", code)
+      .eq("student_name", studentName)
+      .maybeSingle();
+    if (error) { console.error("[cloudSave] seen load failed:", error.message); return undefined; }
+    if (!data) return null;
+    return Array.isArray(data.seen_flags) ? data.seen_flags : [];
+  } catch (e) {
+    console.error("[cloudSave] seen load threw:", e);
+    return undefined;
+  }
+}
+export async function markSeen(code: string, studentName: string, flag: string) {
+  try {
+    const { error } = await supabase.rpc("mpe_mark_seen", { p_code: code, p_name: studentName, p_flag: flag });
+    if (error) console.error("[cloudSave] mark seen failed:", error.message);
+    else console.log("[cloudSave] seen", flag, code, studentName);
+  } catch (e) {
+    console.error("[cloudSave] mark seen threw:", e);
+  }
+}
+
 // ONE DAILY TREAT per kid per day (Taiwan date), whatever the device or world. The database
 // (function mpe_claim_daily) refuses a second claim the same day. Returns the jar total like addTreats.
 export async function claimDailyTreat(code: string, studentName: string): Promise<number | null | undefined> {
