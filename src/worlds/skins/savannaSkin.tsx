@@ -275,6 +275,11 @@ const Page = ({ v }: { v: WorldView }) => {
   const toastT = useRef(0);
   const toast = (t: string) => { setToastMsg(t); window.clearTimeout(toastT.current); toastT.current = window.setTimeout(() => setToastMsg(""), 1700); };
   const soon = () => toast("Coming soon!");
+  // VOCAB + GRAMMAR (5.4, Andy 21:27): kids land on the BOOK choice (vocab arcade) / the LEVEL list (grammar hub) first.
+  // The page remembers itself (this tab only) so the games' 'back to world' brings the kid back HERE.
+  const goGames = (path: string) => { sessionStorage.setItem("mpe_return_world", window.location.pathname); v.navigate(path); };
+  const goVocab = () => goGames(`${v.world.gamePath}/${v.code}/${v.studentName}/${v.family?.book ?? 1}`);
+  const goGrammar = () => goGames(`/grammar-hub/${v.code}/${v.studentName}`);
   const [panel, setPanel] = useState<null | "animals" | "exit" | "theater">(null);
 
   // VIDEO THEATER (Andy 16:34): Savanna cards from the brain (won = grown + video watched); Ocean + Dino = 'Coming soon!'
@@ -432,8 +437,8 @@ const Page = ({ v }: { v: WorldView }) => {
 
         {/* left: ways to earn */}
         <div className="sv-left">
-          <div className="sv-imgbtn sv-tap" onClick={soon}><img src={`${UI}/btn_vocab.webp`} alt="Vocab Games" /></div>
-          <div className="sv-imgbtn sv-tap" onClick={soon}><img src={`${UI}/btn_grammar.webp`} alt="Grammar Games" /></div>
+          <div className="sv-imgbtn sv-tap" onClick={goVocab}><img src={`${UI}/btn_vocab.webp`} alt="Vocab Games" /></div>
+          <div className="sv-imgbtn sv-tap" onClick={goGrammar}><img src={`${UI}/btn_grammar.webp`} alt="Grammar Games" /></div>
           <div ref={puzzleRef} className={"sv-imgbtn sv-tap" + lift} style={bumpStyle("piece")} onClick={soon}><img src={`${UI}/btn_puzzle.webp`} alt="Puzzle Activity" /></div>
           <div className="sv-imgbtn sv-tap" onClick={() => setPanel("theater")}>
             <img src={`${UI}/btn_video.webp`} alt="Video Theater" />{allNew.length > 0 && <span className="sv-dot" />}

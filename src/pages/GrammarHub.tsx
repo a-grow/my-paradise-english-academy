@@ -376,7 +376,11 @@ export default function GrammarHub() {
         }}
       >
         <button
-          onClick={() => navigate(`/world/${kidCode}/${kidName}`)}
+          onClick={() => {
+            // Back to the world the kid came from (a new-look world remembers its page in this tab); else Ocean as before.
+            const r = sessionStorage.getItem("mpe_return_world") || "";
+            navigate(r.toLowerCase().includes(`/${kidCode.toLowerCase()}/${kidName}`) ? r : `/world/${kidCode}/${kidName}`);
+          }}
           style={{
             background: "rgba(255,255,255,0.1)",
             border: "1.5px solid rgba(255,255,255,0.22)",

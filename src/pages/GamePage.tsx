@@ -127,6 +127,16 @@ const GamePage = () => {
     setShowCelebration(true);
   }, [isMaster, capKey, jarKey, playCelebrate]);
 
+  // Back to the world the kid came from. Ocean + Dino: as before. A new-look world (savanna...) remembered its own
+  // page address in this tab (mpe_return_world, set when its Vocab button was tapped) - only used if it is this kid's.
+  const worldHome = () => {
+    if (gameWorld !== "ocean" && gameWorld !== "dino") {
+      const r = sessionStorage.getItem("mpe_return_world") || "";
+      if (r.toLowerCase().includes(`/${(code ?? "").toLowerCase()}/${(studentName ?? "").toLowerCase()}`)) return r;
+    }
+    return fromDino ? `/dino/${code}/${studentName}` : `/world/${code}/${studentName}`;
+  };
+
   if (!code || !studentName) return null;
 
   return (
@@ -137,7 +147,7 @@ const GamePage = () => {
       {/* ARCADE */}
       <GameTest
         onClaim={handleClaim}
-        onBackToWorld={() => { sessionStorage.removeItem("mpe_from_dino"); navigate(fromDino ? `/dino/${code}/${studentName}` : `/world/${code}/${studentName}`); }}
+        onBackToWorld={() => { sessionStorage.removeItem("mpe_from_dino"); navigate(worldHome()); }}
         claimedCombos={claimedCombos}
         treatsCappedToday={treatsCappedToday}
         treatsEarnedToday={treatsEarnedToday}

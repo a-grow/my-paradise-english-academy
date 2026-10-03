@@ -102,6 +102,7 @@ export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand
     });
     setFlyers(list);
     setPhase("fly");
+    play(`${D}/harp.mp3`, 0.5); // Andy 21:36: soft harp while the treats + coins fly (first 2.6s of his 'remembrance harp', faded)
     later(() => setPhase("out"), last + 600);
     later(onDone, last + 1200);
   };
