@@ -17,7 +17,8 @@ import type { WorldSkin } from "../skin";
 import type { WorldView } from "@/pages/WorldPage";
 import CookieJar from "@/components/CookieJar";
 import GrowUpParty, { type Prize, type PrizeKind } from "./GrowUpParty";
-import VideoTheater, { type TheaterWorld } from "./VideoTheater";
+import VideoTheater, { type TheaterWorld, type TheaterCard } from "./VideoTheater";
+import type { WorldConfig } from "@/worlds";
 import DailyPrize, { type DailyKind } from "./DailyPrize";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 
@@ -345,7 +346,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const goGames = (path: string) => { sessionStorage.setItem("mpe_return_world", window.location.pathname); v.navigate(path); };
   const goVocab = () => goGames(`${v.world.gamePath}/${v.code}/${v.studentName}/${v.family?.book ?? 1}`);
   const goGrammar = () => goGames(`/grammar-hub/${v.code}/${v.studentName}`);
-  const [panel, setPanel] = useState<null | "animals" | "exit" | "theater">(null);
+  const [panel, setPanel] = useState<null | "animals" | "exit" | "theater" | "worlds">(null);
 
   // VIDEO THEATER (Andy 16:34): Savanna cards from the brain (won = grown + video watched); Ocean + Dino = 'Coming soon!'
   // until step 7. Playing a video there saves nothing. TEST ONLY ?t=1 = open it on load, first won video marked new.
@@ -354,12 +355,19 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     id: a.id, name: v.petNameMap[a.id] || a.name, poster: art(a, a.stages.length - 1), video: a.video ?? null,
     won: getAnimalStageIdx(a, v.fedTreatsState[a.id] ?? 0) === a.stages.length - 1 && !!v.videoWatchedMap[a.id] && !!a.video,
   }));
-  const theaterBase: TheaterWorld[] = [
-    { key: "ocean", title: "Ocean World", cards: null },
-    { key: "dino", title: "Dino World", cards: null },
-    { key: "savanna", title: "Savanna World", cards: null },
-  ];
-  const theaterWorlds = theaterBase.map(w => (w.key === v.world.id ? { ...w, cards: myTheaterCards } : w));
+  // STEP 7 (2026-10-04): EVERY world (v.worldList, in order). This world = live brain state; the others = the kid's
+  // cloud row (read only). A world not started yet shows all its cards as '?' (not won).
+  const cardsOf = (w: WorldConfig): TheaterCard[] => {
+    if (w.id === v.world.id) return myTheaterCards;
+    const S2 = w.makeSave("", "");
+    const r2 = v.rowData && S2.hasCloud(v.rowData) ? S2.readCloud(v.rowData, null) : null;
+    return w.animals.map(a => {
+      const c = r2?.animals[a.id];
+      return { id: a.id, name: c?.petName || a.name, poster: `/worlds/${w.id}/${a.id}-${KEYS[a.stages.length - 1]}.webp`, video: a.video ?? null,
+        won: !!c && getAnimalStageIdx(a, c.fed) === a.stages.length - 1 && !!c.videoWatched && !!a.video };
+    });
+  };
+  const theaterWorlds: TheaterWorld[] = v.worldList.map(x => ({ key: x.world.id, title: `${x.world.title} World`, cards: cardsOf(x.world) }));
   const theaterStart = Math.max(0, theaterWorlds.findIndex(w => w.key === v.world.id));
   useEffect(() => {
     if (!(onTest && q.get("t") === "1")) return;
@@ -369,8 +377,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   }, []);
   // RED DOTS (5.4, Andy 14:28 choice a): every WON video not yet played in the Video Theater = red dot on its card + the
   // button. 'Played' is saved in the cloud (v.seen 'theater:<world>:<animal>'), so the dot is gone on every device.
-  const myCards = theaterWorlds.find(w => w.key === v.world.id)?.cards ?? [];
-  const realNew = v.seen ? myCards.filter(c => c.won && !v.seen!.includes(`theater:${v.world.id}:${c.id}`)).map(c => c.id) : [];
+  // step 7: red dots for EVERY world's won videos (animal ids are unique across worlds; cardWorld = which world a card is in)
+  const cardWorld: Record<string, string> = {};
+  theaterWorlds.forEach(w => (w.cards ?? []).forEach(c => { cardWorld[c.id] = w.key; }));
+  const realNew = v.seen ? theaterWorlds.flatMap(w => (w.cards ?? []).filter(c => c.won && !v.seen!.includes(`theater:${w.key}:${c.id}`)).map(c => c.id)) : [];
   const allNew = [...new Set([...realNew, ...newIds])];
   const theaterMusic = (quiet: boolean) => { const a = v.audioRef.current; if (a) a.volume = quiet ? 0.02 : (v.K.musicVolume ?? v.volume * 0.5); };
   const [dailyGone, setDailyGone] = useState(false);
@@ -387,7 +397,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const firstJar = useRef(true);
   useEffect(() => {
     if (testKeep || (holding && v.jarTreats > jarShown)) return; // a celebration is on: prizes fill the jar when they land (a feed still shows at once)
-    localStorage.setItem(seenKey, String(v.jarTreats));
+    if (!v.readOnly) localStorage.setItem(seenKey, String(v.jarTreats)); // a visit writes nothing
     const wait = firstJar.current && jarShown < v.jarTreats ? 900 : 0; // first time: let the page settle, then drop them in
     firstJar.current = false;
     const t = window.setTimeout(() => setJarShown(v.jarTreats), wait);
@@ -397,9 +407,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   // Feed: the brain feeds (jar -1, fed +1, saves); here a treat flies jar -> animal, then the animal hops.
   const [flying, setFlying] = useState<number[]>([]);
   const [hop, setHop] = useState(0);
-  const canFeed = !testView && !grown && v.jarTreats > 0;
+  const canFeed = !testView && !v.readOnly && !grown && v.jarTreats > 0;
   const feed = () => {
     if (testView) return;
+    if (v.readOnly) { toast("Just visiting!"); return; } // a visit: no feeding
     if (grown) { toast("All grown up!"); return; }
     if (v.jarTreats <= 0) { toast("Play games to earn treats!"); return; }
     v.handleFeed();
@@ -413,7 +424,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const namingRef = useRef(false);
   const [draft, setDraft] = useState("");
   const [burst, setBurst] = useState(0);
-  const startName = () => { if (testView) return; v.nudgeSeen(); namingRef.current = true; setDraft(name); setNaming(true); };
+  const startName = () => { if (testView || v.readOnly) return; /* a visit: no renaming */ v.nudgeSeen(); namingRef.current = true; setDraft(name); setNaming(true); };
   const endName = (save: boolean) => {
     if (!namingRef.current) return;
     namingRef.current = false; setNaming(false);
@@ -539,10 +550,11 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         <div className="sv-card sv-album sv-tap" onClick={soon}>
           <img className="sv-cardlbl" style={{ top: 176, height: 38 }} src={`${UI}/lbl_album.webp`} alt="Card Album" />
         </div>
-        <div className="sv-card sv-worlds sv-tap" onClick={soon}>
+        <div className="sv-card sv-worlds sv-tap" onClick={() => setPanel("worlds")}>
           <div className="sv-wrow">
-            {[["ocean", "Ocean World"], ["dino", "Dino World"], ["savanna", "Savanna World"]].map(([k, t]) => (
-              <img key={k} className={k === v.world.id ? "here" : undefined} src={`${UI}/world_${k}.webp`} alt={t} />))}
+            {v.worldList.slice(0, 3).map(x => ( /* step 7: from the world list (4+ worlds: show the 3 nearest - later) */
+              <img key={x.world.id} className={x.world.id === v.world.id ? "here" : (!x.finished && x.world.id !== v.currentWorld.id ? "lock" : undefined)}
+                src={`${UI}/world_${x.world.id}.webp`} alt={`${x.world.title} World`} />))}
           </div>
           <img className="sv-cardlbl" style={{ top: 102, height: 48 }} src={`${UI}/lbl_worlds.webp`} alt="My Worlds" />
         </div>
@@ -575,6 +587,30 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           </div>
         )}
 
+        {/* MY WORLDS (step 7, 2026-10-04): every world in order. Finished = visit (read-only page, saves nothing);
+            the kid's current world = go there; not reached yet = '?'. Only the X closes it (never a background tap). */}
+        {panel === "worlds" && (
+          <div className="sv-ov">
+            <div className="sv-ovcard">
+              <div className="sv-x sv-tap" onClick={() => setPanel(null)}><img src={`${UI}/rb_exit.webp`} alt="Close" /></div>
+              <h2>My Worlds</h2>
+              <div className="sv-biggrid">
+                {v.worldList.map(x => {
+                  const w = x.world, here = w.id === v.world.id, now = w.id === v.currentWorld.id;
+                  const go = here ? null : x.finished ? `/visit/${w.id}/${v.code}/${v.studentName}` : now ? `${w.path}/${v.code}/${v.studentName}` : null;
+                  if (!here && !go) return (
+                    <div key={w.id} className="sv-big locked"><div className="sv-q">?</div><p>???</p></div>);
+                  const label = here ? (v.readOnly ? "Visiting" : "You are here") : x.finished ? "Finished! Tap to visit" : "Tap to go back";
+                  return (
+                    <div key={w.id} className={"sv-big" + (here ? " here" : " sv-tap")} onClick={() => { if (go) v.navigate(go); else setPanel(null); }}>
+                      <img src={`${UI}/world_${w.id}.webp`} alt="" /><p>{w.title} World</p><small>{label}</small>
+                    </div>);
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* video player: the brain marks it watched after 1 second (onVideoTime) and turns the music down/up */}
         {v.showVideo && animal.video && (
           <div className={"sv-ov sv-vov" + (v.videoFadingOut ? " out" : "")}>
@@ -588,7 +624,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
 
         {panel === "theater" && (
           <VideoTheater cx={cx} sh={sh} worlds={theaterWorlds} start={theaterStart} newIds={allNew}
-            onPlay={id => { theaterMusic(true); setNewIds(ids => ids.filter(x => x !== id)); v.markSeen(`theater:${v.world.id}:${id}`); }}
+            onPlay={id => { theaterMusic(true); setNewIds(ids => ids.filter(x => x !== id)); v.markSeen(`theater:${cardWorld[id] ?? v.world.id}:${id}`); }}
             onStop={() => theaterMusic(false)} onClose={() => setPanel(null)} />
         )}
 
@@ -745,6 +781,7 @@ const CSS = `
 .sv-worlds{top:auto;bottom:84px;height:112px;background-image:url(${UI}/frame_worlds.webp)}
 .sv-wrow{position:absolute;left:0;right:0;top:14px;display:flex;justify-content:center;gap:10px}
 .sv-wrow img{width:62px;height:62px;border-radius:50%;border:4px solid #e9b53a;box-shadow:0 3px 0 #a86a10}
+.sv-wrow img.lock{filter:grayscale(1) brightness(.85);opacity:.55}
 .sv-wrow img.here{border-color:#fff;box-shadow:0 0 0 3px #e9b53a,0 3px 0 3px #a86a10}
 .sv-tap{cursor:pointer}
 .sv-rb.muted{opacity:.55}

@@ -392,7 +392,8 @@ const Dashboard = () => {
             <div key={student.name} className="text-center w-full">
               <button onClick={() => {
                 const name = student.name.toLowerCase();
-                const path = localStorage.getItem(`mpe_world_${family.code}_${name}`) === "dino" ? `/dino/${family.code}/${name}` : `/world/${family.code}/${name}`;
+                const wk = localStorage.getItem(`mpe_world_${family.code}_${name}`); // step 7: + savanna (a finished world forwards on anyway)
+                const path = wk === "dino" ? `/dino/${family.code}/${name}` : wk === "savanna" ? `/savanna/${family.code}/${name}` : `/world/${family.code}/${name}`;
                 if (localStorage.getItem(`mpe_worldnotice_seen_${family.code}`) === "true") {
                   navigate(path);
                 } else {

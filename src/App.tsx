@@ -18,8 +18,8 @@ import GrammarSwim from "./pages/GrammarSwim";
 import GrammarDig from "./pages/GrammarDig";
 import GrammarGrab from "./pages/GrammarGrab";
 import CookieJarPreview from "./pages/CookieJarPreview";
-import WorldPage from "./pages/WorldPage";
-import { DINO_WORLD, OCEAN_WORLD, DINO_WORLD_NEW, OCEAN_WORLD_NEW } from "./worlds";
+import WorldPage, { WorldVisit } from "./pages/WorldPage";
+import { DINO_WORLD, OCEAN_WORLD, DINO_WORLD_NEW, OCEAN_WORLD_NEW, SAVANNA_WORLD } from "./worlds";
 import WorldTestSavanna from "./pages/WorldTestSavanna";
 import GrammarHub from "./pages/GrammarHub";
 import NotFound from "./pages/NotFound";
@@ -55,6 +55,8 @@ const App = () => (
 <Route path="/world-test/savanna/:code/:studentName" element={<WorldTestSavanna />} />
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
+              <Route path="/savanna/:code/:studentName" element={<WorldPage world={SAVANNA_WORLD} />} />{/* step 7 */}
+              <Route path="/visit/:world/:code/:studentName" element={<WorldVisit />} />{/* step 7: finished world, saves nothing */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="/mpe-teacher-secret-hq" element={<TeacherHQ />} />
               <Route path="*" element={<NotFound />} />
