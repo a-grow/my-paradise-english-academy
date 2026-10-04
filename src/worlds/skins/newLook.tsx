@@ -137,6 +137,75 @@ const Hand = ({ stage, s, sel, fx, fy, flip = false }: {
   );
 };
 
+// NEW ARRIVAL sparkles (Andy 2026-10-04): round glowing dots only (no star shapes). [angle deg, distance px, size px, s, delay s]
+const ARRIVE = (() => {
+  let seed = 23;
+  const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  return Array.from({ length: 30 }, () => [r() * 360, 120 + r() * 200, 6 + r() * 10, 1.1 + r() * 1.2, r() * 1.6]);
+})();
+
+// STAGE TRANSFORMATION sparkles (Andy 2026-10-04): a canvas over the animal - three glowing ribbons of sparkle dust
+// spiral up around it (bright in front, dim behind = depth), plus soft mist; ~3.2s, then gone. Round dots only.
+const TF_DUR = 3200;
+const TF_P = (() => {
+  let seed = 41;
+  const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const ribbons = Array.from({ length: 3 * 36 }, (_, i) => ({ strand: i % 3, u: Math.floor(i / 3) / 36 + r() * 0.02, size: 2.6 + r() * 3.2 }));
+  const loose = Array.from({ length: 34 }, () => ({ x: r(), y: r(), size: 2 + r() * 3, ph: r() * 6.28, sp: 2 + r() * 3 }));
+  return { ribbons, loose };
+})();
+const TransformFx = () => {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const cv = ref.current; const ctx = cv?.getContext("2d");
+    if (!cv || !ctx) return;
+    const W = 900, H = 900, t0 = performance.now();
+    let raf = 0;
+    const dot = (x: number, y: number, s: number, a: number) => {
+      const g = ctx.createRadialGradient(x, y, 0, x, y, s * 3.2);
+      g.addColorStop(0, `rgba(255,255,255,${a})`); g.addColorStop(0.3, `rgba(255,246,170,${a * 0.85})`);
+      g.addColorStop(0.6, `rgba(255,206,60,${a * 0.35})`); g.addColorStop(1, "rgba(255,190,0,0)");
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, s * 3.2, 0, 6.2832); ctx.fill();
+    };
+    const frame = (now: number) => {
+      const t = (now - t0) / 1000, k = (now - t0) / TF_DUR;
+      ctx.clearRect(0, 0, W, H);
+      if (k >= 1) return;
+      const fade = Math.min(1, t / 0.35) * (k > 0.7 ? Math.max(0, (1 - k) / 0.3) : 1);
+      ctx.globalCompositeOperation = "lighter";
+      for (const p of TF_P.ribbons) {
+        const u = (p.u + t * 0.3) % 1;                                   // travels up the spiral
+        const ang = p.strand * 2.094 + u * Math.PI * 5 + t * 2.6;          // the twist
+        const rad = 250 * (0.3 + 0.7 * Math.sin(Math.PI * u));             // wide in the middle, narrow at both ends
+        const x = W / 2 + Math.cos(ang) * rad, y = H / 2 + 300 - u * 620 + Math.sin(ang) * rad * 0.26;
+        const depth = (Math.sin(ang) + 1) / 2;                            // 0 = behind, 1 = in front
+        const a = fade * (0.25 + 0.75 * depth) * Math.sin(Math.PI * u);
+        dot(x, y, p.size * (0.6 + 0.7 * depth), a);
+        if (depth > 0.5) dot(x, y, p.size * 3.2, a * 0.06);                  // soft mist around the front of the ribbon
+      }
+      for (const p of TF_P.loose) {                                       // twinkles drifting up inside the swirl
+        const tw = 0.5 + 0.5 * Math.sin(t * p.sp + p.ph);
+        dot(W / 2 + (p.x - 0.5) * 420, H / 2 + 260 - ((p.y + t * 0.18) % 1) * 560, p.size, fade * tw * 0.8);
+      }
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return <canvas ref={ref} width={900} height={900} className="sv-tfx" aria-hidden="true" />;
+};
+
+// NEW FRIEND box lights (Andy 2026-10-04): slow glowing motes around the box - rise, sink back, vanish (never shoot out).
+// [left %, top %, size px, seconds, delay seconds, sideways drift px]
+const MOTES = (() => {
+  let seed = 59;
+  const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  return Array.from({ length: 26 }, () => {
+    const a = r() * 6.2832, e = 0.42 + r() * 0.1;
+    return [50 + Math.cos(a) * e * 100, 50 + Math.sin(a) * e * 100, 5 + r() * 7, 3.6 + r() * 2.8, -r() * 6, (r() - 0.5) * 30];
+  });
+})();
+
 const Loading = ({ L }: { L: LookSettings }) => (
   <div style={{ position: "fixed", inset: 0, background: L.loadingBg, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "'Titan One', sans-serif", fontSize: 32 }}>
     <style>{FONTS}</style>
@@ -147,8 +216,12 @@ const Loading = ({ L }: { L: LookSettings }) => (
 const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const { s, sw, sh } = useFit();
   const { animal, stageIdx, fed, testView } = useShown(v);
+  // STAGE TRANSFORMATION (Andy 2026-10-04): during a stage party the OLD stage picture stays (hold.show); 1s after OK a big
+  // glow + spiralling sparkles, and under the glow the picture swaps to the new stage (hold.show = hold.to). Display only.
+  const [hold, setHold] = useState<null | { id: string; show: number; to: number }>(null);
+  const picIdx = hold && hold.id === animal.id ? hold.show : stageIdx;
   const art = (a: Animal, i: number, t = false) => `${L.dir}/${a.id}-${KEYS[i]}${t ? "-t" : ""}.webp`; // picture (t = thumbnail)
-  const akey = `${animal.id}-${KEYS[stageIdx]}`;  // this picture's name in the size tables
+  const akey = `${animal.id}-${KEYS[picIdx]}`;  // this picture's name in the size tables
   const isFly = !!L.fly?.includes(akey);
   const cx = sw / 2;
   const max = animal.stages[animal.stages.length - 1].min;
@@ -232,7 +305,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const coinRef = useRef<HTMLDivElement>(null);
   const puzzleRef = useRef<HTMLDivElement>(null);
   const jarRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (onTest && q.get("g") === "1") { const gs = parseInt(q.get("gs") ?? "", 10); if (gs === 1 || gs === 2) setPartyStage(gs); setParty("on"); } }, []);
+  useEffect(() => { if (onTest && q.get("g") === "1") { const gs = parseInt(q.get("gs") ?? "", 10); if (gs === 1 || gs === 2) { setPartyStage(gs); setHold({ id: animal.id, show: gs - 1, to: gs }); } setParty("on"); } }, []);
   // SMALL STAGE PRIZE (Andy 2026-10-03): baby +5 coins, young +10 coins (database pays once: '<world>:<animal>:baby|young').
   // A gold '+5' pops over the animal and a few coins float into the coin pill. No dark screen, nothing to tap (~1.6s).
   const MINI_COINS = STAGE_COINS; // (small '+5' pop - no longer used since 2026-10-04: baby/young get the party)
@@ -241,13 +314,13 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     const lu = v.levelUpStage;
     if (lu && lu.stageIdx > 0 && lu.stageIdx < lu.animal.stages.length - 1) {
       askPrize(`${v.world.id}:${lu.animal.id}:${lu.stageIdx === 1 ? "baby" : "young"}`); // REAL prize (database pays once)
-      setPartyStage(lu.stageIdx);   // the Congratulations screen, coins only (Andy 2026-10-04)
+      setPartyStage(lu.stageIdx); setHold({ id: lu.animal.id, show: lu.stageIdx - 1, to: lu.stageIdx }); // old stage stays until the transformation   // the Congratulations screen, coins only (Andy 2026-10-04)
       setParty(p => p ?? "on");
       return;
     }
     if (lu && lu.stageIdx === lu.animal.stages.length - 1) {
       askPrize(`${v.world.id}:${lu.animal.id}:grown`); // REAL prize (database pays once)
-      setPartyStage(lu.stageIdx);
+      setPartyStage(lu.stageIdx); setHold({ id: lu.animal.id, show: lu.stageIdx - 1, to: lu.stageIdx }); // old stage stays until the transformation
       setParty(p => p ?? "on");
     }
   }, [v.levelUpStage]);
@@ -275,8 +348,8 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   };
   const partyLanded = () => {
     setJarShown(j => j + (PRIZES.find(p => p.kind === "treat")?.n ?? 0)); // the jar's own fill-up animation
-    window.setTimeout(() => setParty("out"), 3000);
-    window.setTimeout(() => { setParty(null); setPartyStage(null); v.setLevelUpStage(null); }, 3550);
+    window.setTimeout(() => setParty("out"), 3000); // (the transformation already showed the new stage)
+    window.setTimeout(() => { setParty(null); setPartyStage(null); setHold(null); v.setLevelUpStage(null); }, 3550);
   };
   // Video closed: if it counted as watched (brain: 1 second), the Watch button is gone and Video Theater gets its red dot.
   const closeVid = () => {
@@ -407,6 +480,38 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   // Feed: the brain feeds (jar -1, fed +1, saves); here a treat flies jar -> animal, then the animal hops.
   const [flying, setFlying] = useState<number[]>([]);
   const [hop, setHop] = useState(0);
+  // NEW ARRIVAL (Andy 2026-10-04): when a Congratulations box goes away, or a new friend is unlocked, the animal hops in
+  // with a soft glow + round sparkles for ~3s and the magic-wand sound plays (public/worlds/ui/snd_newfriend.mp3). Display only.
+  const [arrive, setArrive] = useState(0);
+  const [arriving, setArriving] = useState(false);
+  const arriveT = useRef(0);
+  // transformation state (see hold above): tf = run number, tfOn = showing, oldPic = the old picture fading out at the swap
+  const [tf, setTf] = useState(0);
+  const [tfOn, setTfOn] = useState(false);
+  const [oldPic, setOldPic] = useState<null | { src: string; style: React.CSSProperties }>(null);
+  const tfT = useRef<number[]>([]);
+  const picStyleFor = (k: string): React.CSSProperties => ({ transform: `scale(${L.zoom?.[k] ?? 1})`,
+    transformOrigin: L.zoomOrigin?.[k] ?? (L.move === "float" || !!L.fly?.includes(k) ? "50% 50%" : "50% 92%") });
+  const picStyle = picStyleFor(akey);
+  const startTransform = () => {
+    setTf(n => n + 1); setTfOn(true);
+    if (v.sfxOn) { const a = new Audio(`${UI}/snd_newfriend.mp3`); a.volume = 0.7; a.play().catch(() => { }); } // wand: sparkles start
+    tfT.current.forEach(t => window.clearTimeout(t));
+    tfT.current = [
+      window.setTimeout(() => { // the swap, under the brightest glow: old fades out, new fades in (0.4s)
+        setOldPic({ src: art(animal, picIdx), style: picStyle });
+        setHold(h => (h ? { ...h, show: h.to } : h));
+      }, 900),
+      window.setTimeout(() => setOldPic(null), 1350),
+      window.setTimeout(() => setTfOn(false), TF_DUR + 100),
+    ];
+  };
+  const startArrive = () => {
+    setArrive(a => a + 1); setArriving(true);
+    window.clearTimeout(arriveT.current);
+    arriveT.current = window.setTimeout(() => setArriving(false), 3300);
+    if (v.sfxOn) { const a = new Audio(`${UI}/snd_newfriend.mp3`); a.volume = 0.7; a.play().catch(() => { }); }
+  };
   const canFeed = !testView && !v.readOnly && !grown && v.jarTreats > 0;
   const feed = () => {
     if (testView) return;
@@ -429,7 +534,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     if (!namingRef.current) return;
     namingRef.current = false; setNaming(false);
     const t = draft.trim().slice(0, 12);
-    if (save && t && t !== name) { v.savePetName(t); setBurst(b => b + 1); }
+    if (save && t && t !== name) {
+      v.savePetName(t); setBurst(b => b + 1);
+      if (v.sfxOn) { const a = new Audio(`${UI}/snd_rename.mp3`); a.volume = 0.8; a.play().catch(() => { }); } // fairy wand (Andy 2026-10-04)
+    }
   };
 
   const claimDaily = () => { if (v.showDailyGift) v.claimDailyGift(); setDailyGone(true); toast("+1 treat!"); };
@@ -471,10 +579,25 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         {L.titleImg ? <img className="sv-title" src={L.titleImg} alt={`${L.title} World`} /> : <div className="sv-titletxt">{L.title} World</div>}
 
         {isFly && <div className="sv-flyshadow" style={{ left: cx }} />}
-        <div className={"sv-animal mv-" + L.move + (stageIdx === 0 ? " egg" : "") + (isFly ? " fly" : "")} style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0) }}>
-          <div key={hop} className={"sv-hop" + (hop ? " go" : "")}><img src={art(animal, stageIdx)} alt={animal.name}
-            style={{ transform: `scale(${L.zoom?.[akey] ?? 1})`, transformOrigin: L.zoomOrigin?.[akey] ?? (L.move === "float" || isFly ? "50% 50%" : "50% 92%") }} /></div>
+        {arriving && <div key={"ag" + arrive} className="sv-arrive" style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0) }}><b className="sv-aglow" /></div>}
+        <div className={"sv-animal mv-" + L.move + (picIdx === 0 ? " egg" : "") + (isFly ? " fly" : "")} style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0) }}>
+          <div key={"in" + arrive} className={"sv-in" + (arrive ? " go" : "")}><div key={hop} className={"sv-hop" + (hop ? " go" : "")}>
+            {oldPic && <img className="sv-picout" src={oldPic.src} alt="" style={oldPic.style} />}
+            <img key={art(animal, picIdx)} className={tfOn ? "sv-picin" : undefined} src={art(animal, picIdx)} alt={animal.name} style={picStyle} /></div></div>
         </div>
+        {tfOn && (
+          <div key={"tf" + tf} className="sv-tf" style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0) }}>
+            <b className="sv-tglow" /><TransformFx />
+          </div>
+        )}
+        {arriving && (
+          <div key={"ad" + arrive} className="sv-arrive" style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0), zIndex: 7 }}>
+            {ARRIVE.map((d, i) => (
+              <i key={i} style={{ width: d[2], height: d[2], margin: -d[2] / 2, ["--a" as string]: `${d[0]}deg`, ["--d" as string]: `${d[1]}px`,
+                animationDuration: `${d[3]}s`, animationDelay: `${d[4]}s` }} />
+            ))}
+          </div>
+        )}
 
         {naming
           ? <input className="sv-nameinput" style={{ left: cx - 330 }} autoFocus maxLength={12} autoComplete="off" spellCheck={false}
@@ -576,8 +699,14 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
                       <img src={x.bigImg} alt={x.a.name} /><p>{x.a.name}</p>{here && <small>With you now</small>}
                     </div>);
                   if (x.ready) return (
-                    <div key={x.a.id} className="sv-big ready sv-tap" onClick={() => { v.dismissUnlock(x.a.id); setUnlockedNow(true); setPanel(null); toast("Say hello to your new friend!"); }}>
-                      <img className="shadow" src={art(x.a, 0)} alt="" /><p>New friend! Tap me!</p>
+                    <div key={x.a.id} className="sv-readywrap">
+                      <div className="sv-fmotes" aria-hidden="true"><b className="sv-fglow" />
+                        {MOTES.map((m, i) => <i key={i} style={{ left: `${m[0]}%`, top: `${m[1]}%`, width: m[2], height: m[2], margin: -m[2] / 2,
+                          ["--dx" as string]: `${m[5]}px`, animationDuration: `${m[3]}s`, animationDelay: `${m[4]}s` }} />)}
+                      </div>
+                      <div className="sv-big ready sv-tap" onClick={() => { v.dismissUnlock(x.a.id); setUnlockedNow(true); setPanel(null); startArrive(); toast("Say hello to your new friend!"); }}>
+                        <img className="shadow" src={art(x.a, 0)} alt="" /><p>New friend! Tap me!</p>
+                      </div>
                     </div>);
                   return (
                     <div key={x.a.id} className="sv-big locked"><div className="sv-q">?</div><p>???</p></div>);
@@ -649,7 +778,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           <GrowUpParty phase={party} cx={cx} sh={sh} prizes={PRIZES} sfxOn={v.sfxOn} target={partyTarget}
             heroImgs={[art(partyAnimal, smallParty ? partyStage! : partyLast)]}
             line={partyLine}
-            onLand={partyLand} onAllLanded={partyLanded} onOk={() => setParty("fly")} />
+            onLand={partyLand} onAllLanded={partyLanded} onOk={() => { setParty("fly"); if (hold) window.setTimeout(startTransform, 1000); }} />
         )}
 
         {done && (
@@ -663,7 +792,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         {watchReady && !party && !done && !dailyDay && !v.showVideo && !panel && (
           <Hand stage={stageRef} s={s} sel=".sv-watch" fx={0.86} fy={0.22} />
         )}
-        {newReady && !panel && !party && !done && !dailyDay && (
+        {newReady && !panel && !party && !done && !dailyDay && !v.showVideo && ( /* not while a video plays (Andy 2026-10-04) */
           <Hand stage={stageRef} s={s} sel=".sv-animals" fx={0.16} fy={0.3} flip />
         )}
         {panel === "animals" && <Hand stage={stageRef} s={s} sel=".sv-big.ready" fx={0.82} fy={0.2} />}
@@ -718,7 +847,7 @@ const CSS = `
 .sv-animal.mv-float,.sv-animal.mv-float.egg{animation:sv-swim 4.5s ease-in-out infinite;transform-origin:50% 50%}
 .sv-animal.mv-still,.sv-animal.mv-still.egg{animation:none}
 .sv-animal.mv-still.fly{animation:sv-swim 3.6s ease-in-out infinite;transform-origin:50% 50%}
-.mv-still .sv-hop.go{animation:none}
+/* (2026-10-04 Andy: every animal hops a little when fed - Dino too; dinos still never sway/breathe) */
 @keyframes sv-swim{0%,100%{transform:translateY(0) rotate(-1.2deg)}50%{transform:translateY(-16px) rotate(1.2deg)}}
 .sv-flyshadow{position:absolute;top:800px;width:300px;height:44px;margin-left:-150px;border-radius:50%;pointer-events:none;
  background:radial-gradient(ellipse at center,rgba(40,25,5,.5) 0%,rgba(40,25,5,.25) 45%,rgba(40,25,5,0) 72%);animation:sv-flyshadow 3.6s ease-in-out infinite}
@@ -788,7 +917,7 @@ const CSS = `
 .sv-imgbtn:active,.sv-rb:active,.sv-daily:active{transform:translateY(5px) scale(.98)}
 .sv-card:active{transform:translateY(4px)}
 .sv-feed:not(.off):active{transform:translate(-50%,5px) scale(.98)}
-.sv-hop{width:100%;height:100%;transform-origin:50% 92%}
+.sv-hop{position:relative;width:100%;height:100%;transform-origin:50% 92%}
 .sv-hop.go{animation:sv-hop .6s ease-out}
 @keyframes sv-hop{0%{transform:translateY(0) scale(1,1)}15%{transform:translateY(0) scale(1.08,.9)}45%{transform:translateY(-46px) scale(.95,1.07)}75%{transform:translateY(0) scale(1.07,.92)}100%{transform:translateY(0) scale(1,1)}}
 .sv-petname{animation:sv-namePop .5s cubic-bezier(.3,1.6,.5,1)}
@@ -844,6 +973,39 @@ const CSS = `
 @keyframes sv-watchPulse{0%,100%{transform:translateX(-50%) scale(1);filter:brightness(1.08) drop-shadow(0 0 3px #fff36b) drop-shadow(0 0 8px #ffd000) drop-shadow(0 0 16px rgba(255,190,0,.9))}
  50%{transform:translateX(-50%) scale(1.05);filter:brightness(1.22) drop-shadow(0 0 5px #fffbb0) drop-shadow(0 0 14px #ffe000) drop-shadow(0 0 28px rgba(255,200,0,1))}}
 .sv-lift{z-index:61;pointer-events:none}
+.sv-tf{position:absolute;width:640px;height:640px;pointer-events:none;z-index:62}
+.sv-tglow{position:absolute;left:50%;top:55%;width:620px;height:620px;margin:-310px 0 0 -310px;border-radius:50%;opacity:0;
+ background:radial-gradient(closest-side,#fff 0%,rgba(255,252,220,.98) 22%,rgba(255,236,120,.85) 45%,rgba(255,210,40,.4) 70%,rgba(255,200,0,0) 100%);
+ animation:sv-tglow 3.2s ease-in-out forwards}
+@keyframes sv-tglow{0%{opacity:0;transform:scale(.4)}22%{opacity:1;transform:scale(1.1)}45%{opacity:1;transform:scale(1.18)}75%{opacity:.35;transform:scale(1.3)}100%{opacity:0;transform:scale(1.4)}}
+.sv-tfx{position:absolute;left:50%;top:50%;width:900px;height:900px;margin:-450px 0 0 -450px;pointer-events:none}
+.sv-picin{animation:sv-picin .4s ease-out both}
+@keyframes sv-picin{from{opacity:0}to{opacity:1}}
+.sv-animal img.sv-picout{position:absolute;left:0;top:0;animation:sv-picout .4s ease-in forwards}
+@keyframes sv-picout{from{opacity:1}to{opacity:0}}
+.sv-readywrap{position:relative}
+.sv-readywrap .sv-big{position:relative;z-index:1}
+.sv-fmotes{position:absolute;inset:-46px;pointer-events:none;z-index:0}
+.sv-fglow{position:absolute;inset:14px;border-radius:60px;filter:blur(8px);
+ background:radial-gradient(closest-side,rgba(255,238,150,.95),rgba(255,214,70,.55) 60%,rgba(255,200,0,0) 100%);animation:sv-fglow 3s ease-in-out infinite}
+@keyframes sv-fglow{0%,100%{opacity:.65;transform:scale(.97)}50%{opacity:1;transform:scale(1.04)}}
+.sv-fmotes i{position:absolute;border-radius:50%;opacity:0;background:#fffde6;
+ box-shadow:0 0 4px 2px #fff27a,0 0 10px 4px #ffd000,0 0 18px 6px rgba(255,170,0,.55);animation-name:sv-mote;animation-timing-function:ease-in-out;animation-iteration-count:infinite}
+@keyframes sv-mote{0%{opacity:0;transform:translate(0,14px) scale(.4)}25%{opacity:1;transform:translate(calc(var(--dx) * .5),-26px) scale(1)}
+ 55%{opacity:.9;transform:translate(var(--dx),-44px) scale(.9)}80%{opacity:.5;transform:translate(calc(var(--dx) * .6),-28px) scale(.7)}100%{opacity:0;transform:translate(0,-12px) scale(.4)}}
+@media (prefers-reduced-motion: reduce){.sv-fmotes i,.sv-fglow{animation:none}}
+.sv-in{width:100%;height:100%;transform-origin:50% 92%}
+.sv-in.go{animation:sv-arriveIn 1.05s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes sv-arriveIn{0%{transform:translateY(-140px) scale(.25);opacity:0}35%{opacity:1;transform:translateY(-60px) scale(1.08)}62%{transform:translateY(0) scale(1.06,.92)}80%{transform:translateY(-14px) scale(.97,1.04)}100%{transform:translateY(0) scale(1)}}
+.sv-arrive{position:absolute;width:640px;height:640px;pointer-events:none;animation:sv-arriveOut 3.3s ease-out forwards}
+@keyframes sv-arriveOut{0%,75%{opacity:1}100%{opacity:0}}
+.sv-aglow{position:absolute;left:50%;top:58%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;
+ background:radial-gradient(closest-side,rgba(255,240,150,.75),rgba(255,214,60,.35) 55%,rgba(255,200,0,0) 100%);animation:sv-aglow 1.6s ease-in-out infinite}
+@keyframes sv-aglow{0%,100%{transform:scale(.9);opacity:.7}50%{transform:scale(1.05);opacity:1}}
+.sv-arrive i{position:absolute;left:50%;top:58%;border-radius:50%;opacity:0;background:#fffde6;
+ box-shadow:0 0 4px 2px #fff27a,0 0 10px 4px #ffd000,0 0 18px 6px rgba(255,170,0,.6);
+ animation-name:sv-adot;animation-timing-function:cubic-bezier(.2,.75,.35,1);animation-iteration-count:2}
+@keyframes sv-adot{0%{opacity:0;transform:rotate(var(--a)) translateX(30px) scale(.4)}20%{opacity:1}75%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scale(1)}}
 .sv-hand{position:absolute;z-index:75;pointer-events:none;animation:sv-handIn .5s 1s ease-out both;transition:left .35s ease-out,top .35s ease-out}
 .sv-hand.flip{transform:scaleX(-1)}
 .sv-hand img{display:block;width:100%;height:auto;filter:drop-shadow(0 5px 5px rgba(0,0,0,.35));will-change:transform;animation:sv-handTap .55s 1s cubic-bezier(.45,0,.55,1) infinite alternate both}

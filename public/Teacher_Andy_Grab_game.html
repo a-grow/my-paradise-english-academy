@@ -290,7 +290,7 @@ function drawOldWordMsg(){                      // big centered message, ~3s: po
   if(t > 3.0){ oldWordT0 = 0; return; }
   const a = t < 0.15 ? t/0.15 : (t > 2.6 ? Math.max(0,(3.0-t)/0.4) : 1);
   const sc = t < 0.25 ? 0.6 + 0.4*Math.sin((t/0.25)*Math.PI/2)*1.08 : 1;
-  const L1 = 'Good word, but not for this sentence.', L2 = 'Try again!';
+  const L1 = 'Oops! That word was for the last sentence.', L2 = 'Try again!';   // Andy 2026-10-04: 'Good word' sounded like a right answer
   const F1 = "bold 58px 'Baloo 2','Arial Rounded MT Bold',sans-serif", F2 = "bold 66px 'Baloo 2','Arial Rounded MT Bold',sans-serif";
   ctx.save(); ctx.font = F1; const w = Math.min(BASE_W - 40, Math.max(ctx.measureText(L1).width, 400) + 90); ctx.restore();
   const cx = BASE_W/2, cy = BASE_H*0.47, h = 200;

@@ -175,7 +175,9 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   };
   useEffect(() => {
     if (noSave) return;
-    if (!dataCloudReady.current) { dataCloudReady.current = true; return; }
+    // FIX (2026-10-04): no save until the cloud read-back has FINISHED (it sets dataCloudReady). Before, the first render
+    // already allowed saves, so a tap in the first second could save this device's old copy over the cloud.
+    if (!dataCloudReady.current) return;
     saveDataToCloud(code, studentName, activeAnimalId, gatherBlob());
     // Ocean (keeps its last animal in its own key) never saved on an animal switch; the other worlds keep
     // activePet in their blob, so they do. The list keeps a fixed length: null = never changes.
@@ -437,6 +439,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
 
   const savePetName = (name: string) => {
     if (readOnly) return;
+    if (!isMaster && !dataCloudReady.current) return; // cloud not read yet
     setPetNameMap(m => ({ ...m, [activeAnimalId]: name }));
     lsSet(S.petName(activeAnimalId), name);
     if (K.renameMusic) {
@@ -449,6 +452,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
 
   const handleFeed = () => {
     if (readOnly || jarTreats <= 0) return;
+    if (!isMaster && !dataCloudReady.current) return; // cloud not read yet (first second): ignore the tap
     const newJar = jarTreats - 1;
     const newFed = fedTreats + 1;
     setJarTreats(newJar);
@@ -513,6 +517,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
     if (!videoWatched && (e.target as HTMLVideoElement).currentTime >= 1) { lsSet(S.videoWatched(activeAnimalId), "1"); setVideoWatchedMap(m => ({ ...m, [activeAnimalId]: true })); }
   };
   const dismissUnlock = (id: string) => {
+    if (!isMaster && !readOnly && !dataCloudReady.current) return; // cloud not read yet
     setShowUnlockFor(null);
     setUnlockSeenMap(m => ({ ...m, [id]: true }));
     setTimeout(() => { window.scrollTo({ top: 0, behavior: "smooth" }); }, 400);

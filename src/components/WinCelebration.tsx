@@ -91,7 +91,7 @@ const CSS = `
 .wc-src { width:max(86px, calc(var(--u) * 11)); height:max(86px, calc(var(--u) * 11)); }
 .wc-row.drain .wc-src { animation:wc-shake .15s linear infinite; }
 .wc-rows { display:flex; align-items:center; justify-content:center; gap:max(150px, calc(var(--u) * 19)); margin:calc(var(--u) * 2.5) 0; }
-.wc-row.t2 { animation-delay:1.2s; }
+.wc-row.t2 { animation-delay:1.0s; } /* treat row is first now: it pops in first */
 .wc-src img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
 .wc-fly.wc-tfly { width:60px; height:60px; margin:-30px 0 0 -30px; }
 .wc-plus { position:absolute; left:100%; margin-left:14px; top:50%; transform:translateY(-50%); color:#8dff5c;
@@ -381,7 +381,21 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
       <div className="wc-center">
         <div className="wc-great"><Word3D text={GREAT} delay={GREAT_DELAY} /></div>
         <div className="wc-rows">
-        {won > 0 && (
+        {/* Andy 2026-10-04: treats first, coins second */}
+        {treatsWon > 0 && (
+          <div className={`wc-row t2${flying ? " drain" : ""}${shine ? " shine" : ""}`}>
+            {shine && (
+              <div className="wc-tw">
+                {TWINKLES2.map((t, i) => (
+                  <i key={i} className={t.star ? "st" : ""} style={{ left: `${t.left}%`, top: `${t.top}%`, width: t.size * (t.star ? 2 : 1),
+                    height: t.size * (t.star ? 2 : 1), marginLeft: -t.size * (t.star ? 1 : 0.5), marginTop: -t.size * (t.star ? 1 : 0.5), animationDelay: `${t.delay}ms` }} />
+                ))}
+              </div>
+            )}
+            <div className="wc-src" ref={treatSrcRef}><img src={TREAT_IMG} alt="" draggable={false} /></div>
+            <span>{"×"}{treatsWon}</span>
+            <span className={`wc-plus${flying ? " go" : ""}`}>+{treatsWon}</span>
+          {won > 0 && (
           <div className={`wc-row${flying ? " drain" : ""}${shine ? " shine" : ""}`}>
             {shine && (
               <div className="wc-tw">
@@ -396,20 +410,7 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
             <span className={`wc-plus${flying ? " go" : ""}`}>+{won}</span>
           </div>
         )}
-        {treatsWon > 0 && (
-          <div className={`wc-row t2${flying ? " drain" : ""}${shine ? " shine" : ""}`}>
-            {shine && (
-              <div className="wc-tw">
-                {TWINKLES2.map((t, i) => (
-                  <i key={i} className={t.star ? "st" : ""} style={{ left: `${t.left}%`, top: `${t.top}%`, width: t.size * (t.star ? 2 : 1),
-                    height: t.size * (t.star ? 2 : 1), marginLeft: -t.size * (t.star ? 1 : 0.5), marginTop: -t.size * (t.star ? 1 : 0.5), animationDelay: `${t.delay}ms` }} />
-                ))}
-              </div>
-            )}
-            <div className="wc-src" ref={treatSrcRef}><img src={TREAT_IMG} alt="" draggable={false} /></div>
-            <span>{"×"}{treatsWon}</span>
-            <span className={`wc-plus${flying ? " go" : ""}`}>+{treatsWon}</span>
-          </div>
+        </div>
         )}
         </div>
         <div className={`wc-btns${ready ? " ready" : ""}`}>
