@@ -174,10 +174,26 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   // then a red dot on Video Theater. STEP 5.4 (Andy 21:04): REAL prizes = 15 coins + 10 treats (puzzle pieces later).
   // The DATABASE pays them (mpe_claim_prize, once per kid; amounts live there - keep these numbers the same).
   // TEST ONLY ?g=1 = play the party on load (display only, claims nothing; add &v=1 to see the Watch button after).
-  const PRIZES: Prize[] = [
-    { kind: "coin", n: 15, img: `${UI}/coin.webp`, flyers: 10, size: 70 },
-    { kind: "treat", n: 10, img: `${UI}/treat.webp`, flyers: 10, size: 64 },
-  ];
+  // STAGE PARTIES (Andy 2026-10-04): baby + young get the same Congratulations screen with a smaller prize (coins only:
+  // baby 5, young 10 - same numbers the database pays for '<world>:<animal>:baby|young'). partyStage = which stage the
+  // party is for (null = grown). TEST ONLY ?g=1&gs=1|2 = the baby/young party (display only, claims nothing).
+  const STAGE_COINS = [0, 5, 10];
+  const STAGE_TREATS = [0, 2, 3];
+  const [partyStage, setPartyStage] = useState<number | null>(null);
+  const partyAnimal = v.levelUpStage?.animal ?? animal;
+  const partyLast = partyAnimal.stages.length - 1;
+  const smallParty = partyStage !== null && partyStage > 0 && partyStage < partyLast;
+  const PRIZES: Prize[] = smallParty
+    ? [ // + treats (Andy 2026-10-04 09:14, database prize v3: baby 2, young 3)
+      { kind: "coin", n: STAGE_COINS[partyStage!] ?? 0, img: `${UI}/coin.webp`, flyers: partyStage === 1 ? 5 : 8, size: 70 },
+      { kind: "treat", n: STAGE_TREATS[partyStage!] ?? 0, img: `${UI}/treat.webp`, flyers: STAGE_TREATS[partyStage!] ?? 0, size: 64 },
+    ]
+    : [
+      { kind: "coin", n: 15, img: `${UI}/coin.webp`, flyers: 10, size: 70 },
+      { kind: "treat", n: 10, img: `${UI}/treat.webp`, flyers: 10, size: 64 },
+    ];
+  const partyWho = v.petNameMap[partyAnimal.id] || `Your ${partyAnimal.name.toLowerCase()}`;
+  const partyLine = !smallParty ? `${partyWho} is all grown up!` : partyStage === 1 ? `${partyWho} is a baby now!` : `${partyWho} is growing up!`;
   const claimed = useRef<Set<string>>(new Set()); // each prize asked for once per page (the database also refuses repeats)
   const askPrize = (id: string) => { if (claimed.current.has(id)) return; claimed.current.add(id); v.claimPrize(id); };
   const [party, setParty] = useState<null | "on" | "fly" | "out">(null);
@@ -188,7 +204,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const [badgesShown, setBadgesShown] = useState(0);
   const badgesRef = useRef<HTMLDivElement>(null);
   const DONE_PRIZES: Prize[] = [ // STEP 5.4 (Andy 21:04): REAL = 50 coins + 15 treats + the badge (database: '<world>:complete')
-    { kind: "coin", n: 50, img: `${UI}/coin.webp`, flyers: 12, size: 70 },
+    { kind: "coin", n: 25, img: `${UI}/coin.webp`, flyers: 12, size: 70 }, // = what the database pays (prize v2/v3: 25 - fixed 2026-10-04, was 50 on screen)
     { kind: "treat", n: 15, img: `${UI}/treat.webp`, flyers: 10, size: 64 },
     { kind: "badge", n: 1, img: `/worlds/badges/${v.world.id}.webp`, flyers: 1, size: 64, label: "New badge!" },
   ];
@@ -215,26 +231,22 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const coinRef = useRef<HTMLDivElement>(null);
   const puzzleRef = useRef<HTMLDivElement>(null);
   const jarRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { if (onTest && q.get("g") === "1") setParty("on"); }, []);
+  useEffect(() => { if (onTest && q.get("g") === "1") { const gs = parseInt(q.get("gs") ?? "", 10); if (gs === 1 || gs === 2) setPartyStage(gs); setParty("on"); } }, []);
   // SMALL STAGE PRIZE (Andy 2026-10-03): baby +5 coins, young +10 coins (database pays once: '<world>:<animal>:baby|young').
   // A gold '+5' pops over the animal and a few coins float into the coin pill. No dark screen, nothing to tap (~1.6s).
-  const MINI_COINS = [0, 5, 10];
+  const MINI_COINS = STAGE_COINS; // (small '+5' pop - no longer used since 2026-10-04: baby/young get the party)
   const [mini, setMini] = useState<null | { id: number; n: number; x1: number; y1: number }>(null);
   useEffect(() => {
     const lu = v.levelUpStage;
     if (lu && lu.stageIdx > 0 && lu.stageIdx < lu.animal.stages.length - 1) {
-      const n = MINI_COINS[lu.stageIdx] ?? 0;
       askPrize(`${v.world.id}:${lu.animal.id}:${lu.stageIdx === 1 ? "baby" : "young"}`); // REAL prize (database pays once)
-      const to = at(coinRef.current, 0.2, 0.5) ?? { x: 160, y: 60 };
-      const id = Date.now();
-      setMini({ id, n, x1: to.x, y1: to.y });
-      const k = Math.min(n, 6);
-      for (let i = 0; i < k; i++) window.setTimeout(() => partyLand("coin", Math.floor(n / k) + (i < n % k ? 1 : 0)), 500 + i * 90 + 750);
-      window.setTimeout(() => { setMini(m => (m && m.id === id ? null : m)); v.setLevelUpStage(null); }, 500 + k * 90 + 900);
+      setPartyStage(lu.stageIdx);   // the Congratulations screen, coins only (Andy 2026-10-04)
+      setParty(p => p ?? "on");
       return;
     }
     if (lu && lu.stageIdx === lu.animal.stages.length - 1) {
       askPrize(`${v.world.id}:${lu.animal.id}:grown`); // REAL prize (database pays once)
+      setPartyStage(lu.stageIdx);
       setParty(p => p ?? "on");
     }
   }, [v.levelUpStage]);
@@ -263,7 +275,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const partyLanded = () => {
     setJarShown(j => j + (PRIZES.find(p => p.kind === "treat")?.n ?? 0)); // the jar's own fill-up animation
     window.setTimeout(() => setParty("out"), 3000);
-    window.setTimeout(() => { setParty(null); v.setLevelUpStage(null); }, 3550);
+    window.setTimeout(() => { setParty(null); setPartyStage(null); v.setLevelUpStage(null); }, 3550);
   };
   // Video closed: if it counted as watched (brain: 1 second), the Watch button is gone and Video Theater gets its red dot.
   const closeVid = () => {
@@ -599,8 +611,8 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
 
         {party && (
           <GrowUpParty phase={party} cx={cx} sh={sh} prizes={PRIZES} sfxOn={v.sfxOn} target={partyTarget}
-            heroImgs={[art(animal, animal.stages.length - 1)]}
-            line={name ? `${name} is all grown up!` : `Your ${animal.name.toLowerCase()} is all grown up!`}
+            heroImgs={[art(partyAnimal, smallParty ? partyStage! : partyLast)]}
+            line={partyLine}
             onLand={partyLand} onAllLanded={partyLanded} onOk={() => setParty("fly")} />
         )}
 
