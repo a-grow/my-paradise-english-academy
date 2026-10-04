@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 // Shared top bar for the 4 grammar games: Back (left) + fullscreen + sound on/off (right).
 // Middle: COINS / LIVES / SOLVED, sent up by each game as {type:"MPE_STATS", coins, lives, solved, total}.
@@ -9,6 +9,8 @@ type Props = {
   muted: boolean;
   onToggleMute: () => void;
   stats?: GameStats | null;
+  center?: ReactNode;   // VOCAB games (2026-10-04): the target word in the middle; LIVES left, SOLVED + TIME right, no coins yet
+  time?: number;        // seconds left (vocab games)
 };
 
 // Run-style heart (red with a white shine) and Run-style coin, drawn as SVG.
@@ -69,7 +71,7 @@ function toggleFullscreen() {
   document.querySelector("iframe")?.contentWindow?.focus();
 }
 
-export default function GrammarGameBar({ onBack, muted, onToggleMute, stats }: Props) {
+export default function GrammarGameBar({ onBack, muted, onToggleMute, stats, center, time }: Props) {
   const [isFs, setIsFs] = useState(fsActive());
   useEffect(() => {
     const onChange = () => setIsFs(fsActive());
@@ -80,6 +82,40 @@ export default function GrammarGameBar({ onBack, muted, onToggleMute, stats }: P
       document.removeEventListener("webkitfullscreenchange", onChange);
     };
   }, []);
+
+  // VOCAB layout: the plain bar (Back + buttons) with LIVES, the centred target word, SOLVED + TIME laid over it.
+  // The grammar games never pass 'center', so their bar is unchanged.
+  if (center) {
+    const narrow = typeof window !== "undefined" && window.innerWidth < 1250; // iPad / small windows: no word labels, tighter
+    const lbl: CSSProperties = narrow ? { display: "none" } : statLabel;
+    const grp: CSSProperties = { position: "absolute", top: 0, height: 56, display: "flex", alignItems: "center", gap: 24, color: "#fff",
+      fontFamily: "Fredoka, sans-serif", fontWeight: 700, fontSize: narrow ? 17 : 20, letterSpacing: 0.5, pointerEvents: "none", ...(narrow ? { gap: 12 } : {}) };
+    return (
+      <div style={{ position: "relative", flex: "0 0 auto" }}>
+        <GrammarGameBar onBack={onBack} muted={muted} onToggleMute={onToggleMute} stats={null} />
+        {stats && (
+          <div style={{ ...grp, left: narrow ? 118 : 132 }}>
+            <div style={statGroup}>
+              <span style={lbl}>COINS</span>
+              <Coin />
+              <span style={{ marginLeft: 6 }}>{"\u00d7"}{String(stats.coins).padStart(2, "0")}</span>
+            </div>
+            <div style={statGroup}>
+              <span style={lbl}>LIVES</span>
+              {stats.lives <= 6
+                ? <span style={{ display: "flex", gap: narrow ? 1 : 4 }}>{Array.from({ length: Math.max(0, stats.lives) }, (_, i) => <Heart key={i} />)}</span>
+                : <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Heart /> {"\u00d7"}{stats.lives}</span>}
+            </div>
+          </div>
+        )}
+        <div style={{ position: "absolute", left: "50%", top: 0, height: 56, transform: "translateX(-50%)", display: "flex", alignItems: "center" }}>{center}</div>
+        <div style={{ ...grp, right: 124 }}>
+          {stats && <div style={statGroup}><span style={lbl}>SOLVED</span><span>{stats.solved}/{stats.total}</span></div>}
+          {time != null && <div style={statGroup}><span style={lbl}>TIME</span><span style={{ color: time <= 10 ? "#ff6b6b" : "#fff" }}>{time}s</span></div>}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

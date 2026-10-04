@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import GameTest from "./GameTest";
-import { addTreats } from "@/lib/cloudSave";
+import { addTreats, addCoins } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
@@ -44,24 +44,30 @@ const GamePage = () => {
   const [treatsEarnedToday, setTreatsEarnedToday] = useState(getTreatsEarnedToday);
   const [showCelebration, setShowCelebration] = useState(false);
   const [lastTreats, setLastTreats] = useState(1);
-  const [musicOn, setMusicOn] = useState(() => localStorage.getItem("mpe_music") !== "off");
+  const [musicOn, setMusicOn] = useState(true); // sound ON by default (Andy 2026-10-04); was the old worlds' shared mpe_music setting
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.18"));
+  const [track, setTrack] = useState<string | null>(null); // a game's own song (null = the arcade song) - 2026-10-04
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
 
   const treatsCappedToday = false; // no cap (Andy rule)
 
+  // MUSIC (Andy 2026-10-04): the arcade song on the menus; a game with its own song (track) plays that instead.
+  // Game songs are pre-levelled files like the world songs (~-20 dB) -> played at full volume.
   useEffect(() => {
+    if (track === "") return; // "" = silence (a game's win / lose screen) - the last run's cleanup already paused it
+    const src = track ?? "/game-music.mp3";
     if (!audioRef.current) {
-      audioRef.current = new Audio("/game-music.mp3");
+      audioRef.current = new Audio(src);
       audioRef.current.loop = true;
     }
+    if (!audioRef.current.src.endsWith(src)) { audioRef.current.pause(); audioRef.current.src = src; }
     if (musicOn) {
       audioRef.current.volume = 0;
       audioRef.current.play().catch(() => {});
       let v = 0;
-      const target = volume * 0.25;
+      const target = track ? 1 : volume * 0.25;
       const fade = setInterval(() => {
         v = Math.min(v + target / 40, target);
         if (audioRef.current) audioRef.current.volume = v;
@@ -71,7 +77,17 @@ const GamePage = () => {
     } else {
       audioRef.current.pause();
     }
-  }, [musicOn]);
+  }, [musicOn, track]);
+  // The computer voice: games send 'mpe-duck' while a word is spoken -> the music dips to 30% so the voice is clear.
+  useEffect(() => {
+    const on = (e: Event) => {
+      const a = audioRef.current; if (!a || !musicOn) return;
+      const full = track ? 1 : volume * 0.25;
+      a.volume = (e as CustomEvent).detail ? full * 0.3 : full;
+    };
+    window.addEventListener("mpe-duck", on);
+    return () => window.removeEventListener("mpe-duck", on);
+  }, [musicOn, track, volume]);
 
   const playCelebrate = useCallback(() => {
     try {
@@ -127,6 +143,11 @@ const GamePage = () => {
     setShowCelebration(true);
   }, [isMaster, capKey, jarKey, playCelebrate]);
 
+  // COINS in the vocab games (Andy 2026-10-04): read the kid's total when a game starts (win screen pill);
+  // pay "+N" only on a WIN - the database adds it (like the grammar games). Teacher code 1006 pays nothing.
+  const coinTotal = useCallback(async () => (isMaster ? 0 : await addCoins(code!, studentName!, 0)), [isMaster, code, studentName]);
+  const payCoins = useCallback((n: number) => { if (!isMaster && n > 0) addCoins(code!, studentName!, n); }, [isMaster, code, studentName]);
+
   // Back to the world the kid came from. Ocean + Dino: as before. A new-look world (savanna...) remembered its own
   // page address in this tab (mpe_return_world, set when its Vocab button was tapped) - only used if it is this kid's.
   const worldHome = () => {
@@ -153,6 +174,11 @@ const GamePage = () => {
         treatsEarnedToday={treatsEarnedToday}
         fromDino={fromDino}
         studentBook={studentBook}
+        musicOn={musicOn}
+        onToggleMusic={() => setMusicOn(m => !m)}
+        onMusicTrack={setTrack}
+        onCoinTotal={coinTotal}
+        onPayCoins={payCoins}
       />
 
     </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import WinCelebration from "@/components/WinCelebration";
 import LoseScreen from "@/components/LoseScreen";
+import SpaceShooter2 from "@/vocab/SpaceShooter"; // NEW Space Shooter look (2026-10-04)
 import book1Data from "@/data/oxford-discover-book1.json";
 import book2Data from "@/data/oxford-discover-book2.json";
 import book3Data from "@/data/oxford-discover-book3.json";
@@ -229,16 +230,19 @@ const CountdownOverlay = ({onDone}:{onDone:()=>void}) => {
 // ── UNIT CLEAR / WINNER SCREEN ────────────────────────────────────────────────
 // Three zones only: celebration → reward → buttons. No stars, no points.
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
-const UnitClearScreen = ({unit,onBack,onClaim,onBackToWorld,claimState,diff}:{unit:UnitData;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;onBackToWorld?:()=>void;claimState?:"available"|"claimed"|"capped";diff?:string;treatsEarnedToday?:number;fromDino?:boolean}) => {
+const UnitClearScreen = ({unit,onBack,onClaim,onBackToWorld,claimState,diff,coinsWon=0,coinStart,onPayCoins,muted=false}:{unit:UnitData;muted?:boolean;onBack:()=>void;onPlay:()=>void;onClaim?:()=>void;onBackToWorld?:()=>void;claimState?:"available"|"claimed"|"capped";diff?:string;treatsEarnedToday?:number;fromDino?:boolean;coinsWon?:number;coinStart?:number;onPayCoins?:(n:number)=>void}) => {
   // WIN SCREEN (Andy 2026-10-04): the grammar games' win screen. The treats are paid the moment the kid wins (no
   // '+N Treats!' button to tap any more); they fly to the bottom-left. Vocab games have no coins yet = no coin row/pill.
   const treatCount = TREATS_BY_DIFF[diff??""] ?? 2;
   const [shown] = useState(() => (onClaim && claimState==="available" ? treatCount : 0)); // frozen: claiming changes the props
   const paid = useRef(false);
   useEffect(()=>{ if(!paid.current && claimState==="available" && onClaim){ paid.current=true; onClaim(); } },[]);
+  // COINS (Andy 2026-10-04): a game that collects coins pays them here, only on a WIN ("+N" - the database adds it)
+  const coinPaid = useRef(false);
+  useEffect(()=>{ if(!coinPaid.current && coinsWon>0 && onPayCoins){ coinPaid.current=true; onPayCoins(coinsWon); } },[]);
   return (
     <div style={{minHeight:"100vh",background:`radial-gradient(ellipse at center, ${unit.color}55 0%, #0f0c29 70%)`}}>
-      <WinCelebration coinsWon={0} startTotal={null} treatsWon={shown} muted={false} fanfare
+      <WinCelebration coinsWon={coinsWon} startTotal={coinStart ?? null} treatsWon={shown} muted={muted} fanfare
         onChooseGame={onBack} onReturnToWorld={onBackToWorld ?? onBack}/>
     </div>
   );
@@ -246,9 +250,9 @@ const UnitClearScreen = ({unit,onBack,onClaim,onBackToWorld,claimState,diff}:{un
 
 // ── RESULT SCREEN (time up / game over) ───────────────────────────────────────
 // LOSE SCREEN (Andy 2026-10-04): the grammar games' lose screen (Try Again / Choose Game / Return to World). Saves nothing.
-const ResultScreen = ({onBack,onPlay,onBackToWorld,reason}:{score:number;total:number;onBack:()=>void;onPlay:()=>void;reason?:"timeout"|"lives";onBackToWorld?:()=>void;fromDino?:boolean}) => (
+const ResultScreen = ({onBack,onPlay,onBackToWorld,reason,muted=false}:{muted?:boolean;score:number;total:number;onBack:()=>void;onPlay:()=>void;reason?:"timeout"|"lives";onBackToWorld?:()=>void;fromDino?:boolean}) => (
   <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#1e1b4b,#312e81,#4c1d95)"}}>
-    <LoseScreen muted={false} title={reason==="timeout" ? "Out of time!" : undefined} onTryAgain={onPlay} onChooseGame={onBack} onReturnToWorld={onBackToWorld ?? onBack}/>
+    <LoseScreen muted={muted} title={reason==="timeout" ? "Out of time!" : undefined} onTryAgain={onPlay} onChooseGame={onBack} onReturnToWorld={onBackToWorld ?? onBack}/>
   </div>
 );
 
@@ -1404,9 +1408,14 @@ interface GameTestProps {
   treatsEarnedToday?: number;
   fromDino?: boolean;
   studentBook?: number;
+  musicOn?: boolean;                               // game songs (2026-10-04): sound button in the game's top bar
+  onToggleMusic?: () => void;
+  onMusicTrack?: (src: string | null) => void;     // a game asks GamePage to play its own song (null = arcade song)
+  onCoinTotal?: () => Promise<number | null | undefined>;  // the kid's coin total (win screen pill)
+  onPayCoins?: (n: number) => void;                         // pay coins collected in a game (only on a WIN)
 }
 
-const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, treatsEarnedToday=0, fromDino=false, studentBook=1}: GameTestProps) => {
+const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, treatsEarnedToday=0, fromDino=false, studentBook=1, musicOn=true, onToggleMusic, onMusicTrack, onCoinTotal, onPayCoins}: GameTestProps) => {
   const navigate=useNavigate();
   const [screen,setScreen]=useState<Screen>("books");
   const [justClaimed,setJustClaimed]=useState(false);
@@ -1442,7 +1451,11 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
     if(game.id==="arrow") return <ArrowShoot {...props}/>;
     if(game.id==="whack") return <WhackAMole {...props}/>;
     if(game.id==="snake") return <WordSnake {...props}/>;
-    if(game.id==="space") return <SpaceShooter {...props}/>;
+    // NEW look (Andy 2026-10-04). The old game stays above as the fallback: <SpaceShooter {...props}/>
+    if(game.id==="space") return <SpaceShooter2 unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
+      onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
+      renderWin={(restart,cw,cs)=><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={restart} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} muted={!musicOn}/>}
+      renderLose={(reason,restart)=><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={restart} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/>}/>;
   }
 
   const back=()=>{

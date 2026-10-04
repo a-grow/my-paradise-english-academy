@@ -206,6 +206,18 @@ const MOTES = (() => {
   });
 })();
 
+// Andy 2026-10-04 16:27: motes along the edge of the WHOLE My Animals box (box = card + 50px each side), same columns as MOTES
+const PANEL_MOTES = (() => {
+  let seed = 83;
+  const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  return Array.from({ length: 44 }, (_, i) => {
+    const side = i % 4, t = r() * 100, o = r() * 7;
+    const x = side === 0 || side === 2 ? t : side === 1 ? 93 + o : o;
+    const y = side === 1 || side === 3 ? t : side === 2 ? 93 + o : o;
+    return [x, y, 5 + r() * 7, 3.6 + r() * 2.8, -r() * 6, (r() - 0.5) * 30];
+  });
+})();
+
 const Loading = ({ L }: { L: LookSettings }) => (
   <div style={{ position: "fixed", inset: 0, background: L.loadingBg, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "'Titan One', sans-serif", fontSize: 32 }}>
     <style>{FONTS}</style>
@@ -346,10 +358,18 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     if (k === "badge") setBadgesShown(b => b + 1);
     setBump(b => ({ ...b, [k]: (b[k] ?? 0) + 1 }));
   };
+  // Andy 2026-10-04 16:22: the treats finish dropping into the jar FIRST (old stage still showing), THEN the transformation.
   const partyLanded = () => {
-    setJarShown(j => j + (PRIZES.find(p => p.kind === "treat")?.n ?? 0)); // the jar's own fill-up animation
-    window.setTimeout(() => setParty("out"), 3000); // (the transformation already showed the new stage)
-    window.setTimeout(() => { setParty(null); setPartyStage(null); setHold(null); v.setLevelUpStage(null); }, 3550);
+    const nT = PRIZES.find(p => p.kind === "treat")?.n ?? 0;
+    setJarShown(j => j + nT); // the jar's own fill-up animation
+    const jarMs = Math.min(nT, 12) * 170 + 900;          // ~ CookieJar earn(): 170ms per drop + settle
+    const endAt = hold ? jarMs + TF_DUR : 3000;
+    if (hold) window.setTimeout(startTransform, jarMs);
+    window.setTimeout(() => setParty("out"), endAt);
+    window.setTimeout(() => {
+      if (onTest && q.get("g") === "1") setTestKeep(true); // TEST party paid nothing: keep the shown jar/coins (no 'going back' lid pop)
+      setParty(null); setPartyStage(null); setHold(null); v.setLevelUpStage(null);
+    }, endAt + 550);
   };
   // Video closed: if it counted as watched (brain: 1 second), the Watch button is gone and Video Theater gets its red dot.
   const closeVid = () => {
@@ -507,9 +527,11 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     ];
   };
   const startArrive = () => {
-    setArrive(a => a + 1); setArriving(true);
-    window.clearTimeout(arriveT.current);
-    arriveT.current = window.setTimeout(() => setArriving(false), 3300);
+    setArrive(a => a + 1);
+    // Andy 2026-10-04 16:27: the new egg gets the SAME golden glow + spiral as a stage transformation (was soft glow + dots)
+    setTf(n => n + 1); setTfOn(true);
+    tfT.current.forEach(t => window.clearTimeout(t));
+    tfT.current = [window.setTimeout(() => setTfOn(false), TF_DUR + 100)];
     if (v.sfxOn) { const a = new Audio(`${UI}/snd_newfriend.mp3`); a.volume = 0.7; a.play().catch(() => { }); }
   };
   const canFeed = !testView && !v.readOnly && !grown && v.jarTreats > 0;
@@ -688,6 +710,11 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         {panel === "animals" && (
           <div className="sv-ov" onClick={() => setPanel(null)}>
             <div className="sv-ovcard" onClick={e => e.stopPropagation()}>
+              {newReady && ( /* Andy 2026-10-04 16:27: glow + motes around the WHOLE My Animals box, not one card */
+                <div className="sv-fmotes sv-pmotes" aria-hidden="true"><b className="sv-pglow" />
+                  {PANEL_MOTES.map((m, i) => <i key={i} style={{ left: `${m[0]}%`, top: `${m[1]}%`, width: m[2], height: m[2], margin: -m[2] / 2,
+                    ["--dx" as string]: `${m[5]}px`, animationDuration: `${m[3]}s`, animationDelay: `${m[4]}s` }} />)}
+                </div>)}
               <div className="sv-x sv-tap" onClick={() => setPanel(null)}><img src={`${UI}/rb_exit.webp`} alt="Close" /></div>
               <h2>My {L.title} Animals</h2>
               <div className="sv-biggrid">
@@ -700,10 +727,6 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
                     </div>);
                   if (x.ready) return (
                     <div key={x.a.id} className="sv-readywrap">
-                      <div className="sv-fmotes" aria-hidden="true"><b className="sv-fglow" />
-                        {MOTES.map((m, i) => <i key={i} style={{ left: `${m[0]}%`, top: `${m[1]}%`, width: m[2], height: m[2], margin: -m[2] / 2,
-                          ["--dx" as string]: `${m[5]}px`, animationDuration: `${m[3]}s`, animationDelay: `${m[4]}s` }} />)}
-                      </div>
                       <div className="sv-big ready sv-tap" onClick={() => { v.dismissUnlock(x.a.id); setUnlockedNow(true); setPanel(null); startArrive(); toast("Say hello to your new friend!"); }}>
                         <img className="shadow" src={art(x.a, 0)} alt="" /><p>New friend! Tap me!</p>
                       </div>
@@ -778,7 +801,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           <GrowUpParty phase={party} cx={cx} sh={sh} prizes={PRIZES} sfxOn={v.sfxOn} target={partyTarget}
             heroImgs={[art(partyAnimal, smallParty ? partyStage! : partyLast)]}
             line={partyLine}
-            onLand={partyLand} onAllLanded={partyLanded} onOk={() => { setParty("fly"); if (hold) window.setTimeout(startTransform, 1000); }} />
+            onLand={partyLand} onAllLanded={partyLanded} onOk={() => setParty("fly")} />
         )}
 
         {done && (
@@ -951,7 +974,7 @@ const CSS = `
 .sv-big p{font-size:24px;color:#8a4f1d}
 .sv-big small{font-size:16px;color:#8a6a40}
 .sv-big.here{border-color:#ffb000;box-shadow:0 0 0 4px #fff0b3}
-.sv-big.ready{border-color:#ffb000;animation:sv-glowBox 1.1s ease-in-out infinite}
+.sv-big.ready{border-color:#ffb000} /* glow moved to the whole box (Andy 2026-10-04 16:27) */
 @keyframes sv-glowBox{0%,100%{box-shadow:0 0 0 0 rgba(255,215,60,0)}50%{box-shadow:0 0 34px 14px rgba(255,215,60,.95)}}
 .sv-big.locked .sv-q{height:190px;display:flex;align-items:center;justify-content:center;font-size:90px;color:#c9a46a}
 .sv-exit{width:760px;height:317px;padding:52px 40px 0;text-align:center;background:url(${UI}/frame_exit.webp) 0 0/100% 100% no-repeat;filter:drop-shadow(0 12px 16px rgba(0,0,0,.5))}
@@ -993,7 +1016,10 @@ const CSS = `
  box-shadow:0 0 4px 2px #fff27a,0 0 10px 4px #ffd000,0 0 18px 6px rgba(255,170,0,.55);animation-name:sv-mote;animation-timing-function:ease-in-out;animation-iteration-count:infinite}
 @keyframes sv-mote{0%{opacity:0;transform:translate(0,14px) scale(.4)}25%{opacity:1;transform:translate(calc(var(--dx) * .5),-26px) scale(1)}
  55%{opacity:.9;transform:translate(var(--dx),-44px) scale(.9)}80%{opacity:.5;transform:translate(calc(var(--dx) * .6),-28px) scale(.7)}100%{opacity:0;transform:translate(0,-12px) scale(.4)}}
-@media (prefers-reduced-motion: reduce){.sv-fmotes i,.sv-fglow{animation:none}}
+.sv-pmotes{inset:-50px;z-index:-1}
+.sv-pglow{position:absolute;inset:50px;border-radius:44px;animation:sv-pglow 2s ease-in-out infinite}
+@keyframes sv-pglow{0%,100%{box-shadow:0 0 28px 10px rgba(255,215,60,.6)}50%{box-shadow:0 0 60px 26px rgba(255,215,60,.95)}}
+@media (prefers-reduced-motion: reduce){.sv-fmotes i,.sv-fglow,.sv-pglow{animation:none}}
 .sv-in{width:100%;height:100%;transform-origin:50% 92%}
 .sv-in.go{animation:sv-arriveIn 1.05s cubic-bezier(.3,1.4,.5,1) both}
 @keyframes sv-arriveIn{0%{transform:translateY(-140px) scale(.25);opacity:0}35%{opacity:1;transform:translateY(-60px) scale(1.08)}62%{transform:translateY(0) scale(1.06,.92)}80%{transform:translateY(-14px) scale(.97,1.04)}100%{transform:translateY(0) scale(1)}}

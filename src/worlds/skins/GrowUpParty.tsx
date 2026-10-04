@@ -205,7 +205,7 @@ export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, heroImgs, li
 
 const CSS = `
 .gu-ov{position:absolute;inset:0;z-index:60;background:rgba(0,0,0,.88);animation:gu-in .4s ease-out both;transition:background .6s ease-out,opacity .5s ease-out}
-.gu-ov.fly{background:rgba(0,0,0,.45)}
+.gu-ov.fly,.gu-ov.out{background:rgba(0,0,0,0)} /* Andy 2026-10-04 16:22: no dark tint while the prizes fly - the kid sees everything */
 .gu-ov.out{opacity:0}
 @keyframes gu-in{from{opacity:0}to{opacity:1}}
 .gu-wordrow{position:absolute;left:0;right:0;text-align:center;pointer-events:none;transition:opacity .4s}
