@@ -1396,7 +1396,7 @@ const GAMES=[
   {id:"arrow",name:"Arrow Shoot",emoji:"🏹",desc:"Pop the right balloons!",color:"#f97316",glow:"rgba(249,115,22,0.5)"},
   {id:"whack",name:"Whack-a-Mole",emoji:"🔨",desc:"Whack the correct word!",color:"#0ea5e9",glow:"rgba(14,165,233,0.5)"},
   {id:"snake",name:"Word Snake",emoji:"🐍",desc:"Eat letters to spell words!",color:"#10b981",glow:"rgba(16,185,129,0.5)"},
-  {id:"space",name:"Space Shooter",emoji:"🚀",desc:"Blast the right aliens!",color:"#a855f7",glow:"rgba(168,85,247,0.5)"},
+  {id:"space",name:"Space Robots",emoji:"🚀",desc:"Find the right robot!",color:"#a855f7",glow:"rgba(168,85,247,0.5)",cover:"/vocab/space/cover.webp"},
 ];
 type Screen="books"|"units"|"games"|"diff"|"play";
 
@@ -1481,7 +1481,7 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
         <span style={{color:"white",fontFamily:F,fontWeight:900,fontSize:"1.1rem",textShadow:"0 0 20px rgba(168,85,247,0.9)"}}>🎮 MPE Arcade</span>
         <div style={{width:72}}/>
       </nav>
-      <div style={{maxWidth:560,margin:"0 auto",padding:"72px 16px 40px",position:"relative",zIndex:10}}>
+      <div style={{maxWidth:screen==="games"?1040:560,margin:"0 auto",padding:"72px 16px 40px",position:"relative",zIndex:10}}>
         {screen==="books"&&(
           <>
             <div style={{textAlign:"center",marginBottom:"2rem",animation:"slideUp 0.5s ease-out"}}>
@@ -1532,13 +1532,21 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
               <div style={{fontFamily:F,fontWeight:900,fontSize:"1.5rem",color:"white",marginTop:"0.25rem"}}>Unit {unit.unit} — {unit.topic}</div>
               <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.5)",marginTop:4}}>Pick your game and let's go!</div>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem"}}>
+            {/* GAME CARDS like the grammar hub (Andy 2026-10-04): big picture cards, phone 1 column, 768px+ 2x2.
+                A game with a cover picture (title baked in) shows only the picture; the others keep their old card until
+                their covers are made. */}
+            <div className="grid grid-cols-1 md:grid-cols-2" style={{gap:"1.1rem"}}>
               {GAMES.map((g,i)=>(
-                <button key={g.id} onClick={()=>{setGame(g);setScreen("diff");}}
-                  style={{padding:"1.25rem 0.75rem",background:`linear-gradient(135deg,${g.color},${g.color}99)`,border:`2.5px solid ${g.color}`,borderRadius:"1.5rem",cursor:"pointer",textAlign:"center",boxShadow:`0 0 22px ${g.glow},0 8px 28px rgba(0,0,0,0.35)`,animation:`slideUp 0.4s ease-out ${i*0.08}s both, arcadeGlow 2.5s ease-in-out infinite ${i*0.4}s`}}>
+                <button key={g.id} onClick={()=>{setGame(g);setScreen("diff");}} aria-label={g.name}
+                  style={g.cover
+                    ? {position:"relative",padding:0,border:"3px solid rgba(253,224,71,0.9)",borderRadius:"1.25rem",cursor:"pointer",overflow:"hidden",aspectRatio:"1376 / 768",
+                       backgroundImage:`url('${g.cover}')`,backgroundSize:"cover",backgroundPosition:"center",boxShadow:"0 8px 26px rgba(0,0,0,0.45)",animation:`slideUp 0.4s ease-out ${i*0.08}s both`}
+                    : {aspectRatio:"1376 / 768",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"1.25rem 0.75rem",background:`linear-gradient(135deg,${g.color},${g.color}99)`,border:`2.5px solid ${g.color}`,borderRadius:"1.25rem",cursor:"pointer",textAlign:"center",boxShadow:`0 0 22px ${g.glow},0 8px 28px rgba(0,0,0,0.35)`,animation:`slideUp 0.4s ease-out ${i*0.08}s both, arcadeGlow 2.5s ease-in-out infinite ${i*0.4}s`}}>
+                  {!g.cover && <>
                   <div style={{fontSize:"3rem",marginBottom:"0.5rem",animation:`floatUpDown ${2+i*0.35}s ease-in-out infinite`}}>{g.emoji}</div>
-                  <div style={{fontFamily:F,fontWeight:800,fontSize:"0.95rem",color:"white",lineHeight:1.4}}>{g.name}</div>
-                  <div style={{fontFamily:F,fontWeight:700,fontSize:"0.8rem",color:"rgba(255,255,255,0.8)",marginTop:"0.3rem"}}>{g.desc}</div>
+                  <div style={{fontFamily:F,fontWeight:800,fontSize:"1.2rem",color:"white",lineHeight:1.4}}>{g.name}</div>
+                  <div style={{fontFamily:F,fontWeight:700,fontSize:"0.95rem",color:"rgba(255,255,255,0.8)",marginTop:"0.3rem"}}>{g.desc}</div>
+                  </>}
                 </button>
               ))}
             </div>
