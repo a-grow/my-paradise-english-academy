@@ -343,7 +343,7 @@ function initAudio(){
   if(audioReady)return; audioReady=true;
   try{
     bgm=new Audio('data:audio/mp3;base64,'+A.music);
-    bgm.loop=true; bgm.volume=0.4; bgm.play().catch(()=>{});
+    bgm.loop=true; bgm.volume=0.26; bgm.play().catch(()=>{});
     actx=new (window.AudioContext||window.webkitAudioContext)();
   }catch(e){}
 }

@@ -56,7 +56,7 @@ export default function LoseScreen({ muted, onTryAgain, onChooseGame, onReturnTo
   useEffect(() => {
     const t = window.setTimeout(() => setAndyIn(true), 150);
     const sfx = new Audio(LOSE_SFX);
-    sfx.volume = 0.8;
+    sfx.volume = 0.5; // was the loudest sound in the app (Andy 2026-10-05)
     if (!muted) sfx.play().catch(() => {});
     return () => { clearTimeout(t); sfx.pause(); };
     // runs once when the lose screen opens

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import WinCelebration from "@/components/WinCelebration";
 import LoseScreen from "@/components/LoseScreen";
 import SpaceShooter2 from "@/vocab/SpaceShooter"; // NEW Space Shooter look (2026-10-04)
+import WhackGarden from "@/vocab/WhackGarden";
+import { installIdleCursor } from "@/lib/idleCursor"; // hide the mouse when it is not used (Andy 2026-10-05) // NEW Whack-a-mole = Get Out of My Garden! (2026-10-05)
 import book1Data from "@/data/oxford-discover-book1.json";
 import book2Data from "@/data/oxford-discover-book2.json";
 import book3Data from "@/data/oxford-discover-book3.json";
@@ -509,7 +511,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
 
   useEffect(()=>{
     if(done||paused) return;
-    const t=setInterval(()=>setTimeLeft(tl=>{if(tl<=1){clearInterval(t);setDoneReason("timeout");setDone(true);return 0;}return tl-1;}),1000);
+    const t=setInterval(()=>{},1000); // NO TIMER (Andy 2026-10-05)
     return()=>clearInterval(t);
   },[done,paused]);
 
@@ -606,13 +608,13 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
         <button onClick={onBack} style={{background:"rgba(0,0,0,0.55)",border:"2px solid rgba(255,255,255,0.25)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer",flexShrink:0}}>← Back</button>
         <FullscreenButton/>
         <div style={{background:"rgba(0,0,0,0.72)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.45rem 1.4rem",border:"2px solid rgba(255,255,255,0.25)",flex:1,textAlign:"center",minWidth:0}}>
-          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🏹 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}>🔊</button></span>
+          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}><span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}><SpeakerIcon/></button></span>
         </div>
         <div style={{display:"flex",gap:"0.4rem",alignItems:"center",flexShrink:0}}>
-          <Pill dark red={timeLeft<=10}>⏱{timeLeft}s</Pill>
-          <Pill>⭐{score}</Pill>
-          <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
-          <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
+          
+          <Pill>Score {score}</Pill>
+          <Pill><Dot color={cfg.color}/>{cfg.label}</Pill>
+          <Pill><Hearts n={lives}/></Pill>
         </div>
       </div>
       <ArcherSVG ouch={ouch} svgRef={archerRef}/>
@@ -632,7 +634,7 @@ const ArrowShoot = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
       {pops.map(p=>(
         <div key={p.id} style={{position:"fixed",left:p.x,top:p.y,transform:"translate(-50%,-50%)",pointerEvents:"none",zIndex:60}}>
           {[...Array(12)].map((_,i)=>{const a=(i/12)*Math.PI*2;return <div key={i} style={{position:"absolute",width:12,height:12,borderRadius:"50%",background:i%2===0?p.color:"#fbbf24",animation:"popBurst 0.65s ease-out forwards",animationDelay:`${i*0.02}s`,transform:`translate(${Math.cos(a)*60}px,${Math.sin(a)*60}px)`}}/>;})  }
-          <div style={{position:"absolute",fontSize:"2.5rem",animation:"popBurst 0.4s ease-out forwards",left:-20,top:-20}}>💥</div>
+          <div style={{position:"absolute",fontSize:"2.5rem",animation:"popBurst 0.4s ease-out forwards",left:-20,top:-20}}><span style={{display:"block",width:56,height:56,borderRadius:"50%",border:"5px solid #fde047",boxShadow:"0 0 18px #fbbf24"}}/></div>
         </div>
       ))}
       <svg style={{position:"absolute",bottom:36,left:0,right:0,width:"100%",height:55,zIndex:5}} viewBox="0 0 800 55" preserveAspectRatio="none">
@@ -726,7 +728,7 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
     const tgt=pickTarget(new Set());setTimeout(()=>spawnMoles(tgt,new Set()),400);
     const t=setInterval(()=>{
       if(pausedRef.current) return;
-      setTimeLeft(tl=>{if(tl<=1){clearInterval(t);timers.current.forEach(clearTimeout);setDoneReason("timeout");setDone(true);return 0;}return tl-1;});
+      // NO TIMER (Andy 2026-10-05)
     },1000);
     return()=>{clearInterval(t);timers.current.forEach(clearTimeout);};
   },[]);
@@ -784,15 +786,15 @@ const WhackAMole = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,fro
             <FullscreenButton/>
           </div>
           <div style={{display:"flex",gap:"0.5rem",alignItems:"center"}}>
-            <Pill dark red={timeLeft<=10}>⏱{timeLeft}s</Pill>
-            <Pill>⭐{score}</Pill>
-            <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
-              <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
+            
+            <Pill>Score {score}</Pill>
+            <Pill><Dot color={cfg.color}/>{cfg.label}</Pill>
+              <Pill><Hearts n={lives}/></Pill>
             </div>
         </div>
         <div style={{textAlign:"center"}}>
           <div onMouseEnter={()=>setOverUI(true)} onMouseLeave={()=>setOverUI(false)} style={{background:"rgba(0,0,80,0.6)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.5rem 1.75rem",display:"inline-block",border:"2px solid rgba(255,255,255,0.25)"}}>
-            <span style={{fontFamily:F,fontWeight:800,fontSize:"1.2rem",color:"white"}}>🔨 <span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}>🔊</button></span>
+            <span style={{fontFamily:F,fontWeight:800,fontSize:"1.2rem",color:"white"}}><span style={{color:"#fbbf24",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}><SpeakerIcon/></button></span>
           </div>
         </div>
       </div>
@@ -1002,13 +1004,13 @@ const WordSnake = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,from
           <FullscreenButton/>
         </div>
         <div style={{display:"flex",gap:"0.4rem",alignItems:"center"}}>
-          <Pill>⭐{score}</Pill>
-          <Pill><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
-          <Pill>{"❤️".repeat(Math.max(0,lives))}</Pill>
+          <Pill>Score {score}</Pill>
+          <Pill><Dot color={cfg.color}/>{cfg.label}</Pill>
+          <Pill><Hearts n={lives}/></Pill>
         </div>
       </div>
       <div style={{width:"100%",maxWidth:420,marginBottom:"0.5rem",zIndex:10,background:"rgba(0,0,0,0.7)",borderRadius:16,padding:"0.6rem 1rem",border:"3px solid rgba(74,222,128,0.5)",boxShadow:"0 0 20px rgba(74,222,128,0.3)"}}>
-        <div style={{fontFamily:F,fontWeight:800,fontSize:"0.9rem",color:"#4ade80",textAlign:"center",marginBottom:"0.4rem",letterSpacing:1}}>🐍 Spell this word:</div>
+        <div style={{fontFamily:F,fontWeight:800,fontSize:"0.9rem",color:"#4ade80",textAlign:"center",marginBottom:"0.4rem",letterSpacing:1}}>Spell this word:</div>
         <div style={{display:"flex",gap:"0.3rem",justifyContent:"center",flexWrap:"wrap"}}>
           {word.split("").map((ch,i)=>{
             const isDone=i<collected.length,isNext=i===collected.length;
@@ -1132,7 +1134,7 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,f
 
   useEffect(()=>{
     if(done||paused) return;
-    const t=setInterval(()=>setTimeLeft(tl=>{if(tl<=1){setDoneReason("timeout");setDone(true);return 0;}return tl-1;}),1000);
+    const t=setInterval(()=>{},1000); // NO TIMER (Andy 2026-10-05)
     return()=>clearInterval(t);
   },[done,paused]);
 
@@ -1303,13 +1305,13 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,f
         <button onClick={(e)=>{e.stopPropagation();onBack();}} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.2)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.3rem 0.85rem",borderRadius:999,cursor:"pointer",flexShrink:0}}>← Back</button>
         <span onClick={(e)=>e.stopPropagation()} style={{flexShrink:0,display:"flex"}}><FullscreenButton/></span>
         <div style={{background:"rgba(0,0,20,0.85)",backdropFilter:"blur(10px)",borderRadius:999,padding:"0.4rem 1.4rem",border:"1.5px solid rgba(0,255,255,0.25)",flex:1,textAlign:"center",minWidth:0}}>
-          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}>🚀 <span style={{color:"#00ffff",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}>🔊</button></span>
+          <span style={{fontFamily:F,fontWeight:800,fontSize:"1.15rem",color:"white",whiteSpace:"nowrap"}}><span style={{color:"#00ffff",fontSize:"1.8rem"}}>{unit.chinese[target]||target}</span> <button onClick={()=>speak((unit.chinese[target]||target).split("/")[0].trim(),"zh-TW")} style={{background:"none",border:"none",cursor:"pointer",fontSize:"1.4rem",verticalAlign:"middle",padding:"0 0.2rem",lineHeight:1}}><SpeakerIcon/></button></span>
         </div>
         <div style={{display:"flex",gap:"0.35rem",alignItems:"center",flexShrink:0}}>
-          <Pill dark>⭐{score}</Pill>
-          <Pill dark><span style={{color:cfg.color}}>{cfg.emoji}</span>{cfg.label}</Pill>
-          <Pill dark red={timeLeft<=10}>⏱{timeLeft}s</Pill>
-          <Pill dark>{"❤️".repeat(Math.max(0,lives))}</Pill>
+          <Pill dark>Score {score}</Pill>
+          <Pill dark><Dot color={cfg.color}/>{cfg.label}</Pill>
+          
+          <Pill dark><Hearts n={lives}/></Pill>
         </div>
       </div>
       {aliens.map(a=>(
@@ -1365,7 +1367,6 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,f
 const DiffPicker = ({game,unit,onPick,onBack}:{game:{id:string;name:string;emoji:string};unit:UnitData;onPick:(d:Diff)=>void;onBack:()=>void}) => (
   <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#0f0c29,#302b63,#24243e)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"1.5rem"}}>
     <style>{`@keyframes slideUp{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}@keyframes floatUD{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}`}</style>
-    <div style={{fontSize:"3.5rem",animation:"floatUD 2s ease-in-out infinite",marginBottom:"0.5rem"}}>{game.emoji}</div>
     <div style={{fontFamily:F,fontWeight:900,fontSize:"1.4rem",color:"white",marginBottom:"0.2rem"}}>{game.name}</div>
     <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.45)",marginBottom:"1.75rem"}}>Unit {unit.unit} — {unit.topic}</div>
     <div style={{fontFamily:F,fontWeight:800,fontSize:"1rem",color:"rgba(255,255,255,0.7)",marginBottom:"1rem"}}>Choose your difficulty:</div>
@@ -1375,12 +1376,12 @@ const DiffPicker = ({game,unit,onPick,onBack}:{game:{id:string;name:string;emoji
         return (
           <button key={d} onClick={()=>onPick(d)}
             style={{padding:"1rem 1.5rem",background:`linear-gradient(135deg,${dc.color}25,${dc.color}10)`,border:`2.5px solid ${dc.color}`,borderRadius:"1.25rem",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:"1rem",animation:`slideUp 0.4s ease-out ${i*0.1}s both`,boxShadow:`0 0 20px ${dc.color}25`}}>
-            <div style={{fontSize:"2rem"}}>{dc.emoji}</div>
+            <span style={{display:"inline-block",width:22,height:22,borderRadius:"50%",background:dc.color,boxShadow:`0 0 12px ${dc.color}`,flex:"none"}}/>
             <div style={{flex:1}}>
               <div style={{fontFamily:F,fontWeight:800,fontSize:"1rem",color:"white"}}>{dc.label}</div>
-              <div style={{fontFamily:F,fontWeight:700,fontSize:"0.82rem",color:"rgba(255,255,255,0.55)",marginTop:2}}>{dc.desc} · ⏱ {dc.timerSec}s</div>
+              <div style={{fontFamily:F,fontWeight:700,fontSize:"0.82rem",color:"rgba(255,255,255,0.55)",marginTop:2}}>{dc.desc}</div>
             </div>
-            <div style={{color:dc.color,fontSize:"1.2rem"}}>▶</div>
+            <Chevron color={dc.color} size={20}/>
           </button>
         );
       })}
@@ -1389,12 +1390,26 @@ const DiffPicker = ({game,unit,onPick,onBack}:{game:{id:string;name:string;emoji
   </div>
 );
 
+// NO EMOJIS anywhere in the games (Andy 2026-10-05): small drawn icons instead
+const SpeakerIcon = () => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{display:"inline-block",verticalAlign:"middle"}}>
+    <path d="M11 5 6 9H3v6h3l5 4V5z" fill="#fff"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+  </svg>);
+const Hearts = ({n}:{n:number}) => (
+  <span style={{display:"inline-flex",gap:2,verticalAlign:"middle"}}>{Array.from({length:Math.max(0,n)},(_,i)=>(
+    <svg key={i} width="18" height="16" viewBox="0 0 24 22"><path d="M12 11.5C12 4 2 3 2 9C2 14 12 17 12 19.5C12 17 22 14 22 9C22 3 12 4 12 11.5Z" fill="#e8425b"/><ellipse cx="8" cy="7.5" rx="2.2" ry="3.2" transform="rotate(-29 8 7.5)" fill="rgba(255,255,255,0.85)"/></svg>))}</span>);
+const Dot = ({color}:{color:string}) => <span style={{display:"inline-block",width:12,height:12,borderRadius:"50%",background:color,boxShadow:`0 0 6px ${color}`,marginRight:6,verticalAlign:"middle"}}/>;
+const Chevron = ({color="rgba(255,255,255,0.85)",size=18}:{color?:string;size?:number}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{display:"block"}}><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>);
+const NumBadge = ({n,size=44}:{n:number|string;size?:number}) => (
+  <div style={{flex:"none",width:size,height:size,borderRadius:"50%",background:"rgba(255,255,255,0.18)",border:"2px solid rgba(255,255,255,0.5)",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:F,fontWeight:900,fontSize:size*0.42,color:"white",textShadow:"0 2px 4px rgba(0,0,0,0.35)"}}>{n}</div>);
+
 // ══════════════════════════════════════════════════════════════════════════════
 // ARCADE HUB + MAIN EXPORT
 // ══════════════════════════════════════════════════════════════════════════════
 const GAMES=[
   {id:"arrow",name:"Arrow Shoot",emoji:"🏹",desc:"Pop the right balloons!",color:"#f97316",glow:"rgba(249,115,22,0.5)"},
-  {id:"whack",name:"Whack-a-Mole",emoji:"🔨",desc:"Whack the correct word!",color:"#0ea5e9",glow:"rgba(14,165,233,0.5)"},
+  {id:"whack",name:"Get Out of My Garden!",emoji:"🔨",desc:"Whack the correct word!",color:"#0ea5e9",glow:"rgba(14,165,233,0.5)",cover:"/vocab/garden/cover.webp"},
   {id:"snake",name:"Word Snake",emoji:"🐍",desc:"Eat letters to spell words!",color:"#10b981",glow:"rgba(16,185,129,0.5)"},
   {id:"space",name:"Space Robots",emoji:"🚀",desc:"Find the right robot!",color:"#a855f7",glow:"rgba(168,85,247,0.5)",cover:"/vocab/space/cover.webp"},
 ];
@@ -1424,6 +1439,7 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
   const [diff,setDiff]=useState<Diff>("medium");
   const [selectedBook,setSelectedBook]=useState<number>(1);
   const UNITS = buildUnits(ALL_BOOKS[selectedBook] ?? book1Data);
+  useEffect(() => (screen === "play" ? installIdleCursor(document) : undefined), [screen]); // while a game is open
 
   useEffect(()=>{
     if(!document.getElementById("mpe-fonts")){
@@ -1449,7 +1465,11 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
   if(screen==="play"&&unit&&game){
     const props={unit,diff,onBack:()=>{setJustClaimed(false);setScreen("games");},onClaim:handleClaim,onBackToWorld,claimState,treatsEarnedToday,fromDino,onRestart:()=>setJustClaimed(false)};
     if(game.id==="arrow") return <ArrowShoot {...props}/>;
-    if(game.id==="whack") return <WhackAMole {...props}/>;
+    // NEW look (Andy 2026-10-05). The old game stays above as the fallback: <WhackAMole {...props}/>
+    if(game.id==="whack") return <WhackGarden unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
+      onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
+      renderWin={(restart,cw,cs)=><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={restart} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} muted={!musicOn}/>}
+      renderLose={(reason,restart)=><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={restart} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/>}/>;
     if(game.id==="snake") return <WordSnake {...props}/>;
     // NEW look (Andy 2026-10-04). The old game stays above as the fallback: <SpaceShooter {...props}/>
     if(game.id==="space") return <SpaceShooter2 unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
@@ -1472,33 +1492,33 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
         @keyframes slideUp{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}
         @keyframes twinkStar{0%,100%{opacity:0.15}50%{opacity:0.9}}
         @keyframes hubFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-10px) rotate(1deg)}}
+        @media (max-width: 760px){.mpe-unit-grid{grid-template-columns:1fr !important;grid-auto-rows:auto !important}}
       `}</style>
       {[...Array(55)].map((_,i)=>(
         <div key={i} style={{position:"fixed",left:`${(i*137.5)%100}%`,top:`${(i*97.3)%100}%`,width:1+i%3,height:1+i%3,background:i%8===0?"#93c5fd":i%5===0?"#fde68a":"white",borderRadius:"50%",animation:`twinkStar ${2+i%4}s ease-in-out infinite ${i%4}s`,pointerEvents:"none"}}/>
       ))}
       <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(14px)",padding:"0.55rem 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid rgba(255,255,255,0.1)"}}>
         <button onClick={back} style={{background:"rgba(255,255,255,0.1)",border:"1.5px solid rgba(255,255,255,0.22)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.32rem 0.95rem",borderRadius:999,cursor:"pointer"}}>{screen==="books"?"← Exit":"← Back"}</button>
-        <span style={{color:"white",fontFamily:F,fontWeight:900,fontSize:"1.1rem",textShadow:"0 0 20px rgba(168,85,247,0.9)"}}>🎮 MPE Arcade</span>
+        <span style={{color:"white",fontFamily:F,fontWeight:900,fontSize:"1.1rem",textShadow:"0 0 20px rgba(168,85,247,0.9)"}}>MPE Arcade</span>
         <div style={{width:72}}/>
       </nav>
-      <div style={{maxWidth:screen==="games"?1040:560,margin:"0 auto",padding:"72px 16px 40px",position:"relative",zIndex:10}}>
+      <div style={{maxWidth:screen==="games"?1040:screen==="units"?1180:560,margin:"0 auto",padding:screen==="units"?"64px 16px 12px":"72px 16px 40px",position:"relative",zIndex:10}}>
         {screen==="books"&&(
           <>
-            <div style={{textAlign:"center",marginBottom:"2rem",animation:"slideUp 0.5s ease-out"}}>
-              <div style={{fontSize:"5rem",animation:"hubFloat 3s ease-in-out infinite",display:"inline-block"}}>🎮</div>
+            <div style={{textAlign:"center",marginBottom:"1.2rem",animation:"slideUp 0.5s ease-out"}}>
               <div style={{fontFamily:F,fontWeight:900,fontSize:"2rem",color:"white",textShadow:"0 0 30px rgba(168,85,247,0.8)",marginTop:"0.25rem"}}>Choose Your Book!</div>
               <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.5)",marginTop:"0.25rem"}}>Pick a book to start playing</div>
             </div>
-            <div style={{display:"flex",flexDirection:"column",gap:"1rem"}}>
+            <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
               {[1,2,3,4,5,6].map((bookNum,i)=>{const unlocked=bookNum<=5;const book={id:bookNum,label:`Book ${bookNum}`,unlocked,color:"#f97316",desc:unlocked?`Units 1–18`:"Coming Soon!"};return(
                 <button key={book.id} disabled={!book.unlocked} onClick={()=>{if(book.unlocked){setSelectedBook(book.id);setScreen("units");}}}
-                  style={{padding:"1.2rem 1.5rem",background:book.unlocked?`linear-gradient(135deg,${book.color}cc,${book.color}88)`:"rgba(255,255,255,0.04)",border:`2px solid ${book.unlocked?book.color:"rgba(255,255,255,0.08)"}`,borderRadius:"1.5rem",cursor:book.unlocked?"pointer":"not-allowed",display:"flex",alignItems:"center",gap:"1rem",opacity:book.unlocked?1:0.45,animation:book.unlocked?`floatUpDown ${2.5+i*0.3}s ease-in-out infinite ${i*0.2}s`:"none"}}>
-                  <div style={{fontSize:"2.8rem"}}>📚</div>
+                  style={{padding:"0.85rem 1.5rem",background:book.unlocked?`linear-gradient(135deg,${book.color}cc,${book.color}88)`:"rgba(255,255,255,0.04)",border:`2px solid ${book.unlocked?book.color:"rgba(255,255,255,0.08)"}`,borderRadius:"1.5rem",cursor:book.unlocked?"pointer":"not-allowed",display:"flex",alignItems:"center",gap:"1rem",opacity:book.unlocked?1:0.45,animation:book.unlocked?`floatUpDown ${2.5+i*0.3}s ease-in-out infinite ${i*0.2}s`:"none"}}>
+                  <NumBadge n={bookNum} size={50}/>
                   <div style={{flex:1,textAlign:"left"}}>
                     <div style={{fontFamily:F,fontWeight:800,fontSize:"1.1rem",color:"white"}}>{book.label}</div>
                     <div style={{fontFamily:F,fontWeight:700,fontSize:"0.85rem",color:"rgba(255,255,255,0.7)",marginTop:2}}>{book.desc}</div>
                   </div>
-                  <div style={{fontSize:"1.4rem"}}>{book.unlocked?"▶":"🔒"}</div>
+                  <div>{book.unlocked?<Chevron size={22}/>:<span style={{fontFamily:F,fontWeight:800,fontSize:"0.85rem",color:"rgba(255,255,255,0.45)"}}>Soon</span>}</div>
                 </button>
               );})}
             </div>
@@ -1506,20 +1526,20 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
         )}
         {screen==="units"&&(
           <>
-            <div style={{textAlign:"center",marginBottom:"1.5rem",animation:"slideUp 0.4s ease-out"}}>
+            <div style={{textAlign:"center",marginBottom:"0.9rem",animation:"slideUp 0.4s ease-out"}}>
               <div style={{fontFamily:F,fontWeight:900,fontSize:"1.8rem",color:"white",textShadow:"0 0 20px rgba(168,85,247,0.7)"}}>Choose Your Unit!</div>
               <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.45)",marginTop:4}}>Book {selectedBook} — Units 1–18</div>
             </div>
-            <div style={{display:"flex",flexDirection:"column",gap:"0.85rem"}}>
+            {/* ALL 18 UNITS ON ONE SCREEN (Andy 2026-10-05): 3 columns, row height fits the window; phone = 1 column */}
+            <div className="mpe-unit-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gridAutoRows:"clamp(66px, calc((100vh - 196px) / 6 - 10px), 108px)",gap:"0.65rem"}}>
               {UNITS.map((u,i)=>(
                 <button key={u.unit} onClick={()=>{setUnit(u);setScreen("games");}}
-                  style={{padding:"1rem 1.25rem",background:`linear-gradient(135deg,${u.color}cc,${u.color}77)`,border:`2px solid ${u.color}`,borderRadius:"1.5rem",cursor:"pointer",display:"flex",alignItems:"center",gap:"1rem",boxShadow:`0 0 20px ${u.glow},0 8px 24px rgba(0,0,0,0.3)`,animation:`slideUp 0.4s ease-out ${i*0.1}s both`}}>
-                  <div style={{fontSize:"2.5rem",animation:`floatUpDown ${2.2+i*0.3}s ease-in-out infinite`}}>{u.emoji}</div>
-                  <div style={{flex:1,textAlign:"left"}}>
-                    <div style={{fontFamily:F,fontWeight:800,fontSize:"0.95rem",color:"white"}}>Unit {u.unit} — {u.topic}</div>
-                    <div style={{fontFamily:F,fontWeight:700,fontSize:"0.8rem",color:"rgba(255,255,255,0.75)",marginTop:3}}>{u.vocab.join(" · ")}</div>
+                  style={{padding:"0.45rem 0.8rem",background:`linear-gradient(135deg,${u.color}cc,${u.color}77)`,border:`2px solid ${u.color}`,borderRadius:"1.1rem",cursor:"pointer",display:"flex",alignItems:"center",gap:"0.7rem",overflow:"hidden",boxShadow:`0 0 14px ${u.glow},0 6px 16px rgba(0,0,0,0.3)`,animation:`slideUp 0.35s ease-out ${i*0.03}s both`}}>
+                  <NumBadge n={u.unit} size={42}/>
+                  <div style={{flex:1,minWidth:0,textAlign:"left"}}>
+                    <div style={{fontFamily:F,fontWeight:800,fontSize:"0.92rem",color:"white",lineHeight:1.2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{u.topic}</div>
+                    <div style={{fontFamily:F,fontWeight:700,fontSize:"0.74rem",color:"rgba(255,255,255,0.8)",marginTop:3,lineHeight:1.3,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{u.vocab.join(" · ")}</div>
                   </div>
-                  <div style={{fontSize:"1.4rem",color:"rgba(255,255,255,0.8)"}}>▶</div>
                 </button>
               ))}
             </div>
@@ -1528,7 +1548,6 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
         {screen==="games"&&unit&&(
           <>
             <div style={{textAlign:"center",marginBottom:"1.5rem",animation:"slideUp 0.4s ease-out"}}>
-              <div style={{fontSize:"3rem",animation:"hubFloat 2.5s ease-in-out infinite",display:"inline-block"}}>{unit.emoji}</div>
               <div style={{fontFamily:F,fontWeight:900,fontSize:"1.5rem",color:"white",marginTop:"0.25rem"}}>Unit {unit.unit} — {unit.topic}</div>
               <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.5)",marginTop:4}}>Pick your game and let's go!</div>
             </div>
@@ -1543,7 +1562,6 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
                        backgroundImage:`url('${g.cover}')`,backgroundSize:"cover",backgroundPosition:"center",boxShadow:"0 8px 26px rgba(0,0,0,0.45)",animation:`slideUp 0.4s ease-out ${i*0.08}s both`}
                     : {aspectRatio:"1376 / 768",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"1.25rem 0.75rem",background:`linear-gradient(135deg,${g.color},${g.color}99)`,border:`2.5px solid ${g.color}`,borderRadius:"1.25rem",cursor:"pointer",textAlign:"center",boxShadow:`0 0 22px ${g.glow},0 8px 28px rgba(0,0,0,0.35)`,animation:`slideUp 0.4s ease-out ${i*0.08}s both, arcadeGlow 2.5s ease-in-out infinite ${i*0.4}s`}}>
                   {!g.cover && <>
-                  <div style={{fontSize:"3rem",marginBottom:"0.5rem",animation:`floatUpDown ${2+i*0.35}s ease-in-out infinite`}}>{g.emoji}</div>
                   <div style={{fontFamily:F,fontWeight:800,fontSize:"1.2rem",color:"white",lineHeight:1.4}}>{g.name}</div>
                   <div style={{fontFamily:F,fontWeight:700,fontSize:"0.95rem",color:"rgba(255,255,255,0.8)",marginTop:"0.3rem"}}>{g.desc}</div>
                   </>}

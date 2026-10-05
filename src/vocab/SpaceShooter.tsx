@@ -30,7 +30,8 @@ const FALL: Record<Diff, number> = { easy: 0.5, medium: 0.75, hard: 0.95 };
 // Andy's sounds (trimmed copies in public/vocab/space; originals in BACKUPFILES/vocab_art/space/originals) + volume
 const SND: Record<string, [string, number]> = {
   shoot: [`${ART}/snd_shoot.mp3`, 0.35], ufoshot: [`${ART}/snd_ufoshot.mp3`, 0.16],
-  hit: [`${ART}/snd_hit.mp3`, 0.55], boom: [`${ART}/snd_boom.mp3`, 0.5],
+  hit: [`${ART}/snd_hit.mp3`, 0.55], boom: [`${ART}/snd_boom.mp3`, 0.75], // boom a bit louder, music down (Andy 2026-10-05)
+  levelup: ["/vocab/snd_levelup.mp3", 0.4], // win: MISSION ACCOMPLISHED (Andy 15:37)
 };
 
 // twinkling stars over the background picture: [x 0-1, y 0-1, size px, seconds, delay s, bright]
@@ -47,7 +48,7 @@ const speak = (text: string, lang: string) => {
   try {
     speechSynthesis.cancel();
     const n = ++sayN, u = new SpeechSynthesisUtterance(text);
-    u.lang = lang; u.volume = 1;
+    u.lang = lang; u.volume = 0.8; // same as the garden game
     const up = () => { if (n === sayN) duck(false); };
     u.onend = up; u.onerror = up; window.setTimeout(up, 4000);
     duck(true); speechSynthesis.speak(u);
@@ -74,7 +75,7 @@ const useSfx = (on: boolean) => {
     });
     return () => { dead = true; };
   }, []);
-  return useCallback((type: "shoot" | "ufoshot" | "hit" | "boom" | "wrong" | "life" | "countdown" | "coin" | "shield") => {
+  return useCallback((type: "shoot" | "ufoshot" | "hit" | "boom" | "wrong" | "life" | "countdown" | "coin" | "shield" | "levelup") => {
     if (!onRef.current) return;
     try {
       const c = getCtx();
@@ -156,16 +157,17 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
   const [solved, setSolved] = useState(0);
   const [coins, setCoins] = useState(0);   // collected this round (paid only on a WIN)
   const coinsRef = useRef(0);
-  const [timeLeft, setTimeLeft] = useState(cfg.timerSec);
   const [ouch, setOuch] = useState(false);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false); pausedRef.current = paused;
   const [countdown, setCountdown] = useState(false);
   const [safe, setSafe] = useState(false); // blinking after the countdown (can't be hit)
   const doneRef = useRef(false);
+  const endRef = useRef(false);              // all words done: MISSION ACCOMPLISHED is playing
+  const [mission, setMission] = useState(false);
 
   const g = useRef({ ufos: [] as Ufo[], shots: [] as Pt[], drops: [] as Pt[], bounces: [] as Bounce[], orb: null as Orb | null, fx: [] as Fx[], coins: [] as Coin[], lastCoin: -1700,
-    shipX: FW / 2, id: 0, lastSpawn: 0, lastDrop: 0, lastOrb: 0, start: 0, lastShot: 0,
+    shipX: FW / 2, id: 0, lastSpawn: 0, lastDrop: 0, lastOrb: 0, start: 0, lastShot: 0, lastTgt: 0, held: {} as Record<string, number>, nudge: 0,
     cooldown: false, invincible: false, cleared: new Set<string>(), keys: new Set<string>() });
 
   const nextTarget = (cleared: Set<string>) => {
@@ -178,20 +180,9 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
 
   const finish = (fn: () => void) => { if (doneRef.current) return; doneRef.current = true; fn(); };
 
-  // timer
-  useEffect(() => {
-    if (paused) return;
-    const t = window.setInterval(() => setTimeLeft(tl => {
-      if (doneRef.current) return tl;
-      if (tl <= 1) { finish(() => onLose("timeout")); return 0; }
-      return tl - 1;
-    }), 1000);
-    return () => window.clearInterval(t);
-  }, [paused]);
-
   const hurt = () => {
     const G = g.current;
-    if (G.cooldown || G.invincible || doneRef.current) return;
+    if (G.cooldown || G.invincible || doneRef.current || endRef.current) return;
     G.cooldown = true;
     sfx("hit");
     setOuch(true);
@@ -205,7 +196,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
 
   const shoot = () => {
     const G = g.current;
-    if (pausedRef.current || doneRef.current) return;
+    if (pausedRef.current || doneRef.current || endRef.current) return;
     const now = performance.now();
     if (now - G.lastShot < 200) return;
     G.lastShot = now;
@@ -224,25 +215,41 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
   useEffect(() => {
     let raf = 0, last = performance.now();
     const G = g.current;
-    if (!G.start) { G.start = last; G.lastDrop = last; G.lastOrb = last; }
+    if (!G.start) { G.start = last; G.lastDrop = last; G.lastOrb = last; G.lastTgt = last - 1800; }
     const loop = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       const { sw, sh } = fitRef.current;
       const top = sh - 235;
-      if (!pausedRef.current && !doneRef.current) {
+      if (!pausedRef.current && !doneRef.current && !endRef.current) {
         // ship (arrow keys held)
-        if (G.keys.has("ArrowLeft")) G.shipX -= sw * 0.42 * dt;
-        if (G.keys.has("ArrowRight")) G.shipX += sw * 0.42 * dt;
+        if (G.nudge) { const st = Math.abs(G.nudge) < 0.5 ? G.nudge : G.nudge * Math.min(1, dt * 14); G.shipX += st; G.nudge -= st; } // smooth tap glide
+        for (const [k, dir] of [["ArrowLeft", -1], ["ArrowRight", 1]] as const) {
+          if (!G.keys.has(k)) { delete G.held[k]; continue; }
+          if (!G.held[k]) G.held[k] = now;
+          // STEADY speed while held (Andy 15:42); a quick tap (< 0.15s) = only the 28px nudge from keydown
+          if (now - G.held[k] > 150) G.shipX += dir * sw * 0.42 * dt;
+        }
         if (G.keys.has(" ")) shoot();
         G.shipX = Math.max(70, Math.min(sw - 70, G.shipX));
         // new UFO (same rules as the old game)
-        if (now - G.lastSpawn > cfg.spawnMs && G.ufos.length < cfg.maxOnScreen) {
+        // a RIGHT UFO is always falling: none on screen for ~2.8s -> one comes now (Andy 15:06, all levels)
+        if (G.ufos.some(a => a.word === targetRef.current)) G.lastTgt = now;
+        const needT = now - G.lastTgt > 5000;                                  // right one not seen for 5s -> send it
+        const gapAny = now - G.lastSpawn > 3000 && G.ufos.length < cfg.maxOnScreen + 2; // nothing new for 3s -> send something
+        if (needT || gapAny || (now - G.lastSpawn > cfg.spawnMs && G.ufos.length < cfg.maxOnScreen)) {
           G.lastSpawn = now;
+          if (needT) G.lastTgt = now;
           const onScreen = G.ufos.filter(a => a.word === targetRef.current).length;
-          const force = onScreen === 0 && G.ufos.length >= Math.min(3, cfg.maxOnScreen - 1);
+          const force = needT || (onScreen === 0 && G.ufos.length >= Math.min(3, cfg.maxOnScreen - 1));
           const word = force ? targetRef.current : unit.vocab[Math.floor(Math.random() * unit.vocab.length)];
-          let x = 110 + Math.random() * (sw - 220);
-          for (let i = 0; i < 8 && G.ufos.some(a => Math.abs(a.x - x) < 160); i++) x = 110 + Math.random() * (sw - 220);
+          // never right behind another UFO: keep about a UFO width apart so either side can be shot (Andy 15:06)
+          let x = 110 + Math.random() * (sw - 220), bestGap = -1;
+          for (let i = 0; i < 18; i++) {
+            const c = 110 + Math.random() * (sw - 220);
+            const gap = G.ufos.length ? Math.min(...G.ufos.map(a => Math.abs(a.x - c))) : 9999;
+            if (gap > bestGap) { bestGap = gap; x = c; }
+            if (gap >= UFO_W * 1.15) break;
+          }
           G.ufos.push({ id: G.id++, x, y: -70, word, idx: Math.max(0, unit.vocab.indexOf(word)), vy: (0.055 + Math.random() * 0.04) * FALL[diff] * 0.6 * sh });
         }
         // UFOs move; one reaching the ship = hurt
@@ -317,7 +324,13 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
             addFx({ x: u.x, y: u.y, kind: "happy", idx: u.idx, word: u.word });
             sfx("boom"); speak(u.word, "en-US");
             G.cleared = new Set([...G.cleared, u.word]); setSolved(G.cleared.size);
-            if (G.cleared.size >= TOTAL) window.setTimeout(() => finish(() => onWin(coinsRef.current)), 600);
+            if (G.cleared.size >= TOTAL) { // meter full (Andy 15:06): green, MISSION ACCOMPLISHED flies to the middle, then the win screen
+              endRef.current = true;
+              for (const a of G.ufos) addFx({ x: a.x, y: a.y, kind: "happy", idx: a.idx, word: a.word });
+              G.ufos = []; G.drops = []; G.bounces = []; G.coins = []; G.orb = null;
+              window.setTimeout(() => { setMission(true); sfx("levelup"); }, 500);
+              window.setTimeout(() => finish(() => onWin(coinsRef.current)), 3700);
+            }
             else window.setTimeout(() => nextTarget(G.cleared), 150);
           } else {
             // WRONG UFO (Andy 20:47): shield on - it turns and flashes bright red, and the shot bounces back down
@@ -343,8 +356,9 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
     const G = g.current;
     const dn = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === " ") e.preventDefault();
-      if (!G.keys.has(e.key) && e.key === "ArrowLeft") G.shipX -= fitRef.current.sw * 0.02;
-      if (!G.keys.has(e.key) && e.key === "ArrowRight") G.shipX += fitRef.current.sw * 0.02;
+      // one tap = a nudge of about a third of the ship (Andy 15:51), GLIDED smoothly over ~0.2s (Andy 16:02: a jump felt abrupt)
+      if (!G.keys.has(e.key) && e.key === "ArrowLeft") G.nudge = Math.max(-56, G.nudge - 28);
+      if (!G.keys.has(e.key) && e.key === "ArrowRight") G.nudge = Math.min(56, G.nudge + 28);
       G.keys.add(e.key);
     };
     const up = (e: KeyboardEvent) => G.keys.delete(e.key);
@@ -371,7 +385,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
     <div className="ss-page">
       <style>{CSS}</style>
       <GrammarGameBar onBack={onBack} muted={!musicOn} onToggleMute={onToggleMusic}
-        stats={{ coins, lives, solved, total: TOTAL }} time={timeLeft}
+        stats={{ coins, lives, solved, total: TOTAL }}
         center={
           <span className="ss-target">
             <span className="ss-zh">{zh}</span>
@@ -384,6 +398,15 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
         } />
       <div className="ss-field" ref={fieldRef} onTouchMove={touchX} onTouchEnd={() => shoot()}>
         <div className="ss-stage" style={{ width: sw, height: sh, transform: `scale(${s})` }}>
+          <div className={"ss-meter" + (solved >= TOTAL ? " full" : "") + (mission ? " flown" : "")}>
+            <div className="ss-track"><div className="ss-fill" style={{ width: `${Math.max(5, (solved / TOTAL) * 100)}%` }} /></div>
+            <img className="ss-mtext" src={`${ART}/mission.webp`} alt="" draggable={false} />
+          </div>
+          {mission && (
+            <div className="ss-mission" style={{ ["--dx" as string]: "265px", ["--dy" as string]: `${30 - sh * 0.45}px` } as CSSProperties}>
+              <i className="ss-mglow" /><img src={`${ART}/mission.webp`} alt="Mission Accomplished!" draggable={false} />
+            </div>
+          )}
           {STARS.map((t, i) => (
             <i key={i} className={"ss-star" + (t[5] ? " big" : "")} style={{ left: t[0] * sw, top: t[1] * sh, width: t[2], height: t[2],
               margin: -t[2] / 2, animationDuration: `${t[3]}s`, animationDelay: `${t[4]}s` }} />
@@ -563,5 +586,24 @@ const CSS = `
 @keyframes ss-coinpop{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-90%) scale(1.5);opacity:0}}
 .ss-fx.coin b{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font-family:'Fredoka','Nunito',sans-serif;font-weight:800;font-size:44px;color:#ffd84a;
  text-shadow:-2px -2px 0 #7a3f08,2px -2px 0 #7a3f08,-2px 2px 0 #7a3f08,2px 2px 0 #7a3f08,0 4px 0 #7a3f08;animation:ss-plus .9s ease-out forwards}
+/* METER (Andy 15:06): shiny silver, green when full, small MISSION ACCOMPLISHED at its end */
+.ss-meter{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:60;display:flex;align-items:center;gap:10px;pointer-events:none}
+.ss-track{width:520px;height:28px;border-radius:999px;background:rgba(8,12,36,.85);border:4px solid #c8d0d8;overflow:hidden;
+ box-shadow:inset 0 0 0 1px #6b737c,0 0 0 1px #3a4047,0 3px 8px rgba(0,0,0,.6)}
+.ss-fill{position:relative;height:100%;border-radius:999px;overflow:hidden;transition:width .5s cubic-bezier(.3,1.4,.6,1);
+ background:linear-gradient(180deg,#ffffff 0%,#eef2f6 16%,#b9c3cc 42%,#7e8a96 58%,#c3ccd5 78%,#f7f9fb 100%);
+ box-shadow:inset 0 2px 0 rgba(255,255,255,.95),0 0 10px rgba(210,230,255,.7)}
+.ss-fill::after{content:"";position:absolute;top:0;bottom:0;width:70px;left:-90px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.95),transparent);animation:ss-shine 2.4s ease-in-out infinite}
+@keyframes ss-shine{0%{left:-90px}55%,100%{left:110%}}
+.ss-meter.full .ss-fill{background:linear-gradient(180deg,#e2ffd2 0%,#9df07c 22%,#4cc531 55%,#2f9a1c 75%,#8de66a 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.8),0 0 12px rgba(120,255,120,.8)}
+.ss-mtext{width:150px;max-width:none;filter:drop-shadow(0 0 4px rgba(255,220,80,.7))}
+.ss-meter.flown .ss-mtext{visibility:hidden}
+.ss-mission{position:absolute;left:50%;top:45%;z-index:300;pointer-events:none;transform:translate(-50%,-50%);animation:ss-fly 1s cubic-bezier(.25,1.15,.4,1) both}
+@keyframes ss-fly{0%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.14)}100%{transform:translate(-50%,-50%) scale(1)}}
+.ss-mission img{position:relative;display:block;width:1100px;max-width:none;
+ filter:drop-shadow(0 0 8px #fff6b0) drop-shadow(0 0 24px #ffd84a) drop-shadow(0 0 48px rgba(255,190,40,.85));animation:ss-mpulse 1.1s ease-in-out 1s infinite alternate}
+@keyframes ss-mpulse{0%{transform:scale(1)}100%{transform:scale(1.04)}}
+.ss-mglow{position:absolute;left:50%;top:50%;width:1400px;height:560px;margin:-280px 0 0 -700px;border-radius:50%;
+ background:radial-gradient(closest-side,rgba(255,240,150,.9),rgba(255,214,70,.5) 45%,rgba(255,200,40,0) 100%);animation:ss-mpulse 1.1s ease-in-out 1s infinite alternate}
 @media (prefers-reduced-motion: reduce){.ss-star,.ss-bob,.ss-orb img,.ss-drop,.ss-coin img{animation:none}}
 `;

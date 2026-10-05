@@ -42,7 +42,7 @@ export default function GrammarHub() {
       a.id = "grammar-bgm";
       a.src = "/grammar-music.mp3";
       a.loop = true;
-      a.volume = 0.4;
+      a.volume = 0.27; // ~-22 LUFS like every other song (Andy 2026-10-05)
       document.body.appendChild(a);
     }
     audioRef.current = a;
@@ -150,7 +150,9 @@ export default function GrammarHub() {
             cursor: "pointer",
           }}
         >
-          {muted ? "🔇" : "🔊"}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+            <path d="M11 5 6 9H3v6h3l5 4V5z" fill="#fff" />{muted ? <><path d="m16 9 6 6" /><path d="m22 9-6 6" /></> : <><path d="M15.5 8.5a5 5 0 0 1 0 7" /><path d="M18.5 5.5a9 9 0 0 1 0 13" /></>}
+          </svg>
         </button>
 
         <button
@@ -357,7 +359,9 @@ export default function GrammarHub() {
           cursor: "pointer",
         }}
       >
-        {muted ? "🔇" : "🔊"}
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
+            <path d="M11 5 6 9H3v6h3l5 4V5z" fill="#fff" />{muted ? <><path d="m16 9 6 6" /><path d="m22 9-6 6" /></> : <><path d="M15.5 8.5a5 5 0 0 1 0 7" /><path d="M18.5 5.5a9 9 0 0 1 0 13" /></>}
+          </svg>
       </button>
       <nav
         style={{

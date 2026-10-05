@@ -57,7 +57,7 @@ const GamePage = () => {
   // Game songs are pre-levelled files like the world songs (~-20 dB) -> played at full volume.
   useEffect(() => {
     if (track === "") return; // "" = silence (a game's win / lose screen) - the last run's cleanup already paused it
-    const src = track ?? "/game-music.mp3";
+    const src = track ?? "/vocab/menu_music.mp3"; // new arcade song for the book/unit/game menus (Andy 2026-10-05, 60% under the old one; old: /game-music.mp3)
     if (!audioRef.current) {
       audioRef.current = new Audio(src);
       audioRef.current.loop = true;
@@ -67,7 +67,7 @@ const GamePage = () => {
       audioRef.current.volume = 0;
       audioRef.current.play().catch(() => {});
       let v = 0;
-      const target = track ? 1 : volume * 0.25;
+      const target = 1; // every song file is pre-levelled to ~-22 LUFS (Andy 2026-10-05: equal volume everywhere)
       const fade = setInterval(() => {
         v = Math.min(v + target / 40, target);
         if (audioRef.current) audioRef.current.volume = v;
@@ -82,7 +82,7 @@ const GamePage = () => {
   useEffect(() => {
     const on = (e: Event) => {
       const a = audioRef.current; if (!a || !musicOn) return;
-      const full = track ? 1 : volume * 0.25;
+      const full = 1;
       a.volume = (e as CustomEvent).detail ? full * 0.3 : full;
     };
     window.addEventListener("mpe-duck", on);

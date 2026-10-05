@@ -136,7 +136,7 @@ const hurtSfx=document.getElementById('hurtSfx'),correctSfx=document.getElementB
       oofSfx=document.getElementById('oofSfx'),digSfx=document.getElementById('digSfx'),levelSfx=document.getElementById('levelSfx'),
       wordSfx=document.getElementById('wordSfx'),winSfx=document.getElementById('winSfx');
 // music softer, sfx louder
-music.volume=0.18;walkSfx.volume=0.45;hurtSfx.volume=1.0;correctSfx.volume=1.0;oofSfx.volume=1.0;digSfx.volume=0.9;levelSfx.volume=1.0;wordSfx.volume=1.0;winSfx.volume=1.0;
+music.volume=0.18;walkSfx.volume=0.45;hurtSfx.volume=1.0;correctSfx.volume=0.6;oofSfx.volume=1.0;digSfx.volume=0.9;levelSfx.volume=1.0;wordSfx.volume=1.0;winSfx.volume=1.0;
 let audioStarted=false;
 function startAudio(){if(audioStarted)return;audioStarted=true;music.play().catch(()=>{});}
 function play(a){try{a.currentTime=0;a.play().catch(()=>{});}catch(e){}}

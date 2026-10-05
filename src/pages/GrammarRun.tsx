@@ -2,11 +2,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { addTreats, addCoins } from "@/lib/cloudSave";
 import GrammarGameBar from "@/components/GrammarGameBar";
+import { installIdleCursor } from "@/lib/idleCursor";
 import WinCelebration from "@/components/WinCelebration";
 import LoseScreen from "@/components/LoseScreen";
 import type { GameStats } from "@/components/GrammarGameBar";
 
 export default function GrammarRun() {
+  useEffect(() => installIdleCursor(document), []); // hide the mouse when it is not used (Andy 2026-10-05)
   const { code, studentName, level } = useParams();
   const navigate = useNavigate();
   const kidCode = (code || "").toUpperCase();
@@ -79,7 +81,7 @@ export default function GrammarRun() {
       <iframe
         key={tryKey}
         ref={frameRef}
-        onLoad={() => { frameRef.current?.contentWindow?.focus(); sendMute(muted); }}
+        onLoad={() => { frameRef.current?.contentWindow?.focus(); sendMute(muted); try { const d = frameRef.current?.contentDocument; if (d) installIdleCursor(d); } catch { /* */ } }}
         src={`/Teacher_Andy_Run_game.html?level=${level || 1}`}
         title="Teacher Andy Run"
         style={{ width: "100%", flex: 1, minHeight: 0, border: "none", display: "block" }}
