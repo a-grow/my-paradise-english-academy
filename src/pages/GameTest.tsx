@@ -4,6 +4,7 @@ import WinCelebration from "@/components/WinCelebration";
 import LoseScreen from "@/components/LoseScreen";
 import SpaceShooter2 from "@/vocab/SpaceShooter"; // NEW Space Shooter look (2026-10-04)
 import WhackGarden from "@/vocab/WhackGarden";
+import TicketPlease from "@/vocab/TicketPlease"; // Word Snake v2 = Ticket Please! (2026-10-05)
 import { installIdleCursor } from "@/lib/idleCursor"; // hide the mouse when it is not used (Andy 2026-10-05) // NEW Whack-a-mole = Get Out of My Garden! (2026-10-05)
 import book1Data from "@/data/oxford-discover-book1.json";
 import book2Data from "@/data/oxford-discover-book2.json";
@@ -1410,7 +1411,7 @@ const NumBadge = ({n,size=44}:{n:number|string;size?:number}) => (
 const GAMES=[
   {id:"arrow",name:"Arrow Shoot",emoji:"🏹",desc:"Pop the right balloons!",color:"#f97316",glow:"rgba(249,115,22,0.5)"},
   {id:"whack",name:"Get Out of My Garden!",emoji:"🔨",desc:"Whack the correct word!",color:"#0ea5e9",glow:"rgba(14,165,233,0.5)",cover:"/vocab/garden/cover.webp"},
-  {id:"snake",name:"Word Snake",emoji:"🐍",desc:"Eat letters to spell words!",color:"#10b981",glow:"rgba(16,185,129,0.5)"},
+  {id:"snake",name:"Ticket Please!",emoji:"🐍",desc:"Pick up passengers to spell words!",color:"#10b981",glow:"rgba(16,185,129,0.5)",cover:"/vocab/train/cover.webp"},
   {id:"space",name:"Space Robots",emoji:"🚀",desc:"Find the right robot!",color:"#a855f7",glow:"rgba(168,85,247,0.5)",cover:"/vocab/space/cover.webp"},
 ];
 type Screen="books"|"units"|"games"|"diff"|"play";
@@ -1470,7 +1471,11 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
       onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
       renderWin={(restart,cw,cs)=><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={restart} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} muted={!musicOn}/>}
       renderLose={(reason,restart)=><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={restart} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/>}/>;
-    if(game.id==="snake") return <WordSnake {...props}/>;
+    // NEW look (Andy 2026-10-05). The old game stays above as the fallback: <WordSnake {...props}/>
+    if(game.id==="snake") return <TicketPlease unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
+      onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
+      renderWin={(restart,cw,cs)=><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={restart} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} muted={!musicOn}/>}
+      renderLose={(reason,restart)=><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={restart} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/>}/>;
     // NEW look (Andy 2026-10-04). The old game stays above as the fallback: <SpaceShooter {...props}/>
     if(game.id==="space") return <SpaceShooter2 unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
       onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
@@ -1500,7 +1505,11 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
       <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(14px)",padding:"0.55rem 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid rgba(255,255,255,0.1)"}}>
         <button onClick={back} style={{background:"rgba(255,255,255,0.1)",border:"1.5px solid rgba(255,255,255,0.22)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.32rem 0.95rem",borderRadius:999,cursor:"pointer"}}>{screen==="books"?"← Exit":"← Back"}</button>
         <span style={{color:"white",fontFamily:F,fontWeight:900,fontSize:"1.1rem",textShadow:"0 0 20px rgba(168,85,247,0.9)"}}>MPE Arcade</span>
-        <div style={{width:72}}/>
+        <div style={{width:72,display:"flex",justifyContent:"flex-end"}}>
+          <button onClick={()=>onToggleMusic?.()} aria-label={musicOn?"Sound off":"Sound on"} title={musicOn?"Sound off":"Sound on"} style={{width:40,height:40,borderRadius:"50%",background:"rgba(255,255,255,0.1)",border:"1.5px solid rgba(255,255,255,0.22)",color:"white",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",padding:0}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z" fill="currentColor"/>{musicOn?<><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></>:<><path d="M16 9l6 6"/><path d="M22 9l-6 6"/></>}</svg>
+          </button>
+        </div>
       </nav>
       <div style={{maxWidth:screen==="games"?1040:screen==="units"?1180:560,margin:"0 auto",padding:screen==="units"?"64px 16px 12px":"72px 16px 40px",position:"relative",zIndex:10}}>
         {screen==="books"&&(
