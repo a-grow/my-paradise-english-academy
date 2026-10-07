@@ -179,9 +179,9 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
     // already allowed saves, so a tap in the first second could save this device's old copy over the cloud.
     if (!dataCloudReady.current) return;
     saveDataToCloud(code, studentName, activeAnimalId, gatherBlob());
-    // Ocean (keeps its last animal in its own key) never saved on an animal switch; the other worlds keep
-    // activePet in their blob, so they do. The list keeps a fixed length: null = never changes.
-  }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, videoButtonSeen, S.active ? null : activeAnimalId, visitDaysCount, visit5Claimed, levelupSaves]);
+    // An animal switch saves in EVERY world (fix 2026-10-07: Ocean used to skip it, so the cloud's old active_pet
+    // put the previous animal back on the next visit). Ocean: active_pet column; other worlds: activePet in their blob.
+  }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, videoButtonSeen, activeAnimalId, visitDaysCount, visit5Claimed, levelupSaves]);
 
   // ONE JAR: same as Ocean - only "+N" / "-1" through the database adder, one call after another.
   const jarQueue = useRef<Promise<unknown>>(Promise.resolve());

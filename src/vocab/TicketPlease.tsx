@@ -372,7 +372,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
     G.items = G.items.filter(it => it.kind !== "pax");
     setWi(n); setPos(G.pos); setHid([]); setHint(false); setPhase("count"); setCount(3); sfx("pop");
     const idx = w.split("").map((_, i) => i).filter(i => isLetter(w[i])), m = idx.length;
-    const nh = diff === "hard" ? Math.max(0, m - 1) : m; // after the countdown every letter is a blank until the kid collects it (hard keeps ONE letter showing)
+    const nh = m; // after the countdown EVERY letter is a blank until the kid collects it, on every level (Andy 2026-10-07 17:07: no clue letter on hard)
     const hide = shuffle(idx).slice(0, nh);
     tm(() => { setCount(2); sfx("pop"); }, 1000);
     tm(() => { setCount(1); sfx("pop"); }, 2000);

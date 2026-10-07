@@ -183,7 +183,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
 }) => {
   const sfx = useSfx(sfxOn);
   const L = LV[diff];
-  const TOTAL = unit.vocab.length;
+  const TOTAL = unit.vocab.length * 2; // every word twice (Andy 2026-10-07)
 
   // field: design 1600x944 scaled to fit, then widened to the window (like the world page)
   const calc = () => {
@@ -218,14 +218,17 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
 
   const g = useRef({ bubs: [] as Bub[], fx: [] as Fx[], tongue: null as Tongue | null, fy: 0, id: 0, start: 0, lastSpawn: 0, lastTgt: 0,
     lastCoin: 0, lastHeart: 0, held: {} as Record<string, number>, nudge: 0, dizzy: 0, happy: 0,
-    lastWord: "", cooldown: false, invincible: false, cleared: new Set<string>(), keys: new Set<string>() });
+    lastWord: "", cooldown: false, invincible: false, cleared: new Set<string>(), keys: new Set<string>(), hits: {} as Record<string, number>, solvedN: 0 });
   if (!g.current.fy) { const [a, b] = frogRange(); g.current.fy = (a + b) / 2; }
 
   const nextTarget = (cleared: Set<string>) => {
+    // every word TWICE (Andy 2026-10-07): pick from the words with the fewest correct hits so far, never the same twice in a row
     const remaining = unit.vocab.filter(v => !cleared.has(v));
     if (!remaining.length) return;
+    const H = g.current.hits, minH = Math.min(...remaining.map(v => H[v] ?? 0));
+    const tier = remaining.filter(v => (H[v] ?? 0) === minH && v !== targetRef.current);
     const others = remaining.filter(v => v !== targetRef.current);
-    const pool = others.length ? others : remaining;
+    const pool = tier.length ? tier : others.length ? others : remaining;
     setTarget(pool[Math.floor(Math.random() * pool.length)]);
   };
   const finish = (fn: () => void) => { if (doneRef.current) return; doneRef.current = true; fn(); };
@@ -267,8 +270,8 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
       addFx({ x: b.x, y: b.y, kind: "pop", n: 0 }, 400);
       addFx({ x: b.x, y: b.y - b.d * 0.12, kind: "free", n: b.fly });
       G.happy = now + 700;
-      G.cleared = new Set([...G.cleared, b.word]); setSolved(G.cleared.size);
-      if (G.cleared.size >= TOTAL) { // meter full: every bubble pops, all flies go free, Great Job! party, then the win screen
+      G.hits[b.word] = (G.hits[b.word] ?? 0) + 1; G.solvedN += 1; if (G.hits[b.word] >= 2) G.cleared = new Set([...G.cleared, b.word]); setSolved(G.solvedN);
+      if (G.solvedN >= TOTAL) { // meter full: every bubble pops, all flies go free, Great Job! party, then the win screen
         endRef.current = true;
         for (const o of G.bubs) {
           addFx({ x: o.x, y: o.y, kind: "pop", n: 0 }, 400);

@@ -426,8 +426,9 @@ export default function GrammarHub() {
         <div style={{ width: 72 }} />
       </nav>
 
-      <div style={{ position: "relative", zIndex: 10, maxWidth: 560, margin: "0 auto", padding: "72px 16px 40px" }}>
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+      <style>{`@media (max-width: 760px){.mpe-level-grid{grid-template-columns:1fr !important;grid-auto-rows:auto !important}}`}</style>
+      <div style={{ position: "relative", zIndex: 10, maxWidth: 1080, margin: "0 auto", padding: "64px 16px 12px" }}>
+        <div style={{ textAlign: "center", marginBottom: "1rem" }}>
           <div
             style={{
               fontFamily: F,
@@ -450,17 +451,19 @@ export default function GrammarHub() {
               textShadow: "0 1px 6px rgba(0,0,0,0.8)",
             }}
           >
-            Easy at the top, harder as you go
+            Easy first, harder as you go
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+        {/* ALL 12 LEVELS ON ONE SCREEN (Andy 2026-10-07): 3 columns x 4 rows, row height fits the window; phone = 1 column */}
+        <div className="mpe-level-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gridAutoRows: "clamp(70px, calc((100vh - 200px) / 4 - 12px), 150px)", gap: "0.85rem" }}>
           {LEVELS.map((l) => (
             <button
               key={l.n}
               onClick={() => setLevel(l.n)}
               style={{
-                padding: "1rem 1.25rem",
+                padding: "0.6rem 1rem",
+                overflow: "hidden",
                 background: "linear-gradient(135deg,#a855f7,#6d28d9)",
                 border: "2px solid #a855f7",
                 borderRadius: "1.5rem",
@@ -471,12 +474,15 @@ export default function GrammarHub() {
                 boxShadow: "0 0 20px rgba(168,85,247,0.4),0 8px 24px rgba(0,0,0,0.3)",
               }}
             >
-              <div style={{ flex: 1, textAlign: "left" }}>
+              <div style={{ flexShrink: 0, width: 54, height: 54, borderRadius: "50%", background: "linear-gradient(180deg,#fff,#ede9fe)",
+                display: "flex", alignItems: "center", justifyContent: "center", fontFamily: F, fontWeight: 900, fontSize: "1.5rem",
+                color: "#6d28d9", boxShadow: "0 3px 0 rgba(0,0,0,0.25), inset 0 -3px 0 rgba(109,40,217,0.15)" }}>{l.n}</div>
+              <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
                 <div
                   style={{
                     fontFamily: F,
                     fontWeight: 800,
-                    fontSize: "0.98rem",
+                    fontSize: "1.1rem",
                     color: "white",
                   }}
                 >
@@ -486,15 +492,19 @@ export default function GrammarHub() {
                   style={{
                     fontFamily: F,
                     fontWeight: 700,
-                    fontSize: "0.82rem",
-                    color: "rgba(255,255,255,0.8)",
+                    fontSize: "0.9rem",
+                    color: "rgba(255,255,255,0.85)",
                     marginTop: 3,
+                    lineHeight: 1.25,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
                   }}
                 >
                   {l.topic}
                 </div>
               </div>
-              <div style={{ fontSize: "1.4rem", color: "rgba(255,255,255,0.85)" }}>▶</div>
             </button>
           ))}
         </div>

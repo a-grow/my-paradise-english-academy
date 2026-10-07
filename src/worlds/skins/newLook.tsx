@@ -22,6 +22,8 @@ import type { WorldConfig } from "@/worlds";
 import DailyPrize, { type DailyKind } from "./DailyPrize";
 import HowToPlay from "@/components/HowToPlay";
 import { worldHowTo } from "@/components/howtos";
+import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL } from "@/cards/economy";
+import { isCloseBtn, playCloseBeep } from "@/lib/clickSfx";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 
 // ---- per-world settings (step 6) ----
@@ -443,6 +445,11 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   });
   const [unlockedNow, setUnlockedNow] = useState(false);
   const newReady = slots.some(x => x.ready) || (onTest && q.get("n") === "1" && !unlockedNow);
+  // ALBUM METER (Andy 2026-10-07): coins toward the next card pack; packs ready = red dot + glow (waits for the new-friend glow)
+  const albumOn = v.isMaster || ALBUM_FOR_ALL;
+  const albumCoins = v.isMaster ? DEMO_COINS : (v.coins ?? 0);
+  const albumPacks = albumOn ? Math.floor(albumCoins / PACK_PRICE) : 0;
+  const albumPct = albumPacks > 0 ? 100 : ((albumCoins % PACK_PRICE) / PACK_PRICE) * 100;
 
   // Visit 5 days: dots = days in the current set of 5; all 5 lit when the +3 is ready to claim.
   const visitReady = Math.floor(v.visitDaysCount / 5) > 0 && !v.visit5Claimed;
@@ -592,6 +599,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const clickN = useRef(0);
   const onPointerDown = (e: React.PointerEvent) => {
     if (!v.sfxOn || !(e.target as HTMLElement).closest(".sv-tap")) return;
+    if (isCloseBtn(e.target)) { playCloseBeep(); return; }   // red X = beep instead of the click (Andy 2026-10-07)
     if (!clicks.current.length) clicks.current = [0, 1, 2].map(() => { const a = new Audio(`${UI}/click.mp3`); a.volume = 0.5; return a; });
     const a = clicks.current[clickN.current++ % 3];
     a.currentTime = 0; a.play().catch(() => { });
@@ -604,6 +612,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         <div className="sv-fill"><img src={L.fill} alt="" /></div>
         <div className="sv-scene" style={{ left: cx - STAGE_W / 2 }}><L.Scene /></div>
 
+        <div className="sv-grp sv-inT">{/* slide-in group (Andy 20:02) */}
         <div className="sv-grow" style={{ left: cx - 290 }}>
           <div className="sv-lbl">Stage {stageIdx + 1} of 4 {"\u00b7"} {stage.name}</div>
           <div className="sv-bar">
@@ -618,6 +627,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         </div>
 
         {L.titleImg ? <img className="sv-title" src={L.titleImg} alt={`${L.title} World`} /> : <div className="sv-titletxt">{L.title} World</div>}
+        </div>
 
         {isFly && <div className="sv-flyshadow" style={{ left: cx }} />}
         {arriving && <div key={"ag" + arrive} className="sv-arrive" style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0) }}><b className="sv-aglow" /></div>}
@@ -671,13 +681,15 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         ))}
 
         {/* top corners */}
+        <div className="sv-grp sv-inT">
         <div className="sv-rb sv-tap" style={{ left: 22 }} onClick={() => setHowto("open")}><img src={`${UI}/rb_help.webp`} alt="Help" /></div>
         <div ref={coinRef} className={"sv-coins" + lift} style={bumpStyle("coin")}><span>{coinShown}</span></div>
         <div className={"sv-rb sv-tap" + (v.musicOn ? "" : " muted")} style={{ right: 100 }} onClick={() => v.setMusicOn(!v.musicOn)}><img src={`${UI}/rb_music.webp`} alt="Music" /></div>
         <div className="sv-rb sv-tap" style={{ right: 22 }} onClick={() => setPanel("exit")}><img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
+        </div>
 
         {/* left: ways to earn */}
-        <div className="sv-left">
+        <div className="sv-left sv-inL">
           <div className="sv-imgbtn sv-tap" onClick={goVocab}><img src={`${UI}/btn_vocab.webp`} alt="Vocab Games" /></div>
           <div className="sv-imgbtn sv-tap" onClick={goGrammar}><img src={`${UI}/btn_grammar.webp`} alt="Grammar Games" /></div>
           <div ref={puzzleRef} className={"sv-imgbtn sv-tap" + lift} style={bumpStyle("piece")} onClick={soon}><img src={`${UI}/btn_puzzle.webp`} alt="Puzzle Activity" /></div>
@@ -687,14 +699,15 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         </div>
 
         {/* bottom left: the real jar (new treat), Daily Treat, Visit 5 days */}
-        <div ref={jarRef} className={"sv-jar" + lift} onClick={() => setJarPoke(p => p + 1)}>
+        <div ref={jarRef} className={"sv-jar sv-inB" + lift} onClick={() => setJarPoke(p => p + 1)}>
           <CookieJar count={jarShown} width="200px" cookie={`${UI}/treat.webp`} muted={!v.sfxOn} flyOut={false} poke={jarPoke} style={{ position: "absolute", left: 0, bottom: 0 }} />
           <div className="sv-jarcount">{holding ? jarShown : Math.max(v.jarTreats, jarShown)}</div>
         </div>
-        <img className={"sv-jarlbl" + lift} src={`${UI}/lbl_treats.webp`} alt="My Treats" />
+        <img className={"sv-jarlbl sv-inB" + lift} src={`${UI}/lbl_treats.webp`} alt="My Treats" />
         {/* Daily Treat button + Visit 5 days REMOVED (Andy 2026-10-03): the Daily Prize box replaces both. */}
 
         {/* right: cards (pre-built gold frames, never CSS border-image) */}
+        <div className="sv-grp sv-inR">
         {newReady && panel !== "animals" && (
           <Sparkler className="sv-spk-animals" cx={131} cy={95} />
         )}
@@ -711,10 +724,20 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           <div className="sv-medals">{[0, 1, 2].map(i => <img key={i} className={"sv-medal" + (i < badgesShown ? " won" : " off")} src={i < badgesShown ? `/worlds/badges/${wonBadges[i] ?? v.world.id}.webp` : `${UI}/medal.webp`} alt="" />)}</div>
           <img className="sv-cardlbl" style={{ top: 111, height: 45 }} src={`${UI}/lbl_badges.webp`} alt="My Badges" />
         </div>
-        <div className="sv-card sv-album sv-tap" onClick={soon}>
+        {albumPacks > 0 && !newReady && !panel && <Sparkler className="sv-spk-album" cx={131} cy={95} />}
+        <div className={"sv-card sv-album sv-tap" + (albumPacks > 0 && !newReady && !panel ? " beacon" : "")} onClick={albumOn ? () => goGames(`/album/${v.code}/${v.studentName}`) : soon}>{/* Card Album: 1006 only for now */}
           <img className="sv-cardlbl" style={{ top: 176, height: 38 }} src={`${UI}/lbl_album.webp`} alt="Card Album" />
+          {albumPacks > 0 && <span className="sv-dot num">{albumPacks}</span>}
         </div>
-        <div className="sv-card sv-worlds sv-tap" onClick={() => setPanel("worlds")}>
+        {albumOn && (
+          <div className="sv-ameter sv-tap" onClick={() => goGames(`/album/${v.code}/${v.studentName}`)}>
+            <div className="sv-amtrack"><i className={albumPacks ? "full" : ""} style={{ width: `${Math.max(8, albumPct)}%` }} />
+              <span>{albumPacks ? "OPEN!" : `${albumCoins % PACK_PRICE} / ${PACK_PRICE}`}</span></div>
+            <img className={"sv-apack" + (albumPacks ? " ready" : "")} src="/cards/ui/pack_closed.webp" alt="" />
+          </div>
+        )}
+        </div>
+        <div className="sv-card sv-worlds sv-tap sv-inB" onClick={() => setPanel("worlds")}>
           <div className="sv-wrow">
             {v.worldList.slice(0, 3).map(x => ( /* step 7: from the world list (4+ worlds: show the 3 nearest - later) */
               <img key={x.world.id} className={x.world.id === v.world.id ? "here" : (!x.finished && x.world.id !== v.currentWorld.id ? "lock" : undefined)}
@@ -796,7 +819,8 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         {panel === "theater" && (
           <VideoTheater cx={cx} sh={sh} worlds={theaterWorlds} start={theaterStart} newIds={allNew}
             onPlay={id => { theaterMusic(true); setNewIds(ids => ids.filter(x => x !== id)); v.markSeen(`theater:${cardWorld[id] ?? v.world.id}:${id}`); }}
-            onStop={() => theaterMusic(false)} onClose={() => setPanel(null)} />
+            onStop={() => theaterMusic(false)} onClose={() => setPanel(null)}
+            muted={!v.sfxOn} onIntro={q => theaterMusic(q)} />
         )}
 
         {howto === "open" && <HowToPlay {...worldHowTo((v.ANIMALS[0]?.stages ?? []).map(st => st.img))} muted={!v.sfxOn} onDone={closeHowto} />}
@@ -908,6 +932,16 @@ const CSS = `
 .sv-coins{position:absolute;left:104px;top:16px;width:230px;height:90px;padding-left:96px;display:flex;align-items:center;justify-content:center;
  background:url(${UI}/pill_coin.webp) center/100% 100% no-repeat;font-size:34px;color:#8a4a10;filter:drop-shadow(0 8px 8px rgba(0,0,0,.3))}
 .sv-left{position:absolute;left:22px;top:104px;width:270px;display:flex;flex-direction:column;gap:14px}
+.sv-grp{position:absolute;inset:0;pointer-events:none}
+.sv-grp .sv-tap,.sv-grp .sv-rb{pointer-events:auto}
+.sv-inL{animation:sv-inL .85s cubic-bezier(.3,1.35,.5,1) .05s backwards}
+.sv-inR{animation:sv-inR .85s cubic-bezier(.3,1.35,.5,1) .1s backwards}
+.sv-inB{animation:sv-inB .85s cubic-bezier(.3,1.35,.5,1) .2s backwards}
+.sv-inT{animation:sv-inT .8s cubic-bezier(.3,1.35,.5,1) .12s backwards}
+@keyframes sv-inL{0%{transform:translateX(-440px)}100%{transform:none}}
+@keyframes sv-inR{0%{transform:translateX(440px)}100%{transform:none}}
+@keyframes sv-inB{0%{transform:translateY(420px)}100%{transform:none}}
+@keyframes sv-inT{0%{transform:translateY(-280px)}100%{transform:none}}
 .sv-imgbtn{position:relative;width:270px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
 .sv-jar{position:absolute;left:55px;bottom:52px;width:200px;height:258px}
 .sv-jarcount{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);z-index:3;background:#6b3a12;color:#fff;font-size:30px;line-height:36px;border-radius:20px;padding:0 18px;border:4px solid #ffd43b}
@@ -928,6 +962,18 @@ const CSS = `
 .sv-slot.done{border-style:solid;background:#fff3d1}
 .sv-slot.locked img{filter:brightness(0);opacity:.25}
 .sv-animals.beacon{animation:sv-peek 2.6s ease-in-out infinite,sv-goldglow 1.3s ease-in-out infinite;transform-origin:50% 90%}
+.sv-album.beacon{animation:sv-peek 2.6s ease-in-out infinite,sv-goldglow 1.3s ease-in-out infinite;transform-origin:50% 90%}
+.sv-spk-album{right:30px;top:525px;width:262px;height:190px}
+.sv-dot.num{display:flex;align-items:center;justify-content:center;width:44px;height:44px;right:-10px;top:-12px;font-family:'Titan One',sans-serif;font-size:22px;line-height:1;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.sv-ameter{position:absolute;right:34px;top:724px;width:256px;height:76px}
+.sv-amtrack{position:absolute;left:0;top:22px;width:210px;height:34px;border-radius:17px;background:#5a2b16;border:4px solid #f3b13a;overflow:hidden;box-shadow:inset 0 3px 6px rgba(0,0,0,.4),0 5px 8px rgba(0,0,0,.3)}
+.sv-amtrack i{position:absolute;left:0;top:0;bottom:0;border-radius:13px;background:linear-gradient(#a6f590,#2fb34a);transition:width .6s}
+.sv-amtrack i.full{background:linear-gradient(#fff38a,#ffcf20 55%,#f5a300);animation:sv-amshine 1.4s ease-in-out infinite alternate}
+@keyframes sv-amshine{0%{filter:brightness(1)}100%{filter:brightness(1.3)}}
+.sv-amtrack span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Titan One',sans-serif;font-size:18px;color:#fff;paint-order:stroke fill;-webkit-text-stroke:4px #3a1d6e}
+.sv-apack{position:absolute;right:0;top:0;width:46px;transform:rotate(10deg);filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+.sv-apack.ready{animation:sv-apack 2s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(255,225,120,.95))}
+@keyframes sv-apack{0%,60%,100%{transform:rotate(10deg)}66%{transform:rotate(-6deg) scale(1.1)}72%{transform:rotate(14deg) scale(1.1)}78%{transform:rotate(2deg)}84%{transform:rotate(10deg)}}
 @keyframes sv-peek{0%,52%,100%{transform:rotate(0)}56%{transform:rotate(-2.4deg)}61%{transform:rotate(2.2deg)}66%{transform:rotate(-1.8deg)}71%{transform:rotate(1.2deg)}76%{transform:rotate(0)}}
 @keyframes sv-goldglow{0%,100%{filter:brightness(1.08) drop-shadow(0 0 3px #fff36b) drop-shadow(0 0 8px #ffd000) drop-shadow(0 0 16px rgba(255,190,0,.9))}50%{filter:brightness(1.22) drop-shadow(0 0 5px #fffbb0) drop-shadow(0 0 14px #ffe000) drop-shadow(0 0 28px rgba(255,200,0,1))}}
 .sv-sparkler{position:absolute;pointer-events:none}

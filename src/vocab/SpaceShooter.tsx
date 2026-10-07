@@ -147,7 +147,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
   const sfx = useSfx(sfxOn);
   const X = EXTRA[diff];
   const MAXU = cfg.maxOnScreen + MORE[diff];
-  const TOTAL = unit.vocab.length;
+  const TOTAL = unit.vocab.length * 2; // every word twice (Andy 2026-10-07)
 
   // field size: design 1600x944 scaled to fit, then widened/taller to fill the window (same as the world page)
   const calc = () => {
@@ -179,13 +179,16 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
 
   const g = useRef({ ufos: [] as Ufo[], shots: [] as Pt[], drops: [] as Pt[], bounces: [] as Bounce[], orb: null as Orb | null, fx: [] as Fx[], coins: [] as Coin[], lastCoin: -1700,
     shipX: FW / 2, id: 0, lastSpawn: 0, lastDrop: 0, lastOrb: 0, start: 0, lastShot: 0, lastTgt: 0, held: {} as Record<string, number>, nudge: 0,
-    lastWord: "", cooldown: false, invincible: false, cleared: new Set<string>(), keys: new Set<string>() });
+    lastWord: "", cooldown: false, invincible: false, cleared: new Set<string>(), keys: new Set<string>(), hits: {} as Record<string, number>, solvedN: 0 });
 
   const nextTarget = (cleared: Set<string>) => {
+    // every word TWICE (Andy 2026-10-07): pick from the words with the fewest correct hits so far, never the same twice in a row
     const remaining = unit.vocab.filter(v => !cleared.has(v));
     if (!remaining.length) return;
+    const H = g.current.hits, minH = Math.min(...remaining.map(v => H[v] ?? 0));
+    const tier = remaining.filter(v => (H[v] ?? 0) === minH && v !== targetRef.current);
     const others = remaining.filter(v => v !== targetRef.current);
-    const pool = others.length ? others : remaining;
+    const pool = tier.length ? tier : others.length ? others : remaining;
     setTarget(pool[Math.floor(Math.random() * pool.length)]);
   };
 
@@ -347,8 +350,8 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
             G.ufos = G.ufos.filter(a => a !== u);
             addFx({ x: u.x, y: u.y, kind: "happy", idx: u.idx, word: u.word });
             sfx("boom"); speak(u.word, "en-US");
-            G.cleared = new Set([...G.cleared, u.word]); setSolved(G.cleared.size);
-            if (G.cleared.size >= TOTAL) { // meter full (Andy 15:06): green, MISSION ACCOMPLISHED flies to the middle, then the win screen
+            G.hits[u.word] = (G.hits[u.word] ?? 0) + 1; G.solvedN += 1; if (G.hits[u.word] >= 2) G.cleared = new Set([...G.cleared, u.word]); setSolved(G.solvedN);
+            if (G.solvedN >= TOTAL) { // meter full (Andy 15:06): green, MISSION ACCOMPLISHED flies to the middle, then the win screen
               endRef.current = true;
               for (const a of G.ufos) addFx({ x: a.x, y: a.y, kind: "happy", idx: a.idx, word: a.word });
               G.ufos = []; G.drops = []; G.bounces = []; G.coins = []; G.orb = null;

@@ -21,11 +21,13 @@ const BOX_H = 128, BOX_W = Math.round(BOX_H * 366 / 466), FLOOR_Y = 696 * K, PIL
 // popcorn: [landing x from the box's left, landing y above the floor, spin deg, size px, delay ms]
 const POP = [[BOX_W + 12, 2, 300, 16, 0], [BOX_W + 34, 0, -240, 15, 90], [-14, 1, 200, 16, 170]]; // same size as the popcorn in the box
 
-export default function VideoTheater({ cx, sh, worlds, start, newIds, onPlay, onStop, onClose }: {
+export default function VideoTheater({ cx, sh, worlds, start, newIds, onPlay, onStop, onClose, muted, onIntro }: {
   cx: number; sh: number; worlds: TheaterWorld[]; start: number; newIds: string[];
   onPlay: (id: string) => void;   // a video starts (parent: music down, red dot off)
   onStop: () => void;             // the video closed (parent: music back)
   onClose: () => void;
+  muted?: boolean;                // sound off = no opening fanfare and no waiting
+  onIntro?: (on: boolean) => void; // the opening fanfare starts / ends (parent: world music down / back)
 }) {
   const [wi, setWi] = useState(start);
   const [playing, setPlaying] = useState<TheaterCard | null>(null);
@@ -41,7 +43,31 @@ export default function VideoTheater({ cx, sh, worlds, start, newIds, onPlay, on
 
   const playingRef = useRef(false);
   useEffect(() => () => { if (playingRef.current) onStop(); }, []); // closing the theater mid-video brings the music back
-  const play = (c: TheaterCard) => { if (!c.won || !c.video) return; playingRef.current = true; setPlaying(c); onPlay(c.id); };
+  // OPENING FANFARE (Andy 2026-10-07): public/worlds/theater/fanfare.mp3 plays when the theater opens (world music dips).
+  // The play buttons pop in after 2 s (17:02 - was: at the end). Starting a video fades the fanfare out; the world music
+  // then stays down for the video (onPlay) and comes back when it closes (onStop). Sound off = no fanfare, no wait.
+  const [intro, setIntro] = useState(!muted);
+  const fanRef = useRef<HTMLAudioElement | null>(null);
+  const fanOn = useRef(false);                 // fanfare still holding the world music down
+  useEffect(() => {
+    if (muted) return;
+    const a = new Audio(`${T}/fanfare.mp3`); a.volume = 0.8; fanRef.current = a;
+    fanOn.current = true; onIntro?.(true);
+    const end = () => { if (!fanOn.current) return; fanOn.current = false; onIntro?.(false); };
+    a.addEventListener("ended", end);
+    a.play().catch(end);
+    const t1 = window.setTimeout(() => setIntro(false), 2000);
+    const t2 = window.setTimeout(end, 12500);  // safety
+    return () => { a.pause(); window.clearTimeout(t1); window.clearTimeout(t2); if (fanOn.current) { fanOn.current = false; onIntro?.(false); } };
+  }, []);
+  const fadeFanfare = () => {
+    const a = fanRef.current; fanOn.current = false;
+    if (!a || a.paused) return;
+    const v0 = a.volume, t0 = performance.now();
+    const step = () => { const k = (performance.now() - t0) / 700; if (k >= 1) { a.pause(); return; } a.volume = v0 * (1 - k); requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  };
+  const play = (c: TheaterCard) => { if (intro || !c.won || !c.video) return; fadeFanfare(); playingRef.current = true; setPlaying(c); onPlay(c.id); };
   const stop = () => { setFading(true); window.setTimeout(() => { playingRef.current = false; setPlaying(null); setFading(false); onStop(); }, 650); };
 
   return (
@@ -58,7 +84,7 @@ export default function VideoTheater({ cx, sh, worlds, start, newIds, onPlay, on
           {w.cards
             ? <div className="tv-grid">
                 {w.cards.map(c => c.won && c.video
-                  ? <div key={c.id} className="tv-card sv-tap" onClick={() => play(c)}>
+                  ? <div key={c.id} className={"tv-card" + (intro ? " wait" : " sv-tap")} onClick={() => play(c)}>
                       <div className="tv-poster"><img src={c.poster} alt="" /></div>
                       <i className="tv-play" />
                       <p>{c.name}</p>
@@ -126,6 +152,8 @@ const CSS = `
 @keyframes tv-page{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .tv-title{margin-top:14px;font-family:'Titan One',sans-serif;font-size:46px;line-height:1;color:#7a3fd0;text-shadow:0 3px 0 rgba(255,255,255,.8)}
 .tv-grid{margin-top:16px;display:grid;grid-template-columns:repeat(3,250px);gap:18px 40px}
+.tv-card.wait .tv-play{opacity:0;transform:scale(.3)}
+.tv-card.wait{cursor:default}
 .tv-card{position:relative;width:250px;height:184px;border-radius:22px;border:5px solid #f3b81f;box-sizing:border-box;
  background:linear-gradient(180deg,#d6b8ff 0%,#a56df5 100%);box-shadow:0 6px 0 #b07a00,0 10px 14px rgba(60,20,110,.35);overflow:visible}
 .tv-card:not(.locked):active{transform:translateY(4px)}

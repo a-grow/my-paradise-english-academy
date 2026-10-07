@@ -153,8 +153,12 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
   const fitRef = useRef(fit); fitRef.current = fit;
   useEffect(() => { const on = () => setFit(calc()); window.addEventListener("resize", on); return () => window.removeEventListener("resize", on); }, []);
 
-  // target order: every word ONCE, shuffled - no word twice in the same game (Andy 2026-10-07; was every word twice)
-  const queue = useRef<string[]>(shuffle([...new Set(unit.vocab)]));
+  // target order: every word TWICE (Andy 2026-10-07 21:26) = two shuffled rounds, never the same word back-to-back
+  const queue = useRef<string[]>((() => {
+    const w = [...new Set(unit.vocab)], a = shuffle(w), b = shuffle(w);
+    if (b.length > 1 && b[0] === a[a.length - 1]) [b[0], b[1]] = [b[1], b[0]];
+    return [...a, ...b];
+  })());
   const TOTAL = queue.current.length;
   const real = useRef(new Set(unit.vocab.map(v => v.toLowerCase())));
   const [qi, setQi] = useState(0);

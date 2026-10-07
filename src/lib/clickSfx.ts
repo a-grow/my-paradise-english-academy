@@ -26,10 +26,33 @@ const tappable = (start: EventTarget | null) => {
   return false;
 };
 
+// CLOSE BEEP (Andy 2026-10-07): a red X button (the rb_exit picture, or anything marked data-closex) plays this beep
+// INSTEAD of the click.
+let beeps: HTMLAudioElement[] = [];
+let bn = 0;
+export const playCloseBeep = () => {
+  try {
+    if (!beeps.length) beeps = [0, 1].map(() => { const a = new Audio("/worlds/ui/close_beep.mp3"); a.volume = 0.6; return a; });
+    const a = beeps[bn++ % beeps.length];
+    a.currentTime = 0; a.play().catch(() => { });
+  } catch { /* */ }
+};
+export const isCloseBtn = (start: EventTarget | null) => {
+  const el = start instanceof Element ? start : null;
+  if (!el) return false;
+  if (el.closest("[data-closex]")) return true;
+  if (el.tagName === "IMG" && (el as HTMLImageElement).src.includes("rb_exit")) return true;
+  const host = el.closest("button,[role=button],.sv-tap,.ca-tap");
+  return !!host && !!host.querySelector(':scope > img[src*="rb_exit"]');
+};
+
 export function useClickSfx(on: boolean) {
   const onRef = useRef(on); onRef.current = on;
   useEffect(() => {
-    const h = (e: PointerEvent) => { if (onRef.current && e.isPrimary !== false && tappable(e.target)) playClick(); };
+    const h = (e: PointerEvent) => {
+      if (!onRef.current || e.isPrimary === false) return;
+      if (isCloseBtn(e.target)) playCloseBeep(); else if (tappable(e.target)) playClick();
+    };
     document.addEventListener("pointerdown", h, true);
     return () => document.removeEventListener("pointerdown", h, true);
   }, []);
