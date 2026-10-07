@@ -2,6 +2,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { addTreats, addCoins } from "@/lib/cloudSave";
 import GrammarGameBar from "@/components/GrammarGameBar";
+import { useClickSfx } from "@/lib/clickSfx";
+import ControlHints, { HINT_BOTTOM } from "@/components/ControlHints";
+import HowToPlay from "@/components/HowToPlay";
+import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { RUN_HOWTO } from "@/components/howtos";
 import { installIdleCursor } from "@/lib/idleCursor";
 import WinCelebration from "@/components/WinCelebration";
 import LoseScreen from "@/components/LoseScreen";
@@ -15,11 +20,15 @@ export default function GrammarRun() {
   const kidName = (studentName || "").toLowerCase();
 
   const [won, setWon] = useState(false);
+  const [howto, setHowto] = useState<boolean | null>(null); // null = asking the cloud; How to Play the first 3 times (Andy 2026-10-07)
   const [lost, setLost] = useState(false);
   const [tryKey, setTryKey] = useState(0);
   const claimed = useRef(false);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [muted, setMuted] = useState(false);
+  useClickSfx(!muted); // click on every button (Andy 2026-10-07)
+  const howReady = useHowtoSeen(kidCode, kidName);
+  useEffect(() => { if (howReady && howto === null) setHowto(wantHowto("grun")); }, [howReady]);
   const [stats, setStats] = useState<GameStats | null>(null);
   // COINS: latest coin count from the game, what this win banked, and the kid's coin total before this win
   const coinsNow = useRef(0);
@@ -78,14 +87,16 @@ export default function GrammarRun() {
           frameRef.current?.contentWindow?.focus(); // keep arrow keys working after the click
         }}
       />
-      <iframe
+      {howto && <HowToPlay {...RUN_HOWTO} muted={muted} onDone={() => { setHowto(false); seenHowto("grun"); }} />} {/* How to Play first; the game loads after (Andy 2026-10-07) */}
+      {howto === false && <iframe
         key={tryKey}
         ref={frameRef}
         onLoad={() => { frameRef.current?.contentWindow?.focus(); sendMute(muted); try { const d = frameRef.current?.contentDocument; if (d) installIdleCursor(d); } catch { /* */ } }}
         src={`/Teacher_Andy_Run_game.html?level=${level || 1}`}
         title="Teacher Andy Run"
         style={{ width: "100%", flex: 1, minHeight: 0, border: "none", display: "block" }}
-      />
+      />}
+      {howto === false && !won && !lost && <ControlHints keys={["left", "right", "up", "space"]} style={HINT_BOTTOM} />} {/* controls as pictures, no text (Andy 23:32) */}
       {won && (
         <WinCelebration
           coinsWon={coinsWon}

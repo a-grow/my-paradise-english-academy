@@ -24,9 +24,28 @@ const items = (i: number) => {
 
 const BW = 1000, BH = Math.round(1000 * 809 / 1270);   // board size on the stage (DARK teal art 1270 x 809, Andy 19:19)
 const TW = 150, TH = 155, GAP = 15;                    // day boxes
-const GX = 130, GY = 208;                              // grid top-left inside the board
+const GX = 130, GY = 242;                              // (was 208: room for the week meter, Andy 2026-10-07)                              // grid top-left inside the board
 const GIFT_X = GX + 3 * TW + 2 * GAP + 30, GIFT_W = 230;
 const FLY_MS = 800;
+// WEEK METER (Andy 2026-10-07): across the board between the ribbon and the boxes. Done days = green check, other days = number,
+// bonus days 3 + 6 (puzzle piece) and day 7 (big gift) = little presents in different colours. [day, [box, lid, ribbon], size]
+const MX0 = 150, MX1 = 850, MY = 172;
+// every day has a little present (Andy 10:01), each its own colour; day 7 = gold + purple bow like the big gift, bigger
+const PRESENTS: [number, [string, string, string], number][] = [
+  [1, ["#ff9a3c", "#ffbd73", "#3fc1ff"], 60], [2, ["#4cd964", "#8ef09c", "#ff5d8f"], 60], [3, ["#ff6fae", "#ff9cc8", "#ffd23f"], 60],
+  [4, ["#a066ff", "#c49bff", "#ffd23f"], 60], [5, ["#2ec4c4", "#7ee3e3", "#ff7a59"], 60], [6, ["#38a8ff", "#7cc8ff", "#ff5d8f"], 60],
+  [7, ["#ffc531", "#ffdc6b", "#9b4dff"], 74]];
+const Present = ({ c, size }: { c: [string, string, string]; size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+    <path d="M32 20 C24 6 11 8 15 16 C18 22 28 21 32 20 Z" fill={c[2]} stroke="#3a1a05" strokeWidth="3" strokeLinejoin="round" />
+    <path d="M32 20 C40 6 53 8 49 16 C46 22 36 21 32 20 Z" fill={c[2]} stroke="#3a1a05" strokeWidth="3" strokeLinejoin="round" />
+    <rect x="10" y="31" width="44" height="28" rx="4" fill={c[0]} stroke="#3a1a05" strokeWidth="3" />
+    <rect x="6" y="20" width="52" height="13" rx="4" fill={c[1]} stroke="#3a1a05" strokeWidth="3" />
+    <rect x="28" y="20" width="8" height="39" fill={c[2]} stroke="#3a1a05" strokeWidth="2.5" />
+    <rect x="10" y="23" width="15" height="3.5" rx="1.75" fill="rgba(255,255,255,.75)" />
+    <rect x="14" y="35" width="5" height="18" rx="2.5" fill="rgba(255,255,255,.35)" />
+  </svg>
+);
 
 const SPARKS = [[-40, 120, 46, 3.6, 0], [1030, 90, 40, 4.2, 1.1], [-20, 470, 34, 3.9, 2.0], [1020, 430, 50, 4.6, 0.6],
   [180, -30, 36, 4.0, 1.6], [820, -40, 42, 3.7, 2.6], [520, 655, 38, 4.4, 0.3], [90, 640, 30, 3.8, 2.9], [930, 630, 34, 4.1, 1.9]];
@@ -67,6 +86,24 @@ export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand
   const timers = useRef<number[]>([]);
   const later = (fn: () => void, ms: number) => { timers.current.push(window.setTimeout(fn, ms)); };
   useEffect(() => { later(() => setPhase(p => (p === "in" ? "idle" : p)), 950); return () => timers.current.forEach(t => window.clearTimeout(t)); }, []);
+
+  // WIGGLE (Andy 2026-10-07): the little presents on the meter + the big Day 7 present wiggle ONCE now and then,
+  // one at a time, at random spread-out moments. Nothing else wiggles.
+  const doneN = opened ? day : day - 1;
+  const doneRef = useRef(doneN); doneRef.current = doneN;
+  const [wig, setWig] = useState("");
+  useEffect(() => {
+    let t = 0, last = "";
+    const next = (first: boolean) => {
+      t = window.setTimeout(() => {
+        const c = [...PRESENTS.filter(([d]) => d > doneRef.current).map(([d]) => "p" + d), ...(doneRef.current < 7 ? ["big"] : [])].filter(k => k !== last);
+        if (c.length) { last = c[Math.floor(Math.random() * c.length)]; setWig(last); window.setTimeout(() => setWig(""), 1000); }
+        next(false);
+      }, first ? 1200 + Math.random() * 1000 : 1700 + Math.random() * 1800); // more often (Andy 10:01), never two at once
+    };
+    next(true);
+    return () => window.clearTimeout(t);
+  }, []);
 
   const left = cx - BW / 2, top = sh / 2 - BH / 2 - 20;
   const tilePos = (i: number) => i === 6
@@ -122,6 +159,16 @@ export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand
           <path id="dp-arc" d="M290,116 Q500,64 710,116" fill="none" /> {/* measured on the dark board: ribbon middle ~y71 centre, ~y87 at x315/670 */}
           <text textAnchor="middle"><textPath href="#dp-arc" startOffset="50%">Daily Prize</textPath></text>
         </svg>
+        <div className="dp-meter" style={{ left: MX0, top: MY, width: MX1 - MX0 }}>
+          <div className="dp-mfill" style={{ width: doneN > 0 ? `${((doneN - 0.5) / 7) * 100}%` : 0 }} />
+        </div>
+        {DAILY_TABLE.map((_, i) => {
+          const d = i + 1, x = MX0 + ((i + 0.5) / 7) * (MX1 - MX0), y = MY + 16;
+          const pr = PRESENTS.find(p => p[0] === d);
+          if (d <= doneN) return <div key={"m" + d} className="dp-mk done" style={{ left: x, top: y }}><svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="#2f9a1c" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" /></svg></div>;
+          if (pr) return <div key={"m" + d} className={"dp-mk gift" + (d === day ? " now" : "") + (wig === "p" + d ? " wig" : "")} style={{ left: x, top: y }}><Present c={pr[1]} size={pr[2]} /></div>;
+          return <div key={"m" + d} className={"dp-mk dot" + (d === day ? " now" : "")} style={{ left: x, top: y }}>{d}</div>;
+        })}
         {DAILY_TABLE.map((_, i) => {
           const p = tilePos(i);
           const done = i < day - 1 || (i === day - 1 && opened);
@@ -134,7 +181,7 @@ export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand
                 {done
                   ? <img src={`${D}/tile_done.webp`} alt="" style={{ position: "absolute", left: 25, top: 40, width: 180 }} />
                   : (
-                    <div className="dp-giftbox" style={{ position: "absolute", left: 0, top: 0, width: GIFT_W, height: 240 }}>
+                    <div className={"dp-giftbox" + (wig === "big" ? " wig" : "")} style={{ position: "absolute", left: 0, top: 0, width: GIFT_W, height: 240 }}>
                       <img src={`${D}/tile_gift.webp`} alt="" style={{ position: "absolute", left: 0, top: 0, width: GIFT_W }} />
                       {label("7", { left: 113, width: 60, top: 104, fontSize: 34, textAlign: "center", color: "#7a3d00", textShadow: "none", WebkitTextStroke: "0" })}
                     </div>
@@ -191,7 +238,22 @@ const CSS = `
 /* Day 7 gift when it is today: ONLY the present wiggles (Andy 14:49 - not the prizes under it), same peek-wiggle as
    the My Animals card (Andy 14:43) + soft gold glow */
 .dp-tile.dp-gift.today{animation:none}
-.dp-gift.today .dp-giftbox{animation:dp-peek 2.6s ease-in-out infinite;transform-origin:50% 80%} /* no gold glow (Andy 19:11) */
+/* the big present no longer wiggles all the time: it wiggles once now and then with the meter presents (Andy 2026-10-07) */
+.dp-giftbox{transform-origin:50% 80%}
+.dp-giftbox.wig{animation:dp-wigbig 1s ease-in-out}
+@keyframes dp-wigbig{0%,100%{transform:rotate(0)}15%{transform:rotate(-3.5deg)}30%{transform:rotate(3deg)}45%{transform:rotate(-2.2deg)}60%{transform:rotate(1.5deg)}75%{transform:rotate(-.7deg)}}
+.dp-meter{position:absolute;height:24px;border-radius:999px;background:#0d3437;border:4px solid #f4e3b5;box-shadow:inset 0 3px 6px rgba(0,0,0,.5),0 3px 0 rgba(0,0,0,.25)}
+.dp-mfill{height:100%;border-radius:999px;background:linear-gradient(180deg,#d4ffa8 0%,#6fdc4a 45%,#2f9a1c 100%);box-shadow:inset 0 3px 0 rgba(255,255,255,.55);transition:width .9s cubic-bezier(.3,1.3,.6,1)}
+.dp-mk{position:absolute;transform:translate(-50%,-50%);pointer-events:none}
+.dp-mk.done{width:42px;height:42px;border-radius:50%;background:#fff8e6;border:3px solid #c98a2a;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 rgba(0,0,0,.3);animation:dp-mkpop .45s cubic-bezier(.3,1.6,.5,1)}
+.dp-mk.dot{width:30px;height:30px;border-radius:50%;background:#f4e3b5;border:3px solid #8a5a1a;display:flex;align-items:center;justify-content:center;font-family:'Titan One',sans-serif;font-size:15px;color:#5a2d08}
+.dp-mk.dot.now{background:#ffe066;box-shadow:0 0 12px 3px rgba(255,220,90,.9)}
+.dp-mk.gift{transform:translate(-50%,-76%);filter:drop-shadow(0 4px 3px rgba(0,0,0,.35))}
+.dp-mk.gift svg{display:block;transform-origin:50% 90%}
+.dp-mk.gift.now{filter:drop-shadow(0 0 8px #fff3a0) drop-shadow(0 0 16px rgba(255,214,70,.95)) drop-shadow(0 4px 3px rgba(0,0,0,.35))} /* today's present glows */
+.dp-mk.gift.wig svg{animation:dp-wig .9s ease-in-out}
+@keyframes dp-wig{0%,100%{transform:rotate(0)}15%{transform:rotate(-8deg)}30%{transform:rotate(6.5deg)}45%{transform:rotate(-4.5deg)}60%{transform:rotate(3deg)}75%{transform:rotate(-1.2deg)}} /* smaller (Andy 10:01) */
+@keyframes dp-mkpop{0%{transform:translate(-50%,-50%) scale(.3)}100%{transform:translate(-50%,-50%) scale(1)}}
 .dp-pink{position:absolute;width:0;height:0;pointer-events:none}
 .dp-pinkhalo{position:absolute;left:-190px;top:-190px;width:380px;height:380px;border-radius:50%;
   background:radial-gradient(closest-side,rgba(255,226,90,.95),rgba(255,206,60,.62) 42%,rgba(255,220,110,.25) 70%,rgba(255,220,110,0) 100%); /* YELLOW (Andy 20:38, was pink) */

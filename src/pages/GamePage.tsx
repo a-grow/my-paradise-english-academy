@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useHowtoSeen } from "@/lib/howtoSeen";
 import GameTest from "./GameTest";
 import { addTreats, addCoins } from "@/lib/cloudSave";
 
@@ -12,6 +13,7 @@ const GamePage = () => {
   const studentBook = parseInt(book || "1", 10);
   const navigate = useNavigate();
   const isMaster = code === MASTER_CODE;
+  useHowtoSeen(code, studentName); // How to Play 'seen' list from the cloud (Andy 2026-10-07)
   const today = new Date().toDateString();
 
   const gameWorld = world || "ocean";

@@ -9,6 +9,10 @@
 // All words done = win (treats paid by the win screen, coins collected paid only on a win); time or lives out = lose.
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import GrammarGameBar from "@/components/GrammarGameBar";
+import ControlHints, { HINT_BOTTOM_LEFT } from "@/components/ControlHints";
+import HowToPlay from "@/components/HowToPlay";
+import { wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { gardenHowTo } from "@/components/howtos";
 
 type Diff = "easy" | "medium" | "hard";
 type Cfg = { timerSec: number };
@@ -25,8 +29,8 @@ const COIN_UP = 2800, HEART_UP = 3200; // prizes stay up longer (Andy 10-05)
 const LV: Record<Diff, { cols: number; hw: number; gap: number; spawnMs: number; upMs: number; maxUp: number; tDelay: number;
   pX: number; maxX: number; pFake: number; coinMs: number; heartMs: number; two: number }> = { // two = chance of a 2nd right answer up at once (Andy 10-05)
   easy:   { cols: 3, hw: 250, gap: 400, spawnMs: 900, upMs: 3400, maxUp: 4, tDelay: 1100, pX: 0.14, maxX: 1, pFake: 0,    coinMs: 4200, heartMs: 15000, two: 0 },
-  medium: { cols: 4, hw: 228, gap: 330, spawnMs: 700, upMs: 3000, maxUp: 6, tDelay: 900,  pX: 0.16, maxX: 2, pFake: 0.3,  coinMs: 4800, heartMs: 19000, two: 0 }, // only ONE right critter at a time (Andy 15:42)
-  hard:   { cols: 5, hw: 206, gap: 282, spawnMs: 380, upMs: 2600, maxUp: 11, tDelay: 900, pX: 0.24, maxX: 3, pFake: 0.55, coinMs: 5400, heartMs: 26000, two: 0 }, // harder (Andy 15:26): busier, more fakes + red X, fewer double right ones
+  medium: { cols: 4, hw: 228, gap: 330, spawnMs: 700, upMs: 3400, maxUp: 6, tDelay: 900,  pX: 0.16, maxX: 2, pFake: 0.3,  coinMs: 4800, heartMs: 19000, two: 0 }, // only ONE right critter at a time (Andy 15:42)
+  hard:   { cols: 5, hw: 206, gap: 282, spawnMs: 380, upMs: 3400, maxUp: 11, tDelay: 900, pX: 0.24, maxX: 3, pFake: 0.55, coinMs: 5400, heartMs: 26000, two: 0 }, // harder (Andy 15:26): busier, more fakes + red X, fewer double right ones
 };
 const ROW_Y = [0.355, 0.6, 0.845]; // a bit more room between rows (lower rows stand in front)  // hole centres (x field height)
 const ROW_S = [0.86, 0.93, 1];        // back rows a little smaller (depth)
@@ -149,12 +153,8 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
   const fitRef = useRef(fit); fitRef.current = fit;
   useEffect(() => { const on = () => setFit(calc()); window.addEventListener("resize", on); return () => window.removeEventListener("resize", on); }, []);
 
-  // target order: every word twice, shuffled, never the same word two times in a row
-  const queue = useRef<string[]>((() => {
-    const a = shuffle(unit.vocab), b = shuffle(unit.vocab);
-    if (b.length > 1 && b[0] === a[a.length - 1]) [b[0], b[1]] = [b[1], b[0]];
-    return [...a, ...b];
-  })());
+  // target order: every word ONCE, shuffled - no word twice in the same game (Andy 2026-10-07; was every word twice)
+  const queue = useRef<string[]>(shuffle([...new Set(unit.vocab)]));
   const TOTAL = queue.current.length;
   const real = useRef(new Set(unit.vocab.map(v => v.toLowerCase())));
   const [qi, setQi] = useState(0);
@@ -400,6 +400,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
       <div className={"wg-field" + (ouch ? " ouch" : "")} ref={fieldRef} onPointerMove={onMove} onPointerDown={whack}
         onPointerLeave={() => setHammer(h => ({ ...h, show: false }))}>
         <div className="wg-stage" style={{ width: sw, height: sh, transform: `scale(${s})` }}>
+          <ControlHints keys={[]} mouse style={HINT_BOTTOM_LEFT} /> {/* controls as pictures (Andy 23:32) */}
           <div className={"wg-meter" + (solved >= TOTAL ? " full" : "")}>
             <div className="wg-track"><div className="wg-fill" style={{ width: `${Math.max(6, (solved / TOTAL) * 100)}%` }} /></div>
             <img key={solved} className={"wg-mbasket" + (solved ? " bump" : "")} src={`${ART}/basket-big.webp`} alt="" draggable={false} />
@@ -490,6 +491,7 @@ export default function WhackGarden({ unit, diff, cfg, sfxOn = true, musicOn, on
   const [coinStart, setCoinStart] = useState(0);
   useEffect(() => { getCoinTotal?.().then(t => { if (typeof t === "number") setCoinStart(t); }); }, [run]);
   const [result, setResult] = useState<null | "win" | "timeout" | "lives">(null);
+  const [howto, setHowto] = useState(() => wantHowto("whack")); // first 3 times (cloud), then only via "?" (Andy 2026-10-07)
   const [playing, setPlaying] = useState(false); // false during the intro = no game song yet
   useEffect(() => () => onMusicTrack?.(null), []);
   useEffect(() => { onMusicTrack?.(result || !playing ? "" : GARDEN_MUSIC); }, [result, playing]);
@@ -501,6 +503,7 @@ export default function WhackGarden({ unit, diff, cfg, sfxOn = true, musicOn, on
   const restart = () => { onRestart?.(); setPlaying(false); setResult(null); setRun(r => r + 1); };
   if (result === "win") return <>{renderWin(restart, coinsWon, coinStart)}</>;
   if (result) return <>{renderLose(result, restart)}</>;
+  if (howto) return <HowToPlay {...gardenHowTo(diff)} muted={!musicOn} onDone={() => { setHowto(false); seenHowto("whack"); }} />;
   return <Play key={run} unit={unit} diff={diff} cfg={cfg} sfxOn={sfxOn && musicOn} musicOn={musicOn} onToggleMusic={onToggleMusic}
     onBack={onBack} onWin={c => { setCoinsWon(c); setResult("win"); }} onLose={r => setResult(r)} intro={run === 0} onPlaying={() => setPlaying(true)} />;
 }

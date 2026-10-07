@@ -1,5 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import { useClickSfx } from "@/lib/clickSfx";
+import { useHowtoSeen } from "@/lib/howtoSeen";
+import HowToPlay from "@/components/HowToPlay";
+import { RUN_HOWTO, SWIM_HOWTO, DIG_HOWTO, GRAB_HOWTO } from "@/components/howtos";
 
 const F = "'Nunito',sans-serif";
 
@@ -32,6 +36,10 @@ export default function GrammarHub() {
   // ----- background music (hub only, 40% volume, starts on first tap) -----
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [muted, setMuted] = useState(false);
+  useClickSfx(!muted); // click on every button (Andy 2026-10-07)
+  useHowtoSeen(kidCode, kidName);
+  const [help, setHelp] = useState<string | null>(null); // '?' on a game card = its How to Play (Andy 2026-10-07)
+  const HOW: Record<string, typeof RUN_HOWTO> = { run: RUN_HOWTO, swim: SWIM_HOWTO, dig: DIG_HOWTO, grab: GRAB_HOWTO };
 
   // one persistent audio element on document.body — survives screen swaps,
   // so music plays continuously across level -> game select.
@@ -134,6 +142,7 @@ export default function GrammarHub() {
           rel="stylesheet"
         />
         <div style={{ position: "absolute", inset: 0, background: "rgba(20,16,60,0.35)" }} />
+        {help && HOW[help] && <HowToPlay {...HOW[help]} muted={muted} onDone={() => setHelp(null)} />}
 
         <button
           onClick={toggleMute}
@@ -243,6 +252,10 @@ export default function GrammarHub() {
               >
                 {c.ready ? (
                   <>
+                    <span role="button" aria-label="How to play" onClick={e => { e.stopPropagation(); setHelp(c.id); }}
+                      style={{ position: "absolute", top: 8, left: 8, zIndex: 3, width: 46, height: 46, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                        background: "linear-gradient(180deg,#fff38a,#ffd11c 55%,#f5a300)", border: "3px solid #9a5200", boxShadow: "0 4px 0 #9a5200",
+                        fontFamily: "'Lilita One',sans-serif", fontSize: 28, color: "#5a2d08", cursor: "pointer" }}>?</span>
                     {/* gradient veil so title reads over the art */}
                     <div
                       style={{

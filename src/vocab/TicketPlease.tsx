@@ -8,9 +8,13 @@
 // EASY: whole word shown + the next ticket glows. MEDIUM: whole word shown, no glow, more wrong tickets.
 // HARD: the word is hidden (only the Chinese + speaker), faster, the most wrong tickets.
 // Coins (x1/x2/x3) and, while lives < 5, a heart appear now and then - drive over them. Coins are paid only on a WIN.
-// Steering: arrow keys / WASD, or move the mouse / touch where the train should go. Edges: the train turns by itself.
+// Steering: arrow keys / WASD only (Andy 2026-10-07: NO mouse - a click made the train turn corners by itself). A finger on a touch screen still steers (iPad). Edges: the train turns by itself.
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import GrammarGameBar from "@/components/GrammarGameBar";
+import ControlHints, { HINT_BOTTOM_LEFT } from "@/components/ControlHints";
+import HowToPlay from "@/components/HowToPlay";
+import { wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { TICKET_HOWTO } from "@/components/howtos";
 
 type Diff = "easy" | "medium" | "hard";
 type Cfg = { timerSec: number };
@@ -554,7 +558,8 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
   // mouse / touch: drive towards that spot
   const fieldRef = useRef<HTMLDivElement>(null);
   const aim = (e: React.PointerEvent) => {
-    if (e.type === "pointermove" && !e.buttons) return; // only a click / finger steers - a mouse just resting or moving never does
+    if (e.pointerType === "mouse") return; // mouse never steers (Andy 2026-10-07) - arrow keys only; a finger (iPad) still does
+    if (e.type === "pointermove" && !e.buttons) return;
     const r = fieldRef.current?.getBoundingClientRect(); if (!r) return;
     const bx = box();
     g.current.target = { x: Math.max(bx.L, Math.min(bx.R, (e.clientX - r.left) / fitRef.current.s)), y: Math.max(bx.T, Math.min(bx.B, (e.clientY - r.top) / fitRef.current.s)) };
@@ -574,6 +579,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
         stats={{ coins, lives, solved, total: TOTAL }} />
       <div className={"tp-field" + (ouch ? " ouch" : "")} ref={fieldRef} onPointerMove={aim} onPointerDown={aim}>
         <div className="tp-stage" style={{ width: sw, height: sh, transform: `scale(${s})` }}>
+          <ControlHints keys={["left", "up", "down", "right"]} style={HINT_BOTTOM_LEFT} /> {/* controls as pictures (Andy 23:32) */}
           <div className={"tp-meter" + (solved >= TOTAL ? " full" : "")}>
             <div className="tp-track"><div className="tp-fill" style={{ width: `${Math.max(7, (solved / TOTAL) * 100)}%` }} /></div>
             <img className="tp-meng" src={`${ART}/engine.webp`} alt="" draggable={false} style={{ left: `calc(${Math.max(7, (solved / TOTAL) * 100)}% - 40px)` }} />
@@ -589,7 +595,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
                   const next = i === pos && !G.busy && !blank;
                   return <span key={i} className={"tp-slot" + (done ? " done" : "") + (phase === "count" || hint ? " flash" : "") + (next && L.glow ? " next" : "")}>{blank ? "" : c}</span>;
                 })}
-                <button className={"tp-hint" + (hints <= 0 ? " empty" : "")} onPointerDown={e => e.stopPropagation()} onClick={askHint}>{hints > 0 ? `x${hints} Hints` : "0 Hints"}</button>
+                <button data-noclick className={"tp-hint" + (hints <= 0 ? " empty" : "")} onPointerDown={e => e.stopPropagation()} onClick={askHint}>{hints > 0 ? `x${hints} Hints` : "0 Hints"}</button>
               </div>
             </div>
           )}
@@ -669,6 +675,7 @@ export default function TicketPlease({ unit, diff, cfg, sfxOn = true, musicOn, o
   const [coinStart, setCoinStart] = useState(0);
   useEffect(() => { getCoinTotal?.().then(t => { if (typeof t === "number") setCoinStart(t); }); }, [run]);
   const [result, setResult] = useState<null | "win" | "timeout" | "lives">(null);
+  const [howto, setHowto] = useState(() => wantHowto("snake")); // first 3 times (cloud), then only via "?" (Andy 2026-10-07)
   useEffect(() => () => onMusicTrack?.(null), []);
   useEffect(() => { onMusicTrack?.(result ? "" : TRAIN_MUSIC); }, [result]);
   useEffect(() => { // font for the tickets
@@ -679,6 +686,7 @@ export default function TicketPlease({ unit, diff, cfg, sfxOn = true, musicOn, o
   const restart = () => { onRestart?.(); setResult(null); setRun(r => r + 1); };
   if (result === "win") return <>{renderWin(restart, coinsWon, coinStart)}</>;
   if (result) return <>{renderLose(result, restart)}</>;
+  if (howto) return <HowToPlay {...TICKET_HOWTO} muted={!musicOn} onDone={() => { setHowto(false); seenHowto("snake"); }} />;
   return <Play key={run} unit={unit} diff={diff} sfxOn={sfxOn && musicOn} musicOn={musicOn} onToggleMusic={onToggleMusic}
     onBack={onBack} onWin={c => { setCoinsWon(c); setResult("win"); }} onLose={r => setResult(r)} />;
 }

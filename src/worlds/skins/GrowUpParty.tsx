@@ -175,7 +175,7 @@ export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, heroImgs, li
       ))}
 
       {okReady && (
-        <button className={"f3-btn f3-yellow gu-ok" + (musicDone ? " wake" : "")} style={{ top: okTop, left: cx }} disabled={phase !== "on" || !musicDone}
+        <button className={"f3-btn f3-yellow gu-ok sv-tap" + (musicDone ? " wake" : "")} style={{ top: okTop, left: cx }} disabled={phase !== "on" || !musicDone}
           onClick={() => { if (phase === "on" && musicDone) onOk(); }}>OK!</button>
       )}
 

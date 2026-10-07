@@ -8,6 +8,10 @@
 // the kid has fewer than 5 lives - shoot it for +1 life. No explosions: a right UFO spins away happy, a wrong one fades.
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import GrammarGameBar from "@/components/GrammarGameBar";
+import ControlHints, { HINT_BOTTOM } from "@/components/ControlHints";
+import HowToPlay from "@/components/HowToPlay";
+import { wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { SPACE_HOWTO } from "@/components/howtos";
 
 type Diff = "easy" | "medium" | "hard";
 type Cfg = { spawnMs: number; speedMult: number; timerSec: number; maxOnScreen: number };
@@ -20,13 +24,19 @@ const SHIP_W = 86, UFO_W = 120, ORB_W = 72; // smaller (Andy 20:18) = farther to
 const MAX_LIVES = 5;
 // UFO shots + heart orbs per difficulty (slow + rare on easy/medium - Andy 2026-10-04)
 const EXTRA: Record<Diff, { shotMs: number; shotSpeed: number; orbMs: number }> = {
-  easy: { shotMs: 5200, shotSpeed: 220, orbMs: 16000 },
-  medium: { shotMs: 3800, shotSpeed: 290, orbMs: 20000 },
-  hard: { shotMs: 2400, shotSpeed: 390, orbMs: 24000 },
+  easy: { shotMs: 4000, shotSpeed: 220, orbMs: 16000 },   // UFOs shoot more (Andy 2026-10-07; was 5200 / 3800 / 2400)
+  medium: { shotMs: 2600, shotSpeed: 220, orbMs: 20000 },   // shots fall as slowly as on easy (Andy 10:01)
+  hard: { shotMs: 1300, shotSpeed: 220, orbMs: 24000 },
 };
 
 // UFO falling speed per level (Andy 20:18: easy slower, medium faster, hard a little faster). Was the shared cfg.speedMult.
 const FALL: Record<Diff, number> = { easy: 0.5, medium: 0.75, hard: 0.95 };
+// Andy 2026-10-07: a few more UFOs (+1/+2/+3 on screen, hard spawns faster), more CORRECT UFOs at the same time
+// (up to 2/2/3), and on hard two UFOs can shoot at once
+const MORE: Record<Diff, number> = { easy: 1, medium: 0, hard: -2 }; // Andy 10:01: fewer UFOs = easy 4, medium 6, hard 7 (was 4 / 8 / 12)
+const SPAWNX: Record<Diff, number> = { easy: 1, medium: 0.9, hard: 0.75 };
+const TGT: Record<Diff, number> = { easy: 2, medium: 2, hard: 2 }; // at most 2 correct UFOs, far apart (Andy 10:01)
+const SHOTS: Record<Diff, number> = { easy: 1, medium: 1, hard: 2 };
 // Andy's sounds (trimmed copies in public/vocab/space; originals in BACKUPFILES/vocab_art/space/originals) + volume
 const SND: Record<string, [string, number]> = {
   shoot: [`${ART}/snd_shoot.mp3`, 0.35], ufoshot: [`${ART}/snd_ufoshot.mp3`, 0.16],
@@ -136,6 +146,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
 }) => {
   const sfx = useSfx(sfxOn);
   const X = EXTRA[diff];
+  const MAXU = cfg.maxOnScreen + MORE[diff];
   const TOTAL = unit.vocab.length;
 
   // field size: design 1600x944 scaled to fit, then widened/taller to fill the window (same as the world page)
@@ -168,7 +179,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
 
   const g = useRef({ ufos: [] as Ufo[], shots: [] as Pt[], drops: [] as Pt[], bounces: [] as Bounce[], orb: null as Orb | null, fx: [] as Fx[], coins: [] as Coin[], lastCoin: -1700,
     shipX: FW / 2, id: 0, lastSpawn: 0, lastDrop: 0, lastOrb: 0, start: 0, lastShot: 0, lastTgt: 0, held: {} as Record<string, number>, nudge: 0,
-    cooldown: false, invincible: false, cleared: new Set<string>(), keys: new Set<string>() });
+    lastWord: "", cooldown: false, invincible: false, cleared: new Set<string>(), keys: new Set<string>() });
 
   const nextTarget = (cleared: Set<string>) => {
     const remaining = unit.vocab.filter(v => !cleared.has(v));
@@ -235,20 +246,30 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
         // a RIGHT UFO is always falling: none on screen for ~2.8s -> one comes now (Andy 15:06, all levels)
         if (G.ufos.some(a => a.word === targetRef.current)) G.lastTgt = now;
         const needT = now - G.lastTgt > 5000;                                  // right one not seen for 5s -> send it
-        const gapAny = now - G.lastSpawn > 3000 && G.ufos.length < cfg.maxOnScreen + 2; // nothing new for 3s -> send something
-        if (needT || gapAny || (now - G.lastSpawn > cfg.spawnMs && G.ufos.length < cfg.maxOnScreen)) {
+        const gapAny = now - G.lastSpawn > 3000 && G.ufos.length < MAXU + 2; // nothing new for 3s -> send something
+        if (needT || gapAny || (now - G.lastSpawn > cfg.spawnMs * SPAWNX[diff] && G.ufos.length < MAXU)) {
           G.lastSpawn = now;
           if (needT) G.lastTgt = now;
           const onScreen = G.ufos.filter(a => a.word === targetRef.current).length;
-          const force = needT || (onScreen === 0 && G.ufos.length >= Math.min(3, cfg.maxOnScreen - 1));
-          const word = force ? targetRef.current : unit.vocab[Math.floor(Math.random() * unit.vocab.length)];
+          const force = needT || (onScreen === 0 && G.ufos.length >= Math.min(3, MAXU - 1));
+          // never a word already on screen, never the same word twice in a row (Andy 2026-10-07)
+          const onS = new Set(G.ufos.map(a => a.word)), pool = unit.vocab.filter(v => !onS.has(v) && v !== G.lastWord);
+          const pool2 = pool.length ? pool : unit.vocab.filter(v => v !== G.lastWord);
+          const pick = pool2.length ? pool2 : unit.vocab;
+          const more = onScreen < TGT[diff] && Math.random() < 0.4; // another correct UFO now and then
+          const word = force || more ? targetRef.current : pick[Math.floor(Math.random() * pick.length)];
+          G.lastWord = word;
           // never right behind another UFO: keep about a UFO width apart so either side can be shot (Andy 15:06)
-          let x = 110 + Math.random() * (sw - 220), bestGap = -1;
-          for (let i = 0; i < 18; i++) {
+          // a 2nd correct UFO comes down FAR from the other one (at least ~1/3 of the screen away, Andy 10:01)
+          const tx = word === targetRef.current ? G.ufos.filter(a => a.word === word).map(a => a.x) : [];
+          let x = 110 + Math.random() * (sw - 220), bestGap = -1e9;
+          for (let i = 0; i < 30; i++) {
             const c = 110 + Math.random() * (sw - 220);
             const gap = G.ufos.length ? Math.min(...G.ufos.map(a => Math.abs(a.x - c))) : 9999;
-            if (gap > bestGap) { bestGap = gap; x = c; }
-            if (gap >= UFO_W * 1.15) break;
+            const far = tx.length ? Math.min(...tx.map(t => Math.abs(t - c))) : 9999;
+            const score = far >= sw * 0.35 ? gap : far - 10000;
+            if (score > bestGap) { bestGap = score; x = c; }
+            if (gap >= UFO_W * 1.15 && far >= sw * 0.35) break;
           }
           G.ufos.push({ id: G.id++, x, y: -70, word, idx: Math.max(0, unit.vocab.indexOf(word)), vy: (0.055 + Math.random() * 0.04) * FALL[diff] * 0.6 * sh });
         }
@@ -263,7 +284,10 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
         if (now - G.start > 4000 && now - G.lastDrop > X.shotMs) {
           G.lastDrop = now;
           const can = G.ufos.filter(a => a.y > 40 && a.y < top - 260);
-          if (can.length) { const a = can[Math.floor(Math.random() * can.length)]; G.drops.push({ id: G.id++, x: a.x, y: a.y + 42 }); sfx("ufoshot"); }
+          for (let k = 0; k < SHOTS[diff] && can.length; k++) {
+            const a = can.splice(Math.floor(Math.random() * can.length), 1)[0];
+            G.drops.push({ id: G.id++, x: a.x, y: a.y + 42 }); if (k === 0) sfx("ufoshot");
+          }
         }
         for (const d of G.drops) d.y += X.shotSpeed * dt;
         const hit = G.drops.find(d => Math.abs(d.x - G.shipX) < 34 && d.y > top + 15 && d.y < top + 110);
@@ -452,10 +476,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
             <img className="f2" src={`${ART}/ship-2.webp`} alt="" style={{ width: SHIP_W }} draggable={false} />
           </div>
           {!isTouch && (
-            <div className="ss-help">
-              <div>{"← →"} Move Ship {" • "} Space to Shoot!</div>
-              <div className="zh">{"← →"} 移動太空船 • 空白鍵射擊！</div>
-            </div>
+            <ControlHints keys={["left", "right", "space"]} style={HINT_BOTTOM} /> /* icons only, no text (Andy 23:32) */
           )}
         </div>
         {isTouch && (
@@ -489,6 +510,7 @@ export default function SpaceShooter2({ unit, diff, cfg, sfxOn = true, musicOn, 
   const [coinStart, setCoinStart] = useState(0);
   useEffect(() => { getCoinTotal?.().then(t => { if (typeof t === "number") setCoinStart(t); }); }, [run]);
   const [result, setResult] = useState<null | "win" | "timeout" | "lives">(null);
+  const [howto, setHowto] = useState(() => wantHowto("space")); // first 3 times (cloud), then only via "?" (Andy 2026-10-07)
   useEffect(() => () => onMusicTrack?.(null), []);                          // leaving the game: back to the arcade song
   useEffect(() => { onMusicTrack?.(result ? "" : SPACE_MUSIC); }, [result]); // win / lose screen: game music stops (Andy 20:41)
   useEffect(() => { // fonts: VT323 (green computer letters on the UFO signs)
@@ -499,6 +521,7 @@ export default function SpaceShooter2({ unit, diff, cfg, sfxOn = true, musicOn, 
   const restart = () => { onRestart?.(); setResult(null); setRun(r => r + 1); };
   if (result === "win") return <>{renderWin(restart, coinsWon, coinStart)}</>;
   if (result) return <>{renderLose(result, restart)}</>;
+  if (howto) return <HowToPlay {...SPACE_HOWTO} muted={!musicOn} onDone={() => { setHowto(false); seenHowto("space"); }} />;
   return <Play key={run} unit={unit} diff={diff} cfg={cfg} sfxOn={sfxOn && musicOn} musicOn={musicOn} onToggleMusic={onToggleMusic}
     onBack={onBack} onWin={c => { setCoinsWon(c); setResult("win"); }} onLose={r => setResult(r)} />;
 }

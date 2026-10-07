@@ -20,6 +20,8 @@ import GrowUpParty, { type Prize, type PrizeKind } from "./GrowUpParty";
 import VideoTheater, { type TheaterWorld, type TheaterCard } from "./VideoTheater";
 import type { WorldConfig } from "@/worlds";
 import DailyPrize, { type DailyKind } from "./DailyPrize";
+import HowToPlay from "@/components/HowToPlay";
+import { worldHowTo } from "@/components/howtos";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 
 // ---- per-world settings (step 6) ----
@@ -381,6 +383,23 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   // While a celebration is on, the coin pill + jar HOLD their old numbers; the flying prizes add them as they land.
   // Afterwards both follow the real numbers again (= the database's, so a prize that was not paid shows nothing).
   const [dailyDay, setDailyDay] = useState(0); // DAILY PRIZE on screen = today's box 1-7 (0 = not showing)
+  // HOW TO PLAY (Andy 2026-10-07): pops in 1s after entering, ONCE per kid on any device (the brain's cloud seen list,
+  // flag howto:world:one); '?' opens it any time. 'pending' = still reading the cloud, 'wait' = it will show; the Daily
+  // Prize waits for both. Visits (read-only) and the teacher code never show it by themselves (test: ?h=1 on /world-test/).
+  const [howto, setHowto] = useState<"pending" | "wait" | "open" | "closed">(() => {
+    if (v.readOnly) return "closed";
+    if (window.location.pathname.startsWith("/world-test/") && new URLSearchParams(window.location.search).get("h") === "1") return "wait";
+    return v.isMaster ? "closed" : "pending";
+  });
+  const howAuto = useRef(false);
+  useEffect(() => {
+    if (howto !== "pending") return;
+    if (v.seen) { setHowto(v.seen.includes("howto:world:one") ? "closed" : "wait"); return; }
+    const t = window.setTimeout(() => setHowto(h => (h === "pending" ? "closed" : h)), 4000); // cloud not answering: don't block the Daily Prize
+    return () => window.clearTimeout(t);
+  }, [howto, v.seen]);
+  useEffect(() => { if (howto !== "wait") return; const t = window.setTimeout(() => { howAuto.current = true; setHowto("open"); }, 1000); return () => window.clearTimeout(t); }, [howto]);
+  const closeHowto = () => { setHowto("closed"); if (howAuto.current) { howAuto.current = false; v.markSeen("howto:world:one"); } };
   // TEST ONLY (?dp=): nothing is saved, so after the test prize the jar + coin pill KEEP the shown numbers
   // (going back to the real number made the jar open again with the feed sound - Andy 14:19).
   const [testKeep, setTestKeep] = useState(false);
@@ -397,10 +416,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const dailyReady = isTestDp ? testDp : (v.dailyPrize && !v.dailyPrize.claimedToday ? v.dailyPrize.day : 0);
   const dailyShown = useRef(false);
   useEffect(() => {
-    if (!dailyReady || dailyShown.current || party || done) return;
+    if (!dailyReady || dailyShown.current || party || done || howto !== "closed") return;
     const t = window.setTimeout(() => { dailyShown.current = true; setDailyDay(dailyReady); }, 1200);
     return () => window.clearTimeout(t);
-  }, [dailyReady, party, done]);
+  }, [dailyReady, party, done, howto]);
   const dailyLand = (k: DailyKind, add: number) => {
     if (k === "treat") { setJarShown(j => j + add); setBump(b => ({ ...b, treat: (b.treat ?? 0) + 1 })); }
     else partyLand(k, add);
@@ -652,7 +671,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         ))}
 
         {/* top corners */}
-        <div className="sv-rb sv-tap" style={{ left: 22 }} onClick={() => toast("How to play - coming soon!")}><img src={`${UI}/rb_help.webp`} alt="Help" /></div>
+        <div className="sv-rb sv-tap" style={{ left: 22 }} onClick={() => setHowto("open")}><img src={`${UI}/rb_help.webp`} alt="Help" /></div>
         <div ref={coinRef} className={"sv-coins" + lift} style={bumpStyle("coin")}><span>{coinShown}</span></div>
         <div className={"sv-rb sv-tap" + (v.musicOn ? "" : " muted")} style={{ right: 100 }} onClick={() => v.setMusicOn(!v.musicOn)}><img src={`${UI}/rb_music.webp`} alt="Music" /></div>
         <div className="sv-rb sv-tap" style={{ right: 22 }} onClick={() => setPanel("exit")}><img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
@@ -780,6 +799,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
             onStop={() => theaterMusic(false)} onClose={() => setPanel(null)} />
         )}
 
+        {howto === "open" && <HowToPlay {...worldHowTo((v.ANIMALS[0]?.stages ?? []).map(st => st.img))} muted={!v.sfxOn} onDone={closeHowto} />}
         {dailyDay > 0 && (
           <DailyPrize cx={cx} sh={sh} day={dailyDay} sfxOn={v.sfxOn}
             onClaim={() => (isTestDp ? Promise.resolve({ paid: true }) : v.claimDailyPrize())}

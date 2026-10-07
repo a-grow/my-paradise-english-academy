@@ -5,12 +5,18 @@ import LoseScreen from "@/components/LoseScreen";
 import SpaceShooter2 from "@/vocab/SpaceShooter"; // NEW Space Shooter look (2026-10-04)
 import WhackGarden from "@/vocab/WhackGarden";
 import TicketPlease from "@/vocab/TicketPlease"; // Word Snake v2 = Ticket Please! (2026-10-05)
+import FrogSnap from "@/vocab/FrogSnap"; // Arrow Shoot v2 = Frog Snap! (2026-10-06)
 import { installIdleCursor } from "@/lib/idleCursor"; // hide the mouse when it is not used (Andy 2026-10-05) // NEW Whack-a-mole = Get Out of My Garden! (2026-10-05)
+import ArcadeBg from "@/components/ArcadeBg";
 import book1Data from "@/data/oxford-discover-book1.json";
 import book2Data from "@/data/oxford-discover-book2.json";
 import book3Data from "@/data/oxford-discover-book3.json";
 import book4Data from "@/data/oxford-discover-book4.json";
 import book5Data from "@/data/oxford-discover-book5.json";
+import { useClickSfx } from "@/lib/clickSfx";
+import HowToPlay from "@/components/HowToPlay";
+import { gardenHowTo, TICKET_HOWTO, SPACE_HOWTO } from "@/components/howtos";
+import { FROG_HOWTO } from "@/vocab/FrogSnap";
 
 // ── FONT ──────────────────────────────────────────────────────────────────────
 const FONT_URL="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap";
@@ -1365,18 +1371,20 @@ const SpaceShooter = ({unit,diff,onBack,onClaim,claimState,treatsEarnedToday=0,f
 // ══════════════════════════════════════════════════════════════════════════════
 // DIFFICULTY PICKER
 // ══════════════════════════════════════════════════════════════════════════════
-const DiffPicker = ({game,unit,onPick,onBack}:{game:{id:string;name:string;emoji:string};unit:UnitData;onPick:(d:Diff)=>void;onBack:()=>void}) => (
-  <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#0f0c29,#302b63,#24243e)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"1.5rem"}}>
+const DiffPicker = ({game,unit,onPick,onBack,onHelp}:{game:{id:string;name:string;emoji:string;cover?:string};unit:UnitData;onPick:(d:Diff)=>void;onBack:()=>void;onHelp?:()=>void}) => (
+  <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#0f0c29,#302b63,#24243e)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"1.5rem",position:"relative",overflow:"hidden"}}>
+    {/* the game's own cover picture, dimmed so the level buttons stand out (Andy 2026-10-06) */}
+    {game.cover&&<><div aria-hidden style={{position:"absolute",inset:0,backgroundImage:`url('${game.cover}')`,backgroundSize:"cover",backgroundPosition:"center"}}/><div aria-hidden style={{position:"absolute",inset:0,background:"rgba(8,4,28,0.66)"}}/></>}
     <style>{`@keyframes slideUp{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}@keyframes floatUD{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}`}</style>
-    <div style={{fontFamily:F,fontWeight:900,fontSize:"1.4rem",color:"white",marginBottom:"0.2rem"}}>{game.name}</div>
-    <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.45)",marginBottom:"1.75rem"}}>Unit {unit.unit} — {unit.topic}</div>
-    <div style={{fontFamily:F,fontWeight:800,fontSize:"1rem",color:"rgba(255,255,255,0.7)",marginBottom:"1rem"}}>Choose your difficulty:</div>
-    <div style={{display:"flex",flexDirection:"column",gap:"0.75rem",width:"100%",maxWidth:340}}>
+    {!game.cover&&<div style={{position:"relative",fontFamily:F,fontWeight:900,fontSize:"1.4rem",color:"white",marginBottom:"0.2rem"}}>{game.name}</div>}
+    <div style={{position:"relative",fontFamily:F,fontWeight:800,fontSize:"1rem",color:"rgba(255,255,255,0.8)",textShadow:"0 2px 8px rgba(0,0,0,0.8)",marginBottom:"1.75rem"}}>Unit {unit.unit} — {unit.topic}</div>
+    <div style={{position:"relative",fontFamily:F,fontWeight:800,fontSize:"1.1rem",color:"white",textShadow:"0 2px 8px rgba(0,0,0,0.8)",marginBottom:"1rem"}}>Choose your difficulty:</div>
+    <div style={{position:"relative",display:"flex",flexDirection:"column",gap:"0.75rem",width:"100%",maxWidth:340}}>
       {(["easy","medium","hard"] as Diff[]).map((d,i)=>{
         const dc=DIFF_CONFIG[d];
         return (
           <button key={d} onClick={()=>onPick(d)}
-            style={{padding:"1rem 1.5rem",background:`linear-gradient(135deg,${dc.color}25,${dc.color}10)`,border:`2.5px solid ${dc.color}`,borderRadius:"1.25rem",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:"1rem",animation:`slideUp 0.4s ease-out ${i*0.1}s both`,boxShadow:`0 0 20px ${dc.color}25`}}>
+            style={{padding:"1rem 1.5rem",background:`linear-gradient(135deg,${dc.color}55,${dc.color}30), rgba(12,6,36,0.88)`,border:`2.5px solid ${dc.color}`,borderRadius:"1.25rem",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:"1rem",animation:`slideUp 0.4s ease-out ${i*0.1}s both`,boxShadow:`0 0 20px ${dc.color}25`}}>
             <span style={{display:"inline-block",width:22,height:22,borderRadius:"50%",background:dc.color,boxShadow:`0 0 12px ${dc.color}`,flex:"none"}}/>
             <div style={{flex:1}}>
               <div style={{fontFamily:F,fontWeight:800,fontSize:"1rem",color:"white"}}>{dc.label}</div>
@@ -1387,7 +1395,9 @@ const DiffPicker = ({game,unit,onPick,onBack}:{game:{id:string;name:string;emoji
         );
       })}
     </div>
-    <button onClick={onBack} style={{marginTop:"1.5rem",background:"rgba(255,255,255,0.08)",border:"1.5px solid rgba(255,255,255,0.2)",color:"rgba(255,255,255,0.6)",fontFamily:F,fontWeight:700,fontSize:"0.9rem",padding:"0.5rem 1.2rem",borderRadius:999,cursor:"pointer"}}>← Back</button>
+    {onHelp&&<button onClick={onHelp} style={{position:"relative",marginTop:"1.25rem",display:"flex",alignItems:"center",gap:10,background:"linear-gradient(180deg,#fff38a,#ffd11c 55%,#f5a300)",border:"3px solid #9a5200",color:"#5a2d08",fontFamily:F,fontWeight:900,fontSize:"1rem",padding:"0.45rem 1.2rem 0.45rem 0.5rem",borderRadius:999,cursor:"pointer",boxShadow:"0 4px 0 #9a5200"}}>
+      <span style={{width:30,height:30,borderRadius:"50%",background:"#fff",border:"2px solid #9a5200",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.1rem"}}>?</span>How to Play</button>}
+    <button onClick={onBack} style={{position:"relative",marginTop:"1.5rem",background:"rgba(0,0,0,0.45)",border:"1.5px solid rgba(255,255,255,0.3)",color:"rgba(255,255,255,0.85)",fontFamily:F,fontWeight:700,fontSize:"0.9rem",padding:"0.5rem 1.2rem",borderRadius:999,cursor:"pointer"}}>← Back</button>
   </div>
 );
 
@@ -1409,10 +1419,10 @@ const NumBadge = ({n,size=44}:{n:number|string;size?:number}) => (
 // ARCADE HUB + MAIN EXPORT
 // ══════════════════════════════════════════════════════════════════════════════
 const GAMES=[
-  {id:"arrow",name:"Arrow Shoot",emoji:"🏹",desc:"Pop the right balloons!",color:"#f97316",glow:"rgba(249,115,22,0.5)"},
+  {id:"arrow",name:"Frog Snap!",emoji:"🏹",desc:"Snap the correct bubble!",color:"#f97316",glow:"rgba(249,115,22,0.5)",cover:"/vocab/frog/cover.webp"},
   {id:"whack",name:"Get Out of My Garden!",emoji:"🔨",desc:"Whack the correct word!",color:"#0ea5e9",glow:"rgba(14,165,233,0.5)",cover:"/vocab/garden/cover.webp"},
   {id:"snake",name:"Ticket Please!",emoji:"🐍",desc:"Pick up passengers to spell words!",color:"#10b981",glow:"rgba(16,185,129,0.5)",cover:"/vocab/train/cover.webp"},
-  {id:"space",name:"Space Robots",emoji:"🚀",desc:"Find the right robot!",color:"#a855f7",glow:"rgba(168,85,247,0.5)",cover:"/vocab/space/cover.webp"},
+  {id:"space",name:"Space Robots",emoji:"🚀",desc:"Find the correct robot!",color:"#a855f7",glow:"rgba(168,85,247,0.5)",cover:"/vocab/space/cover.webp"},
 ];
 type Screen="books"|"units"|"games"|"diff"|"play";
 
@@ -1434,6 +1444,8 @@ interface GameTestProps {
 const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, treatsEarnedToday=0, fromDino=false, studentBook=1, musicOn=true, onToggleMusic, onMusicTrack, onCoinTotal, onPayCoins}: GameTestProps) => {
   const navigate=useNavigate();
   const [screen,setScreen]=useState<Screen>("books");
+  const [help,setHelp]=useState(false);
+  useClickSfx(musicOn); // click on every button (Andy 2026-10-07)
   const [justClaimed,setJustClaimed]=useState(false);
   const [unit,setUnit]=useState<UnitData|null>(null);
   const [game,setGame]=useState<typeof GAMES[0]|null>(null);
@@ -1461,11 +1473,17 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
     ? () => { onClaim(unit.unit, game.id, diff); setJustClaimed(true); }
     : undefined;
 
-  if(screen==="diff"&&unit&&game) return <DiffPicker game={game} unit={unit} onPick={(d)=>{setDiff(d);setScreen("play");}} onBack={()=>setScreen("games")}/>;
+  // "?" How to Play on the difficulty screen (Andy 2026-10-07): any time, does not count as a showing
+  const howFor = (id:string) => id==="arrow" ? {...FROG_HOWTO, bg:"/vocab/frog/bg.webp"} : id==="whack" ? gardenHowTo("medium") : id==="snake" ? TICKET_HOWTO : SPACE_HOWTO;
+  if(screen==="diff"&&unit&&game) return <>{help&&<HowToPlay {...howFor(game.id)} muted={!musicOn} onDone={()=>setHelp(false)}/>}<DiffPicker game={game} unit={unit} onPick={(d)=>{setDiff(d);setScreen("play");}} onBack={()=>setScreen("games")} onHelp={()=>setHelp(true)}/></>;
 
   if(screen==="play"&&unit&&game){
     const props={unit,diff,onBack:()=>{setJustClaimed(false);setScreen("games");},onClaim:handleClaim,onBackToWorld,claimState,treatsEarnedToday,fromDino,onRestart:()=>setJustClaimed(false)};
-    if(game.id==="arrow") return <ArrowShoot {...props}/>;
+    // NEW look (Andy 2026-10-06). The old game stays above as the fallback: <ArrowShoot {...props}/>
+    if(game.id==="arrow") return <FrogSnap unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
+      onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
+      renderWin={(restart,cw,cs)=><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={restart} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} muted={!musicOn}/>}
+      renderLose={(reason,restart)=><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={restart} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/>}/>;
     // NEW look (Andy 2026-10-05). The old game stays above as the fallback: <WhackAMole {...props}/>
     if(game.id==="whack") return <WhackGarden unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
       onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
@@ -1499,10 +1517,8 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
         @keyframes hubFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-10px) rotate(1deg)}}
         @media (max-width: 760px){.mpe-unit-grid{grid-template-columns:1fr !important;grid-auto-rows:auto !important}}
       `}</style>
-      {[...Array(55)].map((_,i)=>(
-        <div key={i} style={{position:"fixed",left:`${(i*137.5)%100}%`,top:`${(i*97.3)%100}%`,width:1+i%3,height:1+i%3,background:i%8===0?"#93c5fd":i%5===0?"#fde68a":"white",borderRadius:"50%",animation:`twinkStar ${2+i%4}s ease-in-out infinite ${i%4}s`,pointerEvents:"none"}}/>
-      ))}
-      <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,background:"rgba(0,0,0,0.55)",backdropFilter:"blur(14px)",padding:"0.55rem 1rem",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid rgba(255,255,255,0.1)"}}>
+      <ArcadeBg/>{/* arcade-room picture + glowing lights/screens/stars (Andy 2026-10-06) */}
+      <nav style={{position:"fixed",top:0,left:0,right:0,zIndex:100,background:"linear-gradient(180deg,rgba(10,4,30,0.55),rgba(10,4,30,0))",padding:"0.55rem 1rem",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
         <button onClick={back} style={{background:"rgba(255,255,255,0.1)",border:"1.5px solid rgba(255,255,255,0.22)",color:"white",fontFamily:F,fontWeight:800,fontSize:"0.95rem",padding:"0.32rem 0.95rem",borderRadius:999,cursor:"pointer"}}>{screen==="books"?"← Exit":"← Back"}</button>
         <span style={{color:"white",fontFamily:F,fontWeight:900,fontSize:"1.1rem",textShadow:"0 0 20px rgba(168,85,247,0.9)"}}>MPE Arcade</span>
         <div style={{width:72,display:"flex",justifyContent:"flex-end"}}>
@@ -1513,7 +1529,7 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
       </nav>
       <div style={{maxWidth:screen==="games"?1040:screen==="units"?1180:560,margin:"0 auto",padding:screen==="units"?"64px 16px 12px":"72px 16px 40px",position:"relative",zIndex:10}}>
         {screen==="books"&&(
-          <>
+          <div style={{minHeight:"calc(86vh - 112px)",display:"flex",flexDirection:"column",justifyContent:"center"}}> {/* centred above the checkered floor (Andy 23:52) */}
             <div style={{textAlign:"center",marginBottom:"1.2rem",animation:"slideUp 0.5s ease-out"}}>
               <div style={{fontFamily:F,fontWeight:900,fontSize:"2rem",color:"white",textShadow:"0 0 30px rgba(168,85,247,0.8)",marginTop:"0.25rem"}}>Choose Your Book!</div>
               <div style={{fontFamily:F,fontWeight:700,fontSize:"0.9rem",color:"rgba(255,255,255,0.5)",marginTop:"0.25rem"}}>Pick a book to start playing</div>
@@ -1521,7 +1537,7 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
             <div style={{display:"flex",flexDirection:"column",gap:"0.75rem"}}>
               {[1,2,3,4,5,6].map((bookNum,i)=>{const unlocked=bookNum<=5;const book={id:bookNum,label:`Book ${bookNum}`,unlocked,color:"#f97316",desc:unlocked?`Units 1–18`:"Coming Soon!"};return(
                 <button key={book.id} disabled={!book.unlocked} onClick={()=>{if(book.unlocked){setSelectedBook(book.id);setScreen("units");}}}
-                  style={{padding:"0.85rem 1.5rem",background:book.unlocked?`linear-gradient(135deg,${book.color}cc,${book.color}88)`:"rgba(255,255,255,0.04)",border:`2px solid ${book.unlocked?book.color:"rgba(255,255,255,0.08)"}`,borderRadius:"1.5rem",cursor:book.unlocked?"pointer":"not-allowed",display:"flex",alignItems:"center",gap:"1rem",opacity:book.unlocked?1:0.45,animation:book.unlocked?`floatUpDown ${2.5+i*0.3}s ease-in-out infinite ${i*0.2}s`:"none"}}>
+                  style={{padding:"0.85rem 1.5rem",background:book.unlocked?`linear-gradient(135deg,${book.color}f2,${book.color}cc)`:"rgba(20,10,50,0.7)",border:`2px solid ${book.unlocked?book.color:"rgba(255,255,255,0.08)"}`,borderRadius:"1.5rem",cursor:book.unlocked?"pointer":"not-allowed",display:"flex",alignItems:"center",gap:"1rem",opacity:book.unlocked?1:0.45,animation:book.unlocked?`floatUpDown ${2.5+i*0.3}s ease-in-out infinite ${i*0.2}s`:"none"}}>
                   <NumBadge n={bookNum} size={50}/>
                   <div style={{flex:1,textAlign:"left"}}>
                     <div style={{fontFamily:F,fontWeight:800,fontSize:"1.1rem",color:"white"}}>{book.label}</div>
@@ -1531,7 +1547,7 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
                 </button>
               );})}
             </div>
-          </>
+          </div>
         )}
         {screen==="units"&&(
           <>
@@ -1543,7 +1559,7 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
             <div className="mpe-unit-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gridAutoRows:"clamp(66px, calc((100vh - 196px) / 6 - 10px), 108px)",gap:"0.65rem"}}>
               {UNITS.map((u,i)=>(
                 <button key={u.unit} onClick={()=>{setUnit(u);setScreen("games");}}
-                  style={{padding:"0.45rem 0.8rem",background:`linear-gradient(135deg,${u.color}cc,${u.color}77)`,border:`2px solid ${u.color}`,borderRadius:"1.1rem",cursor:"pointer",display:"flex",alignItems:"center",gap:"0.7rem",overflow:"hidden",boxShadow:`0 0 14px ${u.glow},0 6px 16px rgba(0,0,0,0.3)`,animation:`slideUp 0.35s ease-out ${i*0.03}s both`}}>
+                  style={{padding:"0.45rem 0.8rem",background:`linear-gradient(135deg,${u.color}f7,${u.color}e0)`,border:`2px solid ${u.color}`,borderRadius:"1.1rem",cursor:"pointer",display:"flex",alignItems:"center",gap:"0.7rem",overflow:"hidden",boxShadow:`0 0 14px ${u.glow},0 6px 16px rgba(0,0,0,0.3)`,animation:`slideUp 0.35s ease-out ${i*0.03}s both`}}>
                   <NumBadge n={u.unit} size={42}/>
                   <div style={{flex:1,minWidth:0,textAlign:"left"}}>
                     <div style={{fontFamily:F,fontWeight:800,fontSize:"0.92rem",color:"white",lineHeight:1.2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{u.topic}</div>
