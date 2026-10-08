@@ -575,6 +575,30 @@ export default function CardAlbum() {
     return () => ts.forEach(t => window.clearTimeout(t));
   }, [isMaster]);
 
+  // BACKGROUND MUSIC (Andy 2026-10-08): coffee jazz, looping, at the levelled volume. Starts ~2.5s after the open book lands
+  // (the fanfare plays first), fades in; fades out when the book closes. Follows the music on/off setting of the world the kid
+  // came from (Ocean = mpe_music, others = mpe_<world>_music).
+  const musicRef = useRef<HTMLAudioElement | null>(null);
+  const fadeT = useRef(0);
+  const fadeTo = (to: number, ms: number, then?: () => void) => {
+    const a = musicRef.current; if (!a) return;
+    window.clearInterval(fadeT.current);
+    const from = a.volume, t0 = performance.now();
+    fadeT.current = window.setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / ms); a.volume = from + (to - from) * k;
+      if (k >= 1) { window.clearInterval(fadeT.current); then?.(); }
+    }, 40);
+  };
+  useEffect(() => {
+    if (!isMaster) return;
+    const w = (ret.match(/\/(dino|savanna|snowy)\//) || [])[1];
+    const off = (() => { try { return localStorage.getItem(w ? `mpe_${w}_music` : "mpe_music") === "off"; } catch { return false; } })();
+    if (off) return;
+    const a = new Audio(`${U}/album_music.mp3`); a.loop = true; a.volume = 0; musicRef.current = a;
+    const t = window.setTimeout(() => { a.play().then(() => fadeTo(1, 2000)).catch(() => { }); }, 6100);
+    return () => { window.clearTimeout(t); window.clearInterval(fadeT.current); a.pause(); musicRef.current = null; };
+  }, [isMaster, ret]);
+
   const countIn = (st: CardSet) => st.cards.filter(c => owned[key(st.id, c.n)]).length;
   const total = CARD_SETS.reduce((a, st) => a + countIn(st), 0);
   const packs = Math.floor(album.coins / PACK_PRICE);
@@ -627,6 +651,7 @@ export default function CardAlbum() {
     if (phase !== "open") { navigate(ret); return; }
     closing.current = true;
     setPhase("closing"); play(CHIME, 0.7);
+    fadeTo(0, 1200, () => musicRef.current?.pause());   // music fades out as the book closes
     const f = fx(), { cx: X, bk } = geo.current, BW = HOME.bookW * bk, BH = BW * BOOK_H / BOOK_W;
     f?.burst(X, HOME.bookTop + BH / 2, { fairies: 90, embers: 30, w: BW * 0.8, h: BH * 0.6 });
     window.setTimeout(() => play(`${U}/album_close.mp3`, 0.4), 1650);

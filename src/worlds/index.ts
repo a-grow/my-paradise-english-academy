@@ -11,6 +11,8 @@ import { SAVANNA_ANIMALS } from "./savanna";
 import { SAVANNA_SKIN } from "./skins/savannaSkin";
 import { OCEAN_LOOK } from "./skins/oceanLook";
 import { DINO_LOOK } from "./skins/dinoLook";
+import { SNOWY_ANIMALS } from "./snowy";
+import { SNOWY_LOOK } from "./skins/snowyLook";
 
 export interface WorldConfig {
   id: string;                                           // "dino" (cloud blob key + save names)
@@ -66,6 +68,22 @@ export const SAVANNA_WORLD: WorldConfig = {
   makeSave: (code, name) => standardSave("savanna", code, name, SAVANNA_ANIMALS.map(a => a.id)),
   gamePath: "/game/savanna",
   skin: SAVANNA_SKIN,
+  nextWorld: null,
+  masterAllGrown: false,
+  legacyMasterCleanup: false,
+};
+
+// WORLD 4 = SNOWY (2026-10-08): STANDARD storage (mpe_snowy_..., cloud data.snowy - never rename). TEST ROUTE ONLY for now:
+// NOT in ALL_WORLDS and Savanna.nextWorld stays null until the art/music/videos + the database lock (last_animal snowyowl,
+// grown_at 120) are done - then add it to ALL_WORLDS, set Savanna.nextWorld, add the real /snowy route + world_snowy.webp icon.
+export const SNOWY_WORLD: WorldConfig = {
+  id: "snowy",
+  title: "Snowy",
+  path: "/snowy",
+  animals: SNOWY_ANIMALS,
+  makeSave: (code, name) => standardSave("snowy", code, name, SNOWY_ANIMALS.map(a => a.id)),
+  gamePath: "/game/snowy",
+  skin: SNOWY_LOOK,
   nextWorld: null,
   masterAllGrown: false,
   legacyMasterCleanup: false,

@@ -539,6 +539,23 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const picStyleFor = (k: string): React.CSSProperties => ({ transform: `scale(${L.zoom?.[k] ?? 1})`,
     transformOrigin: L.zoomOrigin?.[k] ?? (L.move === "float" || !!L.fly?.includes(k) ? "50% 50%" : "50% 92%") });
   const picStyle = picStyleFor(akey);
+  // LITTLE ACTIONS (Andy 2026-10-08): every 5-9 s the animal does ONE short random action (wiggle, bounce, stretch,
+  // look the other way); tapping the animal = an action at once. Display only, nothing saved. Dinos (move 'still')
+  // never move; eggs/blankets only wiggle or bounce; nothing during parties, transformations, arrivals or the Daily Prize.
+  const [act, setAct] = useState("");
+  const actRef = useRef({ go: (_tap?: boolean) => { } });
+  actRef.current.go = (tap?: boolean) => {
+    if (L.move === "still" || act || holding || tfOn || arriving || document.hidden) return;
+    if (tap && picIdx > 0) { setAct("look"); return; } // Andy 10-08: turning around = ONLY on a tap (eggs/blankets: random wiggle/bounce)
+    const list = picIdx === 0 ? ["wiggle", "bounce"] : ["wiggle", "bounce", "stretch"];
+    setAct(list[Math.floor(Math.random() * list.length)]);
+  };
+  useEffect(() => {
+    let t = 0;
+    const next = () => { t = window.setTimeout(() => { actRef.current.go(); next(); }, 5000 + Math.random() * 4000); };
+    next();
+    return () => window.clearTimeout(t);
+  }, []);
   const startTransform = () => {
     setTf(n => n + 1); setTfOn(true);
     if (v.sfxOn) { const a = new Audio(`${UI}/snd_newfriend.mp3`); a.volume = 0.7; a.play().catch(() => { }); } // wand: sparkles start
@@ -631,10 +648,12 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
 
         {isFly && <div className="sv-flyshadow" style={{ left: cx }} />}
         {arriving && <div key={"ag" + arrive} className="sv-arrive" style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0) }}><b className="sv-aglow" /></div>}
-        <div className={"sv-animal mv-" + L.move + (picIdx === 0 ? " egg" : "") + (isFly ? " fly" : "")} style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0) }}>
+        <div className={"sv-animal mv-" + L.move + (picIdx === 0 ? " egg" : "") + (isFly ? " fly" : "")} style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0) }}
+          onClick={() => actRef.current.go(true)}>
           <div key={"in" + arrive} className={"sv-in" + (arrive ? " go" : "")}><div key={hop} className={"sv-hop" + (hop ? " go" : "")}>
+            <div className={"sv-act" + (act ? " a-" + act : "")} onAnimationEnd={e => { if (e.target === e.currentTarget) setAct(""); }}>
             {oldPic && <img className="sv-picout" src={oldPic.src} alt="" style={oldPic.style} />}
-            <img key={art(animal, picIdx)} className={tfOn ? "sv-picin" : undefined} src={art(animal, picIdx)} alt={animal.name} style={picStyle} /></div></div>
+            <img key={art(animal, picIdx)} className={tfOn ? "sv-picin" : undefined} src={art(animal, picIdx)} alt={animal.name} style={picStyle} /></div></div></div>
         </div>
         {tfOn && (
           <div key={"tf" + tf} className="sv-tf" style={{ left: cx - 320, top: 201 + (L.dy?.[akey] ?? 0) }}>
@@ -1087,6 +1106,18 @@ const CSS = `
 @keyframes sv-pglow{0%,100%{box-shadow:0 0 28px 10px rgba(255,215,60,.6)}50%{box-shadow:0 0 60px 26px rgba(255,215,60,.95)}}
 @media (prefers-reduced-motion: reduce){.sv-fmotes i,.sv-fglow,.sv-pglow{animation:none}}
 .sv-in{width:100%;height:100%;transform-origin:50% 92%}
+.sv-animal:not(.mv-still){cursor:pointer}
+.sv-act{width:100%;height:100%;transform-origin:50% 92%}
+.mv-float .sv-act{transform-origin:50% 50%}
+.sv-act.a-wiggle{animation:sv-aWiggle 1.1s ease-in-out}
+.sv-act.a-bounce{animation:sv-aBounce 1.1s ease-out}
+.sv-act.a-stretch{animation:sv-aStretch 1.4s ease-in-out}
+.sv-act.a-look{animation:sv-aLook 2.6s ease-in-out}
+@keyframes sv-aWiggle{0%,100%{transform:rotate(0)}15%{transform:rotate(-4deg)}35%{transform:rotate(4deg)}55%{transform:rotate(-3deg)}75%{transform:rotate(2deg)}}
+@keyframes sv-aBounce{0%,100%{transform:translateY(0) scale(1,1)}10%{transform:translateY(0) scale(1.05,.94)}25%{transform:translateY(-28px) scale(.97,1.04)}40%{transform:translateY(0) scale(1.05,.95)}55%{transform:translateY(-16px) scale(.98,1.02)}70%{transform:translateY(0) scale(1.03,.97)}85%{transform:translateY(0) scale(1,1)}}
+@keyframes sv-aStretch{0%,100%{transform:scale(1,1)}30%{transform:scale(1.07,.92)}60%{transform:scale(.96,1.07)}80%{transform:scale(1.01,.99)}}
+@keyframes sv-aLook{0%,100%{transform:scaleX(1)}12%,80%{transform:scaleX(-1)}}
+@media (prefers-reduced-motion: reduce){.sv-act.a-wiggle,.sv-act.a-bounce,.sv-act.a-stretch,.sv-act.a-look{animation:none}}
 .sv-in.go{animation:sv-arriveIn 1.05s cubic-bezier(.3,1.4,.5,1) both}
 @keyframes sv-arriveIn{0%{transform:translateY(-140px) scale(.25);opacity:0}35%{opacity:1;transform:translateY(-60px) scale(1.08)}62%{transform:translateY(0) scale(1.06,.92)}80%{transform:translateY(-14px) scale(.97,1.04)}100%{transform:translateY(0) scale(1)}}
 .sv-arrive{position:absolute;width:640px;height:640px;pointer-events:none;animation:sv-arriveOut 3.3s ease-out forwards}
