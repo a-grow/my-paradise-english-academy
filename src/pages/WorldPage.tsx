@@ -110,8 +110,10 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   const ctxRef = useRef<AudioContext | null>(null);
   const prevStageRef = useRef<number | null>(null);
   const levelUpFiredRef = useRef<Record<string, Set<number>>>(
+    // Teacher 1006 (Andy 2026-10-08): growth is never saved, so the 'party shown' list must not be kept either (it was saved
+    // in the browser -> after a reload, feeding again changed stages with NO Congratulations). Starts empty every visit.
     Object.fromEntries(ANIMALS.map(a => [a.id, new Set<number>(
-      JSON.parse(localStorage.getItem(S.levelup(a.id)) || "[]")
+      isMaster ? [] : JSON.parse(localStorage.getItem(S.levelup(a.id)) || "[]")
     )]))
   );
 
@@ -399,7 +401,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
     if (stageIdx > 0 && stageIdx !== prevStageRef.current && !animalFired.has(stageIdx)) {
       animalFired.add(stageIdx);
       levelUpFiredRef.current[activeAnimalId] = animalFired;
-      lsSet(S.levelup(activeAnimalId), JSON.stringify([...animalFired]));
+      if (!isMaster) lsSet(S.levelup(activeAnimalId), JSON.stringify([...animalFired])); // 1006: not kept (see levelUpFiredRef)
       setLevelupSaves(n => n + 1); // save again so the cloud gets this stage too
       setLevelUpStage({ animal: activeAnimal, stageIdx });
       if (K.levelUpMusic) {

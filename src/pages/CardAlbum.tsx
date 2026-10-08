@@ -591,7 +591,7 @@ export default function CardAlbum() {
   };
   useEffect(() => {
     if (!isMaster) return;
-    const w = (ret.match(/\/(dino|savanna|snowy)\//) || [])[1];
+    const w = (ret.match(/\/(dino|savanna|snowy|taiwan)\//) || [])[1];   // + taiwan (2026-10-08: from Taiwan it read Ocean's mpe_music)
     const off = (() => { try { return localStorage.getItem(w ? `mpe_${w}_music` : "mpe_music") === "off"; } catch { return false; } })();
     if (off) return;
     const a = new Audio(`${U}/album_music.mp3`); a.loop = true; a.volume = 0; musicRef.current = a;
@@ -903,6 +903,8 @@ const CSS = `
 .ca-b3.closing{animation:ca-b3slide 1.2s .5s cubic-bezier(.45,.05,.35,1) both,ca-b3out .65s 2s cubic-bezier(.55,-0.35,.85,.4) forwards}
 @keyframes ca-b3out{0%{transform:translate(-25%,0)}100%{transform:translate(-25%,900px) rotate(4deg)}}
 @keyframes ca-b3slide{0%{transform:none}100%{transform:translateX(-25%)}}
+.ca-b3.opening{animation:ca-b3slideo 1.4s cubic-bezier(.45,.05,.35,1) both}   /* Andy 2026-10-08 14:34: SLIDE right while the cover opens (was a hop: the transition can't start from the pop-in animation) */
+@keyframes ca-b3slideo{0%{transform:translateX(-25%)}100%{transform:none}}
 .ca-b3.closing .ca-b3pg{animation:ca-b3pgc .9s cubic-bezier(.45,.05,.35,1) both}
 @keyframes ca-b3pgc{0%{transform:rotateY(-180deg) translateZ(var(--z))}100%{transform:rotateY(0) translateZ(var(--z))}}
 .ca-b3.closing .ca-b3cv{animation:ca-b3cvc 1.2s .5s cubic-bezier(.5,.02,.35,1) both}

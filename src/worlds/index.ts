@@ -13,6 +13,8 @@ import { OCEAN_LOOK } from "./skins/oceanLook";
 import { DINO_LOOK } from "./skins/dinoLook";
 import { SNOWY_ANIMALS } from "./snowy";
 import { SNOWY_LOOK } from "./skins/snowyLook";
+import { TAIWAN_ANIMALS } from "./taiwan";
+import { TAIWAN_LOOK } from "./skins/taiwanLook";
 
 export interface WorldConfig {
   id: string;                                           // "dino" (cloud blob key + save names)
@@ -84,6 +86,22 @@ export const SNOWY_WORLD: WorldConfig = {
   makeSave: (code, name) => standardSave("snowy", code, name, SNOWY_ANIMALS.map(a => a.id)),
   gamePath: "/game/snowy",
   skin: SNOWY_LOOK,
+  nextWorld: null,
+  masterAllGrown: false,
+  legacyMasterCleanup: false,
+};
+
+// WORLD 5 = TAIWAN (2026-10-08): STANDARD storage (mpe_taiwan_..., cloud data.taiwan - never rename). TEST ROUTE ONLY for now:
+// NOT in ALL_WORLDS and Snowy.nextWorld stays null until the art/music/videos + the database lock (last_animal blackbear,
+// grown_at 120) are done - then add it to ALL_WORLDS, set Snowy.nextWorld, add the real /taiwan route + world_taiwan.webp icon.
+export const TAIWAN_WORLD: WorldConfig = {
+  id: "taiwan",
+  title: "Taiwan",
+  path: "/taiwan",
+  animals: TAIWAN_ANIMALS,
+  makeSave: (code, name) => standardSave("taiwan", code, name, TAIWAN_ANIMALS.map(a => a.id)),
+  gamePath: "/game/taiwan",
+  skin: TAIWAN_LOOK,
   nextWorld: null,
   masterAllGrown: false,
   legacyMasterCleanup: false,

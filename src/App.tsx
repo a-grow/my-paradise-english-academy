@@ -19,7 +19,7 @@ import GrammarDig from "./pages/GrammarDig";
 import GrammarGrab from "./pages/GrammarGrab";
 import CookieJarPreview from "./pages/CookieJarPreview";
 import WorldPage, { WorldVisit } from "./pages/WorldPage";
-import { DINO_WORLD, OCEAN_WORLD, DINO_WORLD_NEW, OCEAN_WORLD_NEW, SAVANNA_WORLD, SNOWY_WORLD } from "./worlds";
+import { DINO_WORLD, OCEAN_WORLD, DINO_WORLD_NEW, OCEAN_WORLD_NEW, SAVANNA_WORLD, SNOWY_WORLD, TAIWAN_WORLD } from "./worlds";
 import WorldTestSavanna from "./pages/WorldTestSavanna";
 import GrammarHub from "./pages/GrammarHub";
 import NotFound from "./pages/NotFound";
@@ -56,6 +56,7 @@ const App = () => (
 <Route path="/world-test/ocean/:code/:studentName" element={<WorldTestSavanna world={OCEAN_WORLD_NEW} />} />
 <Route path="/world-test/savanna/:code/:studentName" element={<WorldTestSavanna />} />
 <Route path="/world-test/snowy/:code/:studentName" element={<WorldTestSavanna world={SNOWY_WORLD} />} />{/* World 4, test only (2026-10-08) */}
+<Route path="/world-test/taiwan/:code/:studentName" element={<WorldTestSavanna world={TAIWAN_WORLD} />} />{/* World 5, test only (2026-10-08) */}
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
               <Route path="/savanna/:code/:studentName" element={<WorldPage world={SAVANNA_WORLD} />} />{/* step 7 */}
