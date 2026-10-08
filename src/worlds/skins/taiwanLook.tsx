@@ -13,7 +13,7 @@ const TaiwanScene = () => (
 );
 
 export const TAIWAN_LOOK = makeLook({
-  title: "Taiwan", titleImg: null, dir: W, fill: `${W}/far.jpg`, Scene: TaiwanScene,   // titleImg: Andy's title art later
+  title: "Taiwan", titleImg: `${W}/title.webp`, dir: W, fill: `${W}/far.jpg`, Scene: TaiwanScene,   // Andy's Gemini title (2026-10-08, cut from magenta, 784 wide like Savanna)
   music: `${W}/music.mp3`, loadingBg: "#2f5a35",   // Andy 2026-10-08: moonlit-forest (pixabay), trimmed 1.45s start, 1.5s fade out, -22.5 LUFS, 128k; original BACKUPFILES/world3_art/music_originals
   move: "breathe",                 // animals stand on the grass and breathe; eggs wobble
   dy: { "macaque-grown": 30 },     // Andy 2026-10-08 14:32: monkey down so its tail sits just above 'Name your pet!'
