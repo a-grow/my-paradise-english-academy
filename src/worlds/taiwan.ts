@@ -2,7 +2,7 @@
 // must go into the database lock list BEFORE kids can finish it). English only (no Chinese).
 // STAGE PRICES (Andy 2026-10-08): treats per stage mikado pheasant 25, leopard cat 30, pangolin 30, macaque 35, sika deer 35,
 // black bear 40 (stage mins 0, p, 2p, 3p). Black bear grown = 120 = the database lock's 'taiwan finished' number - change BOTH together.
-// Videos: none yet (Andy) -> video null (a kid can't unlock the next animal until videos exist; 1006 display is fine).
+// Videos: all 6 from Andy 2026-10-09 (public/worlds/taiwan/<id>-video.mp4; originals BACKUPFILES/world5_art/originals).
 // Pictures: public/worlds/taiwan/<id>-<egg|baby|young|grown>(-t).webp, cut 2026-10-08 from Andy's Gemini sprite sheets
 // (BACKUPFILES/world3_art/tools/cut_taiwan.py + contacts_taiwan.json; originals BACKUPFILES/world5_art/originals).
 import type { Animal } from "./types";
@@ -22,7 +22,7 @@ export const TAIWAN_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 75, img: `${P}/mikadopheasant-grown.webp` },
     ],
     unlockCondition: "default",
-    ...FOREST, video: null, isEggType: true, scale: 1,
+    ...FOREST, video: `${P}/mikadopheasant-video.mp4`, isEggType: true, scale: 1,
     feedLabel: "mikado pheasant", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Mikado Pheasant!", subZh: "" },
@@ -40,7 +40,7 @@ export const TAIWAN_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 90, img: `${P}/leopardcat-grown.webp` },
     ],
     unlockCondition: "mikadopheasant_grown_video_watched",
-    ...FOREST, video: null, isEggType: false, scale: 1,
+    ...FOREST, video: `${P}/leopardcat-video.mp4`, isEggType: false, scale: 1,
     feedLabel: "leopard cat", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Leopard Cat!", subZh: "" },
@@ -58,7 +58,7 @@ export const TAIWAN_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 90, img: `${P}/pangolin-grown.webp` },
     ],
     unlockCondition: "leopardcat_grown_video_watched",
-    ...FOREST, video: null, isEggType: false, scale: 1,
+    ...FOREST, video: `${P}/pangolin-video.mp4`, isEggType: false, scale: 1,
     feedLabel: "pangolin", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Pangolin!", subZh: "" },
@@ -76,7 +76,7 @@ export const TAIWAN_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 105, img: `${P}/macaque-grown.webp` },
     ],
     unlockCondition: "pangolin_grown_video_watched",
-    ...FOREST, video: null, isEggType: false, scale: 1,
+    ...FOREST, video: `${P}/macaque-video.mp4`, isEggType: false, scale: 1,
     feedLabel: "macaque", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Macaque!", subZh: "" },
@@ -94,7 +94,7 @@ export const TAIWAN_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 105, img: `${P}/sikadeer-grown.webp` },
     ],
     unlockCondition: "macaque_grown_video_watched",
-    ...FOREST, video: null, isEggType: false, scale: 1,
+    ...FOREST, video: `${P}/sikadeer-video.mp4`, isEggType: false, scale: 1,
     feedLabel: "sika deer", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Sika Deer!", subZh: "" },
@@ -112,7 +112,7 @@ export const TAIWAN_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 120, img: `${P}/blackbear-grown.webp` },
     ],
     unlockCondition: "sikadeer_grown_video_watched",
-    ...FOREST, video: null, isEggType: false, scale: 1,
+    ...FOREST, video: `${P}/blackbear-video.mp4`, isEggType: false, scale: 1,
     feedLabel: "black bear", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Black Bear!", subZh: "" },
