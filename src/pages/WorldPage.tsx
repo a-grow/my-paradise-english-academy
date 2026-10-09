@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, loadJarFromCloud, addTreats, addCoins, claimPrize, loadPrizes, claimDailyPrize, loadDailyPrize, loadSeen, markSeen, claimDailyTreat, dailyClaimedToday } from "@/lib/cloudSave";
 import { getAnimalStage, getAnimalStageIdx, type Animal } from "@/worlds/types";
-import { ALL_WORLDS, worldState, type WorldConfig } from "@/worlds";
+import { ALL_WORLDS, COMING_WORLDS, worldState, type WorldConfig } from "@/worlds";
 
 const MASTER_CODE = "1006";
 
@@ -74,7 +74,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   const [videoFadingOut, setVideoFadingOut] = useState(false);
   const [showLookBelow, setShowLookBelow] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
-  const [musicOn, setMusicOn] = useState(() => localStorage.getItem(S.music) !== "off");
+  const [musicOn, setMusicOn] = useState(true); // Andy 2026-10-09: music ON every time the world opens (the button turns it off for this visit)
   const [sfxOn, setSfxOn] = useState(() => localStorage.getItem("mpe_sfx") !== "off");
   const [volume, setVolume] = useState(() => parseFloat(localStorage.getItem("mpe_volume") || "0.25"));
   const musicVol = () => K.musicVolume ?? volume * 0.5; // new look sets its own; Ocean/Dino skins = unchanged
@@ -550,8 +550,9 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   const thisFinished = getAnimalStageIdx(lastA, fedTreatsState[lastA.id] ?? 0) === lastA.stages.length - 1 && !!videoWatchedMap[lastA.id];
   const worldList = ALL_WORLDS.map(w => ({ world: w, ...(w.id === world.id ? { started: true, finished: thisFinished } : worldState(w, rowData)) }));
   const currentWorld = (worldList.find(x => !x.finished) ?? worldList[worldList.length - 1]).world;
+  const comingWorlds = COMING_WORLDS.filter(w => !ALL_WORLDS.some(a => a.id === w.id)); // My Worlds: grey + name only
 
-  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg, coins, prizes, claimPrize: claimPrizeNow, dailyPrize, claimDailyPrize: claimDailyPrizeNow, seen, markSeen: markSeenNow, switchAnimal, nudgeSeen, readOnly, rowData, worldList, currentWorld };
+  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg, coins, prizes, claimPrize: claimPrizeNow, dailyPrize, claimDailyPrize: claimDailyPrizeNow, seen, markSeen: markSeenNow, switchAnimal, nudgeSeen, readOnly, rowData, worldList, currentWorld, comingWorlds };
 };
 
 export type WorldView = ReturnType<typeof useWorldBrain>;

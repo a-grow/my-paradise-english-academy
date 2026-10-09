@@ -110,6 +110,9 @@ export const TAIWAN_WORLD: WorldConfig = {
 // STEP 7 (2026-10-04): every world IN ORDER (My Worlds + Video Theater + "which world is the kid on").
 // A NEW world = add it here (and its round icon public/worlds/ui/world_<id>.webp) - it then shows up everywhere.
 export const ALL_WORLDS: WorldConfig[] = [OCEAN_WORLD, DINO_WORLD, SAVANNA_WORLD];
+// COMING WORLDS (Andy 2026-10-09): shown in My Worlds as a grey picture + name only (never clickable, nothing loads or saves).
+// Picture = public/worlds/ui/card_<id>.webp. When a world moves into ALL_WORLDS it drops out of this list by itself.
+export const COMING_WORLDS: WorldConfig[] = [SNOWY_WORLD, TAIWAN_WORLD];
 
 // A world's state from the kid's cloud row (the data blob): started = its section exists; finished = its LAST animal
 // grown + its video watched (the same rule the brain and the database lock use). Reads only.

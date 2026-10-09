@@ -57,10 +57,13 @@ const SND: Record<string, [string, number, number?]> = {
   "ty-asianwoman": [`${ART}/ty-asianwoman.mp3`, 0.9], "ty-woman": [`${ART}/ty-woman.mp3`, 0.9], "ty-oldlady": [`${ART}/ty-oldlady.mp3`, 0.9],
   "ty-man": [`${ART}/ty-man.mp3`, 0.9], "ty-gent": [`${ART}/ty-gent.mp3`, 0.9],
   "ty-great": [`${ART}/ty-great.mp3`, 0.9], "ty-excellent": [`${ART}/ty-excellent.mp3`, 0.9], "ty-hey": [`${ART}/ty-hey.mp3`, 0.9], "ty-bluehat": [`${ART}/ty-bluehat.mp3`, 0.9], "ty-sad": [`${ART}/ty-sad.mp3`, 0.9],
-  "ty-boy": [`${ART}/ty-gent.mp3`, 0.9, 1.45], // the boy = the gentleman's clip played higher
+  "ty-boy": [`${ART}/ty-gent.mp3`, 0.9, 1.45], // the boy = the gentleman's clip played higher (unused since 2026-10-09)
+  // Andy's own voice lines (2026-10-09)
+  "ty-lovely": [`${ART}/ty-lovely.mp3`, 0.9], "ty-finally": [`${ART}/ty-finally.mp3`, 0.9],
+  "ty-wonderful": [`${ART}/ty-wonderful.mp3`, 0.9], "ty-window": [`${ART}/ty-window.mp3`, 0.9],
 };
 // face-N.webp -> who says thank you (1 woman, 2 older man, 3 Asian woman, 4 gentleman, 5 older man, 6 snobby old lady, 7 redbeard man, 8 woman, 9 boy, 10 monocle gentleman)
-const TY: Record<number, string> = { 1: "ty-hey", 2: "ty-great", 3: "ty-asianwoman", 4: "ty-gent", 5: "ty-excellent", 6: "ty-oldlady", 7: "ty-man", 8: "ty-bluehat", 9: "ty-boy", 10: "ty-sad" };
+const TY: Record<number, string> = { 1: "ty-lovely", 2: "ty-great", 3: "ty-asianwoman", 4: "ty-wonderful", 5: "ty-excellent", 6: "ty-finally", 7: "ty-man", 8: "ty-bluehat", 9: "ty-window", 10: "ty-sad" };
 
 // The computer voice: the game music dips while it speaks (GamePage listens to 'mpe-duck').
 let sayN = 0;

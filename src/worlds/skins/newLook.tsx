@@ -385,6 +385,26 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   // While a celebration is on, the coin pill + jar HOLD their old numbers; the flying prizes add them as they land.
   // Afterwards both follow the real numbers again (= the database's, so a prize that was not paid shows nothing).
   const [dailyDay, setDailyDay] = useState(0); // DAILY PRIZE on screen = today's box 1-7 (0 = not showing)
+  // NEW-WORLD WELCOME (Andy 2026-10-09): the background drops in (1 bounce), then the front layer, a glow grows + sparkles,
+  // 2s later the swirl brings the egg/blanket, then '<Name> World' fades in with a chime; then the UI slides in + the music
+  // fades up. ONCE per kid per world (cloud seen flag intro:<world>:one), only while the world's FIRST animal has 0 treats.
+  // Visits + teacher 1006 never; TEST ONLY ?wi=1 on /world-test/ plays it (marks nothing).
+  const introFlag = `intro:${v.world.id}:one`;
+  const introTest = onTest && q.get("wi") === "1";
+  const [intro, setIntro] = useState<"pending" | "on" | "off">(() =>
+    introTest ? "on" : (!v.readOnly && !v.isMaster && (v.fedTreatsState[v.ANIMALS[0].id] ?? 0) === 0) ? "pending" : "off");
+  const [ip, setIp] = useState(0); // intro step: 1 drop, 2 glow, 3 egg, 4 title, 5 title leaving
+  // the world before this one (My Worlds order): its picture, NOT blurred, is what the new world drops onto (Ocean = none)
+  const introIds = [...v.worldList.map(x => x.world.id), ...v.comingWorlds.map(w => w.id)];
+  const prevId = introIds[introIds.indexOf(v.world.id) - 1];
+  const prevFar = prevId ? (prevId === "ocean" ? "/worlds/ocean/bg.jpg" : `/worlds/${prevId}/far.jpg`) : null;
+  const backRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (intro !== "pending") return;
+    if (v.seen) { setIntro(v.seen.includes(introFlag) ? "off" : "on"); return; }
+    const t = window.setTimeout(() => setIntro(i => (i === "pending" ? "off" : i)), 4000); // cloud not answering: skip it
+    return () => window.clearTimeout(t);
+  }, [intro, v.seen]);
   // HOW TO PLAY (Andy 2026-10-07): pops in 1s after entering, ONCE per kid on any device (the brain's cloud seen list,
   // flag howto:world:one); '?' opens it any time. 'pending' = still reading the cloud, 'wait' = it will show; the Daily
   // Prize waits for both. Visits (read-only) and the teacher code never show it by themselves (test: ?h=1 on /world-test/).
@@ -400,12 +420,12 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     const t = window.setTimeout(() => setHowto(h => (h === "pending" ? "closed" : h)), 4000); // cloud not answering: don't block the Daily Prize
     return () => window.clearTimeout(t);
   }, [howto, v.seen]);
-  useEffect(() => { if (howto !== "wait") return; const t = window.setTimeout(() => { howAuto.current = true; setHowto("open"); }, 1000); return () => window.clearTimeout(t); }, [howto]);
+  useEffect(() => { if (howto !== "wait" || intro !== "off") return; const t = window.setTimeout(() => { howAuto.current = true; setHowto("open"); }, 1000); return () => window.clearTimeout(t); }, [howto, intro]);
   const closeHowto = () => { setHowto("closed"); if (howAuto.current) { howAuto.current = false; v.markSeen("howto:world:one"); } };
   // TEST ONLY (?dp=): nothing is saved, so after the test prize the jar + coin pill KEEP the shown numbers
   // (going back to the real number made the jar open again with the feed sound - Andy 14:19).
   const [testKeep, setTestKeep] = useState(false);
-  const holding = !!(party || done || mini || dailyDay || testKeep);
+  const holding = !!(party || done || mini || dailyDay || testKeep || intro !== "off");
   useEffect(() => { if (!holding) setCoinShown(v.coins ?? 0); }, [v.coins, holding]);
   // MY BADGES (step 5.4): one badge per finished world = '<world>:complete' in the kid's prize list (from the cloud).
   // During the world-finished party the new badge flies in first, then lights up (same hold as coins / jar).
@@ -418,10 +438,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const dailyReady = isTestDp ? testDp : (v.dailyPrize && !v.dailyPrize.claimedToday ? v.dailyPrize.day : 0);
   const dailyShown = useRef(false);
   useEffect(() => {
-    if (!dailyReady || dailyShown.current || party || done || howto !== "closed") return;
+    if (!dailyReady || dailyShown.current || party || done || howto !== "closed" || intro !== "off") return;
     const t = window.setTimeout(() => { dailyShown.current = true; setDailyDay(dailyReady); }, 1200);
     return () => window.clearTimeout(t);
-  }, [dailyReady, party, done, howto]);
+  }, [dailyReady, party, done, howto, intro]);
   const dailyLand = (k: DailyKind, add: number) => {
     if (k === "treat") { setJarShown(j => j + add); setBump(b => ({ ...b, treat: (b.treat ?? 0) + 1 })); }
     else partyLand(k, add);
@@ -504,6 +524,19 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const theaterMusic = (quiet: boolean) => { const a = v.audioRef.current; if (a) a.volume = quiet ? 0.02 : (v.K.musicVolume ?? v.volume * 0.5); };
   const [dailyGone, setDailyGone] = useState(false);
   const [jarPoke, setJarPoke] = useState(0);
+  const musicWasPaused = useRef(false); // music button: was the music still waiting for a tap?
+  // MY WORLDS row (Andy 2026-10-09): arrows scroll one card; opening the panel shows the kid's own world
+  const wRowRef = useRef<HTMLDivElement>(null);
+  const [wEdge, setWEdge] = useState({ l: true, r: false });
+  const wEdges = () => { const e = wRowRef.current; if (e) setWEdge({ l: e.scrollLeft < 8, r: e.scrollLeft + e.clientWidth > e.scrollWidth - 8 }); };
+  const wScroll = (d: number) => { wRowRef.current?.scrollBy({ left: d * 280, behavior: "smooth" }); };
+  useEffect(() => {
+    if (panel !== "worlds") return;
+    const e = wRowRef.current; if (!e) return;
+    const here = e.querySelector(".sv-wcard.here") as HTMLElement | null;
+    if (here) e.scrollLeft = Math.max(0, here.offsetLeft - e.offsetLeft - 280);
+    wEdges();
+  }, [panel]);
   // Treats won while away (games) FALL INTO the jar: the jar starts at the count this device last showed,
   // then moves to the real count. Display only - a per-device hint, never Supabase, never a save.
   const seenKey = `mpe_jarseen_${v.code}_${v.studentName}`;
@@ -577,6 +610,83 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     tfT.current = [window.setTimeout(() => setTfOn(false), TF_DUR + 100)];
     if (v.sfxOn) { const a = new Audio(`${UI}/snd_newfriend.mp3`); a.volume = 0.7; a.play().catch(() => { }); }
   };
+  // SETTLE-IN WAVE (Andy 2026-10-09): 1.2s after the UI is in (every load, after the welcome too), a light band sweeps
+  // left->right over the whole screen (linear, 1.8s), round glitters follow it and each button pulses once as it passes.
+  const WAVE_MS = 1800, WAVE_W = 520;
+  const [wave, setWave] = useState(0);
+  const waveDone = useRef(false);
+  useEffect(() => {
+    if (intro !== "off" || waveDone.current) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    waveDone.current = true;
+    const t = window.setTimeout(() => setWave(1), 1200);
+    return () => window.clearTimeout(t);
+  }, [intro]);
+  const waveAt = (x: number) => Math.max(0, Math.min(1, (x + 600 - WAVE_W / 2) / (sw + 800))) * WAVE_MS; // ms until the band's middle reaches x
+  const waveDots = useRef<{ x: number; y: number; z: number; d: number }[]>([]);
+  useEffect(() => {
+    if (!wave) return;
+    const st = stageRef.current; if (!st) return;
+    const sr = st.getBoundingClientRect();
+    st.querySelectorAll<HTMLElement>(".sv-rb,.sv-imgbtn,.sv-card,.sv-jar,.sv-coins,.sv-feed,.sv-watch").forEach(el => {
+      const r = el.getBoundingClientRect(); if (!r.width) return;
+      const x = (r.left + r.width / 2 - sr.left) / s;
+      el.animate([{ scale: "1" }, { scale: "1.12", offset: 0.4 }, { scale: "1" }], { duration: 520, delay: waveAt(x), easing: "ease-out" });
+    });
+    const t = window.setTimeout(() => setWave(0), WAVE_MS + 1200);
+    return () => window.clearTimeout(t);
+  }, [wave]);
+  if (wave && !waveDots.current.length) waveDots.current = Array.from({ length: 24 }, () => ({ x: Math.random() * sw, y: 70 + Math.random() * (sh - 140), z: 10 + Math.random() * 14, d: Math.random() * 260 }));
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const fillRef = useRef<HTMLDivElement>(null);
+  const introDots = useRef(Array.from({ length: 26 }, () => ({ a: Math.random() * Math.PI * 2, r: 60 + Math.random() * 250, d: Math.random() * 1.6, z: 9 + Math.random() * 12 })));
+  useEffect(() => {
+    if (intro !== "on") return;
+    if (!introTest) v.markSeen(introFlag);
+    const ivs: number[] = [];
+    const hush = () => { const a = v.audioRef.current; if (a) a.volume = 0; }; // world music waits until the animal appears
+    hush();
+    // one fall + ONE bounce + settle; 'translate' adds to each layer's own transform/animation (bubbles, smoke...)
+    const DROP: Keyframe[] = [
+      { translate: "0 -1150px", easing: "cubic-bezier(.55,0,1,.45)" },
+      { translate: "0 0", offset: 0.58, easing: "cubic-bezier(0,.45,.45,1)" },
+      { translate: "0 -64px", offset: 0.78, easing: "cubic-bezier(.55,0,1,.45)" },
+      { translate: "0 0" },
+    ];
+    const kids = Array.from(sceneRef.current?.children ?? []) as HTMLElement[];
+    // Andy 17:12: background comes DOWN from the top, the front layer comes UP from the bottom (mirror: rise, ONE dip, settle)
+    const RISE: Keyframe[] = DROP.map(k => ({ ...k, translate: String(k.translate).replace(" -", " ") }));
+    kids.forEach((el, i) => el.animate(i === 0 ? DROP : RISE, { duration: 1250, delay: i === 0 ? 0 : 900, fill: "backwards" }));
+    // the old world stays behind and fades away once the new background has landed
+    backRef.current?.animate([{ opacity: 1 }, { opacity: 1, offset: 0.6 }, { opacity: 0 }], { duration: 1400, fill: "forwards" });
+    const thud = () => { if (v.sfxOn) { const a = new Audio(`${UI}/snd_thud.mp3`); a.volume = 0.9; a.play().catch(() => { }); } };
+    const whoosh = () => { if (v.sfxOn) { const a = new Audio("/cards/ui/whoosh.mp3"); a.volume = 0.75; a.play().catch(() => { }); } };
+    const musicUp = () => { // world music fades up (1.5s)
+      const m = v.audioRef.current, full = v.K.musicVolume ?? v.volume * 0.5; let k = 0;
+      ivs.push(window.setInterval(() => { k++; if (m) m.volume = Math.min(full, (full * k) / 20); }, 75));
+    };
+    setIp(1);
+    const ts = [
+      window.setTimeout(hush, 80), window.setTimeout(hush, 600), // the brain may create/start the music just after this
+      window.setTimeout(whoosh, 0), window.setTimeout(whoosh, 900), // background flies down, front flies up
+      window.setTimeout(thud, 725), window.setTimeout(thud, 1625), // background lands, front lands (first touch of each)
+      window.setTimeout(() => setIp(2), 2150),
+      window.setTimeout(() => { setIp(3); startArrive(); musicUp(); }, 4150),
+      window.setTimeout(() => {
+        setIp(4);
+        if (v.sfxOn) { // chime fades in
+          const c = new Audio("/cookiejar/snd_chime.mp3"); c.volume = 0; c.play().catch(() => { });
+          let k = 0; ivs.push(window.setInterval(() => { k++; c.volume = Math.min(0.7, k * 0.07); }, 50));
+        }
+      }, 5700),
+      window.setTimeout(() => setIp(5), 8300),
+      window.setTimeout(() => {
+        setIntro("off"); setIp(0);
+        ivs.forEach(t => window.clearInterval(t)); // music + chime ramps are done by now
+      }, 8800),
+    ];
+    return () => { ts.forEach(t => window.clearTimeout(t)); ivs.forEach(t => window.clearInterval(t)); };
+  }, [intro]);
   const canFeed = !testView && !v.readOnly && !grown && v.jarTreats > 0;
   const feed = () => {
     if (testView) return;
@@ -625,9 +735,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   return (
     <div className="sv-root" onPointerDown={onPointerDown}>
       <style>{FONTS + CSS}</style>
-      <div className="sv-stage" ref={stageRef} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
-        <div className="sv-fill"><img src={L.fill} alt="" /></div>
-        <div className="sv-scene" style={{ left: cx - STAGE_W / 2 }}><L.Scene /></div>
+      <div className={"sv-stage" + (intro !== "off" ? " intro ip" + ip : "")} ref={stageRef} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
+        <div className="sv-fill" ref={fillRef}><img src={L.fill} alt="" /></div>
+        {intro !== "off" && prevFar && ip <= 1 && <div className="sv-iback" ref={backRef}><img src={prevFar} alt="" /></div>}
+        <div className="sv-scene" ref={sceneRef} style={{ left: cx - STAGE_W / 2 }}><L.Scene /></div>
 
         <div className="sv-grp sv-inT">{/* slide-in group (Andy 20:02) */}
         <div className="sv-grow" style={{ left: cx - 290 }}>
@@ -703,7 +814,8 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         <div className="sv-grp sv-inT">
         <div className="sv-rb sv-tap" style={{ left: 22 }} onClick={() => setHowto("open")}><img src={`${UI}/rb_help.webp`} alt="Help" /></div>
         <div ref={coinRef} className={"sv-coins" + lift} style={bumpStyle("coin")}><span>{coinShown}</span></div>
-        <div className={"sv-rb sv-tap" + (v.musicOn ? "" : " muted")} style={{ right: 100 }} onClick={() => v.setMusicOn(!v.musicOn)}><img src={`${UI}/rb_music.webp`} alt="Music" /></div>
+        <div className={"sv-rb sv-tap" + (v.musicOn ? "" : " muted")} style={{ right: 100 }} onPointerDown={() => { const a = v.audioRef.current; musicWasPaused.current = !!a && a.paused; }}
+          onClick={() => { if (v.musicOn && musicWasPaused.current) { v.audioRef.current?.play().catch(() => { }); return; } v.setMusicOn(!v.musicOn); }}><img src={`${UI}/rb_music.webp`} alt="Music" /></div>
         <div className="sv-rb sv-tap" style={{ right: 22 }} onClick={() => setPanel("exit")}><img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
         </div>
 
@@ -807,18 +919,24 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
             <div className="sv-ovcard">
               <div className="sv-x sv-tap" onClick={() => setPanel(null)}><img src={`${UI}/rb_exit.webp`} alt="Close" /></div>
               <h2>My Worlds</h2>
-              <div className="sv-biggrid">
-                {v.worldList.map(x => {
-                  const w = x.world, here = w.id === v.world.id, now = w.id === v.currentWorld.id;
-                  const go = here ? null : x.finished ? `/visit/${w.id}/${v.code}/${v.studentName}` : now ? `${w.path}/${v.code}/${v.studentName}` : null;
-                  if (!here && !go) return (
-                    <div key={w.id} className="sv-big locked"><div className="sv-q">?</div><p>???</p></div>);
-                  const label = here ? (v.readOnly ? "Visiting" : "You are here") : x.finished ? "Finished! Tap to visit" : "Tap to go back";
-                  return (
-                    <div key={w.id} className={"sv-big" + (here ? " here" : " sv-tap")} onClick={() => { if (go) v.navigate(go); else setPanel(null); }}>
-                      <img src={`${UI}/world_${w.id}.webp`} alt="" /><p>{w.title} World</p><small>{label}</small>
-                    </div>);
-                })}
+              {/* Andy 2026-10-09: ONE row, scroll left/right (pink arrows); background pictures; not reached = grey + name, no tap */}
+              <div className="sv-wwrap">
+                <div className={"sv-warr l" + (wEdge.l ? " off" : " sv-tap")} onClick={() => wScroll(-1)}><svg viewBox="0 0 24 24"><path d="M16 3 6 12l10 9z" fill="#fff" /></svg></div>
+                <div className="sv-wlist" ref={wRowRef} onScroll={wEdges}>
+                  {[...v.worldList, ...v.comingWorlds.map(w => ({ world: w, finished: false }))].map(x => {
+                    const w = x.world, here = w.id === v.world.id, now = w.id === v.currentWorld.id;
+                    const go = here ? null : x.finished ? `/visit/${w.id}/${v.code}/${v.studentName}` : now ? `${w.path}/${v.code}/${v.studentName}` : null;
+                    const pic = <img className="sv-wpic" src={`${UI}/card_${w.id}.webp`} alt="" />;
+                    if (!here && !go) return (
+                      <div key={w.id} className="sv-big sv-wcard locked">{pic}<p>{w.title} World</p></div>);
+                    const label = here ? (v.readOnly ? "Visiting" : "You are here") : x.finished ? "Finished! Tap to visit" : "Tap to go back";
+                    return (
+                      <div key={w.id} className={"sv-big sv-wcard" + (here ? " here" : " sv-tap")} onClick={() => { if (go) v.navigate(go); else setPanel(null); }}>
+                        {pic}<p>{w.title} World</p><small>{label}</small>
+                      </div>);
+                  })}
+                </div>
+                <div className={"sv-warr r" + (wEdge.r ? " off" : " sv-tap")} onClick={() => wScroll(1)}><svg viewBox="0 0 24 24"><path d="M8 3l10 9-10 9z" fill="#fff" /></svg></div>
               </div>
             </div>
           </div>
@@ -883,6 +1001,25 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         )}
         {panel === "animals" && <Hand stage={stageRef} s={s} sel=".sv-big.ready" fx={0.82} fy={0.2} />}
         {dailyDay > 0 && <Hand stage={stageRef} s={s} sel=".dp-claim:not(:disabled)" fx={0.86} fy={0.25} />}
+
+        {/* NEW-WORLD WELCOME: glow + round sparkles where the egg will appear, then the big world title */}
+        {intro !== "off" && ip >= 2 && (
+          <div className={"sv-iglow" + (ip >= 3 ? " fade" : "")} style={{ left: cx, top: 600 }}>
+            <b />
+            {introDots.current.map((d, i) => <i key={i} style={{ left: Math.cos(d.a) * d.r, top: Math.sin(d.a) * d.r * 0.8, width: d.z, height: d.z, animationDelay: `${d.d}s` }} />)}
+          </div>)}
+        {intro !== "off" && ip >= 4 && (
+          <div className={"sv-ititle" + (ip >= 5 ? " out" : "")} style={{ left: cx }}>
+            <b className="sv-ihalo" />
+            {L.titleImg ? <img src={L.titleImg} alt="" /> : <div className="sv-ititxt">{L.title} World</div>}
+            {introDots.current.slice(0, 16).map((d, i) => <i key={i} style={{ left: Math.cos(d.a) * (d.r * 1.3 + 90), top: Math.sin(d.a) * d.r * 0.35, width: d.z, height: d.z, animationDelay: `${0.3 + d.d}s` }} />)}
+          </div>)}
+
+        {wave > 0 && (
+          <div className="sv-wave" style={{ ["--sw" as string]: `${sw}px` } as React.CSSProperties}>
+            <b className="sv-wband" style={{ width: WAVE_W, animationDuration: `${WAVE_MS}ms` }} />
+            {waveDots.current.map((d, i) => <i key={i} style={{ left: d.x, top: d.y, width: d.z, height: d.z, animationDelay: `${waveAt(d.x) + d.d}ms` }} />)}
+          </div>)}
 
         {/* exit: our own popup, never a system box */}
         {panel === "exit" && (
@@ -1061,6 +1198,53 @@ const CSS = `
 .sv-big.here{border-color:#ffb000;box-shadow:0 0 0 4px #fff0b3}
 .sv-big.ready{border-color:#ffb000} /* glow moved to the whole box (Andy 2026-10-04 16:27) */
 @keyframes sv-glowBox{0%,100%{box-shadow:0 0 0 0 rgba(255,215,60,0)}50%{box-shadow:0 0 34px 14px rgba(255,215,60,.95)}}
+.sv-stage.intro{background:radial-gradient(ellipse at 50% 45%,#2b1d5c 0%,#0c0720 75%)}
+.sv-stage.intro :is(.sv-inL,.sv-inR,.sv-inB,.sv-inT,.sv-nametag,.sv-feed,.sv-watch,.sv-petname,.sv-hand){animation:none!important;visibility:hidden}
+.sv-stage.intro.ip0 :is(.sv-scene,.sv-fill){visibility:hidden}
+.sv-wave{position:absolute;inset:0;z-index:70;pointer-events:none;overflow:hidden}
+.sv-wband{position:absolute;top:-10%;left:0;height:120%;transform:skewX(-18deg);mix-blend-mode:screen;
+ background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,248,215,.16) 30%,rgba(255,250,230,.42) 50%,rgba(255,248,215,.16) 70%,rgba(255,255,255,0) 100%);
+ animation:sv-wsweep linear both}
+@keyframes sv-wsweep{0%{translate:-600px 0}100%{translate:calc(var(--sw) + 200px) 0}}
+.sv-wave i{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff 0%,#fff6c8 35%,rgba(255,220,110,0) 70%);
+ transform:translate(-50%,-50%) scale(.2);opacity:0;animation:sv-wdot .9s ease-out both}
+@keyframes sv-wdot{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}35%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-60%) scale(.4)}}
+.sv-iback{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.sv-iback img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover}
+.sv-stage.intro:is(.ip0,.ip1,.ip2) .sv-animal{visibility:hidden}
+.sv-iglow{position:absolute;z-index:6;width:0;height:0;pointer-events:none;transition:opacity .9s}
+.sv-iglow.fade{opacity:0}
+.sv-iglow b{position:absolute;left:-300px;top:-300px;width:600px;height:600px;border-radius:50%;
+ background:radial-gradient(circle,rgba(255,250,215,.95) 0%,rgba(255,215,90,.6) 30%,rgba(255,190,40,.18) 58%,rgba(255,190,40,0) 72%);
+ animation:sv-igrow 1.6s cubic-bezier(.2,.8,.3,1) both,sv-ipulse 1.4s 1.6s ease-in-out infinite}
+.sv-iglow i,.sv-ititle i{position:absolute;border-radius:50%;background:radial-gradient(circle,#fff 0%,#fff6c8 35%,rgba(255,220,110,0) 70%);
+ transform:translate(-50%,-50%);opacity:0;animation:sv-itw 1.6s ease-in-out infinite}
+@keyframes sv-igrow{0%{transform:scale(.05);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes sv-ipulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes sv-itw{0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.3)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}}
+.sv-ititle{position:absolute;top:255px;z-index:60;width:0;height:0;pointer-events:none;animation:sv-itin 1.1s cubic-bezier(.3,1.4,.5,1) both}
+.sv-ititle.out{animation:sv-itout .5s ease-in both}
+.sv-ititle img{position:absolute;left:0;top:0;height:140px;width:auto;max-width:none;transform:translate(-50%,-50%);
+ filter:drop-shadow(0 0 18px rgba(255,230,140,.95)) drop-shadow(0 8px 6px rgba(60,25,0,.5))}
+.sv-ititxt{position:absolute;left:0;top:0;transform:translate(-50%,-50%);white-space:nowrap;font-family:'Lilita One',sans-serif;font-size:120px;
+ color:#ffd23a;-webkit-text-stroke:8px #6b3a0a;paint-order:stroke fill;filter:drop-shadow(0 0 18px rgba(255,230,140,.95))}
+.sv-ihalo{position:absolute;left:-460px;top:-160px;width:920px;height:320px;border-radius:50%;
+ background:radial-gradient(ellipse,rgba(255,240,170,.75) 0%,rgba(255,210,80,.3) 40%,rgba(255,210,80,0) 70%);animation:sv-ipulse 1.6s ease-in-out infinite}
+@keyframes sv-itin{0%{opacity:0;transform:scale(.6)}100%{opacity:1;transform:scale(1)}}
+@keyframes sv-itout{0%{opacity:1}100%{opacity:0;transform:translateY(-60px) scale(.8)}}
+.sv-wwrap{position:relative;margin:20px 50px 0}
+.sv-wlist{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:6px 0}
+.sv-wlist::-webkit-scrollbar{display:none}
+.sv-wcard{flex:0 0 258px;scroll-snap-align:start;box-sizing:border-box}
+.sv-big img.sv-wpic{height:160px;object-fit:cover;border-radius:16px}
+.sv-wcard.locked img.sv-wpic{filter:grayscale(1) contrast(.85) brightness(1.05);opacity:.7}
+.sv-wcard.locked p{color:#a8977a}
+.sv-warr{position:absolute;top:50%;z-index:2;width:62px;height:96px;margin-top:-48px;border-radius:22px;background:linear-gradient(#ff8ab5,#e0457a);
+ border:5px solid #fff;box-shadow:0 6px 0 #9c1d4c,0 10px 14px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.sv-warr.l{left:-74px}.sv-warr.r{right:-74px}
+.sv-warr svg{width:34px;height:34px;filter:drop-shadow(0 2px 0 #9c1d4c)}
+.sv-warr:active{transform:translateY(4px);box-shadow:0 2px 0 #9c1d4c}
+.sv-warr.off{opacity:.35}
 .sv-big.locked .sv-q{height:190px;display:flex;align-items:center;justify-content:center;font-size:90px;color:#c9a46a}
 .sv-exit{width:760px;height:317px;padding:52px 40px 0;text-align:center;background:url(${UI}/frame_exit.webp) 0 0/100% 100% no-repeat;filter:drop-shadow(0 12px 16px rgba(0,0,0,.5))}
 .sv-exit .q1{font-size:42px;color:#8a4a10;white-space:nowrap}
