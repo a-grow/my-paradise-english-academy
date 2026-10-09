@@ -510,13 +510,13 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const [jarShown, setJarShown] = useState(() => {
     const testJ = onTest ? parseInt(q.get("j") ?? "", 10) : NaN; // TEST ONLY: ?j=10 = pretend 10 treats were just won
     if (Number.isFinite(testJ) && testJ > 0) return Math.max(0, v.jarTreats - testJ);
-    const seen = parseInt(localStorage.getItem(seenKey) ?? "", 10);
+    const seen = v.isMaster ? NaN : parseInt(localStorage.getItem(seenKey) ?? "", 10); // 1006: jar is 99 every visit - no fake drop-in
     return Number.isFinite(seen) && seen >= 0 && seen < v.jarTreats ? seen : v.jarTreats;
   });
   const firstJar = useRef(true);
   useEffect(() => {
     if (testKeep || (holding && v.jarTreats > jarShown)) return; // a celebration is on: prizes fill the jar when they land (a feed still shows at once)
-    if (!v.readOnly) localStorage.setItem(seenKey, String(v.jarTreats)); // a visit writes nothing
+    if (!v.readOnly && !v.isMaster) localStorage.setItem(seenKey, String(v.jarTreats)); // a visit + 1006 write nothing
     const wait = firstJar.current && jarShown < v.jarTreats ? 900 : 0; // first time: let the page settle, then drop them in
     firstJar.current = false;
     const t = window.setTimeout(() => setJarShown(v.jarTreats), wait);

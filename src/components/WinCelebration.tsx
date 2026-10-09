@@ -257,6 +257,9 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
     let arrived = 0, tArrived = 0, coinsDone = flyers === 0, treatsDone = tFlyers === 0, ended = false;
     // both done (coins in the pill + treats in the jar) -> thumbs-up, glow, buttons
     const allDone = () => { if (ended || !coinsDone || !treatsDone) return; ended = true; later(finish, 250); later(() => setReady(true), 500); };
+    // Andy 2026-10-09: buttons wake 1 second earlier = 500ms BEFORE the last coin/treat lands (paid at the win already)
+    const lastLand = Math.max(flyers > 0 ? (flyers - 1) * GAP + POP + FLIGHT : 0, tFlyers > 0 ? 60 + (tFlyers - 1) * 160 + POP + FLIGHT : 0);
+    later(() => setReady(true), Math.max(400, START + lastLand + 500 - 1000));
 
     const land = () => {
       arrived++;

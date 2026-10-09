@@ -77,7 +77,7 @@ export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, heroImgs, li
     const tune = play(music.file, 0.5); // grow-up: the win-screen fanfare (Andy 16:53); world finished: its own music
     tune?.addEventListener("ended", () => setMusicDone(true));
     const ts = [
-      window.setTimeout(() => setMusicDone(true), MUSIC_MS), // sound off / blocked: same wait
+      window.setTimeout(() => setMusicDone(true), Math.max(0, MUSIC_MS - 1000)), // Andy 2026-10-09: OK wakes 1s before the music ends
       window.setTimeout(() => setEmbers(true), WORD_DONE),
       window.setTimeout(() => setOkReady(true), okAt),
     ];
