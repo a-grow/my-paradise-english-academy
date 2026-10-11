@@ -25,6 +25,7 @@ import { worldHowTo } from "@/components/howtos";
 import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL } from "@/cards/economy";
 import { isCloseBtn, playCloseBeep } from "@/lib/clickSfx";
 import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
+import { REAL_CODES as PUZZLE_REAL_CODES, demoPiecesGet, demoPiecesSet } from "@/pages/PuzzleMixup";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 
 // ---- per-world settings (step 6) ----
@@ -322,6 +323,9 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     window.setTimeout(() => { setDone(null); if (v.showComplete) v.closeComplete(); }, 1750);
   };
   const [coinShown, setCoinShown] = useState(0);
+  const [pieceShown, setPieceShown] = useState(0);   // PUZZLE PIECE COUNTER on the Puzzle button (Andy 2026-10-11): holds + counts up like the coins
+  const [demoPieces, setDemoPieces] = useState(() => (v.isMaster ? demoPiecesGet() : 0));   // 1006: the tab's pretend piece count, shared with the Puzzle page (nothing saved)
+  const pzCountRef = useRef<HTMLDivElement>(null);
   const [bump, setBump] = useState<Record<string, number>>({});
   const [newIds, setNewIds] = useState<string[]>([]); // EXTRA red dots in this page only (test flags ?v=1 / ?t=1, just watched)
   const stageRef = useRef<HTMLDivElement>(null);
@@ -363,9 +367,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   };
   const partyTarget = (k: PrizeKind) =>
     k === "coin" ? at(coinRef.current, 0.2, 0.5) : k === "treat" ? at(jarRef.current, 0.5, 0.1)
-      : k === "badge" ? at(badgesRef.current, 0.22, 0.38) : at(puzzleRef.current, 0.17, 0.5);
+      : k === "badge" ? at(badgesRef.current, 0.22, 0.38) : pzCountRef.current ? at(pzCountRef.current, 0.5, 0.5) : at(puzzleRef.current, 0.17, 0.5);
   const partyLand = (k: PrizeKind, add: number) => {
     if (k === "coin") setCoinShown(c => c + add);
+    if (k === "piece") { setPieceShown(c => c + add); if (v.isMaster) { setDemoPieces(d => d + add); demoPiecesSet(demoPiecesGet() + add); } }
     if (k === "badge") setBadgesShown(b => b + 1);
     setBump(b => ({ ...b, [k]: (b[k] ?? 0) + 1 }));
   };
@@ -435,6 +440,8 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const [testKeep, setTestKeep] = useState(false);
   const holding = !!(party || done || mini || dailyDay || testKeep || intro !== "off");
   useEffect(() => { if (!holding) setCoinShown(v.coins ?? 0); }, [v.coins, holding]);
+  const pieceReal = v.isMaster ? demoPieces : v.pieces;
+  useEffect(() => { if (!holding && pieceReal !== null) setPieceShown(pieceReal); }, [pieceReal, holding]);
   // MY BADGES (step 5.4): one badge per finished world = '<world>:complete' in the kid's prize list (from the cloud).
   // During the world-finished party the new badge flies in first, then lights up (same hold as coins / jar).
   const wonBadges = (v.prizes ?? []).filter(p => /^[a-z]+:complete$/.test(p)).map(p => p.split(":")[0]);
@@ -475,7 +482,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const newReady = slots.some(x => x.ready) || (onTest && q.get("n") === "1" && !unlockedNow);
   // ALBUM METER (Andy 2026-10-07): coins toward the next card pack; packs ready = red dot + glow (waits for the new-friend glow)
   const albumOn = v.isMaster || ALBUM_FOR_ALL;
-  const puzzleOn = v.isMaster;   // Puzzle Mixup: 1006 only until its cloud session (2026-10-11)
+  const puzzleOn = v.isMaster || PUZZLE_REAL_CODES.includes(v.code);   // Puzzle Mixup: 1006 demo + the real-saving codes in PuzzleMixup.tsx REAL_CODES (TEST99 now; every kid at launch)
   const albumCoins = v.isMaster ? DEMO_COINS : (v.coins ?? 0);
   const albumPacks = albumOn ? Math.floor(albumCoins / PACK_PRICE) : 0;
   const albumPct = albumPacks > 0 ? 100 : ((albumCoins % PACK_PRICE) / PACK_PRICE) * 100;
@@ -834,6 +841,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           <div className="sv-imgbtn sv-tap" onClick={goGrammar}><img src={`${UI}/btn_grammar.webp`} alt="Grammar Games" /></div>
           <div ref={puzzleRef} className={"sv-imgbtn sv-tap sv-pzbtn" + lift} style={bumpStyle("piece")} onClick={puzzleOn ? () => goGames(`/puzzle/${v.code}/${v.studentName}`) : soon}>
             <img src="/puzzle/btn_blank.webp" alt="Puzzle Mixup!" /><img className="sv-pzico" src="/puzzle/piece.webp" alt="" />
+            {puzzleOn && (v.isMaster || v.pieces !== null) && <div ref={pzCountRef} className="sv-pzcount"><span key={pieceShown}>{pieceShown}</span></div>}
             <div className="sv-pzw"><MixupWord size={40} twoLines /></div>
           </div>
           <div className="sv-imgbtn sv-tap" onClick={() => setPanel("theater")}>
@@ -1112,6 +1120,9 @@ const CSS = `
 @keyframes sv-inT{0%{transform:translateY(-280px)}100%{transform:none}}
 .sv-imgbtn{position:relative;width:270px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
 .sv-imgbtn .sv-pzico{position:absolute;left:2%;top:11%;width:30%;filter:drop-shadow(0 3px 3px rgba(0,0,0,.3))}
+.sv-pzcount{position:absolute;right:-12px;top:-14px;min-width:64px;height:50px;padding:0 12px;box-sizing:border-box;border-radius:30px;z-index:2;background:linear-gradient(#ffffff,#eadcff);border:4px solid #7d4fd0;display:flex;align-items:center;justify-content:center;font-family:'Titan One',sans-serif;font-size:30px;color:#6b2fb5;pointer-events:none;box-shadow:0 4px 6px rgba(40,0,80,.35)}
+.sv-pzcount span{display:inline-block;animation:sv-pzn .3s}
+@keyframes sv-pzn{0%{transform:scale(1.5)}100%{transform:none}}
 .sv-pzw{position:absolute;left:33%;right:4%;top:0;bottom:4%;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .sv-jar{position:absolute;left:55px;bottom:52px;width:200px;height:258px}
 .sv-jarcount{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);z-index:3;background:#6b3a12;color:#fff;font-size:30px;line-height:36px;border-radius:20px;padding:0 18px;border:4px solid #ffd43b}

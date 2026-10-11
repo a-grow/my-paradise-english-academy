@@ -15,10 +15,10 @@ import HowToPlay from "@/components/HowToPlay";
 import { PUZZLE_HOWTO } from "@/components/howtos";
 import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
 import { DEMO_COINS } from "@/cards/economy";
-import { loadPuzzle, puzzlePop, addCoins } from "@/lib/cloudSave";
+import { loadPuzzle, puzzlePop, addCoins, claimPrize } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
-const REAL_CODES = ["TEST99"];   // REAL saving (puzzle cloud step 2026-10-11): test kid only until launch
+export const REAL_CODES = ["TEST99"];   // REAL saving (puzzle cloud step 2026-10-11): test kid only until launch
 const P = "/puzzle";
 const UI = "/worlds/ui";
 const STAGE_W = 1600, STAGE_H = 1000;
@@ -28,8 +28,14 @@ const FW = 960, FT = 122, PAD = 8;          // frame width + top on the stage; t
 const K = FW / FR.w, FH = FR.h * K;
 const PIC = { x: FR.hx * K - PAD, y: FR.hy * K - PAD, w: FR.hw * K + 2 * PAD, h: FR.hh * K + 2 * PAD };
 const PRIZE = { coins: 50, treats: 5 };     // shown only (Andy to decide) - the database will pay (cloud step)
-const DEMO_PIECES = 60;
+export const DEMO_PIECES = 60;   // 1006 pretend pieces (also the world page's Puzzle button counter)
+const DEMO_PCS_KEY = "mpe_demo_pieces";   // 1006: ONE pretend piece count for this browser tab, shared with the world page's Puzzle button counter (Andy 2026-10-11)
+export const demoPiecesGet = () => { try { const n = parseInt(sessionStorage.getItem(DEMO_PCS_KEY) ?? "", 10); return Number.isFinite(n) && n >= 0 ? n : DEMO_PIECES; } catch { return DEMO_PIECES; } };
+export const demoPiecesSet = (n: number) => { try { sessionStorage.setItem(DEMO_PCS_KEY, String(Math.max(0, n))); } catch { /* */ } };
 const PILL = { x: 30 + 30, y: 22 + 34 };    // where flying pieces start (the piece icon on the pill)
+const WELCOME = 8;                          // WELCOME GIFT: 8 pieces once per kid (database prize 'puzzle:welcome' pays them; Andy 2026-10-11)
+const PLUCK = [1, 1.125, 1.25, 1.5, 1.667, 2, 2.25, 2.5];   // each gift piece lands with a harp pluck, a little higher each time (like the parties)
+const pluck = (k: number) => { try { const a = new Audio("/celebration/piece_pluck.mp3") as HTMLAudioElement & { preservesPitch?: boolean; webkitPreservesPitch?: boolean }; a.volume = 0.6; a.preservesPitch = false; a.webkitPreservesPitch = false; a.playbackRate = PLUCK[k % PLUCK.length]; a.play().catch(() => { }); } catch { /* */ } };
 // 1006 DEMO: progress kept for this browser tab (sessionStorage) - a game/world trip and back keeps it; a full page load starts fresh.
 const DEMO_KEY = "mpe_demo_puzzle";
 let demoBooted = false;
@@ -237,7 +243,7 @@ function makeCovers(pz: Puzzle, W: number, H: number, seed: number): Cover[] {
   });
 }
 
-type Phase = "intro" | "play" | "paying" | "finale" | "prize" | "collect" | "next" | "out";
+type Phase = "intro" | "gift" | "play" | "paying" | "finale" | "prize" | "collect" | "next" | "out";
 type Flyer = { id: number; x0: number; y0: number; x1: number; y1: number; d: number; img: string; w: number };
 
 export default function PuzzleMixup() {
@@ -270,7 +276,7 @@ export default function PuzzleMixup() {
   const almost = () => (qs.get("almost") === "1" ? new Set(pz.need.map((_, i) => i).slice(1)) : new Set<number>());
   const [gone, setGone] = useState<Set<number>>(() => (saved ? new Set(saved.gone) : almost()));   // covers already popped off
   const [rem, setRem] = useState<number[]>(() => pz.need.slice());  // number showing on each cover (counts down while paying)
-  const [pieces, setPieces] = useState(() => { if (real) return 0; if (saved) return saved.pieces; const n = parseInt(qs.get("pc") ?? "", 10); return Number.isFinite(n) ? n : DEMO_PIECES; });
+  const [pieces, setPieces] = useState(() => { if (real) return 0; const n = parseInt(qs.get("pc") ?? "", 10); return Number.isFinite(n) ? n : demoPiecesGet(); });   // 1006 = the tab's shared pretend count
   const [coins, setCoins] = useState(real ? 0 : saved?.coins ?? DEMO_COINS);
   const [doneList, setDoneList] = useState<number[]>(() => saved?.done ?? Array.from({ length: startIdx }, (_, i) => i));
   const [phase, setPhase] = useState<Phase>("intro");
@@ -284,21 +290,27 @@ export default function PuzzleMixup() {
   const [zoom, setZoom] = useState<number | null>(null);
   const [leaving, setLeaving] = useState(false);
   const [fontReady, setFontReady] = useState(false);
+  const [gift, setGift] = useState<{ n: number; out: boolean } | null>(null);   // the 'Welcome gift!' card (n = pieces still on it)
   // REAL KID: read the puzzle + piece jar + coins first; the board waits for it. Could not read = 'try again' screen.
   const [loaded, setLoaded] = useState(!real);
   const [failed, setFailed] = useState(false);
   const prizeRef = useRef({ coins: PRIZE.coins, treats: PRIZE.treats });   // what the database paid for this puzzle
+  const giftRef = useRef(isMaster && qs.get("gift") === "1" ? WELCOME : 0);   // welcome pieces still to fly in (TEST ONLY 1006 ?gift=1 = show it, nothing saved)
   useEffect(() => {
     if (!real) return;
     let alive = true;
-    Promise.all([loadPuzzle(code, name), addCoins(code, name, 0)]).then(([p, c]) => {
+    // WELCOME GIFT: asked FIRST (the database pays 8 pieces once; a repeat = paid false), so the jar read below already holds them.
+    // The pill starts WITHOUT the gift; the pieces fly in after the frame drops (welcomeGift). A kid leaving early keeps them (paid).
+    claimPrize(code, name, "puzzle:welcome").then(w => Promise.all([loadPuzzle(code, name), addCoins(code, name, 0), w])).then(([p, c, w]) => {
       if (!alive) return;
       if (p === undefined) { setFailed(true); return; }
+      const gift = w && w.paid ? Math.max(0, Number((w as { pieces?: number }).pieces ?? WELCOME)) : 0;
+      giftRef.current = gift;
       if (typeof c === "number") setCoins(c);
       const all = !!p && p.idx >= PUZZLES.length, n = p ? Math.min(p.idx, PUZZLES.length - 1) : 0;
       setIdx(n); setRem(PUZZLES[n].need.slice());
       setGone(new Set(all ? PUZZLES[n].need.map((_, i) => i) : p ? p.gone : []));
-      setPieces(Math.max(0, p ? p.pieces : 0));
+      setPieces(Math.max(0, (p ? p.pieces : 0) - gift));
       setDoneList(Array.from({ length: all ? PUZZLES.length : n }, (_, i) => i));
       setLoaded(true);
     });
@@ -373,7 +385,7 @@ export default function PuzzleMixup() {
     const live = covers.filter(c => !gone.has(c.i));
     if (!live.length) { later(900, () => { setReveal(true); setPhase("next"); }); return; }   // every puzzle done: show the last one in colour
     live.forEach((_, k) => later(760 + k * 75, () => popIn(k)));
-    later(760 + live.length * 75 + 350, () => { setPhase("play"); lastTap.current = performance.now(); });
+    later(760 + live.length * 75 + 350, () => { if (giftRef.current > 0) welcomeGift(); else { setPhase("play"); lastTap.current = performance.now(); } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [round, on, go]);
 
@@ -485,6 +497,24 @@ export default function PuzzleMixup() {
     later(4200, () => setPhase("prize"));
   };
 
+  // WELCOME GIFT show: 'Welcome gift! x8' pops up over the frame, then the pieces fly one by one into the piece pill (harp plucks).
+  const welcomeGift = () => {
+    const n = giftRef.current; giftRef.current = 0;
+    const gy = FT + FH / 2 - 40, START = 1200, GAP = 140, FLY = 620;
+    setPhase("gift"); setGift({ n, out: false }); play("/celebration/rising_pop.mp3", 0.6);
+    fxRef.current?.burst(cx, gy, { fairies: 24, glow: 90, w: 320, sp: 0.9 });
+    const fs: Flyer[] = [];
+    for (let q = 0; q < n; q++) {
+      fs.push({ id: ++fid.current, x0: cx - 70 - 32, y0: gy + 40 - 32, x1: PILL.x - 32, y1: PILL.y - 34, d: START + q * GAP, img: `${P}/piece.webp`, w: 64 });
+      later(START + q * GAP, () => setGift(g => (g ? { ...g, n: Math.max(0, g.n - 1) } : g)));
+      later(START + q * GAP + FLY, () => { pluck(q); setPieces(x => x + 1); fxRef.current?.burst(PILL.x, PILL.y, { fairies: 4, w: 30, sp: 0.6 }); });
+    }
+    setFlyers(f => [...f, ...fs]);
+    const end = START + Math.max(0, n - 1) * GAP + FLY;
+    later(end - 250, () => setGift(g => (g ? { ...g, out: true } : g)));
+    later(end + 150, () => { const ids = new Set(fs.map(x => x.id)); setFlyers(f => f.filter(x => !ids.has(x.id))); setGift(null); setPhase("play"); lastTap.current = performance.now(); });
+  };
+
   const collect = () => {
     if (phase !== "prize") return;
     setPhase("collect"); play("/celebration/rising_pop.mp3", 0.6);   // the coin-flying sound (same as the grow-up party)
@@ -515,6 +545,8 @@ export default function PuzzleMixup() {
     const d: DemoSave = { idx: fin ? idx + 1 : idx, gone: fin ? [] : [...gone], pieces, coins, done: doneList };
     try { sessionStorage.setItem(DEMO_KEY, JSON.stringify(d)); } catch { /* */ }
   }, [isMaster, phase, idx, gone, pieces, coins, doneList]);
+
+  useEffect(() => { if (isMaster) demoPiecesSet(pieces); }, [isMaster, pieces]);   // 1006: keep the shared pretend count (world page counter reads it)
 
   const leave = () => { setLeaving(true); later(380, () => navigate(ret)); };
 
@@ -624,6 +656,12 @@ export default function PuzzleMixup() {
         {hintC && phase === "play" && (
           <div className="pz-hand" style={{ left: centre(hintC).x + hintC.m * 0.3 - HAND_W * 0.016, top: centre(hintC).y + hintC.m * 0.18 - HAND_H * 0.945, width: HAND_W }}>
             <img src={`${UI}/hand_point.webp`} alt="" />
+          </div>
+        )}
+        {gift && (
+          <div className={"pz-gift" + (gift.out ? " out" : "")} style={{ left: cx, top: FT + FH / 2 - 40 }}>
+            <div className="pz-gift-t">Welcome gift!</div>
+            <div className="pz-gift-n"><img src={`${P}/piece.webp`} alt="pieces" /><b key={gift.n}>x{gift.n}</b></div>
           </div>
         )}
         {flyers.map(f => (
@@ -761,6 +799,14 @@ const CSS = `
 .pz-hand img{display:block;width:100%;filter:drop-shadow(0 5px 5px rgba(0,0,0,.35));animation:pz-tapH .55s cubic-bezier(.45,0,.55,1) infinite alternate}
 @keyframes pz-tapH{from{transform:translate(0,0)}to{transform:translate(10px,-14px)}}
 .pz-fly{position:absolute;left:0;top:0;z-index:50;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35));animation:pz-fly .62s var(--d) cubic-bezier(.45,0,.55,1) both}
+.pz-gift{position:absolute;transform:translate(-50%,-50%);z-index:45;background:#fff;color:#6b2fb5;border:6px solid #7d4fd0;border-radius:34px;padding:18px 44px 14px;text-align:center;white-space:nowrap;box-shadow:0 14px 30px rgba(40,0,80,.45);animation:pz-gin .5s cubic-bezier(.3,1.5,.5,1) backwards}
+.pz-gift.out{animation:pz-gout .4s ease-in forwards}
+.pz-gift-t{font-size:56px;line-height:1.1;color:#ff4f9a}
+.pz-gift-n{display:flex;align-items:center;justify-content:center;gap:12px;font-size:52px;margin-top:6px}
+.pz-gift-n img{height:72px;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25))}
+.pz-gift-n b{font-weight:400;display:inline-block;animation:pz-nb .3s}
+@keyframes pz-gin{from{opacity:0;transform:translate(-50%,-50%) scale(.3)}to{opacity:1;transform:translate(-50%,-50%)}}
+@keyframes pz-gout{to{opacity:0;transform:translate(-50%,-50%) scale(.85)}}
 @keyframes pz-fly{0%{transform:translate(var(--x0),var(--y0)) scale(.6);opacity:0}12%{opacity:1}50%{transform:translate(var(--xm),var(--ym)) scale(1.15)}100%{transform:translate(var(--x1),var(--y1)) scale(.8);opacity:1}}
 .pz-zoom{position:absolute;inset:0;z-index:70;background:rgba(25,5,50,.78);display:flex;align-items:center;justify-content:center;animation:pz-fade .3s}
 .pz-zoom>img{width:min(80%,1180px);border-radius:30px;border:10px solid #ffd75a;box-shadow:0 20px 40px rgba(0,0,0,.5);animation:pz-zin .4s cubic-bezier(.3,1.5,.5,1)}

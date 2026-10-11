@@ -42,7 +42,7 @@ export const isCloseBtn = (start: EventTarget | null) => {
   if (!el) return false;
   if (el.closest("[data-closex]")) return true;
   if (el.tagName === "IMG" && (el as HTMLImageElement).src.includes("rb_exit")) return true;
-  const host = el.closest("button,[role=button],.sv-tap,.ca-tap");
+  const host = el.closest("button,[role=button],.sv-tap,.ca-tap,.pz-tap");   // .pz-tap = Puzzle Mixup (Andy 2026-10-11: every red X beeps)
   return !!host && !!host.querySelector(':scope > img[src*="rb_exit"]');
 };
 
