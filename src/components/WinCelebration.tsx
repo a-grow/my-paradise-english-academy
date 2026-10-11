@@ -13,6 +13,7 @@ type Props = {
   muted: boolean;
   treatsTotal?: number | null; // NOT SHOWN since 2026-10-04 (jar removed) - kept so the game pages need no change
   treatsWon?: number;          // treats this win paid (grammar: 2)
+  piecesWon?: number;          // puzzle pieces this win paid (every game win: 1) - fly to the bottom-left like the treats
   fanfare?: boolean;   // play Run's win fanfare when the screen opens (Swim/Dig/Grab; Run already had it at the flag)
   onChooseGame: () => void;
   onReturnToWorld: () => void;
@@ -25,6 +26,8 @@ const WIN_SFX = ART + "win_pop.mp3";       // the moment the win screen pops up
 const FANFARE = ART + "win_fanfare.mp3";   // Run's victory fanfare
 const TREAT_IMG = "/worlds/ui/treat.webp";  // the new treat (same as the world page)
 const TREAT_HTML = `<img src="${TREAT_IMG}" alt="" style="display:block;width:100%;height:100%;object-fit:contain">`;
+const PIECE_IMG = "/puzzle/piece.webp";   // the purple Puzzle Mixup piece (2026-10-11)
+const PIECE_HTML = `<img src="${PIECE_IMG}" alt="" style="display:block;width:100%;height:100%;object-fit:contain">`;
 
 // Load the art as soon as a game page loads, so Andy is ready the moment a kid wins.
 if (typeof window !== "undefined") {
@@ -91,6 +94,7 @@ const CSS = `
 .wc-src { width:max(86px, calc(var(--u) * 11)); height:max(86px, calc(var(--u) * 11)); }
 .wc-row.drain .wc-src { animation:wc-shake .15s linear infinite; }
 .wc-rows { display:flex; align-items:center; justify-content:center; gap:max(150px, calc(var(--u) * 19)); margin:calc(var(--u) * 2.5) 0; }
+.wc-row.p3 { animation-delay:1.2s; }
 .wc-row.t2 { animation-delay:1.0s; } /* treat row is first now: it pops in first */
 .wc-src img { display:block; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 3px 3px rgba(0,0,0,.35)); }
 .wc-fly.wc-tfly { width:60px; height:60px; margin:-30px 0 0 -30px; }
@@ -151,7 +155,7 @@ const CSS = `
 @keyframes wc-twinkle { 0%,100%{opacity:0; transform:scale(.3) rotate(0deg)} 50%{opacity:1; transform:scale(1.3) rotate(45deg)} }
 `;
 
-export default function WinCelebration({ coinsWon, startTotal, treatsTotal = null, treatsWon = 2, muted, fanfare = false, onChooseGame, onReturnToWorld }: Props) {
+export default function WinCelebration({ coinsWon, startTotal, treatsTotal = null, treatsWon = 2, piecesWon = 0, muted, fanfare = false, onChooseGame, onReturnToWorld }: Props) {
   const won = Math.max(0, Math.floor(Number(coinsWon) || 0));
   const start = Math.max(0, Math.floor(Number(startTotal) || 0));
 
@@ -168,6 +172,7 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
   const jarRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLSpanElement>(null);
   const treatSrcRef = useRef<HTMLDivElement>(null);
+  const pieceSrcRef = useRef<HTMLDivElement>(null);
   const treatsTotalRef = useRef(treatsTotal);
   treatsTotalRef.current = treatsTotal;
 
@@ -254,11 +259,13 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
     sfx.preload = "auto";
     const flyers = Math.min(won, MAX_FLYERS);
     const tFlyers = Math.min(Math.max(0, treatsWon), 6);
+    const pFlyers = Math.min(Math.max(0, piecesWon), 6);
     let arrived = 0, tArrived = 0, coinsDone = flyers === 0, treatsDone = tFlyers === 0, ended = false;
+    let pArrived = 0, piecesDone = pFlyers === 0;
     // both done (coins in the pill + treats in the jar) -> thumbs-up, glow, buttons
-    const allDone = () => { if (ended || !coinsDone || !treatsDone) return; ended = true; later(finish, 250); later(() => setReady(true), 500); };
+    const allDone = () => { if (ended || !coinsDone || !treatsDone || !piecesDone) return; ended = true; later(finish, 250); later(() => setReady(true), 500); };
     // Andy 2026-10-09: buttons wake 1 second earlier = 500ms BEFORE the last coin/treat lands (paid at the win already)
-    const lastLand = Math.max(flyers > 0 ? (flyers - 1) * GAP + POP + FLIGHT : 0, tFlyers > 0 ? 60 + (tFlyers - 1) * 160 + POP + FLIGHT : 0);
+    const lastLand = Math.max(flyers > 0 ? (flyers - 1) * GAP + POP + FLIGHT : 0, tFlyers > 0 ? 60 + (tFlyers - 1) * 160 + POP + FLIGHT : 0, pFlyers > 0 ? 360 + (pFlyers - 1) * 160 + POP + FLIGHT : 0);
     later(() => setReady(true), Math.max(400, START + lastLand + 500 - 1000));
 
     const land = () => {
@@ -304,6 +311,13 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
       setTreatsIn(Math.round((treatsWon * tArrived) / tFlyers));
       if (tArrived === tFlyers) { treatsDone = true; allDone(); }
     };
+    let pieceDst = { x: 0, y: 0 };
+    const landPiece = () => {
+      flash(pieceDst.x, pieceDst.y);
+      pArrived++;
+      if (pArrived === 1 && flyers === 0 && tFlyers === 0) setHop(true);
+      if (pArrived === pFlyers) { piecesDone = true; allDone(); }
+    };
 
     const launch = (src: { x: number; y: number }, dst: { x: number; y: number }, html: string, onLand: () => void, cls = "") => {
       const c = document.createElement("div");
@@ -340,9 +354,11 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
     later(() => {
       const coinOk = flyers > 0 && !!srcRef.current && !!pillCoinRef.current;
       const treatOk = tFlyers > 0 && !!treatSrcRef.current;
+      const pieceOk = pFlyers > 0 && !!pieceSrcRef.current;
       if (!coinOk) { setTotal(start + won); coinsDone = true; }
       if (!treatOk) { setTreatsIn(treatsWon); treatsDone = true; }
-      if (!coinOk && !treatOk) { allDone(); return; }
+      if (!pieceOk) piecesDone = true;
+      if (!coinOk && !treatOk && !pieceOk) { allDone(); return; }
       setFlying(true);
       if (coinOk) {
         const src = center(srcRef.current!), dst = center(pillCoinRef.current!);
@@ -354,6 +370,12 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
         const dst = { x: rr.left + 70, y: rr.bottom - 70 }; // bottom-left corner
         treatDst = dst;
         for (let i = 0; i < tFlyers; i++) later(() => launch(src, dst, TREAT_HTML, landTreat, " wc-tfly"), 60 + i * 160);
+      }
+      if (pieceOk) {   // puzzle pieces: same trip as the treats (bottom-left flash), just after them, with the coin sound
+        const src = center(pieceSrcRef.current!), rr = root.getBoundingClientRect();
+        pieceDst = { x: rr.left + 70, y: rr.bottom - 70 };
+        later(() => { if (!mutedRef.current) { const a = new Audio(SFX); a.play().catch(() => {}); } }, 360 + POP + FLIGHT - 100);
+        for (let i = 0; i < pFlyers; i++) later(() => launch(src, pieceDst, PIECE_HTML, landPiece, " wc-tfly"), 360 + i * 160);
       }
     }, START);
 
@@ -411,6 +433,13 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
             <div className="wc-src" ref={srcRef}><CoinFill /></div>
             <span>{"×"}{won}</span>
             <span className={`wc-plus${flying ? " go" : ""}`}>+{won}</span>
+          </div>
+        )}
+        {piecesWon > 0 && (
+          <div className={`wc-row p3${flying ? " drain" : ""}${shine ? " shine" : ""}`}>
+            <div className="wc-src" ref={pieceSrcRef}><img src={PIECE_IMG} alt="" draggable={false} /></div>
+            <span>{"×"}{piecesWon}</span>
+            <span className={`wc-plus${flying ? " go" : ""}`}>+{piecesWon}</span>
           </div>
         )}
         </div>

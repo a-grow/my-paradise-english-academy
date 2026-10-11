@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { addTreats, addCoins } from "@/lib/cloudSave";
+import { addTreats, addCoins, addPieces } from "@/lib/cloudSave";
 import GrammarGameBar from "@/components/GrammarGameBar";
 import { useClickSfx } from "@/lib/clickSfx";
 import ControlHints, { HINT_TOP } from "@/components/ControlHints";
@@ -56,6 +56,7 @@ export default function GrammarDig() {
         localStorage.setItem(jarKey, String(newTotal));
         setTreatsAfter(newTotal); // this device's number until the database answers
         // ONE JAR: send only "+2" - the database adds it (never the device's whole number).
+        addPieces(kidCode, kidName, 1);   // +1 puzzle piece per WIN (2026-10-11; the database adds it)
         addTreats(kidCode, kidName, 2).then(total => { if (typeof total === "number") { localStorage.setItem(jarKey, String(total)); setTreatsAfter(total); } });
         // let the game's own ending (fireworks / chest / last grab) play, then show the celebration
         window.setTimeout(() => {
@@ -105,6 +106,7 @@ export default function GrammarDig() {
           coinsWon={coinsWon}
           startTotal={coinStart}
           treatsTotal={treatsAfter}
+          piecesWon={1}
           muted={muted}
           fanfare
           onChooseGame={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}

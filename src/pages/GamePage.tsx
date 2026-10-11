@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useHowtoSeen } from "@/lib/howtoSeen";
 import GameTest from "./GameTest";
-import { addTreats, addCoins } from "@/lib/cloudSave";
+import { addTreats, addCoins, addPieces } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
@@ -149,6 +149,7 @@ const GamePage = () => {
   // pay "+N" only on a WIN - the database adds it (like the grammar games). Teacher code 1006 pays nothing.
   const coinTotal = useCallback(async () => (isMaster ? 0 : await addCoins(code!, studentName!, 0)), [isMaster, code, studentName]);
   const payCoins = useCallback((n: number) => { if (!isMaster && n > 0) addCoins(code!, studentName!, n); }, [isMaster, code, studentName]);
+  const payPieces = useCallback(() => { if (!isMaster) addPieces(code!, studentName!, 1); }, [isMaster, code, studentName]);   // +1 puzzle piece per WIN
 
   // Back to the world the kid came from. Ocean + Dino: as before. A new-look world (savanna...) remembered its own
   // page address in this tab (mpe_return_world, set when its Vocab button was tapped) - only used if it is this kid's.
@@ -181,6 +182,7 @@ const GamePage = () => {
         onMusicTrack={setTrack}
         onCoinTotal={coinTotal}
         onPayCoins={payCoins}
+        onPayPieces={payPieces}
       />
 
     </div>
