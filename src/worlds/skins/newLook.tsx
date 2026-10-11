@@ -24,6 +24,7 @@ import HowToPlay from "@/components/HowToPlay";
 import { worldHowTo } from "@/components/howtos";
 import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL } from "@/cards/economy";
 import { isCloseBtn, playCloseBeep } from "@/lib/clickSfx";
+import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 
 // ---- per-world settings (step 6) ----
@@ -467,6 +468,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const newReady = slots.some(x => x.ready) || (onTest && q.get("n") === "1" && !unlockedNow);
   // ALBUM METER (Andy 2026-10-07): coins toward the next card pack; packs ready = red dot + glow (waits for the new-friend glow)
   const albumOn = v.isMaster || ALBUM_FOR_ALL;
+  const puzzleOn = v.isMaster;   // Puzzle Mixup: 1006 only until its cloud session (2026-10-11)
   const albumCoins = v.isMaster ? DEMO_COINS : (v.coins ?? 0);
   const albumPacks = albumOn ? Math.floor(albumCoins / PACK_PRICE) : 0;
   const albumPct = albumPacks > 0 ? 100 : ((albumCoins % PACK_PRICE) / PACK_PRICE) * 100;
@@ -482,7 +484,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const soon = () => toast("Coming soon!");
   // VOCAB + GRAMMAR (5.4, Andy 21:27): kids land on the BOOK choice (vocab arcade) / the LEVEL list (grammar hub) first.
   // The page remembers itself (this tab only) so the games' 'back to world' brings the kid back HERE.
-  const goGames = (path: string) => { sessionStorage.setItem("mpe_return_world", window.location.pathname); v.navigate(path); };
+  const goGames = (path: string) => { sessionStorage.setItem("mpe_return_world", window.location.pathname + window.location.search); v.navigate(path); }; // + ?query: the demo flag survives the trip (2026-10-11)
   const goVocab = () => goGames(`${v.world.gamePath}/${v.code}/${v.studentName}/${v.family?.book ?? 1}`);
   const goGrammar = () => goGames(`/grammar-hub/${v.code}/${v.studentName}`);
   const [panel, setPanel] = useState<null | "animals" | "exit" | "theater" | "worlds">(null);
@@ -734,7 +736,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
 
   return (
     <div className="sv-root" onPointerDown={onPointerDown}>
-      <style>{FONTS + CSS}</style>
+      <style>{FONTS + CSS + MIXUP_CSS}</style>
       <div className={"sv-stage" + (intro !== "off" ? " intro ip" + ip : "")} ref={stageRef} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
         <div className="sv-fill" ref={fillRef}><img src={L.fill} alt="" /></div>
         {intro !== "off" && prevFar && ip <= 1 && <div className="sv-iback" ref={backRef}><img src={prevFar} alt="" /></div>}
@@ -823,7 +825,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         <div className="sv-left sv-inL">
           <div className="sv-imgbtn sv-tap" onClick={goVocab}><img src={`${UI}/btn_vocab.webp`} alt="Vocab Games" /></div>
           <div className="sv-imgbtn sv-tap" onClick={goGrammar}><img src={`${UI}/btn_grammar.webp`} alt="Grammar Games" /></div>
-          <div ref={puzzleRef} className={"sv-imgbtn sv-tap" + lift} style={bumpStyle("piece")} onClick={soon}><img src={`${UI}/btn_puzzle.webp`} alt="Puzzle Activity" /></div>
+          <div ref={puzzleRef} className={"sv-imgbtn sv-tap sv-pzbtn" + lift} style={bumpStyle("piece")} onClick={puzzleOn ? () => goGames(`/puzzle/${v.code}/${v.studentName}`) : soon}>
+            <img src="/puzzle/btn_blank.webp" alt="Puzzle Mixup!" /><img className="sv-pzico" src="/puzzle/piece.webp" alt="" />
+            <div className="sv-pzw"><MixupWord size={40} twoLines /></div>
+          </div>
           <div className="sv-imgbtn sv-tap" onClick={() => setPanel("theater")}>
             <img src={`${UI}/btn_video.webp`} alt="Video Theater" />{allNew.length > 0 && <span className="sv-dot" />}
           </div>
@@ -1099,6 +1104,8 @@ const CSS = `
 @keyframes sv-inB{0%{transform:translateY(420px)}100%{transform:none}}
 @keyframes sv-inT{0%{transform:translateY(-280px)}100%{transform:none}}
 .sv-imgbtn{position:relative;width:270px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
+.sv-imgbtn .sv-pzico{position:absolute;left:2%;top:11%;width:30%;filter:drop-shadow(0 3px 3px rgba(0,0,0,.3))}
+.sv-pzw{position:absolute;left:33%;right:4%;top:0;bottom:4%;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .sv-jar{position:absolute;left:55px;bottom:52px;width:200px;height:258px}
 .sv-jarcount{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);z-index:3;background:#6b3a12;color:#fff;font-size:30px;line-height:36px;border-radius:20px;padding:0 18px;border:4px solid #ffd43b}
 .sv-jarlbl{position:absolute;left:55px;bottom:14px;width:200px;height:36px;object-fit:contain;filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));pointer-events:none}

@@ -25,6 +25,7 @@ import GrammarHub from "./pages/GrammarHub";
 import NotFound from "./pages/NotFound";
 import TeacherHQ from "./pages/TeacherHQ";
 import CardAlbum from "./pages/CardAlbum";
+import PuzzleMixup from "./pages/PuzzleMixup";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => (
 <Route path="/grammar-grab/:code/:studentName/:level?" element={<GrammarGrab />} />
 <Route path="/grammar-hub/:code/:studentName/:level?" element={<GrammarHub />} />
 <Route path="/album/:code/:studentName" element={<CardAlbum />} />{/* Card Album step 1: teacher 1006 display only */}
+<Route path="/puzzle/:code/:studentName" element={<PuzzleMixup />} />{/* Puzzle Mixup step 1: teacher 1006 display only (2026-10-11) */}
 <Route path="/cookie-jar-preview" element={<CookieJarPreview />} />
 <Route path="/world-test/dino/:code/:studentName" element={<WorldTestSavanna world={DINO_WORLD_NEW} />} />
 <Route path="/world-test/ocean/:code/:studentName" element={<WorldTestSavanna world={OCEAN_WORLD_NEW} />} />

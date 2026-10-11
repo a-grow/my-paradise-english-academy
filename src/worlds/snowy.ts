@@ -2,7 +2,7 @@
 // must go into the database lock list BEFORE kids can finish it). English only (no Chinese). Penguin on purpose (North + South Pole mix).
 // STAGE PRICES (Andy 2026-10-07): treats per stage arctic fox 25, polar bear 30, penguin 30, seal 35, walrus 35, snowy owl 40
 // (stage mins 0, p, 2p, 3p). Snowy owl grown = 120 = the database lock's 'snowy finished' number - change BOTH together.
-// Videos: none yet (Andy) -> video null (a kid can't unlock the next animal until videos exist; 1006 display is fine).
+// Videos: arcticfox, polarbear, penguin from Andy 2026-10-10 (public/worlds/snowy/<id>-video.mp4; originals BACKUPFILES/world4_art/originals). seal, walrus, snowyowl still null.
 // Pictures: public/worlds/snowy/<id>-<egg|baby|young|grown>(-t).webp, cut 2026-10-08 from Andy's Gemini sprite sheets.
 import type { Animal } from "./types";
 
@@ -21,7 +21,7 @@ export const SNOWY_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 75, img: `${P}/arcticfox-grown.webp` },
     ],
     unlockCondition: "default",
-    ...ICE, video: null, isEggType: false, scale: 1,
+    ...ICE, video: `${P}/arcticfox-video.mp4`, isEggType: false, scale: 1,
     feedLabel: "arctic fox", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Arctic Fox!", subZh: "" },
@@ -39,7 +39,7 @@ export const SNOWY_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 90, img: `${P}/polarbear-grown.webp` },
     ],
     unlockCondition: "arcticfox_grown_video_watched",
-    ...ICE, video: null, isEggType: false, scale: 1,
+    ...ICE, video: `${P}/polarbear-video.mp4`, isEggType: false, scale: 1,
     feedLabel: "polar bear", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Polar Bear!", subZh: "" },
@@ -57,7 +57,7 @@ export const SNOWY_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 90, img: `${P}/penguin-grown.webp` },
     ],
     unlockCondition: "polarbear_grown_video_watched",
-    ...ICE, video: null, isEggType: true, scale: 1,
+    ...ICE, video: `${P}/penguin-video.mp4`, isEggType: true, scale: 1,
     feedLabel: "penguin", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Penguin!", subZh: "" },

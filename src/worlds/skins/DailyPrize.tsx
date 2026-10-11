@@ -16,7 +16,7 @@ export const DAILY_TABLE: { t: number; c: number; p: number }[] = [
 ];
 export type DailyKind = "treat" | "coin" | "piece";
 type Pt = { x: number; y: number };
-const ICON: Record<DailyKind, string> = { treat: `${UI}/treat.webp`, coin: `${UI}/coin.webp`, piece: `${UI}/i_puzzle.webp` };
+const ICON: Record<DailyKind, string> = { treat: `${UI}/treat.webp`, coin: `${UI}/coin.webp`, piece: "/puzzle/piece.webp" };   // new purple Puzzle Mixup piece (2026-10-11)
 const items = (i: number) => {
   const r = DAILY_TABLE[i];
   return ([["treat", r.t], ["coin", r.c], ["piece", r.p]] as [DailyKind, number][]).filter(([, n]) => n > 0);

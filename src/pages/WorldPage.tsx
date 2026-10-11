@@ -4,8 +4,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, loadJarFromCloud, addTreats, addCoins, claimPrize, loadPrizes, claimDailyPrize, loadDailyPrize, loadSeen, markSeen, claimDailyTreat, dailyClaimedToday } from "@/lib/cloudSave";
 import { getAnimalStage, getAnimalStageIdx, type Animal } from "@/worlds/types";
 import { ALL_WORLDS, COMING_WORLDS, worldState, type WorldConfig } from "@/worlds";
+import { DEMO_COINS } from "@/cards/economy";
 
 const MASTER_CODE = "1006";
+const demoBooted: Record<string, boolean> = {};   // DEMO START: first brain of this page load per world = start fresh
 
 // WORLD TEMPLATE (step 4, 2026-09-29): ONE brain for every world. useWorldBrain holds ALL the rules
 // (saving, cloud read-back, feeding, unlocking, daily treat, visit-5, level-up, world finished).
@@ -29,6 +31,14 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   // last-animal, no jar/coins/prizes/Daily Prize, no visit days, no device keys (lsSet), no finished screen, no jump.
   // (Only the Video Theater's red dots may still go away - seen flags, no progress. Andy 09:48.)
   const noSave = isMaster || readOnly;
+  // DEMO START (Andy 2026-10-11): 1006 on /world-test/ only. ?fresh=<animal id> = this world starts fresh IN MEMORY: that animal
+  // at stage 0 (Feed works), the animals before it grown + video watched, later ones not; coins 640. 1006 saves nothing.
+  const demoAt = isMaster && window.location.pathname.startsWith("/world-test/") ? ANIMALS.findIndex(a => a.id === new URLSearchParams(window.location.search).get("fresh")) : -1;
+  const demoKey = `mpe_demo_${world.id}`;   // this browser tab only (sessionStorage), never localStorage / cloud
+  if (demoAt >= 0 && !demoBooted[world.id]) { demoBooted[world.id] = true; try { sessionStorage.removeItem(demoKey); } catch { /* */ } }
+  const demoSaved = ((): { fed?: Record<string, number>; vid?: Record<string, boolean>; active?: string } | null => {
+    if (demoAt < 0) return null; try { return JSON.parse(sessionStorage.getItem(demoKey) || "null"); } catch { return null; }
+  })();
   const lsSet = (k: string, v: string) => { if (!readOnly) localStorage.setItem(k, v); };
   if (isMaster && world.legacyMasterCleanup) { // old Ocean teacher-test cleanup, kept as-is
     localStorage.removeItem(`mpe_game_claimed_${code}_Test_${new Date().toDateString()}`);
@@ -46,6 +56,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   const [visit5Claimed, setVisit5Claimed] = useState<boolean>(() => { const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); const sets = Math.floor(visitDaysCount / 5); return claimed >= sets && sets > 0; });
   const handleVisit5Days = () => { if (noSave) return; const days = getVisitDays(); const sets = Math.floor(days.length / 5); const claimed = parseInt(localStorage.getItem(visit5ClaimedKey) || "0"); if (sets > claimed) { const newJar = jarTreats + 3; setJarTreats(newJar); lsSet(`mpe_jar_${code}_${studentName}`, String(newJar)); sendTreats(3); lsSet(visit5ClaimedKey, String(sets)); setVisit5Claimed(true); playSfx(K.snd.visit5); } };
   const [fedTreatsState, setFedTreatsState] = useState<Record<string, number>>(() =>
+    demoAt >= 0 ? (demoSaved?.fed ?? Object.fromEntries(ANIMALS.map((a, i) => [a.id, i < demoAt ? a.stages[a.stages.length - 1].min : 0]))) : // DEMO START
     isMaster ? Object.fromEntries((world.masterAllGrown ? ANIMALS : ANIMALS.slice(0, -1)).map(a => [a.id, a.stages[a.stages.length - 1].min])) : // teacher view: grown = the animal's own last stage
       Object.fromEntries(ANIMALS.map(a => [a.id, parseInt(localStorage.getItem(S.fed(a.id)) || "0")]))
   );
@@ -64,6 +75,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   const [showVideo, setShowVideo] = useState(false);
   const [videoButtonSeen, setVideoButtonSeen] = useState(() => S.videoSeen ? localStorage.getItem(S.videoSeen) === "1" : false); // Ocean only
   const [videoWatchedMap, setVideoWatchedMap] = useState<Record<string, boolean>>(() => {
+    if (demoAt >= 0) return demoSaved?.vid ?? Object.fromEntries(ANIMALS.map((a, i) => [a.id, i < demoAt])); // DEMO START
     if (isMaster) return Object.fromEntries((world.masterAllGrown ? ANIMALS : ANIMALS.slice(0, -1)).map(a => [a.id, true]));
     return Object.fromEntries(ANIMALS.map(a => [a.id, localStorage.getItem(S.videoWatched(a.id)) === "1"]));
   });
@@ -125,6 +137,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   })();
 
   const [activeAnimalId, setActiveAnimalId] = useState(() => {
+    if (demoAt >= 0) return demoSaved?.active && ANIMALS.some(a => a.id === demoSaved.active) ? demoSaved.active : ANIMALS[demoAt].id; // DEMO START
     if (isMaster) return ANIMALS[0].id;
     const saved = S.active ? localStorage.getItem(S.active) : null; // Ocean remembers its last animal in its own key
     if (saved && ANIMALS.some(a => a.id === saved)) return saved; // PHANTOM FIX: ignore another world's animal
@@ -205,7 +218,11 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   // COINS + PRIZES (step 5.4, 2026-10-02). coins = the kid's coin total (null = not read yet / teacher code).
   // claimPrizeNow("savanna:giraffe:grown"): the DATABASE decides the amounts and pays each prize once per kid;
   // it goes through the jar queue so it never races a feed. Teacher code 1006 = nothing saved (queueJar skips it).
-  const [coins, setCoins] = useState<number | null>(null);
+  const [coins, setCoins] = useState<number | null>(() => (demoAt >= 0 ? DEMO_COINS : null)); // DEMO START: pretend coins
+  useEffect(() => { // DEMO START: remember the demo for this tab (a game and back keeps it)
+    if (demoAt < 0) return;
+    try { sessionStorage.setItem(demoKey, JSON.stringify({ fed: fedTreatsState, vid: videoWatchedMap, active: activeAnimalId })); } catch { /* */ }
+  }, [demoAt, demoKey, fedTreatsState, videoWatchedMap, activeAnimalId]);
   // prizes = names of prizes already paid (= badges won, e.g. "savanna:complete"); null = not read yet / teacher code
   const [prizes, setPrizes] = useState<string[] | null>(null);
   useEffect(() => {
