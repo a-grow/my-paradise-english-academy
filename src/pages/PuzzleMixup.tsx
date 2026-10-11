@@ -26,17 +26,24 @@ const PRIZE = { coins: 50, treats: 5 };     // shown only (Andy to decide) - the
 const DEMO_PIECES = 60;
 const PILL = { x: 30 + 30, y: 22 + 34 };    // where flying pieces start (the piece icon on the pill)
 
-// The pictures (public/puzzle/p1..p7.webp) + how many pieces each cover needs (row by row). Andy can change the numbers.
+// The pictures (public/puzzle/p1..p7.webp). DIFFICULTY GROWS GENTLY (Andy 2026-10-11): a few more covers each picture and
+// slightly higher numbers. [columns, rows, lowest need, highest need] per picture; the numbers inside a range are picked once
+// (fixed seed = the same every time). Totals about 12, 16, 24, 27, 42, 48, 67 pieces. Andy can change this table.
 type Puzzle = { img: string; cols: number; rows: number; need: number[] };
-const PUZZLES: Puzzle[] = [
-  { img: "p1", cols: 3, rows: 2, need: [2, 4, 3, 5, 2, 3] },                    // theme park selfie
-  { img: "p2", cols: 3, rows: 2, need: [3, 2, 5, 4, 3, 2] },                    // at the movies
-  { img: "p3", cols: 4, rows: 3, need: [2, 3, 1, 4, 3, 2, 4, 2, 1, 3, 2, 5] },  // picnic
-  { img: "p4", cols: 4, rows: 3, need: [3, 1, 2, 4, 2, 5, 3, 2, 4, 2, 3, 1] },  // ice rink
-  { img: "p5", cols: 4, rows: 3, need: [1, 4, 2, 3, 5, 2, 3, 4, 2, 3, 1, 4] },  // underwater
-  { img: "p6", cols: 4, rows: 3, need: [4, 2, 3, 2, 1, 3, 5, 2, 3, 4, 2, 3] },  // water park
-  { img: "p7", cols: 4, rows: 3, need: [2, 5, 3, 1, 4, 2, 3, 3, 5, 2, 4, 2] },  // flying car
+const LEVELS: [number, number, number, number][] = [
+  [3, 2, 1, 3],   // 1 theme park selfie (6 covers)
+  [3, 2, 1, 4],   // 2 at the movies (6)
+  [4, 2, 2, 4],   // 3 picnic (8)
+  [3, 3, 2, 4],   // 4 ice rink (9)
+  [4, 3, 2, 5],   // 5 underwater (12)
+  [4, 3, 3, 5],   // 6 water park (12)
+  [5, 3, 3, 6],   // 7 flying car (15)
 ];
+const PUZZLES: Puzzle[] = LEVELS.map(([cols, rows, lo, hi], k) => {
+  let seed = 101 + k * 977;
+  const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  return { img: `p${k + 1}`, cols, rows, need: Array.from({ length: cols * rows }, () => lo + Math.floor(r() * (hi - lo + 1))) };
+});
 
 const play = (src: string, vol = 0.6) => { try { const a = new Audio(src); a.volume = vol; a.play().catch(() => { }); } catch { /* */ } };
 
@@ -147,7 +154,7 @@ function edge(a: V, b: V, s: number, m: number, horiz: boolean): Seg[] {
   const L = horiz ? b[0] - a[0] : b[1] - a[1];
   const pt = (u: number, v: number): V => (horiz ? [a[0] + u, a[1] + v * s] : [a[0] + v * s, a[1] + u]);
   if (!s) return [[pt(0, 0), pt(0, 0), pt(L, 0), pt(L, 0)]];
-  const c = L / 2, k = m * 1.08;
+  const c = L / 2, k = m * 0.82;   // tab size (smaller = more room for the centred label, Andy 13:37)
   const q = (du: number, v: number) => pt(c + du * k, v * k);
   return [
     [pt(0, 0), pt(0, 0), q(-0.16, 0), q(-0.16, 0)],
@@ -159,13 +166,47 @@ function edge(a: V, b: V, s: number, m: number, horiz: boolean): Seg[] {
   ];
 }
 const rev = (segs: Seg[]): Seg[] => segs.slice().reverse().map(([p0, c1, c2, p3]) => [p3, c2, c1, p0] as Seg);
-type Cover = { i: number; d: string; cx: number; cy: number; m: number };
+type Cover = { i: number; d: string; cx: number; cy: number; m: number; lx: number; ly: number; fs: number; iw: number };
+// Label = piece icon + number. Size at scale 1: icon 0.27m wide, number 0.36m tall (m = the smaller cell side).
+const LBL = (m: number, sc: number, digits: number) => {
+  const fs = m * 0.36 * sc, iw = m * 0.27 * sc, gap = 6 * sc;
+  return { fs, iw, gap, w: iw + gap + fs * (0.66 * digits + 0.1), h: Math.max(iw * 256 / 237, fs * 1.05) };
+};
+const bezAt = (g: Seg, t: number): V => {
+  const u = 1 - t, a = u * u * u, b = 3 * u * u * t, c = 3 * u * t * t, d = t * t * t;
+  return [a * g[0][0] + b * g[1][0] + c * g[2][0] + d * g[3][0], a * g[0][1] + b * g[1][1] + c * g[2][1] + d * g[3][1]];
+};
+const inside = (pt: V, poly: V[]) => {
+  let r = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi) r = !r;
+  }
+  return r;
+};
+const CLEAR = 13, EDGE = 28;   // px clear of every cut line / of the picture edge (the frame sits over it)
+function fitLabel(poly: V[], x0: number, y0: number, x1: number, y1: number, m: number, digits: number, W: number, H: number, scales: number[]) {
+  const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+  for (const sc of scales) {
+    const L = LBL(m, sc, digits), spots: V[] = [[mx, my]];   // ALWAYS the exact centre of the piece (Andy 13:37: every label in the same place)
+    for (const [cx, cy] of spots) {
+      const l = cx - L.w / 2, r = cx + L.w / 2, t = cy - L.h / 2, b = cy + L.h / 2;
+      if (l < EDGE || t < EDGE || r > W - EDGE || b > H - EDGE) continue;
+      if (![[l, t], [r, t], [l, b], [r, b]].every(c => inside(c as V, poly))) continue;
+      if (poly.some(([px, py]) => px > l - CLEAR && px < r + CLEAR && py > t - CLEAR && py < b + CLEAR)) continue;
+      return { sc, lx: l, ly: cy, fs: L.fs, iw: L.iw };
+    }
+  }
+  const sc = scales[scales.length - 1], L = LBL(m, sc, digits);
+  return { sc, lx: mx - L.w / 2, ly: my, fs: L.fs, iw: L.iw };
+}
+const SCALES = Array.from({ length: 12 }, (_, i) => 1 - i * 0.05);   // 1 .. 0.45
 function makeCovers(pz: Puzzle, W: number, H: number, seed: number): Cover[] {
   const { cols, rows } = pz, cw = W / cols, ch = H / rows, m = Math.min(cw, ch), r = rnd(seed);
   const hs = Array.from({ length: rows + 1 }, (_, j) => Array.from({ length: cols }, () => (j === 0 || j === rows ? 0 : r() < 0.5 ? 1 : -1)));
   const vs = Array.from({ length: rows }, () => Array.from({ length: cols + 1 }, (_, i) => (i === 0 || i === cols ? 0 : r() < 0.5 ? 1 : -1)));
   const f = (v: V) => `${v[0].toFixed(1)} ${v[1].toFixed(1)}`;
-  const out: Cover[] = [];
+  const raw: { i: number; d: string; cx: number; cy: number; m: number; poly: V[]; box: [number, number, number, number] }[] = [];
   for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
     const x0 = i * cw, x1 = (i + 1) * cw, y0 = j * ch, y1 = (j + 1) * ch;
     const segs = [
@@ -174,9 +215,17 @@ function makeCovers(pz: Puzzle, W: number, H: number, seed: number): Cover[] {
       ...rev(edge([x0, y1], [x1, y1], hs[j + 1][i], m, true)),
       ...rev(edge([x0, y0], [x0, y1], vs[j][i], m, false)),
     ];
-    out.push({ i: j * cols + i, d: `M${f(segs[0][0])}` + segs.map(sg => `C${f(sg[1])} ${f(sg[2])} ${f(sg[3])}`).join("") + "Z", cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, m });
+    const poly: V[] = [];
+    segs.forEach(g => { for (let k = 0; k < 16; k++) poly.push(bezAt(g, k / 16)); });
+    raw.push({ i: j * cols + i, d: `M${f(segs[0][0])}` + segs.map(sg => `C${f(sg[1])} ${f(sg[2])} ${f(sg[3])}`).join("") + "Z", cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, m, poly, box: [x0, y0, x1, y1] });
   }
-  return out;
+  // ONE label size per picture: the biggest that fits EVERY cover; then each label sits at its safe spot nearest the middle.
+  const dig = (i: number) => String(pz.need[i]).length;
+  const common = Math.min(...raw.map(c => fitLabel(c.poly, ...c.box, m, dig(c.i), W, H, SCALES).sc));
+  return raw.map(({ poly, box, ...c }) => {
+    const { sc: _sc, ...lab } = fitLabel(poly, ...box, m, dig(c.i), W, H, [common]);
+    return { ...c, ...lab };
+  });
 }
 
 type Phase = "intro" | "play" | "paying" | "finale" | "prize" | "collect" | "next" | "out";
@@ -408,7 +457,7 @@ export default function PuzzleMixup() {
         {/* THE BOARD: muted picture, colour picture (revealed at the end), the covers, then the frame on top */}
         <div key={round} className={"pz-board" + (phase === "out" ? " out" : " drop") + (phase === "finale" || phase === "prize" ? " glow" : "")}
           style={{ left: fl, top: FT, width: FW, height: FH }}>
-          <div className="pz-pic" style={{ left: PIC.x, top: PIC.y, width: PIC.w, height: PIC.h }}>
+          <div className={"pz-pic" + (phase === "intro" ? " hide" : "")} style={{ left: PIC.x, top: PIC.y, width: PIC.w, height: PIC.h }}>
             <img className="pz-mute" src={`${P}/${pz.img}.webp`} alt="" />
             <img className={"pz-color" + (reveal ? " on" : "")} src={`${P}/${pz.img}.webp`} alt="" />
             <div className={"pz-ring" + (reveal ? " on" : "")} />
@@ -419,15 +468,15 @@ export default function PuzzleMixup() {
                 <filter id="pzs" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#5a2a00" floodOpacity="0.35" /></filter>
               </defs>
               {covers.filter(c => !gone.has(c.i)).map((c, k) => {
-                const n = rem[c.i], fs = c.m * 0.36, iw = c.m * 0.27, tw = fs * 0.6 * String(n).length, gx = c.cx - (iw + 6 + tw) / 2;
+                const n = rem[c.i], fs = c.fs, iw = c.iw, gx = c.lx;   // safe spot found in makeCovers (never touches a line)
                 const anim = cls[c.i] || (hint === c.i ? "hint" : phase === "intro" ? "in" : "");
                 return (
                   <g key={c.i} className={"pz-cv " + anim + (canPay(c.i) && phase === "play" ? " can" : "")} style={v({ "--d": `${760 + k * 75}ms` })} onClick={() => tapCover(c)}>
                     <path d={c.d} fill="url(#pzc)" stroke="#d2a964" strokeWidth={3} filter="url(#pzs)" />
                     <path d={c.d} className="pz-gl" />
                     <path d={c.d} className="pz-wh" />
-                    <image href={`${P}/piece.webp`} x={gx} y={c.cy - iw * 0.55} width={iw} height={iw * 256 / 237} />
-                    <text key={n} className={"pz-num" + (n < pz.need[c.i] ? " bump" : "")} x={gx + iw + 6} y={c.cy + fs * 0.36} fontSize={fs} strokeWidth={fs * 0.16}>{n}</text>
+                    <image href={`${P}/piece.webp`} x={gx} y={c.ly - iw * 0.54} width={iw} height={iw * 256 / 237} />
+                    <text key={n} className={"pz-num" + (n < pz.need[c.i] ? " bump" : "")} x={gx + iw + fs * 0.05 + 6 * (fs / (c.m * 0.36))} y={c.ly + fs * 0.36} fontSize={fs} strokeWidth={fs * 0.16}>{n}</text>
                   </g>
                 );
               })}
@@ -527,6 +576,7 @@ const CSS = `
 .pz-pic{position:absolute;overflow:hidden;border-radius:34px;background:#cbbfd8}
 .pz-pic>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .pz-mute{filter:saturate(.16) brightness(1.04) contrast(.9)}
+.pz-pic.hide>img{visibility:hidden}   /* the picture is never seen before the covers are on (Andy 13:26) */
 .pz-color{clip-path:circle(0% at 50% 50%);transition:clip-path 2.2s cubic-bezier(.45,0,.3,1)}
 .pz-color.on{clip-path:circle(75% at 50% 50%)}
 .pz-ring{position:absolute;left:50%;top:50%;width:0;height:0;border-radius:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none;
@@ -539,8 +589,10 @@ const CSS = `
 .pz-svg{position:absolute;left:0;top:0;overflow:visible}
 
 .pz-cv{cursor:pointer;transform-box:fill-box;transform-origin:center}
-.pz-cv.in{animation:pz-cin .45s var(--d) cubic-bezier(.3,1.7,.5,1) backwards}
-@keyframes pz-cin{from{transform:scale(.15);opacity:0}to{transform:none;opacity:1}}
+.pz-cv.in{animation:pz-cin .45s var(--d) ease-out backwards}
+@keyframes pz-cin{0%{transform:none}45%{transform:scale(1.07)}100%{transform:none}}
+.pz-cv.in .pz-wh{animation:pz-wh2 .45s var(--d) backwards}
+@keyframes pz-wh2{0%{opacity:0}40%{opacity:.6}100%{opacity:0}}
 .pz-cv.wig{animation:pz-wig .45s}
 @keyframes pz-wig{0%,100%{transform:none}20%{transform:rotate(-6deg)}40%{transform:rotate(5deg)}60%{transform:rotate(-4deg)}80%{transform:rotate(3deg)}}
 .pz-cv.crack{animation:pz-crack .4s}
@@ -572,7 +624,8 @@ const CSS = `
 .pz-prize.gone{transform:scale(.6);opacity:0}
 .pz-tapc{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:4px;font-size:28px;white-space:nowrap;-webkit-text-stroke:6px #4a1070;paint-order:stroke fill;animation:pz-blink 1s ease-in-out infinite}
 @keyframes pz-blink{50%{opacity:.45}}
-.pz-next{position:absolute;transform:translateX(-50%);z-index:8;animation:pz-cin .45s cubic-bezier(.3,1.7,.5,1) backwards}
+.pz-next{position:absolute;transform:translateX(-50%);z-index:8;animation:pz-nin .45s cubic-bezier(.3,1.7,.5,1) backwards}
+@keyframes pz-nin{from{opacity:0;transform:translateX(-50%) scale(.3)}to{opacity:1;transform:translateX(-50%)}}
 .pz-alldone{font-size:40px;white-space:nowrap;-webkit-text-stroke:8px #4a1070;paint-order:stroke fill}
 .pz-congrats{position:absolute;transform:translateX(-50%);font-size:92px;z-index:20;white-space:nowrap;pointer-events:none;animation:pz-cgout .6s 5.3s forwards}
 @keyframes pz-cgout{to{opacity:0;transform:translateX(-50%) translateY(-30px) scale(.9)}}
@@ -620,7 +673,8 @@ const CSS = `
 .pz-fly{position:absolute;left:0;top:0;z-index:50;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35));animation:pz-fly .62s var(--d) cubic-bezier(.45,0,.55,1) both}
 @keyframes pz-fly{0%{transform:translate(var(--x0),var(--y0)) scale(.6);opacity:0}12%{opacity:1}50%{transform:translate(var(--xm),var(--ym)) scale(1.15)}100%{transform:translate(var(--x1),var(--y1)) scale(.8);opacity:1}}
 .pz-zoom{position:absolute;inset:0;z-index:70;background:rgba(25,5,50,.78);display:flex;align-items:center;justify-content:center;animation:pz-fade .3s}
-.pz-zoom>img{width:min(80%,1180px);border-radius:30px;border:10px solid #ffd75a;box-shadow:0 20px 40px rgba(0,0,0,.5);animation:pz-cin .4s cubic-bezier(.3,1.5,.5,1)}
+.pz-zoom>img{width:min(80%,1180px);border-radius:30px;border:10px solid #ffd75a;box-shadow:0 20px 40px rgba(0,0,0,.5);animation:pz-zin .4s cubic-bezier(.3,1.5,.5,1)}
+@keyframes pz-zin{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:none}}
 .pz-zx{right:22px}
 .pz-soon{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:'Titan One',sans-serif;background:#5a1aa0 url(/puzzle/bg.webp) center/cover}
 @media (prefers-reduced-motion: reduce){.pz-cv.in,.pz-cv.hint,.pz-cv.can .pz-gl,.pz-th.now,.pz-prize.ready{animation:none}}
