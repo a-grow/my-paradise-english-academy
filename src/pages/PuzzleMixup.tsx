@@ -11,6 +11,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Word3D, FUN3D_CSS } from "@/components/Fun3D";
 import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
 import { useClickSfx } from "@/lib/clickSfx";
+import HowToPlay from "@/components/HowToPlay";
+import { PUZZLE_HOWTO } from "@/components/howtos";
+import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
 import { DEMO_COINS } from "@/cards/economy";
 
 const MASTER_CODE = "1006";
@@ -25,6 +28,10 @@ const PIC = { x: FR.hx * K - PAD, y: FR.hy * K - PAD, w: FR.hw * K + 2 * PAD, h:
 const PRIZE = { coins: 50, treats: 5 };     // shown only (Andy to decide) - the database will pay (cloud step)
 const DEMO_PIECES = 60;
 const PILL = { x: 30 + 30, y: 22 + 34 };    // where flying pieces start (the piece icon on the pill)
+// 1006 DEMO: progress kept for this browser tab (sessionStorage) - a game/world trip and back keeps it; a full page load starts fresh.
+const DEMO_KEY = "mpe_demo_puzzle";
+let demoBooted = false;
+type DemoSave = { idx: number; gone: number[]; pieces: number; coins: number; done: number[] };
 
 // The pictures (public/puzzle/p1..p7.webp). DIFFICULTY GROWS GENTLY (Andy 2026-10-11): a few more covers each picture and
 // slightly higher numbers. [columns, rows, lowest need, highest need] per picture; the numbers inside a range are picked once
@@ -247,15 +254,21 @@ export default function PuzzleMixup() {
 
   const qs = useMemo(() => new URLSearchParams(window.location.search), []);
   const startIdx = Math.max(0, Math.min(PUZZLES.length - 1, (parseInt(qs.get("p") ?? "1", 10) || 1) - 1));
-  const [idx, setIdx] = useState(startIdx);
+  const flagged = ["p", "almost", "pc"].some(k => qs.has(k));   // test flags = always start from them
+  if (isMaster && !demoBooted) { demoBooted = true; try { sessionStorage.removeItem(DEMO_KEY); } catch { /* */ } }
+  const saved = useMemo<DemoSave | null>(() => {
+    if (!isMaster || flagged) return null;
+    try { const d = JSON.parse(sessionStorage.getItem(DEMO_KEY) || "null"); return d && typeof d.idx === "number" ? d : null; } catch { return null; }
+  }, []);   // eslint-disable-line react-hooks/exhaustive-deps
+  const [idx, setIdx] = useState(saved?.idx ?? startIdx);
   const pz = PUZZLES[idx];
   const covers = useMemo(() => makeCovers(pz, PIC.w, PIC.h, 7 + idx * 131), [pz, idx]);
   const almost = () => (qs.get("almost") === "1" ? new Set(pz.need.map((_, i) => i).slice(1)) : new Set<number>());
-  const [gone, setGone] = useState<Set<number>>(almost);           // covers already popped off
+  const [gone, setGone] = useState<Set<number>>(() => (saved ? new Set(saved.gone) : almost()));   // covers already popped off
   const [rem, setRem] = useState<number[]>(() => pz.need.slice());  // number showing on each cover (counts down while paying)
-  const [pieces, setPieces] = useState(() => { const n = parseInt(qs.get("pc") ?? "", 10); return Number.isFinite(n) ? n : DEMO_PIECES; });
-  const [coins, setCoins] = useState(DEMO_COINS);
-  const [doneList, setDoneList] = useState<number[]>(() => Array.from({ length: startIdx }, (_, i) => i));
+  const [pieces, setPieces] = useState(() => { if (saved) return saved.pieces; const n = parseInt(qs.get("pc") ?? "", 10); return Number.isFinite(n) ? n : DEMO_PIECES; });
+  const [coins, setCoins] = useState(saved?.coins ?? DEMO_COINS);
+  const [doneList, setDoneList] = useState<number[]>(() => saved?.done ?? Array.from({ length: startIdx }, (_, i) => i));
   const [phase, setPhase] = useState<Phase>("intro");
   const [round, setRound] = useState(0);
   const [cls, setCls] = useState<Record<number, string>>({});      // per-cover animation class (wig / crack / pop / hint)
@@ -267,6 +280,15 @@ export default function PuzzleMixup() {
   const [zoom, setZoom] = useState<number | null>(null);
   const [leaving, setLeaving] = useState(false);
   const [fontReady, setFontReady] = useState(false);
+  // HOW TO PLAY first (first 3 times, cloud 'seen' like the games; id 'puzzle'), then the frame drops in. '?' reopens it.
+  const howReady = useHowtoSeen(code, name);
+  const [how, setHow] = useState<"ask" | "open" | "done">("ask");
+  const [go, setGo] = useState(false);
+  useEffect(() => {
+    if (!isMaster || how !== "ask" || !howReady) return;
+    if (wantHowto("puzzle")) setHow("open"); else { setHow("done"); setGo(true); }
+  }, [isMaster, how, howReady]);
+  const closeHow = () => { if (!go) { seenHowto("puzzle"); setGo(true); } setHow("done"); };
 
   const cvRef = useRef<HTMLCanvasElement>(null);
   const fxRef = useRef<Fx | null>(null);
@@ -294,21 +316,21 @@ export default function PuzzleMixup() {
 
   // MUSIC: the cozy album song for now (off if the world the kid came from has music off).
   useEffect(() => {
-    if (!isMaster) return;
+    if (!isMaster || !go) return;
     const w = (ret.match(/\/(dino|savanna|snowy|taiwan)\//) || [])[1];
     const off = (() => { try { return localStorage.getItem(w ? `mpe_${w}_music` : "mpe_music") === "off"; } catch { return false; } })();
     if (off) return;
-    const a = new Audio("/cards/ui/album_music.mp3"); a.loop = true; a.volume = 0;
+    const a = new Audio(`${P}/music.mp3`); a.loop = true; a.volume = 0;   // Andy 14:38: maksymmalko quirky (levelled like the album song)
     let iv = 0;
     const t = window.setTimeout(() => {
-      a.play().then(() => { iv = window.setInterval(() => { a.volume = Math.min(0.8, a.volume + 0.04); if (a.volume >= 0.8) window.clearInterval(iv); }, 100); }).catch(() => { });
+      a.play().then(() => { iv = window.setInterval(() => { a.volume = Math.min(1, a.volume + 0.05); if (a.volume >= 1) window.clearInterval(iv); }, 100); }).catch(() => { });
     }, 1400);
     return () => { window.clearTimeout(t); window.clearInterval(iv); a.pause(); };
-  }, [isMaster, ret]);
+  }, [isMaster, ret, go]);
 
   // INTRO (every new picture): the frame drops in with a bounce + thud, then the covers pop in one by one (rising pops).
   useEffect(() => {
-    if (!isMaster) return;
+    if (!isMaster || !go) return;
     setPhase("intro"); setReveal(false); setCls({}); setHint(null);
     play("/cards/ui/whoosh.mp3", 0.6);
     later(560, () => { play(`${UI}/snd_thud.mp3`, 0.6); const f = fxRef.current; if (f) { f.burst(cx, FT + FH - 10, { fairies: 22, w: FW * 0.8, h: 30, sp: 0.8 }); } });
@@ -316,7 +338,7 @@ export default function PuzzleMixup() {
     live.forEach((_, k) => later(760 + k * 75, () => popIn(k)));
     later(760 + live.length * 75 + 350, () => { setPhase("play"); lastTap.current = performance.now(); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [round, isMaster]);
+  }, [round, isMaster, go]);
 
   // A gentle twinkle along the gold frame now and then.
   useEffect(() => {
@@ -428,6 +450,14 @@ export default function PuzzleMixup() {
     });
   };
 
+  // 1006 DEMO: remember progress for this tab at calm moments (a finished picture = remembered as the NEXT picture, fresh).
+  useEffect(() => {
+    if (!isMaster || (phase !== "play" && phase !== "next")) return;
+    const fin = phase === "next" && idx < PUZZLES.length - 1;
+    const d: DemoSave = { idx: fin ? idx + 1 : idx, gone: fin ? [] : [...gone], pieces, coins, done: doneList };
+    try { sessionStorage.setItem(DEMO_KEY, JSON.stringify(d)); } catch { /* */ }
+  }, [isMaster, phase, idx, gone, pieces, coins, doneList]);
+
   const leave = () => { setLeaving(true); later(380, () => navigate(ret)); };
 
   if (!isMaster) return (
@@ -455,7 +485,7 @@ export default function PuzzleMixup() {
         <div className="pz-title" style={{ left: cx }}><MixupWord size={86} pop /></div>
 
         {/* THE BOARD: muted picture, colour picture (revealed at the end), the covers, then the frame on top */}
-        <div key={round} className={"pz-board" + (phase === "out" ? " out" : " drop") + (phase === "finale" || phase === "prize" ? " glow" : "")}
+        {go && <div key={round} className={"pz-board" + (phase === "out" ? " out" : " drop") + (phase === "finale" || phase === "prize" ? " glow" : "")}
           style={{ left: fl, top: FT, width: FW, height: FH }}>
           <div className={"pz-pic" + (phase === "intro" ? " hide" : "")} style={{ left: PIC.x, top: PIC.y, width: PIC.w, height: PIC.h }}>
             <img className="pz-mute" src={`${P}/${pz.img}.webp`} alt="" />
@@ -483,10 +513,10 @@ export default function PuzzleMixup() {
             </svg>
           </div>
           <img className="pz-frame" src={`${P}/frame.webp`} alt="" />
-        </div>
+        </div>}
 
         {/* prize panel under the frame -> after the finale: tap to collect -> Next Puzzle! */}
-        {phase !== "next" && phase !== "out" && (
+        {go && phase !== "next" && phase !== "out" && (
           <div className={"pz-prize" + (phase === "prize" ? " ready" : "") + (phase === "collect" ? " gone" : "")} style={{ left: cx - 230, top: FT + FH - 40, width: 460 }} onClick={collect}>
             <div>
               <span className="pz-pt">COMPLETE TO GET</span>
@@ -524,6 +554,7 @@ export default function PuzzleMixup() {
         <div className={"pz-pcs " + pillFx}><img src={`${P}/piece.webp`} alt="" /><b key={pieces}>{pieces}</b></div>
         <div className="pz-coins"><span key={coins}>{coins}</span></div>
         <div className="pz-rb pz-tap" style={{ right: 22 }} onClick={leave}><img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
+        <div className="pz-rb pz-tap" style={{ right: 108 }} onClick={() => setHow("open")}><img src={`${UI}/rb_help.webp`} alt="How to play" /></div>
         <div className="pz-teacher">Teacher view: nothing is saved</div>
 
         {bubC && bubble && (
@@ -543,13 +574,14 @@ export default function PuzzleMixup() {
         ))}
 
         {zoom !== null && (
-          <div className="pz-zoom" onClick={() => setZoom(null)}>
+          <div className="pz-zoom">{/* closes ONLY with the X (Andy 14:38) */}
             <img src={`${P}/${PUZZLES[zoom].img}.webp`} alt="" />
-            <div className="pz-rb pz-tap pz-zx"><img src={`${UI}/rb_exit.webp`} alt="Close" /></div>
+            <div className="pz-rb pz-tap pz-zx" onClick={() => setZoom(null)}><img src={`${UI}/rb_exit.webp`} alt="Close" /></div>
           </div>
         )}
         <canvas ref={cvRef} className="pz-fx" width={Math.round(sw)} height={Math.round(sh)} style={{ width: sw, height: sh }} aria-hidden="true" />
       </div>
+      {how === "open" && <HowToPlay {...PUZZLE_HOWTO} onDone={closeHow} />}{/* outside the scaled stage (it fits itself to the window) */}
     </div>
   );
 }

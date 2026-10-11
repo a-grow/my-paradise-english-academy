@@ -12,6 +12,9 @@ import { CARD_SETS, CARDS_TOTAL, cardImg, type CardInfo, type CardSet } from "@/
 import { PACK_PRICE, DEMO_COINS } from "@/cards/economy";
 import { Word3D, FUN3D_CSS } from "@/components/Fun3D";
 import { useClickSfx } from "@/lib/clickSfx";
+import HowToPlay from "@/components/HowToPlay";
+import { ALBUM_HOWTO } from "@/components/howtos";
+import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
 
 const MASTER_CODE = "1006";
 const U = "/cards/ui";
@@ -505,6 +508,15 @@ export default function CardAlbum() {
   const [setDone, setSetDone] = useState<number | null>(null);   // a SET COMPLETE screen is showing for this set
   const doneQ = useRef<number[]>([]);                               // sets this pack completed (shown after the cards land)
   const albumRef = useRef<{ owned: Owned } | null>(null);
+  // HOW TO PLAY before the book pops up (first 3 times, cloud 'seen' like the games; id 'album'). '?' reopens it. (Andy 2026-10-11)
+  const howReady = useHowtoSeen(code, name);
+  const [how, setHow] = useState<"ask" | "open" | "done">("ask");
+  const [go, setGo] = useState(false);
+  useEffect(() => {
+    if (!isMaster || how !== "ask" || !howReady) return;
+    if (wantHowto("album")) setHow("open"); else { setHow("done"); setGo(true); }
+  }, [isMaster, how, howReady]);
+  const closeHow = () => { if (!go) { seenHowto("album"); setGo(true); } setHow("done"); };
 
   const stageRef = useRef<HTMLDivElement>(null);
   const cvRef = useRef<HTMLCanvasElement>(null);
@@ -540,7 +552,7 @@ export default function CardAlbum() {
   // OPEN-ALBUM: the closed cover glimmers (fairy dots round the edge, embers rising), then swings open (2 doors) in a big
   // yellow glow + ember shower, then the set badges pop in, each with its own little sparkle.
   useEffect(() => {
-    if (!isMaster) return;
+    if (!isMaster || !go) return;
     const book = () => {
       const { cx: X, bk } = geo.current, BW = HOME.bookW * bk, BH = BW * BOOK_H / BOOK_W;
       return { l: X - BW / 2, t: HOME.bookTop, w: BW, h: BH };
@@ -573,7 +585,7 @@ export default function CardAlbum() {
       }, 3770 + i * 70)),
     ];
     return () => ts.forEach(t => window.clearTimeout(t));
-  }, [isMaster]);
+  }, [isMaster, go]);
 
   // BACKGROUND MUSIC (Andy 2026-10-08): coffee jazz, looping, at the levelled volume. Starts ~2.5s after the open book lands
   // (the fanfare plays first), fades in; fades out when the book closes. Follows the music on/off setting of the world the kid
@@ -590,14 +602,14 @@ export default function CardAlbum() {
     }, 40);
   };
   useEffect(() => {
-    if (!isMaster) return;
+    if (!isMaster || !go) return;
     const w = (ret.match(/\/(dino|savanna|snowy|taiwan)\//) || [])[1];   // + taiwan (2026-10-08: from Taiwan it read Ocean's mpe_music)
     const off = (() => { try { return localStorage.getItem(w ? `mpe_${w}_music` : "mpe_music") === "off"; } catch { return false; } })();
     if (off) return;
     const a = new Audio(`${U}/album_music.mp3`); a.loop = true; a.volume = 0; musicRef.current = a;
     const t = window.setTimeout(() => { a.play().then(() => fadeTo(1, 2000)).catch(() => { }); }, 6100);
     return () => { window.clearTimeout(t); window.clearInterval(fadeT.current); a.pause(); musicRef.current = null; };
-  }, [isMaster, ret]);
+  }, [isMaster, ret, go]);
 
   const countIn = (st: CardSet) => st.cards.filter(c => owned[key(st.id, c.n)]).length;
   const total = CARD_SETS.reduce((a, st) => a + countIn(st), 0);
@@ -807,8 +819,9 @@ export default function CardAlbum() {
       <div ref={stageRef} className="ca-stage" data-font={fontReady ? 1 : 0} onScroll={e => { e.currentTarget.scrollTop = 0; e.currentTarget.scrollLeft = 0; }} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
         <div className="ca-table" style={{ backgroundImage: `url(${TABLE_BG})` }} />
 
-        {st ? setView(st) : homeView()}
+        {go && (st ? setView(st) : homeView())}
 
+        {go && phase === "open" && !poN && !setDone && <div className="ca-rb ca-tap" style={{ left: 108 }} onClick={() => setHow("open")}><img src="/worlds/ui/rb_help.webp" alt="How to play" /></div>}
         <div className="ca-rb ca-tap" style={{ left: 22 }} onClick={() => (poN || setDone ? undefined : st ? goSet(null) : closeAlbum())}>
           <img src="/worlds/ui/rb_exit.webp" alt={st ? "Back to album" : "Exit"} />
         </div>
@@ -828,6 +841,7 @@ export default function CardAlbum() {
         )}
         <canvas ref={cvRef} className="ca-fx" width={Math.round(sw)} height={Math.round(sh)} style={{ width: sw, height: sh }} aria-hidden="true" />
       </div>
+      {how === "open" && <HowToPlay {...ALBUM_HOWTO} onDone={closeHow} />}{/* outside the scaled stage (it fits itself to the window) */}
     </div>
   );
 }

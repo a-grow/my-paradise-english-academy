@@ -198,3 +198,55 @@ export const worldHowTo = (stages: string[]): How => ({
   controls: [{ mouse: true, text: <>Click or tap the <b>buttons</b></> }],
   tip: <>Come back <b>every day</b> for a <b>Daily Prize!</b><Pics srcs={[`${UI}/btn_daily.webp`]} h={80} /></>,
 });
+
+// ---------------- PUZZLE MIXUP + CARD ALBUM (Andy 2026-10-11) ----------------
+// Puzzle = a SURPRISE: never show a puzzle picture here (frame + big '?').
+const PZ = "/puzzle", CU = "/cards/ui";
+const pzNum: CSSProperties = { fontFamily: "'Titan One',sans-serif", fill: "#fff", stroke: "#6b3a12", strokeWidth: 11, paintOrder: "stroke fill", strokeLinejoin: "round" };
+const PzCover = () => (
+  <svg width="270" height="228" viewBox="0 0 250 210" aria-hidden="true">
+    <defs><linearGradient id="hw-pzc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fffaf0" /><stop offset="1" stopColor="#f3dcae" /></linearGradient></defs>
+    <path d="M20 20 H200 V78 C214 70 236 74 236 95 C236 116 214 120 200 112 V170 H130 C138 184 134 200 110 200 C86 200 82 184 90 170 H20 Z"
+      fill="url(#hw-pzc)" stroke="#d2a964" strokeWidth="4" />
+    <image href={`${PZ}/piece.webp`} x="40" y="62" width="62" height="67" />
+    <text x="110" y="122" fontSize="68" style={pzNum}>3</text>
+  </svg>
+);
+export const PUZZLE_HOWTO: How = {
+  title: "Puzzle Mixup!",
+  bg: `${PZ}/bg.webp`,
+  steps: [
+    { art: <div style={box(300, 230)}>
+        <img src={`${PZ}/piece.webp`} alt="" style={abs({ left: 10, top: 90, width: 100, transform: "rotate(-16deg)" })} />
+        <img src={`${PZ}/piece.webp`} alt="" style={abs({ left: 190, top: 90, width: 100, transform: "rotate(14deg)" })} />
+        <img src={`${PZ}/piece.webp`} alt="" style={abs({ left: 90, top: 20, width: 120 })} />
+      </div>, text: <>Win <b>puzzle pieces</b></> },
+    { art: <PzCover />, text: <>Tap a cover to <b>open</b> it</> },
+    { art: <div style={box(320, 244)}>
+        <img src={`${PZ}/frame.webp`} alt="" style={abs({ left: 0, top: 0, width: 320 })} />
+        <span style={abs({ left: 0, right: 0, top: 44, textAlign: "center", fontFamily: "'Lilita One',sans-serif", fontSize: 130, color: "#ff5fa8",
+          WebkitTextStroke: "10px #3a1270", paintOrder: "stroke fill", lineHeight: 1 })}>?</span>
+      </div>, text: <>Open them all for a <b>surprise!</b></> },
+  ],
+  controls: [{ mouse: true, text: <>Click or tap a <b>cover</b></> }],
+  tip: <>Every picture wins <b>coins</b> and <b>treats!</b><Pics srcs={[`${UI}/coin.webp`, `${UI}/treat.webp`]} h={70} /></>,
+};
+export const ALBUM_HOWTO: How = {
+  title: "My Card Album",
+  bg: `${CU}/table_neutral.webp`,
+  steps: [
+    { art: <div style={box(300, 230)}>
+        <img src={`${UI}/coin.webp`} alt="" style={abs({ left: 10, top: 96, width: 96 })} />
+        <img src={`${UI}/coin.webp`} alt="" style={abs({ left: 194, top: 96, width: 96 })} />
+        <img src={`${UI}/coin.webp`} alt="" style={abs({ left: 92, top: 26, width: 116 })} />
+      </div>, text: <>Win <b>coins</b> in games</> },
+    { art: <img src={`${CU}/pack_closed.webp`} alt="" style={{ height: 240, filter: "drop-shadow(0 8px 10px rgba(0,0,0,.4))" }} />, text: <>Open <b>card packs</b></> },
+    { art: <div style={box(320, 244)}>
+        <img src="/cards/s01/c03.webp" alt="" style={abs({ left: 18, top: 40, height: 190, transform: "rotate(-14deg)" })} />
+        <img src="/cards/s05/c02.webp" alt="" style={abs({ left: 168, top: 40, height: 190, transform: "rotate(14deg)" })} />
+        <img src="/cards/s09/c01.webp" alt="" style={abs({ left: 96, top: 14, height: 210 })} />
+      </div>, text: <>Collect <b>every card!</b></> },
+  ],
+  controls: [{ mouse: true, text: <>Click or tap a <b>pack</b> or a <b>set</b></> }],
+  tip: <>Finish a set for a <b>prize!</b><Pics srcs={[`${UI}/coin.webp`, `${UI}/treat.webp`]} h={70} /></>,
+};
