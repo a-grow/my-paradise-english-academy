@@ -18,6 +18,7 @@ type Pt = { x: number; y: number };
 const WORD_DELAY = 350, STAGGER = 70, FONT = 120;
 const PRIZE_GAP = 260;                                         // ms between prizes
 const FLY_MS = 950;                                            // one flight
+const PLUCK = [1, 1.125, 1.25, 1.5, 1.667];                    // puzzle pieces: each harp pluck a little higher (Andy 2026-10-11 sound)
 
 // fixed pseudo-random numbers (same every time)
 const rnd = (seed: number) => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
@@ -108,6 +109,14 @@ export default function GrowUpParty({ phase, cx, sh, prizes, sfxOn, heroImgs, li
         later(() => {
           onLand(p.kind, add);
           if (p.kind === "treat") play(j % 2 ? "cookiejar/snd_drop2.mp3" : "cookiejar/snd_drop1.mp3", 0.4);
+          if (p.kind === "coin" && j === 0) { // Andy 2026-10-11: coin clinks from the first coin landing until the last one, then fade
+            const a = play("celebration/coins_land.mp3", 0.6);
+            if (a) { const end = (p.flyers - 1) * 85 + 250; [1, 2, 3, 4, 5].forEach(k => later(() => { a.volume = 0.6 * (1 - k / 5); if (k === 5) a.pause(); }, end + k * 50)); }
+          }
+          if (p.kind === "piece") { // Andy 2026-10-11: a harp pluck per piece
+            const a = play("celebration/piece_pluck.mp3", 0.6) as (HTMLAudioElement & { preservesPitch?: boolean; webkitPreservesPitch?: boolean }) | undefined;
+            if (a) { a.preservesPitch = false; a.webkitPreservesPitch = false; a.playbackRate = PLUCK[j % PLUCK.length]; }
+          }
           const id = Date.now() + Math.random();
           setBursts(b => [...b, { id, x: to.x, y: to.y }]);
           later(() => setBursts(b => b.filter(x => x.id !== id)), 800);

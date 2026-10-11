@@ -8,6 +8,8 @@ import { loadSeen, markSeen } from "@/lib/cloudSave";
 const TEACHER = "1006";
 const WORDS = ["one", "two", "three"];
 const TIMES = WORDS.length;
+const LIMIT: Record<string, number> = { puzzle: 2, album: 2 }; // Andy 2026-10-11: Puzzle Mixup + Card Album show twice, then only with '?'
+const times = (id: string) => LIMIT[id] ?? TIMES;
 const st = { code: "", name: "", list: null as string[] | null };
 
 // Load the kid's seen list once per page (cheap read). Returns true when known (or when it could not be read).
@@ -27,10 +29,10 @@ export function useHowtoSeen(code?: string, name?: string) {
 }
 
 const count = (id: string) => (st.list ?? []).filter(f => f.startsWith(`howto:${id}:`)).length;
-export const wantHowto = (id: string) => count(id) < TIMES;
+export const wantHowto = (id: string) => count(id) < times(id);
 export function seenHowto(id: string) {
   const k = count(id);
-  if (k >= TIMES) return;
+  if (k >= times(id)) return;
   const flag = `howto:${id}:${WORDS[k]}`;
   st.list = [...(st.list ?? []), flag];
   if (st.code && st.code !== TEACHER) markSeen(st.code, st.name, flag);

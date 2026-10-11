@@ -270,6 +270,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   // party is for (null = grown). TEST ONLY ?g=1&gs=1|2 = the baby/young party (display only, claims nothing).
   const STAGE_COINS = [0, 5, 10];
   const STAGE_TREATS = [0, 2, 3];
+  const STAGE_PIECES = [0, 1, 2]; // puzzle pieces (database prize v4: baby 1, young 2, grown 3, world finished 5)
   const [partyStage, setPartyStage] = useState<number | null>(null);
   const partyAnimal = v.levelUpStage?.animal ?? animal;
   const partyLast = partyAnimal.stages.length - 1;
@@ -278,10 +279,12 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     ? [ // + treats (Andy 2026-10-04 09:14, database prize v3: baby 2, young 3)
       { kind: "coin", n: STAGE_COINS[partyStage!] ?? 0, img: `${UI}/coin.webp`, flyers: partyStage === 1 ? 5 : 8, size: 70 },
       { kind: "treat", n: STAGE_TREATS[partyStage!] ?? 0, img: `${UI}/treat.webp`, flyers: STAGE_TREATS[partyStage!] ?? 0, size: 64 },
+      { kind: "piece", n: STAGE_PIECES[partyStage!] ?? 0, img: "/puzzle/piece.webp", flyers: STAGE_PIECES[partyStage!] ?? 0, size: 64 },
     ]
     : [
       { kind: "coin", n: 15, img: `${UI}/coin.webp`, flyers: 10, size: 70 },
       { kind: "treat", n: 10, img: `${UI}/treat.webp`, flyers: 10, size: 64 },
+      { kind: "piece", n: 3, img: "/puzzle/piece.webp", flyers: 3, size: 64 },
     ];
   const partyWho = v.petNameMap[partyAnimal.id] || `Your ${partyAnimal.name.toLowerCase()}`;
   const partyLine = !smallParty ? `${partyWho} is all grown up!` : partyStage === 1 ? `${partyWho} is a baby now!` : `${partyWho} is growing up!`;
@@ -297,6 +300,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const DONE_PRIZES: Prize[] = [ // STEP 5.4 (Andy 21:04): REAL = 50 coins + 15 treats + the badge (database: '<world>:complete')
     { kind: "coin", n: 25, img: `${UI}/coin.webp`, flyers: 12, size: 70 }, // = what the database pays (prize v2/v3: 25 - fixed 2026-10-04, was 50 on screen)
     { kind: "treat", n: 15, img: `${UI}/treat.webp`, flyers: 10, size: 64 },
+    { kind: "piece", n: 5, img: "/puzzle/piece.webp", flyers: 5, size: 64 },
     { kind: "badge", n: 1, img: `/worlds/badges/${v.world.id}.webp`, flyers: 1, size: 64, label: "New badge!" },
   ];
   useEffect(() => { if (onTest && q.get("c") === "1") setDone("on"); }, []);
@@ -311,7 +315,9 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     setDone(d => d ?? "on");
   }, [v.showComplete, v.prizes]);
   const doneLanded = () => {
-    setJarShown(j => j + (DONE_PRIZES.find(p => p.kind === "treat")?.n ?? 0)); // the jar's own fill-up animation
+    const nT = DONE_PRIZES.find(p => p.kind === "treat")?.n ?? 0;
+    setJarShown(j => j + nT); // the jar's own fill-up animation
+    if (v.isMaster) v.setJarTreats(j => j + nT); // 1006 (nothing paid, nothing saved): keep the pretend prize treats - else the jar 'feeds' them back after (Andy 2026-10-11)
     window.setTimeout(() => setDone("out"), 1200);
     window.setTimeout(() => { setDone(null); if (v.showComplete) v.closeComplete(); }, 1750);
   };
@@ -367,6 +373,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const partyLanded = () => {
     const nT = PRIZES.find(p => p.kind === "treat")?.n ?? 0;
     setJarShown(j => j + nT); // the jar's own fill-up animation
+    if (v.isMaster) v.setJarTreats(j => j + nT); // 1006 (nothing paid, nothing saved): keep the pretend prize treats - else the jar 'feeds' them back after (Andy 2026-10-11)
     const jarMs = Math.min(nT, 12) * 170 + 900;          // ~ CookieJar earn(): 170ms per drop + settle
     const endAt = hold ? jarMs + TF_DUR : 3000;
     if (hold) window.setTimeout(startTransform, jarMs);
