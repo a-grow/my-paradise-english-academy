@@ -15,8 +15,10 @@ import HowToPlay from "@/components/HowToPlay";
 import { PUZZLE_HOWTO } from "@/components/howtos";
 import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
 import { DEMO_COINS } from "@/cards/economy";
+import { loadPuzzle, puzzlePop, addCoins } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
+const REAL_CODES = ["TEST99"];   // REAL saving (puzzle cloud step 2026-10-11): test kid only until launch
 const P = "/puzzle";
 const UI = "/worlds/ui";
 const STAGE_W = 1600, STAGE_H = 1000;
@@ -243,6 +245,8 @@ export default function PuzzleMixup() {
   const code = (rawCode ?? "").toUpperCase(), name = (rawName ?? "").toLowerCase();
   const navigate = useNavigate();
   const isMaster = code === MASTER_CODE;
+  const real = !isMaster && REAL_CODES.includes(code);   // reads + saves the real piece jar (database)
+  const on = isMaster || real;
   const { s, sw, sh } = useFit();
   const cx = sw / 2;
   useClickSfx(true);
@@ -266,8 +270,8 @@ export default function PuzzleMixup() {
   const almost = () => (qs.get("almost") === "1" ? new Set(pz.need.map((_, i) => i).slice(1)) : new Set<number>());
   const [gone, setGone] = useState<Set<number>>(() => (saved ? new Set(saved.gone) : almost()));   // covers already popped off
   const [rem, setRem] = useState<number[]>(() => pz.need.slice());  // number showing on each cover (counts down while paying)
-  const [pieces, setPieces] = useState(() => { if (saved) return saved.pieces; const n = parseInt(qs.get("pc") ?? "", 10); return Number.isFinite(n) ? n : DEMO_PIECES; });
-  const [coins, setCoins] = useState(saved?.coins ?? DEMO_COINS);
+  const [pieces, setPieces] = useState(() => { if (real) return 0; if (saved) return saved.pieces; const n = parseInt(qs.get("pc") ?? "", 10); return Number.isFinite(n) ? n : DEMO_PIECES; });
+  const [coins, setCoins] = useState(real ? 0 : saved?.coins ?? DEMO_COINS);
   const [doneList, setDoneList] = useState<number[]>(() => saved?.done ?? Array.from({ length: startIdx }, (_, i) => i));
   const [phase, setPhase] = useState<Phase>("intro");
   const [round, setRound] = useState(0);
@@ -280,14 +284,34 @@ export default function PuzzleMixup() {
   const [zoom, setZoom] = useState<number | null>(null);
   const [leaving, setLeaving] = useState(false);
   const [fontReady, setFontReady] = useState(false);
+  // REAL KID: read the puzzle + piece jar + coins first; the board waits for it. Could not read = 'try again' screen.
+  const [loaded, setLoaded] = useState(!real);
+  const [failed, setFailed] = useState(false);
+  const prizeRef = useRef({ coins: PRIZE.coins, treats: PRIZE.treats });   // what the database paid for this puzzle
+  useEffect(() => {
+    if (!real) return;
+    let alive = true;
+    Promise.all([loadPuzzle(code, name), addCoins(code, name, 0)]).then(([p, c]) => {
+      if (!alive) return;
+      if (p === undefined) { setFailed(true); return; }
+      if (typeof c === "number") setCoins(c);
+      const all = !!p && p.idx >= PUZZLES.length, n = p ? Math.min(p.idx, PUZZLES.length - 1) : 0;
+      setIdx(n); setRem(PUZZLES[n].need.slice());
+      setGone(new Set(all ? PUZZLES[n].need.map((_, i) => i) : p ? p.gone : []));
+      setPieces(Math.max(0, p ? p.pieces : 0));
+      setDoneList(Array.from({ length: all ? PUZZLES.length : n }, (_, i) => i));
+      setLoaded(true);
+    });
+    return () => { alive = false; };
+  }, [real, code, name]);
   // HOW TO PLAY first (first 3 times, cloud 'seen' like the games; id 'puzzle'), then the frame drops in. '?' reopens it.
   const howReady = useHowtoSeen(code, name);
   const [how, setHow] = useState<"ask" | "open" | "done">("ask");
   const [go, setGo] = useState(false);
   useEffect(() => {
-    if (!isMaster || how !== "ask" || !howReady) return;
+    if (!on || !loaded || how !== "ask" || !howReady) return;
     if (wantHowto("puzzle")) setHow("open"); else { setHow("done"); setGo(true); }
-  }, [isMaster, how, howReady]);
+  }, [on, loaded, how, howReady]);
   const closeHow = () => { if (!go) { seenHowto("puzzle"); setGo(true); } setHow("done"); };
 
   const cvRef = useRef<HTMLCanvasElement>(null);
@@ -297,16 +321,28 @@ export default function PuzzleMixup() {
   const lastTap = useRef(performance.now());
   const later = (ms: number, fn: () => void) => { timers.current.push(window.setTimeout(fn, ms)); };
   useEffect(() => () => { timers.current.forEach(t => window.clearTimeout(t)); }, []);
+  // MUSIC FADE (Andy 2026-10-11): the puzzle song dips out for the fanfare, then fades back in.
+  const musicRef = useRef<HTMLAudioElement | null>(null);
+  const fadeIv = useRef(0);
+  const fadeMusic = (to: number, ms: number) => {
+    const a = musicRef.current; if (!a) return;
+    window.clearInterval(fadeIv.current);
+    const from = a.volume, steps = Math.max(1, Math.round(ms / 50)); let n = 0;
+    fadeIv.current = window.setInterval(() => {
+      n++; try { a.volume = Math.max(0, Math.min(1, from + (to - from) * n / steps)); } catch { /* */ }
+      if (n >= steps) window.clearInterval(fadeIv.current);
+    }, 50);
+  };
 
   const fl = cx - FW / 2;                          // frame left
   const picL = fl + PIC.x, picT = FT + PIC.y;      // picture box on the stage
   const centre = (c: Cover) => ({ x: picL + c.cx, y: picT + c.cy });
 
   useEffect(() => {
-    if (!isMaster) return;
+    if (!on) return;
     if (cvRef.current) fxRef.current = new Fx(cvRef.current);
     return () => { fxRef.current?.stop(); fxRef.current = null; };
-  }, [isMaster]);
+  }, [on]);
   useEffect(() => {
     let on = true;
     document.fonts?.load("20px 'Titan One'").then(() => on && setFontReady(true)).catch(() => on && setFontReady(true));
@@ -316,33 +352,34 @@ export default function PuzzleMixup() {
 
   // MUSIC: the cozy album song for now (off if the world the kid came from has music off).
   useEffect(() => {
-    if (!isMaster || !go) return;
+    if (!on || !go) return;
     const w = (ret.match(/\/(dino|savanna|snowy|taiwan)\//) || [])[1];
     const off = (() => { try { return localStorage.getItem(w ? `mpe_${w}_music` : "mpe_music") === "off"; } catch { return false; } })();
     if (off) return;
     const a = new Audio(`${P}/music.mp3`); a.loop = true; a.volume = 0;   // Andy 14:38: maksymmalko quirky (levelled like the album song)
-    let iv = 0;
+    musicRef.current = a;
     const t = window.setTimeout(() => {
-      a.play().then(() => { iv = window.setInterval(() => { a.volume = Math.min(1, a.volume + 0.05); if (a.volume >= 1) window.clearInterval(iv); }, 100); }).catch(() => { });
+      a.play().then(() => fadeMusic(1, 2000)).catch(() => { });
     }, 1400);
-    return () => { window.clearTimeout(t); window.clearInterval(iv); a.pause(); };
-  }, [isMaster, ret, go]);
+    return () => { window.clearTimeout(t); window.clearInterval(fadeIv.current); a.pause(); if (musicRef.current === a) musicRef.current = null; };
+  }, [on, ret, go]);
 
   // INTRO (every new picture): the frame drops in with a bounce + thud, then the covers pop in one by one (rising pops).
   useEffect(() => {
-    if (!isMaster || !go) return;
+    if (!on || !go) return;
     setPhase("intro"); setReveal(false); setCls({}); setHint(null);
     play("/cards/ui/whoosh.mp3", 0.6);
     later(560, () => { play(`${UI}/snd_thud.mp3`, 0.6); const f = fxRef.current; if (f) { f.burst(cx, FT + FH - 10, { fairies: 22, w: FW * 0.8, h: 30, sp: 0.8 }); } });
     const live = covers.filter(c => !gone.has(c.i));
+    if (!live.length) { later(900, () => { setReveal(true); setPhase("next"); }); return; }   // every puzzle done: show the last one in colour
     live.forEach((_, k) => later(760 + k * 75, () => popIn(k)));
     later(760 + live.length * 75 + 350, () => { setPhase("play"); lastTap.current = performance.now(); });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [round, isMaster, go]);
+  }, [round, on, go]);
 
   // A gentle twinkle along the gold frame now and then.
   useEffect(() => {
-    if (!isMaster) return;
+    if (!on) return;
     const iv = window.setInterval(() => {
       const f = fxRef.current; if (!f || document.hidden) return;
       const side = Math.random(), x = fl + 30 + Math.random() * (FW - 60), y = FT + 40 + Math.random() * (FH - 80);
@@ -350,13 +387,13 @@ export default function PuzzleMixup() {
       f.fairy(px, py, 0.25);
     }, 380);
     return () => window.clearInterval(iv);
-  }, [isMaster, fl]);
+  }, [on, fl]);
 
   const canPay = (i: number) => !gone.has(i) && pieces >= pz.need[i];
 
   // IDLE HINT: 5 s with nothing tapped -> the hand points at the cheapest cover the kid can open (or the piece pill wiggles).
   useEffect(() => {
-    if (!isMaster || phase !== "play") { setHint(null); return; }
+    if (!on || phase !== "play") { setHint(null); return; }
     const iv = window.setInterval(() => {
       if (performance.now() - lastTap.current < 5000) return;
       const ok = covers.filter(c => canPay(c.i)).sort((a, b) => pz.need[a.i] - pz.need[b.i]);
@@ -365,7 +402,7 @@ export default function PuzzleMixup() {
     }, 700);
     return () => window.clearInterval(iv);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMaster, phase, gone, pieces, idx]);
+  }, [on, phase, gone, pieces, idx]);
 
   const setC = (i: number, c: string) => setCls(o => ({ ...o, [i]: c }));
 
@@ -379,8 +416,24 @@ export default function PuzzleMixup() {
       setBubble({ i: c.i, more: need - pieces, k: Date.now() }); later(2200, () => setBubble(b => (b && b.i === c.i ? null : b)));
       return;
     }
-    // PAY: up to 10 pieces fly from the pill into the cover (bigger numbers = several per flyer), each landing = rising plink.
     setPhase("paying"); setBubble(null);
+    if (real) {   // the DATABASE pays first; the animation only runs when it said yes
+      puzzlePop(code, name, idx, c.i).then(r => {
+        if (r && r.ok) {
+          if (r.done) prizeRef.current = { coins: r.coins ?? 0, treats: r.treats ?? 0 };
+          payAnim(c, need);
+        } else {
+          if (r) { setPieces(Math.max(0, r.pieces)); if (r.idx === idx) setGone(new Set(r.gone)); }
+          nope(); setC(c.i, "wig"); later(460, () => setC(c.i, ""));
+          setPhase("play"); lastTap.current = performance.now();
+        }
+      });
+      return;
+    }
+    payAnim(c, need);
+  };
+  const payAnim = (c: Cover, need: number) => {
+    // PAY: up to 10 pieces fly from the pill into the cover (bigger numbers = several per flyer), each landing = rising plink.
     const V = Math.min(need, 10), base = Math.floor(need / V), extra = need % V;
     const to = centre(c), GAP = 115, FLY = 620;
     play("/cards/ui/whoosh.mp3", 0.45);
@@ -422,6 +475,8 @@ export default function PuzzleMixup() {
         }
       });
     });
+    later(2100, () => fadeMusic(0, 600));
+    later(2700 + 6720 + 150, () => fadeMusic(1, 2500));
     later(2700, () => {
       play("/celebration/win_fanfare.mp3", 0.7);
       const f = fxRef.current;
@@ -432,12 +487,15 @@ export default function PuzzleMixup() {
 
   const collect = () => {
     if (phase !== "prize") return;
-    setPhase("collect"); play("/cards/ui/whoosh.mp3", 0.7);
+    setPhase("collect"); play("/celebration/rising_pop.mp3", 0.6);   // the coin-flying sound (same as the grow-up party)
     const px = cx, py = FT + FH + 20, fs: Flyer[] = [];
     for (let q = 0; q < 6; q++) fs.push({ id: ++fid.current, x0: px - 90 + q * 8, y0: py - 30, x1: 43, y1: 126, d: q * 90, img: `${UI}/coin.webp`, w: 58 });
-    for (let q = 0; q < 4; q++) fs.push({ id: ++fid.current, x0: px + 70, y0: py - 30, x1: px + 260 + q * 40, y1: -120, d: 80 + q * 100, img: `${UI}/treat.webp`, w: 58 });
+    for (let q = 0; q < 4; q++) {
+      fs.push({ id: ++fid.current, x0: px + 70, y0: py - 30, x1: px + 260 + q * 40, y1: -120, d: 80 + q * 100, img: `${UI}/treat.webp`, w: 58 });
+      later(80 + q * 100 + 560, () => play(q % 2 ? "/cookiejar/snd_drop2.mp3" : "/cookiejar/snd_drop1.mp3", 0.4));   // the jar's treat drops
+    }
     setFlyers(f => [...f, ...fs]);
-    later(650, () => { setCoins(c => c + PRIZE.coins); play("/cookiejar/snd_drop1.mp3", 0.4); });
+    later(650, () => setCoins(c => c + (real ? prizeRef.current.coins : PRIZE.coins)));   // coins land silently (Andy)
     later(1400, () => { const ids = new Set(fs.map(x => x.id)); setFlyers(f => f.filter(x => !ids.has(x.id))); setDoneList(d => (d.includes(idx) ? d : [...d, idx])); setPhase("next"); });
   };
 
@@ -460,11 +518,11 @@ export default function PuzzleMixup() {
 
   const leave = () => { setLeaving(true); later(380, () => navigate(ret)); };
 
-  if (!isMaster) return (
+  if (!on || failed) return (
     <div className="pz-root"><style>{FONTS + FUN3D_CSS + MIXUP_CSS + CSS}</style>
       <div className="pz-soon">
         <MixupWord size={64} pop />
-        <div style={{ fontSize: 30, margin: "18px 0 30px" }}>Coming soon!</div>
+        <div style={{ fontSize: 30, margin: "18px 0 30px" }}>{failed ? "Please try again later." : "Coming soon!"}</div>
         <button className="f3-btn f3-yellow" onClick={() => navigate(ret)}>Back</button>
       </div>
     </div>
@@ -555,7 +613,7 @@ export default function PuzzleMixup() {
         <div className="pz-coins"><span key={coins}>{coins}</span></div>
         <div className="pz-rb pz-tap" style={{ right: 22 }} onClick={leave}><img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
         <div className="pz-rb pz-tap" style={{ right: 108 }} onClick={() => setHow("open")}><img src={`${UI}/rb_help.webp`} alt="How to play" /></div>
-        <div className="pz-teacher">Teacher view: nothing is saved</div>
+        {isMaster && <div className="pz-teacher">Teacher view: nothing is saved</div>}
 
         {bubC && bubble && (
           <div key={bubble.k} className="pz-bub" style={{ left: centre(bubC).x, top: centre(bubC).y - bubC.m * 0.38 }}>

@@ -269,3 +269,51 @@ export async function updateLastLogin(code: string, studentName: string) {
     console.error("[cloudSave] last_login update threw:", e);
   }
 }
+
+// PUZZLE MIXUP (2026-10-11, database puzzle_step1_20261011.sql). Pieces jar = puzzle_earned - puzzle_used.
+// loadPuzzle: where the kid is | null = no row | undefined = could not read.
+export async function loadPuzzle(code: string, studentName: string): Promise<{ idx: number; gone: number[]; pieces: number } | null | undefined> {
+  try {
+    const { data, error } = await supabase
+      .from("student_progress")
+      .select("puzzle_idx, puzzle_gone, puzzle_earned, puzzle_used")
+      .eq("code", code)
+      .eq("student_name", studentName)
+      .order("id")
+      .limit(1)
+      .maybeSingle();
+    if (error) { console.error("[cloudSave] puzzle load failed:", error.message); return undefined; }
+    if (!data) return null;
+    return { idx: Number(data.puzzle_idx) || 0, gone: Array.isArray(data.puzzle_gone) ? data.puzzle_gone.map(Number) : [], pieces: (Number(data.puzzle_earned) || 0) - (Number(data.puzzle_used) || 0) };
+  } catch (e) {
+    console.error("[cloudSave] puzzle load threw:", e);
+    return undefined;
+  }
+}
+// puzzlePop: the DATABASE checks the cost + pays the puzzle prize once. ok:false = not enough / out of date (use its numbers).
+export type PuzzlePop = { ok: boolean; why?: string; done?: boolean; pieces: number; idx: number; gone: number[]; coins?: number; treats?: number; jar?: number };
+export async function puzzlePop(code: string, studentName: string, puzzle: number, cover: number): Promise<PuzzlePop | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_puzzle_pop", { p_code: code, p_name: studentName, p_puzzle: puzzle, p_cover: cover });
+    if (error) { console.error("[cloudSave] puzzle pop failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] puzzle pop ->", data, code, studentName);
+    return data as PuzzlePop;
+  } catch (e) {
+    console.error("[cloudSave] puzzle pop threw:", e);
+    return undefined;
+  }
+}
+// addPieces: +N pieces (a game win = +1; 0 = just read). Returns pieces to spend | null = no row | undefined = failed.
+export async function addPieces(code: string, studentName: string, delta: number): Promise<number | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_add_pieces", { p_code: code, p_name: studentName, p_delta: delta });
+    if (error) { console.error("[cloudSave] add pieces failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] pieces +", delta, "->", data, code, studentName);
+    return Number(data);
+  } catch (e) {
+    console.error("[cloudSave] add pieces threw:", e);
+    return undefined;
+  }
+}
