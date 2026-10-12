@@ -2,7 +2,7 @@
 // must go into the database lock list BEFORE kids can finish it). English only (no Chinese). Penguin on purpose (North + South Pole mix).
 // STAGE PRICES (Andy 2026-10-07): treats per stage arctic fox 25, polar bear 30, penguin 30, seal 35, walrus 35, snowy owl 40
 // (stage mins 0, p, 2p, 3p). Snowy owl grown = 120 = the database lock's 'snowy finished' number - change BOTH together.
-// Videos: arcticfox, polarbear, penguin from Andy 2026-10-10 (public/worlds/snowy/<id>-video.mp4; originals BACKUPFILES/world4_art/originals). seal, walrus, snowyowl still null.
+// Videos: arcticfox, polarbear, penguin from Andy 2026-10-10 (public/worlds/snowy/<id>-video.mp4; originals BACKUPFILES/world4_art/originals). seal, walrus, snowyowl added 2026-10-12 (walrus to be remade by Andy).
 // Pictures: public/worlds/snowy/<id>-<egg|baby|young|grown>(-t).webp, cut 2026-10-08 from Andy's Gemini sprite sheets.
 import type { Animal } from "./types";
 
@@ -75,7 +75,7 @@ export const SNOWY_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 105, img: `${P}/seal-grown.webp` },
     ],
     unlockCondition: "penguin_grown_video_watched",
-    ...ICE, video: null, isEggType: false, scale: 1,
+    ...ICE, video: `${P}/seal-video.mp4`, isEggType: false, scale: 1,
     feedLabel: "seal", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Seal!", subZh: "" },
@@ -93,7 +93,7 @@ export const SNOWY_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 105, img: `${P}/walrus-grown.webp` },
     ],
     unlockCondition: "seal_grown_video_watched",
-    ...ICE, video: null, isEggType: false, scale: 1,
+    ...ICE, video: `${P}/walrus-video.mp4`, isEggType: false, scale: 1,
     feedLabel: "walrus", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Walrus!", subZh: "" },
@@ -111,7 +111,7 @@ export const SNOWY_ANIMALS: Animal[] = [
       { name: "Grown", nameZh: "", min: 120, img: `${P}/snowyowl-grown.webp` },
     ],
     unlockCondition: "walrus_grown_video_watched",
-    ...ICE, video: null, isEggType: true, scale: 1,
+    ...ICE, video: `${P}/snowyowl-video.mp4`, isEggType: true, scale: 1,
     feedLabel: "snowy owl", feedLabelZh: "",
     levelUpMessages: [
       { main: "Welcome, little one!", zh: "", sub: "Meet your Baby Snowy Owl!", subZh: "" },
