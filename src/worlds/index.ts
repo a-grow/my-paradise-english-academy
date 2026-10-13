@@ -70,12 +70,13 @@ export const SAVANNA_WORLD: WorldConfig = {
   makeSave: (code, name) => standardSave("savanna", code, name, SAVANNA_ANIMALS.map(a => a.id)),
   gamePath: "/game/savanna",
   skin: SAVANNA_SKIN,
-  nextWorld: null,
+  nextWorld: { id: "snowy", path: "/snowy" },         // Phase 2 (2026-10-13): Savanna -> Snowy
   masterAllGrown: false,
   legacyMasterCleanup: false,
 };
 
-// WORLD 4 = SNOWY (2026-10-08): STANDARD storage (mpe_snowy_..., cloud data.snowy - never rename). TEST ROUTE ONLY for now:
+// PHASE 2 (2026-10-13): Snowy + Taiwan are in ALL_WORLDS with real routes; the DB lock (snowyowl/blackbear 120) must be LIVE before launch.
+// WORLD 4 = SNOWY (2026-10-08): STANDARD storage (mpe_snowy_..., cloud data.snowy - never rename). (was) TEST ROUTE ONLY:
 // NOT in ALL_WORLDS and Savanna.nextWorld stays null until the art/music/videos + the database lock (last_animal snowyowl,
 // grown_at 120) are done - then add it to ALL_WORLDS, set Savanna.nextWorld, add the real /snowy route + world_snowy.webp icon.
 export const SNOWY_WORLD: WorldConfig = {
@@ -86,7 +87,7 @@ export const SNOWY_WORLD: WorldConfig = {
   makeSave: (code, name) => standardSave("snowy", code, name, SNOWY_ANIMALS.map(a => a.id)),
   gamePath: "/game/snowy",
   skin: SNOWY_LOOK,
-  nextWorld: null,
+  nextWorld: { id: "taiwan", path: "/taiwan" },       // Phase 2 (2026-10-13): Snowy -> Taiwan
   masterAllGrown: false,
   legacyMasterCleanup: false,
 };
@@ -109,7 +110,7 @@ export const TAIWAN_WORLD: WorldConfig = {
 
 // STEP 7 (2026-10-04): every world IN ORDER (My Worlds + Video Theater + "which world is the kid on").
 // A NEW world = add it here (and its round icon public/worlds/ui/world_<id>.webp) - it then shows up everywhere.
-export const ALL_WORLDS: WorldConfig[] = [OCEAN_WORLD, DINO_WORLD, SAVANNA_WORLD];
+export const ALL_WORLDS: WorldConfig[] = [OCEAN_WORLD, DINO_WORLD, SAVANNA_WORLD, SNOWY_WORLD, TAIWAN_WORLD];   // + Snowy, Taiwan (Phase 2, 2026-10-13)
 // COMING WORLDS (Andy 2026-10-09): shown in My Worlds as a grey picture + name only (never clickable, nothing loads or saves).
 // Picture = public/worlds/ui/card_<id>.webp. When a world moves into ALL_WORLDS it drops out of this list by itself.
 export const COMING_WORLDS: WorldConfig[] = [SNOWY_WORLD, TAIWAN_WORLD];

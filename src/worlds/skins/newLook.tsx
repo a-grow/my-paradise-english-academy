@@ -532,6 +532,9 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         won: !!c && getAnimalStageIdx(a, c.fed) === a.stages.length - 1 && !!c.videoWatched && !!a.video };
     });
   };
+  // My Worlds BUTTON picture (Phase 2, 2026-10-13): the 3 worlds around THIS one (this world in the middle when it can be)
+  const wHere = Math.max(0, v.worldList.findIndex(x => x.world.id === v.world.id));
+  const wStart = Math.max(0, Math.min(wHere - 1, v.worldList.length - 3));
   const theaterWorlds: TheaterWorld[] = v.worldList.map(x => ({ key: x.world.id, title: `${x.world.title} World`, cards: cardsOf(x.world) }));
   const theaterStart = Math.max(0, theaterWorlds.findIndex(w => w.key === v.world.id));
   useEffect(() => {
@@ -907,7 +910,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         </div>
         <div className="sv-card sv-worlds sv-tap sv-inB" onClick={() => setPanel("worlds")}>
           <div className="sv-wrow">
-            {v.worldList.slice(0, 3).map(x => ( /* step 7: from the world list (4+ worlds: show the 3 nearest - later) */
+            {v.worldList.slice(wStart, wStart + 3).map(x => ( /* step 7 + Phase 2: the 3 worlds around this one (wStart) */
               <img key={x.world.id} className={x.world.id === v.world.id ? "here" : (!x.finished && x.world.id !== v.currentWorld.id ? "lock" : undefined)}
                 src={`${UI}/world_${x.world.id}.webp`} alt={`${x.world.title} World`} />))}
           </div>

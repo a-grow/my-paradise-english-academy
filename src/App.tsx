@@ -62,6 +62,8 @@ const App = () => (
 <Route path="/gametest" element={<Navigate to="/portal" replace />} />
               <Route path="/dino/:code/:studentName" element={<WorldPage world={DINO_WORLD} />} />
               <Route path="/savanna/:code/:studentName" element={<WorldPage world={SAVANNA_WORLD} />} />{/* step 7 */}
+              <Route path="/snowy/:code/:studentName" element={<WorldPage world={SNOWY_WORLD} />} />{/* Phase 2 (2026-10-13) */}
+              <Route path="/taiwan/:code/:studentName" element={<WorldPage world={TAIWAN_WORLD} />} />{/* Phase 2 (2026-10-13) */}
               <Route path="/visit/:world/:code/:studentName" element={<WorldVisit />} />{/* step 7: finished world, saves nothing */}
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="/mpe-teacher-secret-hq" element={<TeacherHQ />} />

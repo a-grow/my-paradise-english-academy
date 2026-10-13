@@ -393,7 +393,7 @@ const Dashboard = () => {
               <button onClick={() => {
                 const name = student.name.toLowerCase();
                 const wk = localStorage.getItem(`mpe_world_${family.code}_${name}`); // step 7: + savanna (a finished world forwards on anyway)
-                const path = wk === "dino" ? `/dino/${family.code}/${name}` : wk === "savanna" ? `/savanna/${family.code}/${name}` : `/world/${family.code}/${name}`;
+                const path = wk === "dino" || wk === "savanna" || wk === "snowy" || wk === "taiwan" ? `/${wk}/${family.code}/${name}` : `/world/${family.code}/${name}`; // + snowy, taiwan (Phase 2, 2026-10-13)
                 if (localStorage.getItem(`mpe_worldnotice_seen_${family.code}`) === "true") {
                   navigate(path);
                 } else {
