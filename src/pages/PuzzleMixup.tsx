@@ -15,7 +15,9 @@ import HowToPlay from "@/components/HowToPlay";
 import { PUZZLE_HOWTO } from "@/components/howtos";
 import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
 import { DEMO_COINS } from "@/cards/economy";
-import { loadPuzzle, puzzlePop, addCoins, claimPrize } from "@/lib/cloudSave";
+import { loadPuzzle, puzzlePop, addCoins, claimPrize, loadPrizes } from "@/lib/cloudSave";
+import { lockLeft, LOCK_IMG } from "@/lib/locks";
+import LockMsg from "@/components/LockMsg";
 
 const MASTER_CODE = "1006";
 export const REAL_CODES = ["TEST99"];   // REAL saving (puzzle cloud step 2026-10-11): test kid only until launch
@@ -295,13 +297,21 @@ export default function PuzzleMixup() {
   const [loaded, setLoaded] = useState(!real);
   const [failed, setFailed] = useState(false);
   const prizeRef = useRef({ coins: PRIZE.coins, treats: PRIZE.treats });   // what the database paid for this puzzle
+  const [lockN, setLockN] = useState(0);   // LOCK (launch step 4): stages still to grow (0 = open) - checked BEFORE the welcome gift
   const giftRef = useRef(isMaster && qs.get("gift") === "1" ? WELCOME : 0);   // welcome pieces still to fly in (TEST ONLY 1006 ?gift=1 = show it, nothing saved)
   useEffect(() => {
     if (!real) return;
     let alive = true;
     // WELCOME GIFT: asked FIRST (the database pays 8 pieces once; a repeat = paid false), so the jar read below already holds them.
     // The pill starts WITHOUT the gift; the pieces fly in after the frame drops (welcomeGift). A kid leaving early keeps them (paid).
-    claimPrize(code, name, "puzzle:welcome").then(w => Promise.all([loadPuzzle(code, name), addCoins(code, name, 0), w])).then(([p, c, w]) => {
+    (async () => {
+      const list = await loadPrizes(code, name);   // LOCK first: a locked kid is paid nothing here (no welcome gift yet)
+      if (!alive) return;
+      if (list === undefined) { setFailed(true); return; }
+      const left = lockLeft("puzzle", list, false);
+      if (left > 0) { setLockN(left); return; }
+      const w = await claimPrize(code, name, "puzzle:welcome");
+      const [p, c] = await Promise.all([loadPuzzle(code, name), addCoins(code, name, 0)]);
       if (!alive) return;
       if (p === undefined) { setFailed(true); return; }
       const gift = w && w.paid ? Math.max(0, Number((w as { pieces?: number }).pieces ?? WELCOME)) : 0;
@@ -313,7 +323,7 @@ export default function PuzzleMixup() {
       setPieces(Math.max(0, (p ? p.pieces : 0) - gift));
       setDoneList(Array.from({ length: all ? PUZZLES.length : n }, (_, i) => i));
       setLoaded(true);
-    });
+    })();
     return () => { alive = false; };
   }, [real, code, name]);
   // HOW TO PLAY first (first 3 times, cloud 'seen' like the games; id 'puzzle'), then the frame drops in. '?' reopens it.
@@ -550,11 +560,13 @@ export default function PuzzleMixup() {
 
   const leave = () => { setLeaving(true); later(380, () => navigate(ret)); };
 
-  if (!on || failed) return (
+  if (!on || failed || lockN > 0) return (
     <div className="pz-root"><style>{FONTS + FUN3D_CSS + MIXUP_CSS + CSS}</style>
       <div className="pz-soon">
         <MixupWord size={64} pop />
-        <div style={{ fontSize: 30, margin: "18px 0 30px" }}>{failed ? "Please try again later." : "Coming soon!"}</div>
+        {lockN > 0 && !failed ? <><img src={LOCK_IMG} alt="" style={{ height: 150, margin: "18px 0 6px", filter: "drop-shadow(0 8px 8px rgba(0,0,0,.35))" }} />
+        <div style={{ fontSize: 34, lineHeight: "44px", textAlign: "center", margin: "0 0 30px" }}><LockMsg left={lockN} nColor="#7fd8ff" /></div></>
+          : <div style={{ fontSize: 30, margin: "18px 0 30px" }}>{failed ? "Please try again later." : "Coming soon!"}</div>}
         <button className="f3-btn f3-yellow" onClick={() => navigate(ret)}>Back</button>
       </div>
     </div>

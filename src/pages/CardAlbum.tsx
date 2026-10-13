@@ -15,6 +15,9 @@ import { useClickSfx } from "@/lib/clickSfx";
 import HowToPlay from "@/components/HowToPlay";
 import { ALBUM_HOWTO } from "@/components/howtos";
 import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { loadPrizes } from "@/lib/cloudSave";
+import { lockLeft, LOCK_IMG } from "@/lib/locks";
+import LockMsg from "@/components/LockMsg";
 
 const MASTER_CODE = "1006";
 const U = "/cards/ui";
@@ -487,6 +490,14 @@ export default function CardAlbum() {
   const { s, sw, sh } = useFit();
   const cx = sw / 2;
   useClickSfx(true);
+  // LOCK (launch step 4): a real kid's prize list decides it (1006 never locked). -1 = still reading.
+  const [lockN, setLockN] = useState(isMaster ? 0 : -1);
+  useEffect(() => {
+    if (isMaster) return;
+    let alive = true;
+    loadPrizes(code, name).then(list => { if (alive) setLockN(list === undefined ? 0 : lockLeft("album", list, false)); });
+    return () => { alive = false; };
+  }, [isMaster, code, name]);
 
   // Where the kid came from (the world page set this when its Card Album button was tapped).
   const ret = useMemo(() => {
@@ -687,7 +698,9 @@ export default function CardAlbum() {
     <div className="ca-root"><style>{FONTS + FUN3D_CSS + CSS}</style>
       <div className="ca-soon">
         <div style={{ fontSize: 48 }}>Card Album</div>
-        <div style={{ fontSize: 30, margin: "10px 0 30px" }}>Coming soon!</div>
+        {lockN > 0 ? <><img src={LOCK_IMG} alt="" style={{ height: 150, margin: "18px 0 6px", filter: "drop-shadow(0 8px 8px rgba(0,0,0,.35))" }} />
+        <div style={{ fontSize: 34, lineHeight: "44px", textAlign: "center", margin: "0 0 30px" }}><LockMsg left={lockN} nColor="#7fd8ff" /></div></>
+          : <div style={{ fontSize: 30, margin: "10px 0 30px" }}>{lockN < 0 ? "" : "Coming soon!"}</div>}
         <button className="f3-btn f3-yellow" onClick={() => navigate(ret)}>Back</button>
       </div>
     </div>

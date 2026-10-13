@@ -26,6 +26,8 @@ import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL } from "@/cards/economy";
 import { isCloseBtn, playCloseBeep } from "@/lib/clickSfx";
 import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
 import { REAL_CODES as PUZZLE_REAL_CODES, demoPiecesGet, demoPiecesSet } from "@/pages/PuzzleMixup";
+import { lockLeft, LOCK_IMG, UNLOCK_IMG, type LockId } from "@/lib/locks";
+import LockMsg from "@/components/LockMsg";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 
 // ---- per-world settings (step 6) ----
@@ -47,6 +49,9 @@ export interface LookSettings {
 }
 const KEYS = ["egg", "baby", "young", "grown"];
 const UI = "/worlds/ui";
+// LOCKS test flag ?lk (1006): stages grown in this TAB, kept through Album/Puzzle and back; a fresh page load starts at 0.
+const LK_KEY = "mpe_demo_lkgrown";
+let lkBooted = false;
 const STAGE_W = 1600, STAGE_H = 1000; // design size; scaled to fit any window (one screen, no scrolling)
 
 // Fit the 1600x1000 design into the window. The stage grows wider/taller to fill the window;
@@ -345,10 +350,16 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   useEffect(() => { if (onTest && q.get("g") === "1") { const gs = parseInt(q.get("gs") ?? "", 10); if (gs === 1 || gs === 2) { setPartyStage(gs); setHold({ id: animal.id, show: gs - 1, to: gs }); } setParty("on"); } }, []);
   // SMALL STAGE PRIZE (Andy 2026-10-03): baby +5 coins, young +10 coins (database pays once: '<world>:<animal>:baby|young').
   // A gold '+5' pops over the animal and a few coins float into the coin pill. No dark screen, nothing to tap (~1.6s).
+  const [grownNow, setGrownNow] = useState(() => { // stages grown (LOCKS test flag ?lk on 1006 only; this tab only)
+    if (!lkBooted) { lkBooted = true; try { sessionStorage.removeItem(LK_KEY); } catch { /* */ } return 0; }
+    try { return parseInt(sessionStorage.getItem(LK_KEY) ?? "0", 10) || 0; } catch { return 0; }
+  });
+  useEffect(() => { if (v.isMaster) try { sessionStorage.setItem(LK_KEY, String(grownNow)); } catch { /* */ } }, [v.isMaster, grownNow]);
   const MINI_COINS = STAGE_COINS; // (small '+5' pop - no longer used since 2026-10-04: baby/young get the party)
   const [mini, setMini] = useState<null | { id: number; n: number; x1: number; y1: number }>(null);
   useEffect(() => {
     const lu = v.levelUpStage;
+    if (lu && lu.stageIdx > 0) setGrownNow(n => n + 1);
     if (lu && lu.stageIdx > 0 && lu.stageIdx < lu.animal.stages.length - 1) {
       askPrize(`${v.world.id}:${lu.animal.id}:${lu.stageIdx === 1 ? "baby" : "young"}`); // REAL prize (database pays once)
       setPartyStage(lu.stageIdx); setHold({ id: lu.animal.id, show: lu.stageIdx - 1, to: lu.stageIdx }); // old stage stays until the transformation   // the Congratulations screen, coins only (Andy 2026-10-04)
@@ -490,11 +501,55 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   });
   const [unlockedNow, setUnlockedNow] = useState(false);
   const newReady = slots.some(x => x.ready) || (onTest && q.get("n") === "1" && !unlockedNow);
+  // LOCKS (launch step 4, Andy 2026-10-13): Album opens after 1 more stage grown, Puzzle after 2 (src/lib/locks.ts; 1006 never locked).
+  // TEST: 1006 on /world-test/ + ?lk=N = pretend N stages grown (+ stages grown this visit) -> the locks show + open (nothing saved).
+  const lkPretend = onTest && v.isMaster && q.get("lk") !== null ? (Math.max(0, parseInt(q.get("lk") ?? "0", 10) || 0) + grownNow) : undefined;
+  const albumLeft = lockLeft("album", v.prizes, v.isMaster, lkPretend);
+  const puzzleLeft = lockLeft("puzzle", v.prizes, v.isMaster, lkPretend);
+  const lockKnown = v.isMaster || v.prizes !== null; // a real kid's prize list read? (before that: locked, no unlock pop)
+  // LOCK BUBBLE (Andy 15:31): a small speech bubble next to the tapped button (number in blue), closes by itself after 3s.
+  // Tap = the lock rattles + rattle sound; the closed lock also gives a gentle shake every few seconds (CSS).
+  const [lockPop, setLockPop] = useState<null | { id: LockId; n: number; k: number }>(null);
+  const [rattle, setRattle] = useState<LockId | null>(null);
+  const lockSnd = (f: string, vol: number) => { if (v.sfxOn) { const a = new Audio(`${UI}/${f}`); a.volume = vol; a.play().catch(() => { }); } }; // PLACEHOLDER sounds (Andy's clips later, same names)
+  const tapLock = (id: LockId, n: number) => { setLockPop({ id, n, k: Date.now() }); setRattle(null); window.setTimeout(() => setRattle(id), 0); lockSnd("snd_lock_rattle.mp3", 0.8); };
+  useEffect(() => { if (!lockPop) return; const t = window.setTimeout(() => setLockPop(null), 3000); return () => window.clearTimeout(t); }, [lockPop]);
+  useEffect(() => { if (!rattle) return; const t = window.setTimeout(() => setRattle(null), 650); return () => window.clearTimeout(t); }, [rattle]);
+  const [unlockFx, setUnlockFx] = useState<LockId[]>([]);         // open-lock pop on a button that JUST unlocked (plays after the party)
+  const leftWas = useRef<Record<LockId, number | null>>({ album: null, puzzle: null });
+  // LOCKED LOOK (Andy 15:50): locked buttons are MUTED (grey-ish). Unlock (after the party): colour fades back in + round
+  // sparkles + the lock pops open + unlock sound, then the hand points at that button until the kid taps it (this visit only).
+  const [pointAt, setPointAt] = useState<LockId | null>(null);
+  const [waitTap, setWaitTap] = useState<LockId[]>([]); // JUST unlocked: taps do nothing until the hand shows (Andy 16:03)
+  const lockLook = (id: LockId, left: number) => {
+    const fx = unlockFx.includes(id);
+    return { locked: lockKnown && (left > 0 || (fx && holding)), opening: fx && !holding };
+  };
+  const pzL = lockLook("puzzle", puzzleLeft), alL = lockLook("album", albumLeft);
+  const openingIds = (["puzzle", "album"] as LockId[]).filter(id => unlockFx.includes(id) && !holding).join(",");
+  useEffect(() => { // the unlock moment (sound + hand), then the open lock goes away
+    if (!openingIds) return;
+    const ids = openingIds.split(",") as LockId[];
+    lockSnd("snd_lock_open.mp3", 0.8);
+    setPointAt(ids[ids.length - 1]);
+    const ready = window.setTimeout(() => setWaitTap(w => w.filter(x => !ids.includes(x))), 1500); // = when the hand has faded in (sv-handIn 1s + .5s)
+    const t = window.setTimeout(() => setUnlockFx(u => u.filter(x => !ids.includes(x))), 2600);
+    return () => { window.clearTimeout(t); window.clearTimeout(ready); };
+  }, [openingIds]);
+  useEffect(() => {
+    if (!lockKnown) return;
+    const now: Record<LockId, number> = { album: albumLeft, puzzle: puzzleLeft };
+    (Object.keys(now) as LockId[]).forEach(id => {
+      const was = leftWas.current[id];
+      if (was !== null && was > 0 && now[id] === 0) { setUnlockFx(u => (u.includes(id) ? u : [...u, id])); setWaitTap(w => (w.includes(id) ? w : [...w, id])); }
+      leftWas.current[id] = now[id];
+    });
+  }, [lockKnown, albumLeft, puzzleLeft]);
   // ALBUM METER (Andy 2026-10-07): coins toward the next card pack; packs ready = red dot + glow (waits for the new-friend glow)
   const albumOn = v.isMaster || ALBUM_FOR_ALL;
   const puzzleOn = v.isMaster || PUZZLE_REAL_CODES.includes(v.code);   // Puzzle Mixup: 1006 demo + the real-saving codes in PuzzleMixup.tsx REAL_CODES (TEST99 now; every kid at launch)
   const albumCoins = v.isMaster ? DEMO_COINS : (v.coins ?? 0);
-  const albumPacks = albumOn ? Math.floor(albumCoins / PACK_PRICE) : 0;
+  const albumPacks = albumOn && albumLeft === 0 && !alL.locked && !alL.opening ? Math.floor(albumCoins / PACK_PRICE) : 0; // locked (or unlocking) = no pack glow / dot
   const albumPct = albumPacks > 0 ? 100 : ((albumCoins % PACK_PRICE) / PACK_PRICE) * 100;
 
   // Visit 5 days: dots = days in the current set of 5; all 5 lit when the +3 is ready to claim.
@@ -859,10 +914,14 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         <div className="sv-left sv-inL">
           <div className="sv-imgbtn sv-tap" onClick={goVocab}><img src={`${UI}/btn_vocab.webp`} alt="Vocab Games" /></div>
           <div className="sv-imgbtn sv-tap" onClick={goGrammar}><img src={`${UI}/btn_grammar.webp`} alt="Grammar Games" /></div>
-          <div ref={puzzleRef} className={"sv-imgbtn sv-tap sv-pzbtn" + lift} style={bumpStyle("piece")} onClick={puzzleOn ? () => goGames(`/puzzle/${v.code}/${v.studentName}`) : soon}>
+          <div ref={puzzleRef} className={"sv-imgbtn sv-tap sv-pzbtn" + lift + (pzL.locked ? " muted" : "") + (pzL.opening ? " unmuting" : "")} style={bumpStyle("piece")} onClick={waitTap.includes("puzzle") ? undefined : puzzleLeft > 0 ? () => tapLock("puzzle", puzzleLeft) : puzzleOn ? () => { setPointAt(null); goGames(`/puzzle/${v.code}/${v.studentName}`); } : soon}>
+            {pzL.opening && <Sparkler className="sv-spk-pz" cx={135} cy={66} k={0.7} halo={[340, 200]} />}
             <img src="/puzzle/btn_blank.webp" alt="Puzzle Mixup!" /><img className="sv-pzico" src="/puzzle/piece.webp" alt="" />
             {puzzleOn && (v.isMaster || v.pieces !== null) && <div ref={pzCountRef} className="sv-pzcount"><span key={pieceShown}>{pieceShown}</span></div>}
             <div className="sv-pzw"><MixupWord size={40} twoLines /></div>
+            {pzL.locked && <img className={"sv-lockico" + (rattle === "puzzle" ? " rattle" : "")} src={LOCK_IMG} alt="Locked" />}
+            {pzL.opening && <img className="sv-lockico open" src={UNLOCK_IMG} alt="" />}
+            {lockPop?.id === "puzzle" && <div key={lockPop.k} className="sv-lockbub r"><LockMsg left={lockPop.n} /></div>}
           </div>
           <div className="sv-imgbtn sv-tap" onClick={() => setPanel("theater")}>
             <img src={`${UI}/btn_video.webp`} alt="Video Theater" />{allNew.length > 0 && <span className="sv-dot" />}
@@ -895,13 +954,19 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           <div className="sv-medals">{[0, 1, 2].map(i => <img key={i} className={"sv-medal" + (i < badgesShown ? " won" : " off")} src={i < badgesShown ? `/worlds/badges/${wonBadges[i] ?? v.world.id}.webp` : `${UI}/medal.webp`} alt="" />)}</div>
           <img className="sv-cardlbl" style={{ top: 111, height: 45 }} src={`${UI}/lbl_badges.webp`} alt="My Badges" />
         </div>
-        {albumPacks > 0 && !newReady && !panel && <Sparkler className="sv-spk-album" cx={131} cy={95} />}
-        <div className={"sv-card sv-album sv-tap" + (albumPacks > 0 && !newReady && !panel ? " beacon" : "")} onClick={albumOn ? () => goGames(`/album/${v.code}/${v.studentName}`) : soon}>{/* Card Album: 1006 only for now */}
+        {(alL.opening || (albumPacks > 0 && !newReady && !panel)) && <Sparkler className="sv-spk-album" cx={131} cy={95} />}
+        <div className={"sv-card sv-album sv-tap" + (albumPacks > 0 && !newReady && !panel ? " beacon" : "") + (alL.locked ? " muted" : "") + (alL.opening ? " unmuting" : "")} onClick={waitTap.includes("album") ? undefined : albumLeft > 0 ? () => tapLock("album", albumLeft) : albumOn ? () => { setPointAt(null); goGames(`/album/${v.code}/${v.studentName}`); } : soon}>{/* Card Album: 1006 only for now */}
           <img className="sv-cardlbl" style={{ top: 176, height: 38 }} src={`${UI}/lbl_album.webp`} alt="Card Album" />
           {albumPacks > 0 && <span className="sv-dot num">{albumPacks}</span>}
         </div>
+        {/* the Album lock sits OUTSIDE the card so the card can be muted without muting the lock */}
+        <div className="sv-albumlk">
+          {alL.locked && <img className={"sv-lockico" + (rattle === "album" ? " rattle" : "")} src={LOCK_IMG} alt="Locked" />}
+          {alL.opening && <img className="sv-lockico open" src={UNLOCK_IMG} alt="" />}
+          {lockPop?.id === "album" && <div key={lockPop.k} className="sv-lockbub l"><LockMsg left={lockPop.n} /></div>}
+        </div>
         {albumOn && (
-          <div className="sv-ameter sv-tap" onClick={() => goGames(`/album/${v.code}/${v.studentName}`)}>
+          <div className={"sv-ameter sv-tap" + (alL.locked ? " muted" : "") + (alL.opening ? " unmuting" : "")} onClick={() => (waitTap.includes("album") ? undefined : albumLeft > 0 ? tapLock("album", albumLeft) : (setPointAt(null), goGames(`/album/${v.code}/${v.studentName}`)))}>
             <div className="sv-amtrack"><i className={albumPacks ? "full" : ""} style={{ width: `${Math.max(8, albumPct)}%` }} />
               <span>{albumPacks ? "OPEN!" : `${albumCoins % PACK_PRICE} / ${PACK_PRICE}`}</span></div>
             <img className={"sv-apack" + (albumPacks ? " ready" : "")} src="/cards/ui/pack_closed.webp" alt="" />
@@ -1041,6 +1106,9 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         )}
         {panel === "animals" && <Hand stage={stageRef} s={s} sel=".sv-big.ready" fx={0.82} fy={0.2} />}
         {dailyDay > 0 && <Hand stage={stageRef} s={s} sel=".dp-claim:not(:disabled)" fx={0.86} fy={0.25} />}
+        {pointAt && !panel && !party && !done && !dailyDay && !v.showVideo && ( /* just unlocked (Andy 15:50) */
+          <Hand stage={stageRef} s={s} sel={pointAt === "puzzle" ? ".sv-pzbtn" : ".sv-album"} fx={pointAt === "puzzle" ? 0.88 : 0.16} fy={0.3} flip={pointAt === "album"} />
+        )}
 
         {/* NEW-WORLD WELCOME: glow + round sparkles where the egg will appear, then the big world title */}
         {intro !== "off" && ip >= 2 && (
@@ -1304,6 +1372,30 @@ const CSS = `
 .sv-exit .q1{font-size:42px;color:#8a4a10;white-space:nowrap}
 .sv-exit .q2{font-size:24px;color:#8a6a40;margin-top:6px}
 .sv-exit .row{display:flex;gap:30px;justify-content:center;margin-top:26px}
+.sv-lockico,.sv-imgbtn .sv-lockico{position:absolute;left:-14px;top:-4px;width:auto;height:78px;z-index:3;transform:rotate(-10deg);transform-origin:50% 15%;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35));animation:sv-lkidle 5s ease-in-out infinite}
+@keyframes sv-lkidle{0%,84%,100%{transform:rotate(-10deg)}87%{transform:rotate(-16deg)}90%{transform:rotate(-4deg)}93%{transform:rotate(-14deg)}96%{transform:rotate(-8deg)}}
+.sv-lockico.rattle{animation:sv-lkrat .6s ease-in-out}
+.sv-albumlk{position:absolute;right:30px;top:525px;width:262px;height:190px;pointer-events:none;z-index:4}
+.sv-spk-pz{left:0;top:0;width:100%;height:100%;z-index:-1}
+.sv-pzbtn.muted > :is(img:not(.sv-lockico):not(.sv-pzico),.sv-pzw,.sv-pzcount){filter:saturate(.2) brightness(.9)}
+.sv-pzbtn.muted > .sv-pzico{filter:drop-shadow(0 3px 3px rgba(0,0,0,.3)) saturate(.2) brightness(.9)}
+.sv-pzbtn.unmuting > :is(img:not(.sv-lockico),.sv-pzw,.sv-pzcount){transition:filter 1.8s ease-in-out .3s}
+.sv-album.muted{filter:drop-shadow(0 8px 8px rgba(0,0,0,.3)) saturate(.2) brightness(.9)}
+.sv-ameter.muted{filter:saturate(.2) brightness(.9)}
+.sv-album.unmuting,.sv-ameter.unmuting{transition:filter 1.8s ease-in-out .3s}
+@keyframes sv-lkrat{0%,100%{transform:rotate(-10deg)}15%{transform:rotate(-24deg)}35%{transform:rotate(3deg)}55%{transform:rotate(-20deg)}75%{transform:rotate(-4deg)}}
+.sv-lockbub{position:absolute;top:50%;translate:0 -50%;z-index:6;white-space:nowrap;pointer-events:none;background:#fffbea;border:5px solid #c47a2c;border-radius:26px;padding:10px 22px;
+ font-family:'Titan One',sans-serif;font-size:26px;line-height:34px;color:#8a4a10;text-align:center;box-shadow:0 8px 14px rgba(0,0,0,.3);animation:sv-bubin 3s ease-out forwards}
+.sv-lockbub.r{left:calc(100% + 26px);transform-origin:0 50%}
+.sv-lockbub.l{right:calc(100% + 26px);transform-origin:100% 50%}
+.sv-lockbub::before,.sv-lockbub::after{content:"";position:absolute;top:50%;margin-top:-14px;border:14px solid transparent}
+.sv-lockbub.r::before{right:100%;border-right-color:#c47a2c;margin-right:2px}
+.sv-lockbub.r::after{right:100%;border-right-color:#fffbea;margin-right:-5px}
+.sv-lockbub.l::before{left:100%;border-left-color:#c47a2c;margin-left:2px}
+.sv-lockbub.l::after{left:100%;border-left-color:#fffbea;margin-left:-5px}
+@keyframes sv-bubin{0%{opacity:0;scale:.5}10%{opacity:1;scale:1.06}16%{scale:1}88%{opacity:1}100%{opacity:0}}
+.sv-lockico.open{animation:sv-unlk 2.4s ease-out forwards}
+@keyframes sv-unlk{0%{opacity:0;transform:rotate(-10deg) scale(.6)}14%{opacity:1;transform:rotate(-10deg) scale(1.2)}28%{transform:rotate(-10deg) scale(1)}70%{opacity:1;transform:rotate(-10deg) translateY(0)}100%{opacity:0;transform:rotate(-10deg) translateY(-46px)}}
 .sv-btn3{position:relative;width:200px;height:84px;font-family:'Titan One',sans-serif;font-size:34px;color:#fff;cursor:pointer;border:7px solid transparent;border-radius:40px;
  background:linear-gradient(180deg,var(--t) 0%,var(--m) 50%,var(--b) 100%) padding-box,linear-gradient(180deg,#fff9c4 0%,#ffe04a 35%,#ffb800 70%,#d98500 100%) border-box;
  text-shadow:-2px -2px 0 var(--e),2px -2px 0 var(--e),-2px 2px 0 var(--e),2px 2px 0 var(--e),0 5px 0 var(--e),0 6px 6px rgba(0,0,0,.4);
