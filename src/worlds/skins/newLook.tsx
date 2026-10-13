@@ -28,6 +28,8 @@ import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
 import { REAL_CODES as PUZZLE_REAL_CODES, demoPiecesGet, demoPiecesSet } from "@/pages/PuzzleMixup";
 import { lockLeft, LOCK_IMG, UNLOCK_IMG, type LockId } from "@/lib/locks";
 import LockMsg from "@/components/LockMsg";
+import { badgeList, earnedBadges, badgeImg } from "@/worlds/badges";
+import TrophyRoom from "./TrophyRoom";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 
 // ---- per-world settings (step 6) ----
@@ -52,6 +54,9 @@ const UI = "/worlds/ui";
 // LOCKS test flag ?lk (1006): stages grown in this TAB, kept through Album/Puzzle and back; a fresh page load starts at 0.
 const LK_KEY = "mpe_demo_lkgrown";
 let lkBooted = false;
+// BADGES test flag ?bd=live (1006): badges earned for real (from what is shown), NEW until seen; seen kept in this TAB.
+const BD_KEY = "mpe_demo_bdseen";
+let bdBooted = false;
 const STAGE_W = 1600, STAGE_H = 1000; // design size; scaled to fit any window (one screen, no scrolling)
 
 // Fit the 1600x1000 design into the window. The stage grows wider/taller to fill the window;
@@ -311,7 +316,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   // celebration: 'World Complete!', all 6 grown animals, coins x50 + a Savanna badge into My Badges (DISPLAY ONLY).
   // TEST ONLY ?c=1 = play it on load (saves nothing, never calls closeComplete).
   const [done, setDone] = useState<null | "on" | "fly" | "out">(null);
-  const [badgesShown, setBadgesShown] = useState(0);
+  const [cardBadges, setCardBadges] = useState<string[]>([]); // My Badges card: the 3 newest badges (launch step 6)
   const badgesRef = useRef<HTMLDivElement>(null);
   const DONE_PRIZES: Prize[] = [ // STEP 5.4 (Andy 21:04): REAL = 50 coins + 15 treats + the badge (database: '<world>:complete')
     { kind: "coin", n: 25, img: `${UI}/coin.webp`, flyers: 12, size: 70 }, // = what the database pays (prize v2/v3: 25 - fixed 2026-10-04, was 50 on screen)
@@ -392,7 +397,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const partyLand = (k: PrizeKind, add: number) => {
     if (k === "coin") setCoinShown(c => c + add);
     if (k === "piece") { setPieceShown(c => c + add); if (v.isMaster) { setDemoPieces(d => d + add); demoPiecesSet(demoPiecesGet() + add); } }
-    if (k === "badge") setBadgesShown(b => b + 1);
+    if (k === "badge") setCardBadges(orderedRef.current.slice(-3)); // the new world badge lights up on the card
     setBump(b => ({ ...b, [k]: (b[k] ?? 0) + 1 }));
   };
   // Andy 2026-10-04 16:22: the treats finish dropping into the jar FIRST (old stage still showing), THEN the transformation.
@@ -463,10 +468,37 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   useEffect(() => { if (!holding) setCoinShown(v.coins ?? 0); }, [v.coins, holding]);
   const pieceReal = v.isMaster ? demoPieces : v.pieces;
   useEffect(() => { if (!holding && pieceReal !== null) setPieceShown(pieceReal); }, [pieceReal, holding]);
-  // MY BADGES (step 5.4): one badge per finished world = '<world>:complete' in the kid's prize list (from the cloud).
-  // During the world-finished party the new badge flies in first, then lights up (same hold as coins / jar).
-  const wonBadges = (v.prizes ?? []).filter(p => /^[a-z]+:complete$/.test(p)).map(p => p.split(":")[0]);
-  useEffect(() => { if (!holding) setBadgesShown(wonBadges.length); }, [wonBadges.length, holding]);
+  // MY BADGES (launch step 6, Andy OK 10-13): 12 badges (src/worlds/badges.ts) worked out from what the kid has. NEW = earned
+  // but not in the seen list ('badge:<id>', add-only, cloud). The card shows the 3 NEWEST (seen order). During a party the card
+  // holds; the world badge lights up when its flyer lands. A visit (read-only) never marks anything seen.
+  // TEST 1006 on /world-test/: ?bd=all = every badge earned, ?bd=new = every badge earned AND new (pops in once).
+  const bdFlag = onTest && v.isMaster ? q.get("bd") : null;
+  const [liveSeen, setLiveSeen] = useState<string[]>(() => {
+    if (!bdBooted) { bdBooted = true; try { sessionStorage.removeItem(BD_KEY); } catch { /* */ } return []; }
+    try { return JSON.parse(sessionStorage.getItem(BD_KEY) || "[]"); } catch { return []; }
+  });
+  const bWorlds = v.worldList.map(x => x.world);
+  const badgeDefs0 = badgeList(bWorlds);
+  const badgeDefs = bdFlag === "many" ? Array.from({ length: 30 }, (_, i) => { const b = badgeDefs0[i % badgeDefs0.length]; return i < badgeDefs0.length ? b : { ...b, id: `${b.id}~${i}` }; }) : badgeDefs0; // ?bd=many = 30 pretend badges (3 walls)
+  const earned = bdFlag && bdFlag !== "live" ? badgeDefs.map(b => b.id)
+    : earnedBadges({ worlds: bWorlds, prizes: v.prizes, rowData: v.rowData, worldId: v.world.id, fed: v.fedTreatsState, dailyBox: v.dailyPrize?.box ?? null });
+  const seenB: string[] | null = v.isMaster ? (bdFlag === "new" ? (v.seen ?? []) : bdFlag === "live" ? liveSeen : earned.map(id => `badge:${id}`)) : v.seen;
+  const newBadges = seenB === null || v.readOnly ? [] : earned.filter(id => !seenB.includes(`badge:${id}`));
+  const seenAt = (id: string) => { const i = (seenB ?? []).indexOf(`badge:${id}`); return i < 0 ? 1e6 : i; };
+  const ordered = [...earned].sort((a, b) => seenAt(a) - seenAt(b)); // newest last
+  const orderedRef = useRef(ordered); orderedRef.current = ordered;
+  const orderKey = ordered.join(",");
+  useEffect(() => { if (!holding) setCardBadges(orderedRef.current.slice(-3)); }, [orderKey, holding]);
+  const [popNew, setPopNew] = useState<string[]>([]); // the NEW badges popping in on this opening of My Badges
+  const openBadges = () => {
+    const fresh = newBadges.slice();
+    setPopNew(fresh); setPanel("badges");
+    if (!fresh.length) return;
+    if (v.sfxOn) { const a = new Audio(`${UI}/snd_newfriend.mp3`); a.volume = 0.7; a.play().catch(() => { }); }
+    if (v.isMaster && bdFlag === "live") { const n = [...liveSeen, ...fresh.map(id => `badge:${id}`)]; setLiveSeen(n); try { sessionStorage.setItem(BD_KEY, JSON.stringify(n)); } catch { /* */ } }
+    else fresh.forEach(id => v.markSeen(`badge:${id}`));
+  };
+  useEffect(() => { if (!popNew.length) return; const t = window.setTimeout(() => setPopNew([]), 3000 + popNew.length * 300); return () => window.clearTimeout(t); }, [popNew]); // after the last one has dropped in
   // DAILY PRIZE (Andy 2026-10-03): rises in ~1.2s after the world opens when today's box is not taken yet (any device).
   // TEST ONLY ?dp=1..7 on /world-test/ = show it as that day (display only - claims nothing).
   const testDp = onTest ? parseInt(q.get("dp") ?? "", 10) : NaN;
@@ -566,7 +598,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const goGames = (path: string) => { sessionStorage.setItem("mpe_return_world", window.location.pathname + window.location.search); v.navigate(path); }; // + ?query: the demo flag survives the trip (2026-10-11)
   const goVocab = () => goGames(`${v.world.gamePath}/${v.code}/${v.studentName}/${v.family?.book ?? 1}`);
   const goGrammar = () => goGames(`/grammar-hub/${v.code}/${v.studentName}`);
-  const [panel, setPanel] = useState<null | "animals" | "exit" | "theater" | "worlds">(null);
+  const [panel, setPanel] = useState<null | "animals" | "exit" | "theater" | "worlds" | "badges">(null);
 
   // VIDEO THEATER (Andy 16:34): Savanna cards from the brain (won = grown + video watched); Ocean + Dino = 'Coming soon!'
   // until step 7. Playing a video there saves nothing. TEST ONLY ?t=1 = open it on load, first won video marked new.
@@ -950,11 +982,13 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           </div>
           <img className="sv-cardlbl" style={{ top: 179, height: 46 }} src={`${UI}/lbl_animals.webp`} alt="My Animals" />
         </div>
-        <div ref={badgesRef} className={"sv-card sv-badges sv-tap" + lift} style={bumpStyle("badge")} onClick={soon}>
-          <div className="sv-medals">{[0, 1, 2].map(i => <img key={i} className={"sv-medal" + (i < badgesShown ? " won" : " off")} src={i < badgesShown ? `/worlds/badges/${wonBadges[i] ?? v.world.id}.webp` : `${UI}/medal.webp`} alt="" />)}</div>
+        {newBadges.length > 0 && !holding && !panel && <Sparkler className="sv-spk-badges" cx={131} cy={61} k={0.7} halo={[300, 220]} />}
+        <div ref={badgesRef} className={"sv-card sv-badges sv-tap" + lift + (newBadges.length > 0 && !holding && !panel ? " beacon" : "")} style={bumpStyle("badge")} onClick={openBadges}>
+          {newBadges.length > 0 && !holding && <span className="sv-dot num">{newBadges.length}</span>}
+          <div className="sv-medals">{[0, 1, 2].map(i => { const id = cardBadges[i]; return <img key={i} className={"sv-medal" + (id ? " won" : " off")} src={id ? badgeImg(id) : `${UI}/medal.webp`} alt="" />; })}</div>
           <img className="sv-cardlbl" style={{ top: 111, height: 45 }} src={`${UI}/lbl_badges.webp`} alt="My Badges" />
         </div>
-        {(alL.opening || (albumPacks > 0 && !newReady && !panel)) && <Sparkler className="sv-spk-album" cx={131} cy={95} />}
+        {(alL.opening || (albumPacks > 0 && !newReady && !panel)) && <Sparkler className="sv-spk-album" cx={131} cy={95} k={0.7} halo={[300, 260]} />}
         <div className={"sv-card sv-album sv-tap" + (albumPacks > 0 && !newReady && !panel ? " beacon" : "") + (alL.locked ? " muted" : "") + (alL.opening ? " unmuting" : "")} onClick={waitTap.includes("album") ? undefined : albumLeft > 0 ? () => tapLock("album", albumLeft) : albumOn ? () => { setPointAt(null); goGames(`/album/${v.code}/${v.studentName}`); } : soon}>{/* Card Album: 1006 only for now */}
           <img className="sv-cardlbl" style={{ top: 176, height: 38 }} src={`${UI}/lbl_album.webp`} alt="Card Album" />
           {albumPacks > 0 && <span className="sv-dot num">{albumPacks}</span>}
@@ -1016,6 +1050,9 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
             </div>
           </div>
         )}
+
+        {/* TROPHY ROOM (launch step 6, Andy 10-13): every badge hangs in its own room (TrophyRoom.tsx). Only the X closes it. */}
+        {panel === "badges" && <TrophyRoom cx={cx} sh={sh} defs={badgeDefs} earned={earned} popNew={popNew} onClose={() => setPanel(null)} musicOn={v.musicOn} onMusic={theaterMusic} />}
 
         {/* MY WORLDS (step 7, 2026-10-04): every world in order. Finished = visit (read-only page, saves nothing);
             the kid's current world = go there; not reached yet = '?'. Only the X closes it (never a background tap). */}
@@ -1231,7 +1268,7 @@ const CSS = `
 .sv-dots{display:flex;gap:6px;margin-top:4px}
 .sv-dots i{width:20px;height:20px;border-radius:50%;background:#e9d6b0;border:2px solid #c47a2c}
 .sv-dots i.on{background:#ffc21c}
-.sv-card{position:absolute;right:30px;width:262px;background-position:0 0;background-size:100% 100%;background-repeat:no-repeat;filter:drop-shadow(0 8px 8px rgba(0,0,0,.3))}
+.sv-card{position:absolute;z-index:2;right:30px;width:262px;background-position:0 0;background-size:100% 100%;background-repeat:no-repeat;filter:drop-shadow(0 8px 8px rgba(0,0,0,.3))}
 .sv-cardlbl{position:absolute;left:50%;transform:translateX(-50%);width:auto;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35));pointer-events:none}
 .sv-animals{top:112px;height:191px;background-image:url(${UI}/frame_animals.webp)}
 .sv-grid{position:absolute;left:22px;top:22px;width:219px;display:grid;grid-template-columns:repeat(3,69px);gap:6px}
@@ -1375,6 +1412,9 @@ const CSS = `
 .sv-lockico,.sv-imgbtn .sv-lockico{position:absolute;left:-14px;top:-4px;width:auto;height:78px;z-index:3;transform:rotate(-10deg);transform-origin:50% 15%;pointer-events:none;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35));animation:sv-lkidle 5s ease-in-out infinite}
 @keyframes sv-lkidle{0%,84%,100%{transform:rotate(-10deg)}87%{transform:rotate(-16deg)}90%{transform:rotate(-4deg)}93%{transform:rotate(-14deg)}96%{transform:rotate(-8deg)}}
 .sv-lockico.rattle{animation:sv-lkrat .6s ease-in-out}
+.sv-badges.beacon{animation:sv-peek 2.6s ease-in-out infinite,sv-goldglow 1.3s ease-in-out infinite;transform-origin:50% 90%}
+.sv-spk-badges{right:30px;top:353px;width:262px;height:122px}
+.sv-spk-album,.sv-spk-badges{opacity:.6}
 .sv-albumlk{position:absolute;right:30px;top:525px;width:262px;height:190px;pointer-events:none;z-index:4}
 .sv-spk-pz{left:0;top:0;width:100%;height:100%;z-index:-1}
 .sv-pzbtn.muted > :is(img:not(.sv-lockico):not(.sv-pzico),.sv-pzw,.sv-pzcount){filter:saturate(.2) brightness(.9)}

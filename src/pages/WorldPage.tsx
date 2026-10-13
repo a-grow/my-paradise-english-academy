@@ -245,14 +245,14 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   };
   // DAILY PRIZE (2026-10-03, new look): today's box + already taken? null = not read yet / teacher code.
   // claimDailyPrizeNow(): the DATABASE opens today's box (one per day) - through the jar queue like every jar change.
-  const [dailyPrize, setDailyPrize] = useState<{ day: number; claimedToday: boolean } | null>(null);
+  const [dailyPrize, setDailyPrize] = useState<{ day: number; claimedToday: boolean; box?: number } | null>(null);
   const claimDailyPrizeNow = (): Promise<{ paid: boolean } | null | undefined> => {
     if (noSave) return Promise.resolve({ paid: false });
     return new Promise(resolve => queueJar(async () => {
       const res = await claimDailyPrize(code, studentName);
       resolve(res);
       if (!res) return undefined;
-      setDailyPrize(d => (d ? { ...d, claimedToday: true } : d)); // paid or already taken: today is done either way
+      setDailyPrize(d => (d ? { ...d, claimedToday: true, box: res.paid && typeof d.box === "number" ? d.box + 1 : d.box } : d)); // paid or already taken: today is done either way (+1 box when paid)
       if (!res.paid) return undefined;
       const t = await addCoins(code, studentName, 0); // read the real coin total back
       if (typeof t === "number") setCoins(t);

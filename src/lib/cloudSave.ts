@@ -114,7 +114,7 @@ export async function claimDailyPrize(code: string, studentName: string): Promis
 }
 
 // DAILY PRIZE status: today's box number (1-7) + already taken today? | null = no row | undefined = could not read.
-export async function loadDailyPrize(code: string, studentName: string): Promise<{ day: number; claimedToday: boolean } | null | undefined> {
+export async function loadDailyPrize(code: string, studentName: string): Promise<{ day: number; claimedToday: boolean; box: number } | null | undefined> {
   try {
     const { data, error } = await supabase
       .from("student_progress")
@@ -126,7 +126,7 @@ export async function loadDailyPrize(code: string, studentName: string): Promise
     if (!data) return null;
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" }); // YYYY-MM-DD
     const box = typeof data.daily_box === "number" ? data.daily_box : 0;
-    return { day: (box % 7) + 1, claimedToday: data.daily_claimed === today };
+    return { day: (box % 7) + 1, claimedToday: data.daily_claimed === today, box }; // box = boxes opened so far (Daily Visitor badge)
   } catch {
     return undefined;
   }
