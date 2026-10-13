@@ -183,7 +183,7 @@ function Ribbon({ img, left, top, width, line1, prize, stroke }: {
 }) {
   const h = width * RIB_H / RIB_W;
   return (
-    <div className="ca-ribbon" style={{ left, top, width, height: h, backgroundImage: `url(${img})` }}>
+    <div className="ca-ribbon ca-inT" style={{ left, top, width, height: h, backgroundImage: `url(${img})` }}>
       <div className="ca-rtxt" style={{ left: width * BAND.x0, width: width * (BAND.x1 - BAND.x0), top: h * BAND.y0, height: h * (BAND.y1 - BAND.y0),
         ["--rs" as string]: stroke } as CSSProperties}>
         <div className="ca-rt" style={{ fontSize: width * 0.031 }}>{line1}</div>
@@ -708,10 +708,10 @@ export default function CardAlbum() {
     const colW = pages[0].width / 3;
     return (
       <>
-        <div className="ca-title" style={{ left: cx, top: HOME.titleTop }}><Word3D text="My Card Album" palette="gold" stagger={40} /></div>
+        <div className="ca-title ca-inT" style={{ left: cx, top: HOME.titleTop }}><Word3D text="My Card Album" palette="gold" stagger={40} /></div>
         <Ribbon img={`${U}/ribbon_blue.webp`} left={cx - HOME.ribW / 2} top={HOME.ribTop} width={HOME.ribW} stroke="#17237a"
           line1="FINISH THE WHOLE ALBUM TO WIN" prize={<PrizeRow treats={ALBUM_PRIZE.treats} coins={ALBUM_PRIZE.coins} badge />} />
-        <div className="ca-bar green" style={{ left: cx - 200, top: HOME.barTop, width: 400 }}>
+        <div className="ca-bar green ca-inT" style={{ left: cx - 200, top: HOME.barTop, width: 400 }}>
           <i style={{ width: `${Math.max(6, (total / CARDS_TOTAL) * 100)}%` }} /><span>{total} / {CARDS_TOTAL}</span>
         </div>
 
@@ -757,7 +757,7 @@ export default function CardAlbum() {
         {phase === "opening" && <div className="ca-glowwrap" style={{ left: bl, top: bt, width: BW, height: BH }}><div className="ca-pageglow" /><div className="ca-burst" /></div>}
         </div>
 
-        <div className="ca-packbox" style={{ top: sh - 336 }}>
+        <div className="ca-packbox ca-inL" style={{ top: sh - 336 }}>
           <div className={"ca-pack" + (packs ? " ready ca-tap" : "")} onClick={openPack}>
             <img src={`${U}/pack_closed.webp`} alt="Card pack" />
             {packs > 1 && <div className="ca-x">x{packs}</div>}
@@ -780,10 +780,10 @@ export default function CardAlbum() {
     const n = countIn(x), CW = SETP.cardW, fontPx = 17;
     return (
       <>
-        <div className="ca-title set" style={{ left: cx }}><Word3D key={x.id} text={x.name} palette="blue" stagger={35} /></div>
+        <div className="ca-title set ca-inT" style={{ left: cx }}><Word3D key={x.id} text={x.name} palette="blue" stagger={35} /></div>
         <Ribbon img={`${U}/ribbon_gold.webp`} left={cx - SETP.ribW / 2} top={SETP.ribTop} width={SETP.ribW} stroke="#8a4a05"
           line1="FINISH THE SET TO WIN" prize={<PrizeRow treats={SET_PRIZE.treats} coins={SET_PRIZE.coins} />} />
-        <div className="ca-bar blue" style={{ left: cx - 150, top: SETP.barTop, width: 300 }}>
+        <div className="ca-bar blue ca-inT" style={{ left: cx - 150, top: SETP.barTop, width: 300 }}>
           <i style={{ width: `${Math.max(6, n * 10)}%` }} /><span>{n} / {x.cards.length}</span>
         </div>
         <div className="ca-bk" style={{ transform: `scale(${bkSet})`, transformOrigin: `${cx}px ${bt}px` }}>
@@ -816,17 +816,17 @@ export default function CardAlbum() {
   return (
     <div className={"ca-root" + (leaving ? " leaving" : "")}>
       <style>{FONTS + FUN3D_CSS + CSS}</style>
-      <div ref={stageRef} className="ca-stage" data-font={fontReady ? 1 : 0} onScroll={e => { e.currentTarget.scrollTop = 0; e.currentTarget.scrollLeft = 0; }} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
+      <div ref={stageRef} className={"ca-stage" + (go ? " go" : "")} data-font={fontReady ? 1 : 0} onScroll={e => { e.currentTarget.scrollTop = 0; e.currentTarget.scrollLeft = 0; }} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
         <div className="ca-table" style={{ backgroundImage: `url(${TABLE_BG})` }} />
 
         {go && (st ? setView(st) : homeView())}
 
-        {go && phase === "open" && !poN && !setDone && <div className="ca-rb ca-tap" style={{ left: 108 }} onClick={() => setHow("open")}><img src="/worlds/ui/rb_help.webp" alt="How to play" /></div>}
-        <div className="ca-rb ca-tap" style={{ left: 22 }} onClick={() => (poN || setDone ? undefined : st ? goSet(null) : closeAlbum())}>
+        {go && phase === "open" && !poN && !setDone && <div className="ca-rb ca-tap ca-inT" style={{ left: 108 }} onClick={() => setHow("open")}><img src="/worlds/ui/rb_help.webp" alt="How to play" /></div>}
+        <div className="ca-rb ca-tap ca-inT" style={{ left: 22 }} onClick={() => (poN || setDone ? undefined : st ? goSet(null) : closeAlbum())}>
           <img src="/worlds/ui/rb_exit.webp" alt={st ? "Back to album" : "Exit"} />
         </div>
-        <div className="ca-coins" style={{ left: pillL }}>{album.coins}</div>
-        <div className="ca-teacher" style={{ top: 112, left: pillL - 80 }}>Teacher view: nothing is saved</div>
+        <div className="ca-coins ca-inR" style={{ left: pillL }}>{album.coins}</div>
+        <div className="ca-teacher ca-inR" style={{ top: 112, left: pillL - 80 }}>Teacher view: nothing is saved</div>
 
         {poN > 0 && <PackOpen count={poN} cx={cx} cy={sh / 2} fx={fx} draw={drawPacks} getTarget={getTarget} onFlyStart={onFlyStart}
           onLand={onLand} onBatchDone={batchDone} hold={setDone !== null} onClose={() => setPoN(0)} />}
@@ -850,12 +850,22 @@ const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Lilita+One&
 const CSS = `
 .ca-root{position:fixed;inset:0;overflow:hidden;background:#000;user-select:none;-webkit-user-select:none}
 .ca-stage{position:absolute;left:50%;top:50%;transform-origin:center center;overflow:hidden;overflow:clip;font-family:'Titan One',sans-serif;color:#fff}
-.ca-table{position:absolute;inset:0;background:#d68c42 center top/cover no-repeat}   /* wide windows crop only the bottom (keeps the cookies) */
+.ca-table{position:absolute;inset:0;background:#d68c42 center top/cover no-repeat;animation:ca-bgb .9s ease-out backwards}   /* wide windows crop only the bottom (keeps the cookies) */
 .ca-stage{animation:ca-fadein .4s backwards}
 .ca-root.leaving .ca-stage{opacity:0;transition:opacity .35s}
 .ca-bk{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .ca-bk>*{pointer-events:auto}
 .ca-fx{position:absolute;left:0;top:0;z-index:80;pointer-events:none}
+/* ENTRY (Andy 2026-10-13): the background bounces, the UI slides/drops in like the world page. Uses the 'translate'/'scale'
+   properties (not 'transform') so every existing transform (translateX(-50%) etc.) stays as it is. */
+.ca-inL{animation:ca-inL .8s cubic-bezier(.3,1.35,.5,1) .1s backwards}
+.ca-inR{animation:ca-inR .8s cubic-bezier(.3,1.35,.5,1) .15s backwards}
+.ca-inT{animation:ca-inT .75s cubic-bezier(.3,1.35,.5,1) .05s backwards}
+@keyframes ca-inL{0%{translate:-460px 0}100%{translate:0 0}}
+@keyframes ca-inR{0%{translate:460px 0}100%{translate:0 0}}
+@keyframes ca-inT{0%{translate:0 -300px}100%{translate:0 0}}
+.ca-stage:not(.go) :is(.ca-bg,.ca-table,.ca-inL,.ca-inR,.ca-inT){animation-play-state:paused}   /* the entry waits while How to Play is open */
+@keyframes ca-bgb{0%{scale:1}28%{scale:1.07}60%{scale:1}80%{scale:1.015}100%{scale:1}}
 .ca-tap{cursor:pointer}
 .ca-rb{position:absolute;top:14px;width:76px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35));z-index:30}
 .ca-rb img{display:block;width:100%;pointer-events:none}

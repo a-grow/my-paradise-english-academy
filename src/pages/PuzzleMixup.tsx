@@ -569,10 +569,10 @@ export default function PuzzleMixup() {
   return (
     <div className={"pz-root" + (leaving ? " leaving" : "")}>
       <style>{FONTS + FUN3D_CSS + MIXUP_CSS + CSS}</style>
-      <div className="pz-stage" data-font={fontReady ? 1 : 0} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
+      <div className={"pz-stage" + (go ? " go" : "")} data-font={fontReady ? 1 : 0} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
         <div className="pz-bg" />
 
-        <div className="pz-title" style={{ left: cx }}><MixupWord size={86} pop /></div>
+        <div className="pz-title pz-inT" style={{ left: cx }}><MixupWord size={86} pop /></div>
 
         {/* THE BOARD: muted picture, colour picture (revealed at the end), the covers, then the frame on top */}
         {go && <div key={round} className={"pz-board" + (phase === "out" ? " out" : " drop") + (phase === "finale" || phase === "prize" ? " glow" : "")}
@@ -626,7 +626,7 @@ export default function PuzzleMixup() {
         )}
 
         {/* right: my puzzles */}
-        <div className="pz-col" style={{ left: sw - 206 }}>
+        <div className="pz-col pz-inR" style={{ left: sw - 206 }}>
           <div className="pz-colh">Puzzles</div>
           <div className="pz-coln">{doneList.length} / {PUZZLES.length}</div>
           {PUZZLES.map((q, i) => {
@@ -641,11 +641,13 @@ export default function PuzzleMixup() {
         </div>
 
         {/* top left: my pieces + my coins */}
+        <div className="pz-grp pz-inL">{/* slide-in group (the pill keeps its own shake) */}
         <div className={"pz-pcs " + pillFx}><img src={`${P}/piece.webp`} alt="" /><b key={pieces}>{pieces}</b></div>
         <div className="pz-coins"><span key={coins}>{coins}</span></div>
-        <div className="pz-rb pz-tap" style={{ right: 22 }} onClick={leave}><img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
-        <div className="pz-rb pz-tap" style={{ right: 108 }} onClick={() => setHow("open")}><img src={`${UI}/rb_help.webp`} alt="How to play" /></div>
-        {isMaster && <div className="pz-teacher">Teacher view: nothing is saved</div>}
+        </div>
+        <div className="pz-rb pz-tap pz-inT" style={{ right: 22 }} onClick={leave}><img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
+        <div className="pz-rb pz-tap pz-inT" style={{ right: 108 }} onClick={() => setHow("open")}><img src={`${UI}/rb_help.webp`} alt="How to play" /></div>
+        {isMaster && <div className="pz-teacher pz-inL">Teacher view: nothing is saved</div>}
 
         {bubC && bubble && (
           <div key={bubble.k} className="pz-bub" style={{ left: centre(bubC).x, top: centre(bubC).y - bubC.m * 0.38 }}>
@@ -688,7 +690,19 @@ const CSS = `
 .pz-stage{position:absolute;left:50%;top:50%;transform-origin:center center;overflow:hidden;overflow:clip;font-family:'Titan One',sans-serif;color:#fff;animation:pz-fade .4s backwards}
 .pz-root.leaving .pz-stage{opacity:0;transition:opacity .35s}
 @keyframes pz-fade{from{opacity:0}to{opacity:1}}
-.pz-bg{position:absolute;inset:0;background:#5a1aa0 url(/puzzle/bg.webp) center/cover no-repeat}
+.pz-bg{position:absolute;inset:0;background:#5a1aa0 url(/puzzle/bg.webp) center/cover no-repeat;animation:pz-bgb .9s ease-out backwards}
+/* ENTRY (Andy 2026-10-13): the background bounces, the UI slides/drops in like the world page. Uses the 'translate'/'scale'
+   properties (not 'transform') so every existing transform (translateX(-50%) etc.) stays as it is. */
+.pz-inL{animation:pz-inL .8s cubic-bezier(.3,1.35,.5,1) .1s backwards}
+.pz-inR{animation:pz-inR .8s cubic-bezier(.3,1.35,.5,1) .15s backwards}
+.pz-inT{animation:pz-inT .75s cubic-bezier(.3,1.35,.5,1) .05s backwards}
+@keyframes pz-inL{0%{translate:-460px 0}100%{translate:0 0}}
+@keyframes pz-inR{0%{translate:460px 0}100%{translate:0 0}}
+@keyframes pz-inT{0%{translate:0 -300px}100%{translate:0 0}}
+@keyframes pz-bgb{0%{scale:1}28%{scale:1.07}60%{scale:1}80%{scale:1.015}100%{scale:1}}
+.pz-grp{position:absolute;inset:0;z-index:20;pointer-events:none}
+.pz-stage:not(.go) :is(.pz-bg,.pz-table,.pz-inL,.pz-inR,.pz-inT){animation-play-state:paused}   /* the entry waits while How to Play is open */
+.pz-grp>*{pointer-events:auto}
 .pz-tap{cursor:pointer}
 .pz-fx{position:absolute;left:0;top:0;z-index:80;pointer-events:none}
 .pz-title{position:absolute;top:8px;transform:translateX(-50%);z-index:6;filter:drop-shadow(0 6px 8px rgba(40,0,80,.45))}

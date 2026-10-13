@@ -13,7 +13,8 @@ const SnowyScene = () => (
 );
 
 export const SNOWY_LOOK = makeLook({
-  title: "Snowy", titleImg: null, dir: W, fill: `${W}/far.jpg`, Scene: SnowyScene,   // titleImg: Andy's title art later
+  title: "Snowy", titleImg: `${W}/title.webp`, dir: W, fill: `${W}/far.jpg`, Scene: SnowyScene,   // Andy's Gemini title (2026-10-12, cut from magenta, 784 wide)
+  titleFx: "ice", titleH: 92,     // shine + glints; 92 tall so the letters match Savanna's (snow caps add height)
   music: `${W}/music.mp3`, loadingBg: "#2b4a73",   // Andy 2026-10-08: grand_project "a christmas tale" (trimmed, -22.5 LUFS; original in BACKUPFILES/world4_art/originals)
   move: "breathe",                 // animals stand on the snow and breathe; eggs wobble
 });

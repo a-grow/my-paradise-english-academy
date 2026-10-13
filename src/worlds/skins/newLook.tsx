@@ -32,6 +32,8 @@ import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 export interface LookSettings {
   title: string;                         // "Savanna" -> "Savanna World", "My Savanna Animals"
   titleImg: string | null;               // title art; null = code text (until Andy makes title art)
+  titleFx?: "ice";                       // Snowy (Andy 2026-10-12): a soft shine slides across the letters + round glints twinkle on the snow
+  titleH?: number;                       // ice title height (default 78); its top sits at the same place as every title
   dir: string;                           // pictures: <dir>/<animal>-<egg|baby|young|grown>(-t).webp
   fill: string;                          // picture behind the blurred window sides
   Scene: ComponentType;                  // the scenery inside the 1600x1000 box
@@ -223,6 +225,14 @@ const PANEL_MOTES = (() => {
     return [x, y, 5 + r() * 7, 3.6 + r() * 2.8, -r() * 6, (r() - 0.5) * 30];
   });
 })();
+
+// ice title twinkles (Andy 2026-10-13): a few round white glints on the LETTER faces (no stars); each one hops to a random spot every cycle
+const ICE_SPOTS: [number, number][] = [[2.8,65],[4.8,37.4],[8.8,45.4],[12.2,42.3],[15.7,33.7],[17.6,62],[21.2,65],[25.9,59.5],[26.9,35.6],[30.9,41.7],[35.6,47.2],[39.2,55.2],[40.2,41.7],[43.9,54],[47.3,44.2],[53.3,21.5],[59.2,55.8],[59.9,49.7],[66.1,36.2],[70,50.3],[74.7,41.7],[76.4,60.7],[81.2,50.9],[83.5,39.3],[87.5,49.1],[92.3,59.5],[95.3,62],[96.9,39.9]];   // [x %, y %] on Snowy's title letters (found from the picture)
+const ICE_TW: [number, number, number][] = [[16, 5.3, 0.4], [13, 6.7, 2.2], [18, 8.1, 3.9], [14, 7.3, 5.6]];   // [size px, cycle s, first delay s]
+const iceHop = (e: React.AnimationEvent<HTMLElement>) => {
+  const [x, y] = ICE_SPOTS[Math.floor(Math.random() * ICE_SPOTS.length)];
+  e.currentTarget.style.left = `${x}%`; e.currentTarget.style.top = `${y}%`;
+};
 
 const Loading = ({ L }: { L: LookSettings }) => (
   <div style={{ position: "fixed", inset: 0, background: L.loadingBg, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontFamily: "'Titan One', sans-serif", fontSize: 32 }}>
@@ -770,7 +780,14 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           <div className="sv-sub">{sub}</div>
         </div>
 
-        {L.titleImg ? <img className="sv-title" src={L.titleImg} alt={`${L.title} World`} /> : <div className="sv-titletxt">{L.title} World</div>}
+        {L.titleImg ? (L.titleFx === "ice"
+          ? <div className="sv-tice">
+              <img src={L.titleImg} alt={`${L.title} World`} style={{ height: L.titleH ?? 78 }} />
+              <b className="sv-tshine" style={{ WebkitMaskImage: `url(${L.titleImg})`, maskImage: `url(${L.titleImg})` }} />
+              {ICE_TW.map(([z, t, d], i) => <i key={i} onAnimationIteration={iceHop} style={{ left: `${ICE_SPOTS[i * 7][0]}%`, top: `${ICE_SPOTS[i * 7][1]}%`, width: z, height: z, animationDuration: `${t}s`, animationDelay: `${d}s` }} />)}
+            </div>
+          : <img className="sv-title" src={L.titleImg} alt={`${L.title} World`} />)
+          : <div className="sv-titletxt">{L.title} World</div>}
         </div>
 
         {isFly && <div className="sv-flyshadow" style={{ left: cx }} />}
@@ -1078,7 +1095,16 @@ const CSS = `
 .sv-stop img{display:block;width:100%;height:100%;border-radius:50%;transition:filter .6s,opacity .6s}
 .sv-stop.off img{filter:brightness(0) blur(2.5px);opacity:.45}
 .sv-sub{position:absolute;left:0;right:0;top:122px;text-align:center;font-size:18px;color:#6b3a12;white-space:nowrap}
-.sv-title{position:absolute;left:50%;top:168px;height:78px;width:auto;transform:translateX(-50%);filter:drop-shadow(0 7px 5px rgba(60,25,0,.45));pointer-events:none}
+/* every title art: top 181 = the same ~11px gap under the stage meter as the Ocean/Dino text titles (Andy 2026-10-13, all worlds) */
+.sv-title{position:absolute;left:50%;top:181px;height:78px;width:auto;transform:translateX(-50%);filter:drop-shadow(0 7px 5px rgba(60,25,0,.45));pointer-events:none}
+.sv-tice{position:absolute;left:50%;top:181px;transform:translateX(-50%);filter:drop-shadow(0 7px 5px rgba(10,30,70,.45));pointer-events:none}
+.sv-tice img{display:block;width:auto;max-width:none}
+.sv-tshine{position:absolute;inset:0;-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+ background:linear-gradient(105deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.7) 50%,rgba(255,255,255,0) 70%) no-repeat;background-size:30% 100%;animation:sv-tshine 13s ease-in-out infinite}
+@keyframes sv-tshine{0%{background-position:-50% 0}16%,100%{background-position:150% 0}}
+.sv-tice i{position:absolute;border-radius:50%;opacity:0;transform:translate(-50%,-50%) scale(.3);
+ background:radial-gradient(circle,#fff 0%,#fff 22%,rgba(210,240,255,.85) 42%,rgba(210,240,255,0) 70%);animation:sv-glint 6s ease-in-out infinite both}
+@keyframes sv-glint{0%,100%{opacity:0;transform:translate(-50%,-50%) scale(.2)}8%{opacity:1;transform:translate(-50%,-50%) scale(1)}18%,99%{opacity:0;transform:translate(-50%,-50%) scale(.3)}}
 .sv-titletxt{position:absolute;left:0;right:0;top:168px;text-align:center;font-family:'Lilita One',sans-serif;font-size:66px;line-height:1.2;color:#ffd23a;pointer-events:none;white-space:nowrap;
  text-shadow:-3px -3px 0 #7a3a08,3px -3px 0 #7a3a08,-3px 3px 0 #7a3a08,3px 3px 0 #7a3a08,0 -3px 0 #7a3a08,0 3px 0 #7a3a08,-3px 0 0 #7a3a08,3px 0 0 #7a3a08,0 8px 0 #7a3a08,0 12px 12px rgba(0,0,0,.45)}
 .sv-animal{position:absolute;top:201px;width:640px;height:640px;transform-origin:50% 92%;animation:sv-idle 6s ease-in-out infinite}
