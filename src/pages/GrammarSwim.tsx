@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { addTreats, addCoins, addPieces } from "@/lib/cloudSave";
+import { addTreats, addCoins, addPieces, addWin } from "@/lib/cloudSave";
 import GrammarGameBar from "@/components/GrammarGameBar";
 import { useClickSfx } from "@/lib/clickSfx";
 import ControlHints, { HINT_BOTTOM } from "@/components/ControlHints";
@@ -56,7 +56,10 @@ export default function GrammarSwim() {
         localStorage.setItem(jarKey, String(newTotal));
         setTreatsAfter(newTotal); // this device's number until the database answers
         // ONE JAR: send only "+2" - the database adds it (never the device's whole number).
-        addPieces(kidCode, kidName, 1);   // +1 puzzle piece per WIN (2026-10-11; the database adds it)
+        // +1 puzzle piece per WIN + count the win for badges (2026-10-14, mpe_win; the database adds both)
+        const lv = String(level || 1);   // same level the game itself uses
+        if (/^[0-9]{1,2}$/.test(lv)) addWin(kidCode, kidName, `grammar:swim:${lv}`);
+        else addPieces(kidCode, kidName, 1);   // odd level in the URL = still pay the piece
         addTreats(kidCode, kidName, 2).then(total => { if (typeof total === "number") { localStorage.setItem(jarKey, String(total)); setTreatsAfter(total); } });
         // let the game's own ending (fireworks / chest / last grab) play, then show the celebration
         window.setTimeout(() => {

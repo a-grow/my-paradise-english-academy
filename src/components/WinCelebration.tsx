@@ -257,9 +257,11 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
 
     sfx = new Audio(SFX);
     sfx.preload = "auto";
-    const flyers = Math.min(won, MAX_FLYERS);
-    const tFlyers = Math.min(Math.max(0, treatsWon), 6);
-    const pFlyers = Math.min(Math.max(0, piecesWon), 6);
+    // NO FLYING (Andy 2026-10-14): the prizes just sit here; they pop up + fly in on the WORLD page (WinParade) instead.
+    const NO_FLY = true;
+    const flyers = NO_FLY ? 0 : Math.min(won, MAX_FLYERS);
+    const tFlyers = NO_FLY ? 0 : Math.min(Math.max(0, treatsWon), 6);
+    const pFlyers = NO_FLY ? 0 : Math.min(Math.max(0, piecesWon), 6);
     let arrived = 0, tArrived = 0, coinsDone = flyers === 0, treatsDone = tFlyers === 0, ended = false;
     let pArrived = 0, piecesDone = pFlyers === 0;
     // both done (coins in the pill + treats in the jar) -> thumbs-up, glow, buttons
@@ -398,7 +400,7 @@ export default function WinCelebration({ coinsWon, startTotal, treatsTotal = nul
         </div></div>
       </div>
 
-      <div className={`wc-pill${pillIn ? " show" : ""}`} ref={pillRef} style={startTotal === null ? { display: "none" } : undefined}>
+      <div className={`wc-pill${pillIn ? " show" : ""}`} ref={pillRef} style={{ display: "none" }}>{/* coin pill hidden (Andy 10-14): coins fly in on the world page */}
         <div className="wc-pillcoin" ref={pillCoinRef}><CoinFill /></div>
         <span>{total}</span>
       </div>

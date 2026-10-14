@@ -149,6 +149,11 @@ export async function loadSeen(code: string, studentName: string): Promise<strin
     return undefined;
   }
 }
+// SEEN NAMES must be 3 parts of LETTERS ONLY (live database rule in mpe_mark_seen: ^[a-z]+:[a-z]+:[a-z]+$ - checked 2026-10-14).
+// seenWord turns numbers into letters (0=a ... 9=j) and drops anything else: visit5 -> visitf, set 12 -> bc.
+export const seenWord = (s: string | number) => String(s).toLowerCase().replace(/[0-9]/g, d => "abcdefghij"[Number(d)]).replace(/[^a-z]/g, "");
+export const badgeSeen = (id: string) => `badge:${seenWord(id)}:seen`;                       // e.g. badge:hello:seen
+export const cardSeen = (set: number, n: number) => `card:${seenWord(set)}:${seenWord(n)}`;   // e.g. set 3 card 7 = card:d:h
 export async function markSeen(code: string, studentName: string, flag: string) {
   try {
     const { error } = await supabase.rpc("mpe_mark_seen", { p_code: code, p_name: studentName, p_flag: flag });
@@ -314,6 +319,73 @@ export async function addPieces(code: string, studentName: string, delta: number
     return Number(data);
   } catch (e) {
     console.error("[cloudSave] add pieces threw:", e);
+    return undefined;
+  }
+}
+
+// CARD ALBUM + WIN COUNTERS (2026-10-14, database cards_step5_20261013.sql).
+// addWin: a game WIN = +1 piece + win counter + remembers which game/level (replaces addPieces(+1) on wins).
+// key = 'vocab:<game>' or 'vocab:<game>:<book>-<unit>' or 'grammar:<game>:<level>' (anything else = the DB refuses).
+// Returns pieces to spend | null = no row yet | undefined = failed.
+export async function addWin(code: string, studentName: string, key: string): Promise<number | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_win", { p_code: code, p_name: studentName, p_key: key });
+    if (error) { console.error("[cloudSave] win failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] win", key, "-> pieces", data, code, studentName);
+    return Number(data);
+  } catch (e) {
+    console.error("[cloudSave] win threw:", e);
+    return undefined;
+  }
+}
+// openPacks: n packs (1..10). The DATABASE takes 200 coins each, picks the cards and pays set/album prizes ONCE.
+// ok:false why 'short' = not enough coins (use its numbers). cards = {"<set>-<n>": how many}.
+export type CardDraw = { set: number; n: number; new: boolean; pts: number };
+export type CardPacks = { ok: boolean; why?: string; packs?: CardDraw[][]; coins: number; cards: Record<string, number>; swap: number; sets?: number[]; album?: boolean; prizeCoins?: number; prizeTreats?: number; jar?: number | null };
+export async function openPacks(code: string, studentName: string, n: number): Promise<CardPacks | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_open_packs", { p_code: code, p_name: studentName, p_n: n });
+    if (error) { console.error("[cloudSave] open packs failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] open packs", n, "->", data, code, studentName);
+    return data as CardPacks;
+  } catch (e) {
+    console.error("[cloudSave] open packs threw:", e);
+    return undefined;
+  }
+}
+// pickCard: 10 swap points = one MISSING card. ok:false why 'short' (points) | 'have' (already owned). Same prizes as packs.
+export type CardPick = { ok: boolean; why?: string; coins: number; cards: Record<string, number>; swap: number; sets?: number[]; album?: boolean; prizeCoins?: number; prizeTreats?: number; jar?: number | null };
+export async function pickCard(code: string, studentName: string, set: number, n: number): Promise<CardPick | null | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_pick_card", { p_code: code, p_name: studentName, p_set: set, p_n: n });
+    if (error) { console.error("[cloudSave] pick card failed:", error.message); return undefined; }
+    if (data === null || data === undefined) return null;
+    console.log("[cloudSave] pick card", set, n, "->", data, code, studentName);
+    return data as CardPick;
+  } catch (e) {
+    console.error("[cloudSave] pick card threw:", e);
+    return undefined;
+  }
+}
+// loadCards: the kid's album (read only) | null = no row | undefined = could not read.
+export async function loadCards(code: string, studentName: string): Promise<{ cards: Record<string, number>; swap: number; coins: number; seen: string[] } | null | undefined> {
+  try {
+    const { data, error } = await supabase
+      .from("student_progress")
+      .select("cards, card_swap, coins_earned, coins_spent, seen_flags")
+      .eq("code", code)
+      .eq("student_name", studentName)
+      .order("id")
+      .limit(1)
+      .maybeSingle();
+    if (error) { console.error("[cloudSave] cards load failed:", error.message); return undefined; }
+    if (!data) return null;
+    const cards = data.cards && typeof data.cards === "object" && !Array.isArray(data.cards) ? (data.cards as Record<string, number>) : {};
+    return { cards, swap: Number(data.card_swap) || 0, coins: (Number(data.coins_earned) || 0) - (Number(data.coins_spent) || 0), seen: Array.isArray(data.seen_flags) ? data.seen_flags : [] };
+  } catch (e) {
+    console.error("[cloudSave] cards load threw:", e);
     return undefined;
   }
 }

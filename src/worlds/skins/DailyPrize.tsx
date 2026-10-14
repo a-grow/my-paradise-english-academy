@@ -85,7 +85,7 @@ export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand
   const [flyers, setFlyers] = useState<{ id: number; img: string; x0: number; y0: number; x1: number; y1: number; delay: number }[]>([]);
   const timers = useRef<number[]>([]);
   const later = (fn: () => void, ms: number) => { timers.current.push(window.setTimeout(fn, ms)); };
-  useEffect(() => { later(() => setPhase(p => (p === "in" ? "idle" : p)), 950); return () => timers.current.forEach(t => window.clearTimeout(t)); }, []);
+  useEffect(() => { if (sfxOn) { const a = new Audio("/celebration/win_pop.mp3"); a.volume = 0.7; a.play().catch(() => { }); } /* pop as the board appears (Andy 10-14) */ later(() => setPhase(p => (p === "in" ? "idle" : p)), 950); return () => timers.current.forEach(t => window.clearTimeout(t)); }, []);
 
   // WIGGLE (Andy 2026-10-07): the little presents on the meter + the big Day 7 present wiggle ONCE now and then,
   // one at a time, at random spread-out moments. Nothing else wiggles.
@@ -205,7 +205,7 @@ export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand
             </div>
           );
         })}
-        <button className="f3-btn f3-yellow dp-claim" disabled={phase !== "idle"} onClick={claim}>Claim!</button>
+        <button className={"f3-btn f3-yellow dp-claim" + (phase === "idle" ? " sv-tap" : "")} disabled={phase !== "idle"} onClick={claim}>Claim!</button>{/* sv-tap = the world page click sound (Andy 10-14) */}
       </div>
       {flyers.map(f => (
         <img key={f.id} className="dp-fly" src={f.img} alt=""
@@ -285,6 +285,7 @@ const CSS = `
 .dp-chips span{display:flex;align-items:center;gap:2px}.dp-chips img{width:30px;height:30px;object-fit:contain}
 .dp-claim{position:absolute;left:50%;top:${BH - 62}px;transform:translateX(-50%);font-size:40px;padding:14px 56px}
 .dp-claim:disabled{filter:saturate(.6) brightness(.95)}
+.f3-btn.dp-claim:active:not(:disabled){transform:translateX(-50%) translateY(.17em)} /* press = stay centred + go down (was: jumped right, taps missed - Andy 10-14) */
 .dp-fly{position:absolute;width:58px;height:58px;margin:-29px 0 0 -29px;opacity:0;z-index:5;filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));
   animation:dp-fly ${FLY_MS}ms cubic-bezier(.45,0,.55,1) forwards}
 @keyframes dp-fadeIn{from{opacity:0}to{opacity:1}}

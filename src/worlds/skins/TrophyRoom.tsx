@@ -20,6 +20,8 @@ const BANNER = { x: 688 * K, y: 95 * K };
 // (plate.webp, cut from the picture) on the ledge under the bottom alcoves (centre y 706). x = each alcove's centre.
 const PLATE_X = [185, 386.5, 587.5, 787.5, 988.5, 1190];
 const PLATE_Y = [419.5, 706], PLATE_W = 121, PLATE_H = 37;
+// ALCOVE LIGHTS (Andy 10-14): the blue velvet inside each alcove, measured in the picture (left x per column, top y per row).
+const ALC_X = [117, 319, 519, 720, 921, 1123], ALC_Y = [173, 468], ALC_W = 137, ALC_H = 208;
 // slow floating light dots: [x 0-1600, start y, size, seconds, delay]
 const MOTES = (() => {
   let seed = 7; const r = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
@@ -66,10 +68,18 @@ export default function TrophyRoom({ cx, sh, defs, earned, popNew, onClose, musi
           <div className="t2">{earned.length} / {defs.length} badges</div>
         </div>
         {MOTES.map((m, i) => <i key={i} className="tr-mote" style={{ left: m[0], top: m[1], width: m[2], height: m[2], animationDuration: `${m[3]}s`, animationDelay: `${m[4]}s` }} />)}
+        {/* ALCOVE LIGHTS: dark = empty / not yet; earned = warm light on (a NEW badge: the light comes on as it lands) */}
+        {Array.from({ length: PER }, (_, i) => {
+          const b = shown[i], got = !!b && earned.includes(b.id), pop = b ? popNew.indexOf(b.id) : -1;
+          return <i key={"a" + i} className={"tr-alc" + (got ? " lit" : "") + (got && pop >= 0 ? " pop" : "")}
+            style={{ left: ALC_X[i % 6] * K, top: ALC_Y[i < 6 ? 0 : 1] * K, width: ALC_W * K, height: ALC_H * K, ["--pd" as string]: `${0.4 + Math.max(0, pop) * 0.3}s` } as CSSProperties} />;
+        })}
         <div className={"tr-wall" + (slide ? " " + slide : "")}>
         {shown.map((b, i) => {
           const [hx, hy] = HOOKS[i], got = earned.includes(b.id), pop = popNew.indexOf(b.id);
           const st = { left: hx * K, top: (hy - 8) * K, ["--pd" as string]: `${0.4 + Math.max(0, pop) * 0.3}s` } as CSSProperties;
+          // NOT EARNED = an EMPTY dark alcove (Andy 10-14); its plate stays, a tap still opens the 'Not yet' card
+          if (!got) return <div key={b.id} className="tr-empty sv-tap" style={{ left: ALC_X[i % 6] * K, top: ALC_Y[i < 6 ? 0 : 1] * K, width: ALC_W * K, height: ALC_H * K }} onClick={() => setZoom(b)} />;
           return (
             <div key={b.id} className={"tr-hang" + (got ? " got" : " off") + (pop >= 0 ? " pop" : "")} style={st}>
               <div className="tr-swing" style={got ? { animationDuration: `${sway[i].d}s`, animationDelay: `${sway[i].dl}s` } : undefined}>
@@ -149,6 +159,17 @@ const CSS = `@import url('https://fonts.googleapis.com/css2?family=Dancing+Scrip
 .tr-plate .w{font-size:13px;line-height:13px;white-space:nowrap}
 .tr-plate.off{opacity:.55}
 .tr-wall{position:absolute;inset:0;transition:transform .26s ease-in,opacity .26s ease-in}
+.tr-empty{position:absolute;z-index:1;cursor:pointer;border-radius:50% 50% 3px 3px / 33% 33% 3px 3px}
+.tr-alc{position:absolute;pointer-events:none;border-radius:50% 50% 3px 3px / 33% 33% 3px 3px}
+.tr-alc::before,.tr-alc::after{content:"";position:absolute;inset:0;border-radius:inherit;transition:opacity .6s}
+.tr-alc::before{background:rgba(4,8,40,.55);box-shadow:inset 0 0 26px 8px rgba(0,0,20,.5)}
+.tr-alc::after{opacity:0;mix-blend-mode:screen;background:radial-gradient(ellipse 85% 70% at 50% 0%,rgba(255,244,200,.55) 0%,rgba(255,226,150,.22) 45%,rgba(255,226,150,0) 80%)}
+.tr-alc.lit::before{opacity:0}
+.tr-alc.lit::after{opacity:1}
+.tr-alc.lit.pop::before{animation:tr-off .8s ease-out calc(var(--pd) + .45s) both}
+.tr-alc.lit.pop::after{animation:tr-on .8s ease-out calc(var(--pd) + .45s) both}
+@keyframes tr-off{from{opacity:1}to{opacity:0}}
+@keyframes tr-on{from{opacity:0}to{opacity:1}}
 .tr-wall.x-l,.tr-wall.e-l{transform:translateX(-120px);opacity:0}
 .tr-wall.x-r,.tr-wall.e-r{transform:translateX(120px);opacity:0}
 .tr-wall.e-l,.tr-wall.e-r{transition:none}

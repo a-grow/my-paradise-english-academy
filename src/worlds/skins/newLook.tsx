@@ -20,9 +20,11 @@ import GrowUpParty, { type Prize, type PrizeKind } from "./GrowUpParty";
 import VideoTheater, { type TheaterWorld, type TheaterCard } from "./VideoTheater";
 import type { WorldConfig } from "@/worlds";
 import DailyPrize, { type DailyKind } from "./DailyPrize";
+import WinParade, { type ParadeItem } from "./WinParade";
 import HowToPlay from "@/components/HowToPlay";
 import { worldHowTo } from "@/components/howtos";
-import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL } from "@/cards/economy";
+import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL, demoCoinsGet, demoCoinsSet } from "@/cards/economy";
+import { badgeSeen } from "@/lib/cloudSave";
 import { isCloseBtn, playCloseBeep } from "@/lib/clickSfx";
 import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
 import { REAL_CODES as PUZZLE_REAL_CODES, demoPiecesGet, demoPiecesSet } from "@/pages/PuzzleMixup";
@@ -57,6 +59,8 @@ let lkBooted = false;
 // BADGES test flag ?bd=live (1006): badges earned for real (from what is shown), NEW until seen; seen kept in this TAB.
 const BD_KEY = "mpe_demo_bdseen";
 let bdBooted = false;
+let wpBooted = false;   // TEST ?wp=1 runs once per page load (2026-10-14)
+let coinsBooted = false;   // TEST ?coins=N (1006): the pretend coins start at N, once per page load
 const STAGE_W = 1600, STAGE_H = 1000; // design size; scaled to fit any window (one screen, no scrolling)
 
 // Fit the 1600x1000 design into the window. The stage grows wider/taller to fill the window;
@@ -342,8 +346,23 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     window.setTimeout(() => setDone("out"), 1200);
     window.setTimeout(() => { setDone(null); if (v.showComplete) v.closeComplete(); }, 1750);
   };
-  const [coinShown, setCoinShown] = useState(0);
-  const [pieceShown, setPieceShown] = useState(0);   // PUZZLE PIECE COUNTER on the Puzzle button (Andy 2026-10-11): holds + counts up like the coins
+  // WIN PARADE (Andy 2026-10-14): what this device last SHOWED (display-only hints, like the jar's mpe_jarseen_): coins, pieces,
+  // badges. Back on the world page, anything that went UP flies in (WinParade). A visit + 1006 never read or write them.
+  const paraKeys = { c: `mpe_coinseen_${v.code}_${v.studentName}`, p: `mpe_pcseen_${v.code}_${v.studentName}`, b: `mpe_bdseen_${v.code}_${v.studentName}` };
+  const paraOn = !v.isMaster && !v.readOnly;
+  const [paraSeen] = useState(() => {
+    const num = (k: string) => { if (!paraOn) return NaN; try { const n = parseInt(localStorage.getItem(k) ?? "", 10); return Number.isFinite(n) && n >= 0 ? n : NaN; } catch { return NaN; } };
+    return { c: num(paraKeys.c), p: num(paraKeys.p) };
+  });
+  const [paraPending, setParaPending] = useState(paraOn);   // real kid: the counters wait until the parade is decided
+  const [parade, setParade] = useState<ParadeItem[] | null>(null);
+  // 1006: ONE pretend coin number for the tab, shared with the Card Album (Andy 10-14: 213 here vs 640 there was confusing).
+  // TEST ?wp=1 (once per page load): the wallet starts at 130, then the pretend +83 lands and grows it past a full pack.
+  const [testWp] = useState(() => { const t = onTest && v.isMaster && q.get("wp") === "1" && !wpBooted; if (t) { wpBooted = true; demoCoinsSet(130); } return t; });
+  useState(() => { const n = parseInt(q.get("coins") ?? "", 10); if (onTest && v.isMaster && Number.isFinite(n) && n >= 0 && !coinsBooted) { coinsBooted = true; demoCoinsSet(n); } return 0; });
+  const [demoCoins, setDemoCoins] = useState(() => (v.isMaster ? demoCoinsGet() : 0));
+  const [coinShown, setCoinShown] = useState(() => (Number.isFinite(paraSeen.c) ? paraSeen.c : 0));
+  const [pieceShown, setPieceShown] = useState(() => (Number.isFinite(paraSeen.p) ? paraSeen.p : 0));   // PUZZLE PIECE COUNTER on the Puzzle button (Andy 2026-10-11): holds + counts up like the coins
   const [demoPieces, setDemoPieces] = useState(() => (v.isMaster ? demoPiecesGet() : 0));   // 1006: the tab's pretend piece count, shared with the Puzzle page (nothing saved)
   const pzCountRef = useRef<HTMLDivElement>(null);
   const [bump, setBump] = useState<Record<string, number>>({});
@@ -392,10 +411,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     return { x: (r.left + r.width * fx - a.left) / s, y: (r.top + r.height * fy - a.top) / s };
   };
   const partyTarget = (k: PrizeKind) =>
-    k === "coin" ? at(coinRef.current, 0.2, 0.5) : k === "treat" ? at(jarRef.current, 0.5, 0.1)
+    k === "coin" ? at(coinRef.current, 0.5, 0.5) : k === "treat" ? at(jarRef.current, 0.5, 0.1)
       : k === "badge" ? at(badgesRef.current, 0.22, 0.38) : pzCountRef.current ? at(pzCountRef.current, 0.5, 0.5) : at(puzzleRef.current, 0.17, 0.5);
   const partyLand = (k: PrizeKind, add: number) => {
-    if (k === "coin") setCoinShown(c => c + add);
+    if (k === "coin") { setCoinShown(c => c + add); if (v.isMaster) { setDemoCoins(d => d + add); demoCoinsSet(demoCoinsGet() + add); } }   // 1006: pretend coins kept for the tab
     if (k === "piece") { setPieceShown(c => c + add); if (v.isMaster) { setDemoPieces(d => d + add); demoPiecesSet(demoPiecesGet() + add); } }
     if (k === "badge") setCardBadges(orderedRef.current.slice(-3)); // the new world badge lights up on the card
     setBump(b => ({ ...b, [k]: (b[k] ?? 0) + 1 }));
@@ -464,12 +483,12 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   // TEST ONLY (?dp=): nothing is saved, so after the test prize the jar + coin pill KEEP the shown numbers
   // (going back to the real number made the jar open again with the feed sound - Andy 14:19).
   const [testKeep, setTestKeep] = useState(false);
-  const holding = !!(party || done || mini || dailyDay || testKeep || intro !== "off");
-  useEffect(() => { if (!holding) setCoinShown(v.coins ?? 0); }, [v.coins, holding]);
+  const holding = !!(party || done || mini || dailyDay || testKeep || parade || intro !== "off");
+  useEffect(() => { if (!holding && !paraPending) setCoinShown(v.coins ?? 0); }, [v.coins, holding, paraPending]);
   const pieceReal = v.isMaster ? demoPieces : v.pieces;
-  useEffect(() => { if (!holding && pieceReal !== null) setPieceShown(pieceReal); }, [pieceReal, holding]);
+  useEffect(() => { if (!holding && !paraPending && pieceReal !== null) setPieceShown(pieceReal); }, [pieceReal, holding, paraPending]);
   // MY BADGES (launch step 6, Andy OK 10-13): 12 badges (src/worlds/badges.ts) worked out from what the kid has. NEW = earned
-  // but not in the seen list ('badge:<id>', add-only, cloud). The card shows the 3 NEWEST (seen order). During a party the card
+  // but not in the seen list (badgeSeen(id) = 'badge:<id in letters>:seen', add-only, cloud). The card shows the 3 NEWEST (seen order). During a party the card
   // holds; the world badge lights up when its flyer lands. A visit (read-only) never marks anything seen.
   // TEST 1006 on /world-test/: ?bd=all = every badge earned, ?bd=new = every badge earned AND new (pops in once).
   const bdFlag = onTest && v.isMaster ? q.get("bd") : null;
@@ -482,9 +501,9 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const badgeDefs = bdFlag === "many" ? Array.from({ length: 30 }, (_, i) => { const b = badgeDefs0[i % badgeDefs0.length]; return i < badgeDefs0.length ? b : { ...b, id: `${b.id}~${i}` }; }) : badgeDefs0; // ?bd=many = 30 pretend badges (3 walls)
   const earned = bdFlag && bdFlag !== "live" ? badgeDefs.map(b => b.id)
     : earnedBadges({ worlds: bWorlds, prizes: v.prizes, rowData: v.rowData, worldId: v.world.id, fed: v.fedTreatsState, dailyBox: v.dailyPrize?.box ?? null });
-  const seenB: string[] | null = v.isMaster ? (bdFlag === "new" ? (v.seen ?? []) : bdFlag === "live" ? liveSeen : earned.map(id => `badge:${id}`)) : v.seen;
-  const newBadges = seenB === null || v.readOnly ? [] : earned.filter(id => !seenB.includes(`badge:${id}`));
-  const seenAt = (id: string) => { const i = (seenB ?? []).indexOf(`badge:${id}`); return i < 0 ? 1e6 : i; };
+  const seenB: string[] | null = v.isMaster ? (bdFlag === "new" ? (v.seen ?? []) : bdFlag === "live" ? liveSeen : earned.map(id => badgeSeen(id))) : v.seen;
+  const newBadges = seenB === null || v.readOnly ? [] : earned.filter(id => !seenB.includes(badgeSeen(id)));
+  const seenAt = (id: string) => { const i = (seenB ?? []).indexOf(badgeSeen(id)); return i < 0 ? 1e6 : i; };
   const ordered = [...earned].sort((a, b) => seenAt(a) - seenAt(b)); // newest last
   const orderedRef = useRef(ordered); orderedRef.current = ordered;
   const orderKey = ordered.join(",");
@@ -495,8 +514,8 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     setPopNew(fresh); setPanel("badges");
     if (!fresh.length) return;
     if (v.sfxOn) { const a = new Audio(`${UI}/snd_newfriend.mp3`); a.volume = 0.7; a.play().catch(() => { }); }
-    if (v.isMaster && bdFlag === "live") { const n = [...liveSeen, ...fresh.map(id => `badge:${id}`)]; setLiveSeen(n); try { sessionStorage.setItem(BD_KEY, JSON.stringify(n)); } catch { /* */ } }
-    else fresh.forEach(id => v.markSeen(`badge:${id}`));
+    if (v.isMaster && bdFlag === "live") { const n = [...liveSeen, ...fresh.map(id => badgeSeen(id))]; setLiveSeen(n); try { sessionStorage.setItem(BD_KEY, JSON.stringify(n)); } catch { /* */ } }
+    else fresh.forEach(id => v.markSeen(badgeSeen(id)));
   };
   useEffect(() => { if (!popNew.length) return; const t = window.setTimeout(() => setPopNew([]), 3000 + popNew.length * 300); return () => window.clearTimeout(t); }, [popNew]); // after the last one has dropped in
   // DAILY PRIZE (Andy 2026-10-03): rises in ~1.2s after the world opens when today's box is not taken yet (any device).
@@ -506,10 +525,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const dailyReady = isTestDp ? testDp : (v.dailyPrize && !v.dailyPrize.claimedToday ? v.dailyPrize.day : 0);
   const dailyShown = useRef(false);
   useEffect(() => {
-    if (!dailyReady || dailyShown.current || party || done || howto !== "closed" || intro !== "off") return;
+    if (!dailyReady || dailyShown.current || party || done || paraPending || parade || howto !== "closed" || intro !== "off") return;
     const t = window.setTimeout(() => { dailyShown.current = true; setDailyDay(dailyReady); }, 1200);
     return () => window.clearTimeout(t);
-  }, [dailyReady, party, done, howto, intro]);
+  }, [dailyReady, party, done, howto, intro, paraPending, parade]);
   const dailyLand = (k: DailyKind, add: number) => {
     if (k === "treat") { setJarShown(j => j + add); setBump(b => ({ ...b, treat: (b.treat ?? 0) + 1 })); }
     else partyLand(k, add);
@@ -578,11 +597,11 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     });
   }, [lockKnown, albumLeft, puzzleLeft]);
   // ALBUM METER (Andy 2026-10-07): coins toward the next card pack; packs ready = red dot + glow (waits for the new-friend glow)
-  const albumOn = v.isMaster || ALBUM_FOR_ALL;
+  const albumOn = v.isMaster || ALBUM_FOR_ALL || PUZZLE_REAL_CODES.includes(v.code);   // + the real-saving codes (TEST99 now; Card Album cloud step 2026-10-14)
   const puzzleOn = v.isMaster || PUZZLE_REAL_CODES.includes(v.code);   // Puzzle Mixup: 1006 demo + the real-saving codes in PuzzleMixup.tsx REAL_CODES (TEST99 now; every kid at launch)
-  const albumCoins = v.isMaster ? DEMO_COINS : (v.coins ?? 0);
+  const albumCoins = v.isMaster ? demoCoins : coinShown;   // the WALLET number: real = the shown coins (grows as coins land); 1006 = the tab's pretend coins
   const albumPacks = albumOn && albumLeft === 0 && !alL.locked && !alL.opening ? Math.floor(albumCoins / PACK_PRICE) : 0; // locked (or unlocking) = no pack glow / dot
-  const albumPct = albumPacks > 0 ? 100 : ((albumCoins % PACK_PRICE) / PACK_PRICE) * 100;
+  const albumPct = albumCoins >= PACK_PRICE ? 100 : (Math.max(0, albumCoins) / PACK_PRICE) * 100;   // wallet bar: full once a pack is affordable
 
   // Visit 5 days: dots = days in the current set of 5; all 5 lit when the +3 is ready to claim.
   const visitReady = Math.floor(v.visitDaysCount / 5) > 0 && !v.visit5Claimed;
@@ -664,13 +683,75 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   });
   const firstJar = useRef(true);
   useEffect(() => {
-    if (testKeep || (holding && v.jarTreats > jarShown)) return; // a celebration is on: prizes fill the jar when they land (a feed still shows at once)
+    if (testKeep || paraPending || (holding && v.jarTreats > jarShown)) return; // a celebration is on: prizes fill the jar when they land (a feed still shows at once)
     if (!v.readOnly && !v.isMaster) localStorage.setItem(seenKey, String(v.jarTreats)); // a visit + 1006 write nothing
     const wait = firstJar.current && jarShown < v.jarTreats ? 900 : 0; // first time: let the page settle, then drop them in
     firstJar.current = false;
     const t = window.setTimeout(() => setJarShown(v.jarTreats), wait);
     return () => window.clearTimeout(t);
-  }, [v.jarTreats, holding]);
+  }, [v.jarTreats, holding, paraPending]);
+
+  // WIN PARADE: decide once the page has settled (numbers read, intro + How to Play closed, no other celebration).
+  // TEST 1006 on /world-test/: ?wp=1 = pretend a win (+6 treats, +83 coins, +2 pieces, +1 badge) - saves nothing.
+  const wpUsed = useRef(false);
+  useEffect(() => { if (!paraPending) return; const t = window.setTimeout(() => setParaPending(false), 8000); return () => window.clearTimeout(t); }, [paraPending]); // never wait forever
+  useEffect(() => {
+    if (!paraPending && !(testWp && !wpUsed.current)) return;
+    if (intro !== "off" || howto !== "closed" || party || done || mini || dailyDay || parade) return;
+    if (testWp && !wpUsed.current) {
+      wpUsed.current = true;
+      setParade([{ kind: "treat", n: 6, img: `${UI}/treat.webp` }, { kind: "coin", n: 83, img: `${UI}/coin.webp` }, { kind: "piece", n: 2, img: "/puzzle/piece.webp" }, { kind: "badge", n: 1, img: badgeImg("games") }]);
+      return;
+    }
+    if (typeof v.coins !== "number" || typeof pieceReal !== "number") return;
+    const items: ParadeItem[] = [];
+    const dT = v.jarTreats - jarShown, dC = Number.isFinite(paraSeen.c) ? v.coins - paraSeen.c : 0, dP = Number.isFinite(paraSeen.p) ? pieceReal - paraSeen.p : 0;
+    if (dT > 0) items.push({ kind: "treat", n: dT, img: `${UI}/treat.webp` });
+    if (dC > 0) items.push({ kind: "coin", n: dC, img: `${UI}/coin.webp` }); else setCoinShown(v.coins);
+    if (dP > 0 && puzzleOn) items.push({ kind: "piece", n: dP, img: "/puzzle/piece.webp" }); else setPieceShown(pieceReal);
+    if (v.prizes !== null && v.rowData !== null && v.dailyPrize !== null) {
+      let old: unknown = null; try { old = JSON.parse(localStorage.getItem(paraKeys.b) ?? "null"); } catch { /* */ }
+      if (Array.isArray(old)) earned.filter(id => !old.includes(id)).slice(0, 4).forEach(id => items.push({ kind: "badge", n: 1, img: badgeImg(id) }));
+    }
+    if (items.length) setParade(items);
+    setParaPending(false);
+  }, [paraPending, intro, howto, party, done, mini, dailyDay, parade, v.coins, pieceReal, v.jarTreats]);   // eslint-disable-line react-hooks/exhaustive-deps
+  // Remember what is SHOWN now (only when calm): next time, what went up flies in.
+  const earnedKey = earned.join(",");
+  useEffect(() => {
+    if (!paraOn || paraPending || holding) return;
+    try {
+      if (typeof v.coins === "number") localStorage.setItem(paraKeys.c, String(v.coins));
+      if (typeof pieceReal === "number") localStorage.setItem(paraKeys.p, String(pieceReal));
+      if (v.prizes !== null && v.rowData !== null && v.dailyPrize !== null) localStorage.setItem(paraKeys.b, JSON.stringify(earned));
+    } catch { /* */ }
+  }, [paraPending, holding, v.coins, pieceReal, earnedKey, v.prizes, v.rowData, v.dailyPrize]);   // eslint-disable-line react-hooks/exhaustive-deps
+  // the parade aims at the MIDDLE of each button (Andy 10-14: fly INTO the button, it absorbs them)
+  const paradeTarget = (k: PrizeKind) => k === "coin" ? at(coinRef.current, 0.5, 0.5) : k === "treat" ? at(jarRef.current, 0.5, 0.55)
+    : k === "badge" ? at(badgesRef.current, 0.5, 0.5) : at(puzzleRef.current, 0.5, 0.5);
+  const [meterGlow, setMeterGlow] = useState(0);
+  const paradeLand = (k: PrizeKind, add: number) => {
+    if (k === "treat") dailyLand("treat", add); else partyLand(k, add);
+    if (k === "coin") setMeterGlow(Date.now());
+  };
+  useEffect(() => { if (!meterGlow) return; const t = window.setTimeout(() => setMeterGlow(0), 700); return () => window.clearTimeout(t); }, [meterGlow]);
+  // PACK READY moment: the meter passes a full pack while coins land -> the pack bounces, OPEN! glows, the red number pops in.
+  const packsWas = useRef(albumPacks);
+  const [packPop, setPackPop] = useState(0);
+  useEffect(() => {
+    if (albumPacks > packsWas.current && (parade || party || done)) {
+      setPackPop(n => n + 1);
+      if (v.sfxOn) { const a = new Audio(`${UI}/snd_newfriend.mp3`); a.volume = 0.7; a.play().catch(() => { }); }
+    }
+    packsWas.current = albumPacks;
+  }, [albumPacks]);   // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!packPop) return; const t = window.setTimeout(() => setPackPop(0), 1600); return () => window.clearTimeout(t); }, [packPop]);
+  // "You need N more coins!" (Andy 10-14): tap the pack while it is not ready; also once after a parade that brought coins.
+  const coinNeed = albumOn && albumLeft === 0 && !alL.locked && albumPacks === 0 ? PACK_PRICE - (Math.max(0, albumCoins) % PACK_PRICE) : 0;
+  const coinNeedRef = useRef(0); coinNeedRef.current = coinNeed;
+  const [coinPop, setCoinPop] = useState<null | { n: number; k: number }>(null);
+  useEffect(() => { if (!coinPop) return; const t = window.setTimeout(() => setCoinPop(null), 3000); return () => window.clearTimeout(t); }, [coinPop]);
+  const tapPack = (e: React.MouseEvent) => { if (coinNeed > 0 && !waitTap.includes("album")) { e.stopPropagation(); setCoinPop({ n: coinNeed, k: Date.now() }); } };
 
   // Feed: the brain feeds (jar -1, fed +1, saves); here a treat flies jar -> animal, then the animal hops.
   const [flying, setFlying] = useState<number[]>([]);
@@ -744,7 +825,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     if (!wave) return;
     const st = stageRef.current; if (!st) return;
     const sr = st.getBoundingClientRect();
-    st.querySelectorAll<HTMLElement>(".sv-rb,.sv-imgbtn,.sv-card,.sv-jar,.sv-coins,.sv-feed,.sv-watch").forEach(el => {
+    st.querySelectorAll<HTMLElement>(".sv-rb,.sv-imgbtn,.sv-card,.sv-jar,.sv-feed,.sv-watch").forEach(el => {
       const r = el.getBoundingClientRect(); if (!r.width) return;
       const x = (r.left + r.width / 2 - sr.left) / s;
       el.animate([{ scale: "1" }, { scale: "1.12", offset: 0.4 }, { scale: "1" }], { duration: 520, delay: waveAt(x), easing: "ease-out" });
@@ -935,11 +1016,11 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
 
         {/* top corners */}
         <div className="sv-grp sv-inT">
-        <div className="sv-rb sv-tap" style={{ left: 22 }} onClick={() => setHowto("open")}><img src={`${UI}/rb_help.webp`} alt="Help" /></div>
-        <div ref={coinRef} className={"sv-coins" + lift} style={bumpStyle("coin")}><span>{coinShown}</span></div>
-        <div className={"sv-rb sv-tap" + (v.musicOn ? "" : " muted")} style={{ right: 100 }} onPointerDown={() => { const a = v.audioRef.current; musicWasPaused.current = !!a && a.paused; }}
+        <div className="sv-rb sv-tap" style={{ left: 178 }} onClick={() => setHowto("open")}><img src={`${UI}/rb_help.webp`} alt="Help" /></div>
+        {/* coin pill moved down to the Card Album = the COIN WALLET (Andy 2026-10-14) */}
+        <div className={"sv-rb sv-tap" + (v.musicOn ? "" : " muted")} style={{ left: 100 }} onPointerDown={() => { const a = v.audioRef.current; musicWasPaused.current = !!a && a.paused; }}
           onClick={() => { if (v.musicOn && musicWasPaused.current) { v.audioRef.current?.play().catch(() => { }); return; } v.setMusicOn(!v.musicOn); }}><img src={`${UI}/rb_music.webp`} alt="Music" /></div>
-        <div className="sv-rb sv-tap" style={{ right: 22 }} onClick={() => setPanel("exit")}><img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
+        <div className="sv-rb sv-tap" style={{ left: 22 }} onClick={() => setPanel("exit")}>{/* X top-left, then music, then ? (Andy 10-14) */}<img src={`${UI}/rb_exit.webp`} alt="Exit" /></div>
         </div>
 
         {/* left: ways to earn */}
@@ -988,10 +1069,20 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           <div className="sv-medals">{[0, 1, 2].map(i => { const id = cardBadges[i]; return <img key={i} className={"sv-medal" + (id ? " won" : " off")} src={id ? badgeImg(id) : `${UI}/medal.webp`} alt="" />; })}</div>
           <img className="sv-cardlbl" style={{ top: 111, height: 45 }} src={`${UI}/lbl_badges.webp`} alt="My Badges" />
         </div>
-        {(alL.opening || (albumPacks > 0 && !newReady && !panel)) && <Sparkler className="sv-spk-album" cx={131} cy={95} k={0.7} halo={[300, 260]} />}
-        <div className={"sv-card sv-album sv-tap" + (albumPacks > 0 && !newReady && !panel ? " beacon" : "") + (alL.locked ? " muted" : "") + (alL.opening ? " unmuting" : "")} onClick={waitTap.includes("album") ? undefined : albumLeft > 0 ? () => tapLock("album", albumLeft) : albumOn ? () => { setPointAt(null); goGames(`/album/${v.code}/${v.studentName}`); } : soon}>{/* Card Album: 1006 only for now */}
-          <img className="sv-cardlbl" style={{ top: 176, height: 38 }} src={`${UI}/lbl_album.webp`} alt="Card Album" />
-          {albumPacks > 0 && <span className="sv-dot num">{albumPacks}</span>}
+        {(alL.opening || (albumPacks > 0 && !newReady && !panel)) && <Sparkler className="sv-spk-album" cx={131} cy={124} k={0.7} halo={[300, 310]} />}
+        <div className={"sv-card sv-album sv-tap" + lift + (albumPacks > 0 && !newReady && !panel ? " beacon" : "") + (alL.locked ? " muted" : "") + (alL.opening ? " unmuting" : "")} onClick={waitTap.includes("album") ? undefined : albumLeft > 0 ? () => tapLock("album", albumLeft) : albumOn ? () => { setPointAt(null); goGames(`/album/${v.code}/${v.studentName}`); } : soon}>{/* Card Album: 1006 only for now */}
+          <img className="sv-cardlbl" style={{ top: 236, height: 45 }} src={`${UI}/lbl_cards.webp`} alt="My Cards" />{/* on the bottom border, like My Animals / My Badges */}
+          {albumPacks > 0 && <span key={albumPacks} className={"sv-dot num" + (packPop ? " pop" : "")}>{albumPacks}</span>}
+          {/* COIN WALLET (Andy 2026-10-14): coins live WITH the Card Album (their only use = card packs). [coin] + the coin total on
+              a bar that fills toward the next pack; the pack's tag shows the price or OPEN!. One number only. (Was: coin pill top-left.) */}
+          <div className={"sv-ameter sv-wallet" + (alL.locked ? " muted" : "") + (alL.opening ? " unmuting" : "") + (meterGlow ? " grow" : "") + (packPop ? " packpop" : "") + (coinPop ? " nope" : "")}>{/* INSIDE the card: wiggles + glows with it (Andy 10-14); taps go to the card */}
+            {/* PIGGY BANK (Andy 10-14 21:31): the number = ALL my coins; the bar under it = how close to a pack (full at 200+) */}
+            <div className="sv-wnum">{Math.max(0, albumCoins)}</div>
+            <div className="sv-amtrack"><i className={albumPacks ? "full" : ""} style={{ width: `${Math.max(8, albumPct)}%` }} /></div>
+            <div ref={coinRef} className="sv-wcoin" style={bumpStyle("coin")}><img src={`${UI}/coin.webp`} alt="Coins" /></div>
+            <img className={"sv-apack" + (albumPacks ? " ready" : "") + (packPop ? " pop" : "")} src="/cards/ui/pack_closed.webp" alt="" onClick={tapPack} />
+            {coinPop && <div key={coinPop.k} className="sv-lockbub l"><div>Win <span style={{ color: "#1a7fff", fontSize: "1.25em" }}>{coinPop.n}</span> more coins!</div></div>}
+          </div>
         </div>
         {/* the Album lock sits OUTSIDE the card so the card can be muted without muting the lock */}
         <div className="sv-albumlk">
@@ -999,13 +1090,6 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           {alL.opening && <img className="sv-lockico open" src={UNLOCK_IMG} alt="" />}
           {lockPop?.id === "album" && <div key={lockPop.k} className="sv-lockbub l"><LockMsg left={lockPop.n} /></div>}
         </div>
-        {albumOn && (
-          <div className={"sv-ameter sv-tap" + (alL.locked ? " muted" : "") + (alL.opening ? " unmuting" : "")} onClick={() => (waitTap.includes("album") ? undefined : albumLeft > 0 ? tapLock("album", albumLeft) : (setPointAt(null), goGames(`/album/${v.code}/${v.studentName}`)))}>
-            <div className="sv-amtrack"><i className={albumPacks ? "full" : ""} style={{ width: `${Math.max(8, albumPct)}%` }} />
-              <span>{albumPacks ? "OPEN!" : `${albumCoins % PACK_PRICE} / ${PACK_PRICE}`}</span></div>
-            <img className={"sv-apack" + (albumPacks ? " ready" : "")} src="/cards/ui/pack_closed.webp" alt="" />
-          </div>
-        )}
         </div>
         <div className="sv-card sv-worlds sv-tap sv-inB" onClick={() => setPanel("worlds")}>
           <div className="sv-wrow">
@@ -1103,6 +1187,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         )}
 
         {howto === "open" && <HowToPlay {...worldHowTo((v.ANIMALS[0]?.stages ?? []).map(st => st.img))} muted={!v.sfxOn} onDone={closeHowto} />}
+        {parade && (
+          <WinParade cx={cx} sh={sh} items={parade} sfxOn={v.sfxOn} target={paradeTarget} onLand={paradeLand}
+            onDone={() => { if (testWp) setTestKeep(true); setParade(null); }} />
+        )}
         {dailyDay > 0 && (
           <DailyPrize cx={cx} sh={sh} day={dailyDay} sfxOn={v.sfxOn}
             onClaim={() => (isTestDp ? Promise.resolve({ paid: true }) : v.claimDailyPrize())}
@@ -1270,7 +1358,7 @@ const CSS = `
 .sv-dots i.on{background:#ffc21c}
 .sv-card{position:absolute;z-index:2;right:30px;width:262px;background-position:0 0;background-size:100% 100%;background-repeat:no-repeat;filter:drop-shadow(0 8px 8px rgba(0,0,0,.3))}
 .sv-cardlbl{position:absolute;left:50%;transform:translateX(-50%);width:auto;filter:drop-shadow(0 4px 4px rgba(0,0,0,.35));pointer-events:none}
-.sv-animals{top:112px;height:191px;background-image:url(${UI}/frame_animals.webp)}
+.sv-animals{top:20px;height:191px;background-image:url(${UI}/frame_animals.webp)}
 .sv-grid{position:absolute;left:22px;top:22px;width:219px;display:grid;grid-template-columns:repeat(3,69px);gap:6px}
 .sv-slot{width:69px;height:69px;border-radius:14px;background:#f1dcae;border:3px dashed #d1a868;overflow:hidden}
 .sv-slot img{display:block;width:100%;height:100%}
@@ -1278,7 +1366,7 @@ const CSS = `
 .sv-slot.locked img{filter:brightness(0);opacity:.25}
 .sv-animals.beacon{animation:sv-peek 2.6s ease-in-out infinite,sv-goldglow 1.3s ease-in-out infinite;transform-origin:50% 90%}
 .sv-album.beacon{animation:sv-peek 2.6s ease-in-out infinite,sv-goldglow 1.3s ease-in-out infinite;transform-origin:50% 90%}
-.sv-spk-album{right:30px;top:525px;width:262px;height:190px}
+.sv-spk-album{right:30px;top:465px;width:262px;height:248px}
 .sv-dot.num{display:flex;align-items:center;justify-content:center;width:44px;height:44px;right:-10px;top:-12px;font-family:'Titan One',sans-serif;font-size:22px;line-height:1;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35)}
 .sv-ameter{position:absolute;right:34px;top:724px;width:256px;height:76px}
 .sv-amtrack{position:absolute;left:0;top:22px;width:210px;height:34px;border-radius:17px;background:#5a2b16;border:4px solid #f3b13a;overflow:hidden;box-shadow:inset 0 3px 6px rgba(0,0,0,.4),0 5px 8px rgba(0,0,0,.3)}
@@ -1288,11 +1376,19 @@ const CSS = `
 .sv-amtrack span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Titan One',sans-serif;font-size:18px;color:#fff;paint-order:stroke fill;-webkit-text-stroke:4px #3a1d6e}
 .sv-apack{position:absolute;right:0;top:0;width:46px;transform:rotate(10deg);filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
 .sv-apack.ready{animation:sv-apack 2s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(255,225,120,.95))}
+.sv-ameter.grow .sv-amtrack{box-shadow:inset 0 3px 6px rgba(0,0,0,.4),0 0 22px 7px rgba(120,255,110,.85)}
+.sv-ameter.grow .sv-amtrack i{background:linear-gradient(#e2ffc8,#5cff6e);box-shadow:0 0 14px 4px rgba(140,255,120,.9)}
+.sv-apack.pop{animation:sv-apackpop 1.2s cubic-bezier(.3,1.6,.5,1) both;filter:drop-shadow(0 0 18px rgba(255,235,140,1))}
+@keyframes sv-apackpop{0%{transform:rotate(10deg) scale(1)}30%{transform:rotate(-6deg) scale(1.6)}60%{transform:rotate(8deg) scale(1.2)}100%{transform:rotate(10deg) scale(1)}}
+.sv-ameter.packpop .sv-amtrack span{animation:sv-openglow 1.2s ease-out both}
+@keyframes sv-openglow{0%{transform:scale(1)}35%{transform:scale(1.35);text-shadow:0 0 14px #fff6a0}100%{transform:scale(1)}}
+.sv-dot.num.pop{animation:sv-dotpop .6s cubic-bezier(.3,1.8,.5,1) both}
+@keyframes sv-dotpop{0%{transform:scale(0)}100%{transform:scale(1)}}
 @keyframes sv-apack{0%,60%,100%{transform:rotate(10deg)}66%{transform:rotate(-6deg) scale(1.1)}72%{transform:rotate(14deg) scale(1.1)}78%{transform:rotate(2deg)}84%{transform:rotate(10deg)}}
 @keyframes sv-peek{0%,52%,100%{transform:rotate(0)}56%{transform:rotate(-2.4deg)}61%{transform:rotate(2.2deg)}66%{transform:rotate(-1.8deg)}71%{transform:rotate(1.2deg)}76%{transform:rotate(0)}}
 @keyframes sv-goldglow{0%,100%{filter:brightness(1.08) drop-shadow(0 0 3px #fff36b) drop-shadow(0 0 8px #ffd000) drop-shadow(0 0 16px rgba(255,190,0,.9))}50%{filter:brightness(1.22) drop-shadow(0 0 5px #fffbb0) drop-shadow(0 0 14px #ffe000) drop-shadow(0 0 28px rgba(255,200,0,1))}}
 .sv-sparkler{position:absolute;pointer-events:none}
-.sv-spk-animals{right:30px;top:112px;width:262px;height:191px}
+.sv-spk-animals{right:30px;top:20px;width:262px;height:191px}
 .sv-spk-watch{top:892px;width:530px;height:102px}
 .sv-halo{position:absolute;left:var(--cx);top:var(--cy);border-radius:50%;
  background:radial-gradient(closest-side,rgba(255,240,120,1) 0%,rgba(255,218,20,1) 55%,rgba(255,196,0,.75) 70%,rgba(255,170,0,.35) 85%,rgba(255,160,0,0) 100%);animation:sv-halo 1.6s ease-in-out infinite}
@@ -1306,11 +1402,12 @@ const CSS = `
 @keyframes sv-ss{0%{opacity:0;transform:rotate(var(--a)) translateX(60px) scaleX(.3)}20%{opacity:1}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scaleX(1)}}
 .sv-ptr{cursor:pointer}
 .sv-new{position:absolute;top:-14px;right:-8px;z-index:2;background:#ff3d7f;color:#fff;font-size:18px;border-radius:14px;padding:3px 10px;border:3px solid #fff;transform:rotate(8deg)}
-.sv-badges{top:353px;height:122px;background-image:url(${UI}/frame_badges.webp)}
+.sv-badges{top:277px;height:122px;background-image:url(${UI}/frame_badges.webp)}
 .sv-medals{position:absolute;left:0;right:0;top:26px;display:flex;justify-content:center;gap:8px}
 .sv-medal{width:65px;height:70px;object-fit:contain;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3))}
 .sv-medal.off{filter:grayscale(1) brightness(1.15);opacity:.4}
-.sv-album{top:525px;height:190px;background-image:url(${UI}/panel_album.webp)}
+.sv-album{top:465px;height:248px;background-image:none}
+.sv-album::before{content:"";position:absolute;inset:0;z-index:-1;background:url(${UI}/panel_album_tall.webp) 0 0/100% 100% no-repeat}   /* frame art on its own layer: a locked card greys ONLY this + the label, never the coins */   /* TALL card: the coin wallet sits INSIDE (Andy 10-14) */
 .sv-worlds{top:auto;bottom:84px;height:112px;background-image:url(${UI}/frame_worlds.webp)}
 .sv-wrow{position:absolute;left:0;right:0;top:14px;display:flex;justify-content:center;gap:10px}
 .sv-wrow img{width:62px;height:62px;border-radius:50%;border:4px solid #e9b53a;box-shadow:0 3px 0 #a86a10}
@@ -1413,16 +1510,38 @@ const CSS = `
 @keyframes sv-lkidle{0%,84%,100%{transform:rotate(-10deg)}87%{transform:rotate(-16deg)}90%{transform:rotate(-4deg)}93%{transform:rotate(-14deg)}96%{transform:rotate(-8deg)}}
 .sv-lockico.rattle{animation:sv-lkrat .6s ease-in-out}
 .sv-badges.beacon{animation:sv-peek 2.6s ease-in-out infinite,sv-goldglow 1.3s ease-in-out infinite;transform-origin:50% 90%}
-.sv-spk-badges{right:30px;top:353px;width:262px;height:122px}
+.sv-spk-badges{right:30px;top:277px;width:262px;height:122px}
 .sv-spk-album,.sv-spk-badges{opacity:.6}
-.sv-albumlk{position:absolute;right:30px;top:525px;width:262px;height:190px;pointer-events:none;z-index:4}
+.sv-albumlk{position:absolute;right:30px;top:465px;width:262px;height:248px;pointer-events:none;z-index:4}
 .sv-spk-pz{left:0;top:0;width:100%;height:100%;z-index:-1}
 .sv-pzbtn.muted > :is(img:not(.sv-lockico):not(.sv-pzico),.sv-pzw,.sv-pzcount){filter:saturate(.2) brightness(.9)}
 .sv-pzbtn.muted > .sv-pzico{filter:drop-shadow(0 3px 3px rgba(0,0,0,.3)) saturate(.2) brightness(.9)}
 .sv-pzbtn.unmuting > :is(img:not(.sv-lockico),.sv-pzw,.sv-pzcount){transition:filter 1.8s ease-in-out .3s}
-.sv-album.muted{filter:drop-shadow(0 8px 8px rgba(0,0,0,.3)) saturate(.2) brightness(.9)}
+.sv-album.muted{filter:drop-shadow(0 8px 8px rgba(0,0,0,.3))}
+.sv-album.muted::before{filter:saturate(.2) brightness(.9)}
+.sv-album.muted .sv-cardlbl{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) saturate(.2) brightness(.9)}
 .sv-ameter.muted{filter:saturate(.2) brightness(.9)}
-.sv-album.unmuting,.sv-ameter.unmuting{transition:filter 1.8s ease-in-out .3s}
+.sv-wallet{right:0;top:156px;width:262px;height:60px;z-index:3}   /* INSIDE the Card Album card (moves with it) */
+.sv-wnum{position:absolute;left:52px;top:2px;width:132px;height:36px;padding-left:12px;box-sizing:border-box;border-radius:18px 18px 5px 5px;display:flex;align-items:center;justify-content:center;
+ background:linear-gradient(#fffaf0,#f1dfbd);border:3px solid #f3b13a;box-shadow:0 3px 6px rgba(0,0,0,.25);font-family:'Titan One',sans-serif;font-size:22px;line-height:1;color:#7a3e1d}
+.sv-wallet .sv-amtrack{left:52px;top:38px;width:132px;height:16px;box-sizing:border-box;border-radius:5px 5px 8px 8px;border-width:3px}   /* joined to the number pill (Andy 10-14) */
+.sv-wallet .sv-amtrack i{border-radius:2px 2px 5px 5px}
+.sv-wcoin{position:absolute;left:16px;top:-1px;width:52px;height:52px;z-index:2}
+.sv-wallet.nope .sv-wnum,.sv-wallet.nope .sv-wcoin{animation:sv-nope .45s ease-in-out}
+.sv-wallet.nope .sv-amtrack{animation:sv-barflash .6s ease-in-out}
+@keyframes sv-nope{0%,100%{translate:0}20%{translate:-7px}40%{translate:7px}60%{translate:-5px}80%{translate:4px}}
+@keyframes sv-barflash{0%,50%,100%{box-shadow:inset 0 3px 6px rgba(0,0,0,.4)}25%,75%{box-shadow:inset 0 3px 6px rgba(0,0,0,.4),0 0 16px 6px rgba(255,230,90,.95)}}
+.sv-wcoin img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 5px rgba(0,0,0,.4))}
+.sv-wallet .sv-apack{right:26px;top:8px;width:34px}   /* clear of the tilted camera (Andy 10-14) */
+.sv-wtag{position:absolute;right:-4px;bottom:-2px;z-index:3;display:flex;align-items:center;gap:2px;height:24px;padding:0 7px;border-radius:12px;
+ background:linear-gradient(#fffaf0,#f1dfbd);border:3px solid #f3b13a;font-family:'Titan One',sans-serif;font-size:16px;line-height:1;color:#7a3e1d;white-space:nowrap}
+.sv-wtag img{width:16px;height:16px}
+.sv-wtag.open{background:linear-gradient(#fff38a,#ffcf20)}
+.sv-wallet.muted{filter:none}
+.sv-wallet.muted .sv-amtrack,.sv-wallet.muted .sv-apack{filter:saturate(.2) brightness(.9)}
+.sv-wallet.unmuting{transition:none}
+.sv-wallet.unmuting .sv-amtrack,.sv-wallet.unmuting .sv-apack{transition:filter 1.8s ease-in-out .3s}
+.sv-album.unmuting,.sv-ameter.unmuting,.sv-album.unmuting::before,.sv-album.unmuting .sv-cardlbl{transition:filter 1.8s ease-in-out .3s}
 @keyframes sv-lkrat{0%,100%{transform:rotate(-10deg)}15%{transform:rotate(-24deg)}35%{transform:rotate(3deg)}55%{transform:rotate(-20deg)}75%{transform:rotate(-4deg)}}
 .sv-lockbub{position:absolute;top:50%;translate:0 -50%;z-index:6;white-space:nowrap;pointer-events:none;background:#fffbea;border:5px solid #c47a2c;border-radius:26px;padding:10px 22px;
  font-family:'Titan One',sans-serif;font-size:26px;line-height:34px;color:#8a4a10;text-align:center;box-shadow:0 8px 14px rgba(0,0,0,.3);animation:sv-bubin 3s ease-out forwards}
