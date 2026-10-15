@@ -166,7 +166,7 @@ export default function DailyPrize({ cx, sh, day, sfxOn, onClaim, target, onLand
           const d = i + 1, x = MX0 + ((i + 0.5) / 7) * (MX1 - MX0), y = MY + 16;
           const pr = PRESENTS.find(p => p[0] === d);
           if (d <= doneN) return <div key={"m" + d} className="dp-mk done" style={{ left: x, top: y }}><svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="#2f9a1c" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" /></svg></div>;
-          if (pr) return <div key={"m" + d} className={"dp-mk gift" + (d === day ? " now" : "") + (wig === "p" + d ? " wig" : "")} style={{ left: x, top: y }}><Present c={pr[1]} size={pr[2]} /></div>;
+          if (pr) return <div key={"m" + d} className={"dp-mk gift" + (d === day ? " now" : "") + (wig === "p" + d ? " wig" : "")} style={{ left: x, top: y }}><img src={`${D}/present_d${d}.webp`} alt="" draggable={false} style={{ width: Math.round(pr[2] * 0.85) }} /></div>; // Gemini presents (Andy 10-15); old drawn <Present> kept unused
           return <div key={"m" + d} className={"dp-mk dot" + (d === day ? " now" : "")} style={{ left: x, top: y }}>{d}</div>;
         })}
         {DAILY_TABLE.map((_, i) => {
@@ -249,9 +249,9 @@ const CSS = `
 .dp-mk.dot{width:30px;height:30px;border-radius:50%;background:#f4e3b5;border:3px solid #8a5a1a;display:flex;align-items:center;justify-content:center;font-family:'Titan One',sans-serif;font-size:15px;color:#5a2d08}
 .dp-mk.dot.now{background:#ffe066;box-shadow:0 0 12px 3px rgba(255,220,90,.9)}
 .dp-mk.gift{transform:translate(-50%,-76%);filter:drop-shadow(0 4px 3px rgba(0,0,0,.35))}
-.dp-mk.gift svg{display:block;transform-origin:50% 90%}
+.dp-mk.gift img{display:block;transform-origin:50% 90%}
 .dp-mk.gift.now{filter:drop-shadow(0 0 8px #fff3a0) drop-shadow(0 0 16px rgba(255,214,70,.95)) drop-shadow(0 4px 3px rgba(0,0,0,.35))} /* today's present glows */
-.dp-mk.gift.wig svg{animation:dp-wig .9s ease-in-out}
+.dp-mk.gift.wig img{animation:dp-wig .9s ease-in-out}
 @keyframes dp-wig{0%,100%{transform:rotate(0)}15%{transform:rotate(-8deg)}30%{transform:rotate(6.5deg)}45%{transform:rotate(-4.5deg)}60%{transform:rotate(3deg)}75%{transform:rotate(-1.2deg)}} /* smaller (Andy 10:01) */
 @keyframes dp-mkpop{0%{transform:translate(-50%,-50%) scale(.3)}100%{transform:translate(-50%,-50%) scale(1)}}
 .dp-pink{position:absolute;width:0;height:0;pointer-events:none}
@@ -278,7 +278,11 @@ const CSS = `
 .dp-face span{display:flex;align-items:center;gap:4px}
 .dp-face.n1 img{width:62px;height:62px}.dp-face.n1{font-size:26px;flex-direction:column}
 .dp-face.n1 span{flex-direction:column;gap:0}
-.dp-face.n2 img,.dp-face.n3 img{width:34px;height:34px}
+/* 2 prizes = side by side, 3 = 2 on top + 1 below, each icon ABOVE its number - all inside the inner box (Andy 10-15: a column of 3 spilled out) */
+.dp-face.n2,.dp-face.n3{flex-direction:row;flex-wrap:wrap;align-content:center;justify-content:center;column-gap:8px;row-gap:2px}
+.dp-face.n2 span,.dp-face.n3 span{flex-direction:column;gap:0;width:52px;line-height:1}
+.dp-face.n2 img{width:42px;height:42px}.dp-face.n2{font-size:21px}
+.dp-face.n3 img{width:30px;height:30px}.dp-face.n3{font-size:18px}
 .dp-face img{object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
 .dp-chips{position:absolute;left:-6px;right:-6px;display:flex;justify-content:center;gap:6px;padding:6px 8px;border-radius:22px;background:rgba(255,248,230,.95);
   box-shadow:0 3px 0 rgba(150,90,20,.35);font-family:'Titan One',sans-serif;color:#5a2d08;font-size:19px}

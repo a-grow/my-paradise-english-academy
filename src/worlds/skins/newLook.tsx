@@ -21,6 +21,7 @@ import VideoTheater, { type TheaterWorld, type TheaterCard } from "./VideoTheate
 import type { WorldConfig } from "@/worlds";
 import DailyPrize, { type DailyKind } from "./DailyPrize";
 import WinParade, { type ParadeItem } from "./WinParade";
+import LaunchGift from "./LaunchGift";
 import HowToPlay from "@/components/HowToPlay";
 import { worldHowTo } from "@/components/howtos";
 import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL, demoCoinsGet, demoCoinsSet } from "@/cards/economy";
@@ -61,6 +62,7 @@ const BD_KEY = "mpe_demo_bdseen";
 let bdBooted = false;
 let wpBooted = false;   // TEST ?wp=1 runs once per page load (2026-10-14)
 let coinsBooted = false;   // TEST ?coins=N (1006): the pretend coins start at N, once per page load
+let giftBooted = false;   // TEST ?gift=1 (1006): the launch gift shows once per page load (2026-10-15)
 const STAGE_W = 1600, STAGE_H = 1000; // design size; scaled to fit any window (one screen, no scrolling)
 
 // Fit the 1600x1000 design into the window. The stage grows wider/taller to fill the window;
@@ -480,10 +482,39 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   }, [howto, v.seen]);
   useEffect(() => { if (howto !== "wait" || intro !== "off") return; const t = window.setTimeout(() => { howAuto.current = true; setHowto("open"); }, 1000); return () => window.clearTimeout(t); }, [howto, intro]);
   const closeHowto = () => { setHowto("closed"); if (howAuto.current) { howAuto.current = false; v.markSeen("howto:world:one"); } };
+  // LAUNCH GIFT (launch step 7, Andy 2026-10-15): once per kid EVER (database prize 'gift:launch' = 10 treats, any device),
+  // after the welcome + How to Play + win parade, before the Daily Prize. 'pending' = reading the prize list, 'wait' = it will
+  // show, 'open' = on screen. A visit + 1006 never; TEST 1006 on /world-test/: ?gift=1 (once per page load, pays nothing).
+  const [gift, setGift] = useState<"pending" | "wait" | "open" | "off">(() => {
+    if (onTest && v.isMaster && q.get("gift") === "1" && !giftBooted) { giftBooted = true; return "wait"; }
+    return v.readOnly || v.isMaster ? "off" : "pending";
+  });
+  const giftOn = gift === "open";
+  useEffect(() => {
+    if (gift !== "pending") return;
+    if (v.prizes) { setGift(v.prizes.includes("gift:launch") ? "off" : "wait"); return; }
+    const t = window.setTimeout(() => setGift(g => (g === "pending" ? "off" : g)), 4000); // cloud not answering: skip (it comes next visit)
+    return () => window.clearTimeout(t);
+  }, [gift, v.prizes]);
+  useEffect(() => {
+    if (gift !== "wait" || intro !== "off" || howto !== "closed" || paraPending || parade || party || done || mini || dailyDay) return;
+    const t = window.setTimeout(() => setGift("open"), 800);
+    return () => window.clearTimeout(t);
+  }, [gift, intro, howto, paraPending, parade, party, done, mini, dailyDay]);
+  // the treats fly (win parade) only once the DATABASE has paid (prize list has it); 1006 = pretend, kept for the tab.
+  // No answer in 8s = nothing flies (the gift comes back next visit).
+  const [giftFly, setGiftFly] = useState(false);
+  const giftOpen = () => { if (v.isMaster) v.setJarTreats(j => j + 10); else v.claimPrize("gift:launch"); };
+  useEffect(() => {
+    if (!giftFly) return;
+    if (v.isMaster || (v.prizes ?? []).includes("gift:launch")) { setGiftFly(false); setParade([{ kind: "treat", n: 10, img: `${UI}/treat.webp` }]); return; }
+    const t = window.setTimeout(() => setGiftFly(false), 8000);
+    return () => window.clearTimeout(t);
+  }, [giftFly, v.prizes]);   // eslint-disable-line react-hooks/exhaustive-deps
   // TEST ONLY (?dp=): nothing is saved, so after the test prize the jar + coin pill KEEP the shown numbers
   // (going back to the real number made the jar open again with the feed sound - Andy 14:19).
   const [testKeep, setTestKeep] = useState(false);
-  const holding = !!(party || done || mini || dailyDay || testKeep || parade || intro !== "off");
+  const holding = !!(party || done || mini || dailyDay || testKeep || parade || intro !== "off" || giftOn || giftFly);
   useEffect(() => { if (!holding && !paraPending) setCoinShown(v.coins ?? 0); }, [v.coins, holding, paraPending]);
   const pieceReal = v.isMaster ? demoPieces : v.pieces;
   useEffect(() => { if (!holding && !paraPending && pieceReal !== null) setPieceShown(pieceReal); }, [pieceReal, holding, paraPending]);
@@ -525,10 +556,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const dailyReady = isTestDp ? testDp : (v.dailyPrize && !v.dailyPrize.claimedToday ? v.dailyPrize.day : 0);
   const dailyShown = useRef(false);
   useEffect(() => {
-    if (!dailyReady || dailyShown.current || party || done || paraPending || parade || howto !== "closed" || intro !== "off") return;
+    if (!dailyReady || dailyShown.current || party || done || paraPending || parade || howto !== "closed" || intro !== "off" || gift === "pending" || gift === "wait" || giftOn || giftFly) return;
     const t = window.setTimeout(() => { dailyShown.current = true; setDailyDay(dailyReady); }, 1200);
     return () => window.clearTimeout(t);
-  }, [dailyReady, party, done, howto, intro, paraPending, parade]);
+  }, [dailyReady, party, done, howto, intro, paraPending, parade, gift, giftFly]);
   const dailyLand = (k: DailyKind, add: number) => {
     if (k === "treat") { setJarShown(j => j + add); setBump(b => ({ ...b, treat: (b.treat ?? 0) + 1 })); }
     else partyLand(k, add);
@@ -1191,6 +1222,9 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           <WinParade cx={cx} sh={sh} items={parade} sfxOn={v.sfxOn} target={paradeTarget} onLand={paradeLand}
             onDone={() => { if (testWp) setTestKeep(true); setParade(null); }} />
         )}
+        {giftOn && (
+          <LaunchGift cx={cx} sh={sh} sfxOn={v.sfxOn} onOpen={giftOpen} onTreats={() => setGiftFly(true)} onDone={() => setGift("off")} />
+        )}
         {dailyDay > 0 && (
           <DailyPrize cx={cx} sh={sh} day={dailyDay} sfxOn={v.sfxOn}
             onClaim={() => (isTestDp ? Promise.resolve({ paid: true }) : v.claimDailyPrize())}
@@ -1223,15 +1257,16 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         )}
 
         {/* POINTING HANDS (Andy 2026-10-03): only while the thing waits for a tap */}
-        {watchReady && !party && !done && !dailyDay && !v.showVideo && !panel && (
+        {watchReady && !party && !done && !dailyDay && !giftOn && !v.showVideo && !panel && (
           <Hand stage={stageRef} s={s} sel=".sv-watch" fx={0.86} fy={0.22} />
         )}
-        {newReady && !panel && !party && !done && !dailyDay && !v.showVideo && ( /* not while a video plays (Andy 2026-10-04) */
+        {newReady && !panel && !party && !done && !dailyDay && !giftOn && !v.showVideo && ( /* not while a video plays (Andy 2026-10-04) */
           <Hand stage={stageRef} s={s} sel=".sv-animals" fx={0.16} fy={0.3} flip />
         )}
         {panel === "animals" && <Hand stage={stageRef} s={s} sel=".sv-big.ready" fx={0.82} fy={0.2} />}
         {dailyDay > 0 && <Hand stage={stageRef} s={s} sel=".dp-claim:not(:disabled)" fx={0.86} fy={0.25} />}
-        {pointAt && !panel && !party && !done && !dailyDay && !v.showVideo && ( /* just unlocked (Andy 15:50) */
+        {giftOn && <Hand stage={stageRef} s={s} sel=".lg-btn:not(:disabled)" fx={0.03} fy={0.35} flip />}
+        {pointAt && !panel && !party && !done && !dailyDay && !giftOn && !v.showVideo && ( /* just unlocked (Andy 15:50) */
           <Hand stage={stageRef} s={s} sel={pointAt === "puzzle" ? ".sv-pzbtn" : ".sv-album"} fx={pointAt === "puzzle" ? 0.88 : 0.16} fy={0.3} flip={pointAt === "album"} />
         )}
 
