@@ -531,7 +531,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const badgeDefs0 = badgeList(bWorlds);
   const badgeDefs = bdFlag === "many" ? Array.from({ length: 30 }, (_, i) => { const b = badgeDefs0[i % badgeDefs0.length]; return i < badgeDefs0.length ? b : { ...b, id: `${b.id}~${i}` }; }) : badgeDefs0; // ?bd=many = 30 pretend badges (3 walls)
   const earned = bdFlag && bdFlag !== "live" ? badgeDefs.map(b => b.id)
-    : earnedBadges({ worlds: bWorlds, prizes: v.prizes, rowData: v.rowData, worldId: v.world.id, fed: v.fedTreatsState, dailyBox: v.dailyPrize?.box ?? null });
+    : earnedBadges({ worlds: bWorlds, prizes: v.prizes, rowData: v.rowData, worldId: v.world.id, fed: v.fedTreatsState, dailyBox: v.dailyPrize?.box ?? null, wins: v.wins });
   const seenB: string[] | null = v.isMaster ? (bdFlag === "new" ? (v.seen ?? []) : bdFlag === "live" ? liveSeen : earned.map(id => badgeSeen(id))) : v.seen;
   const newBadges = seenB === null || v.readOnly ? [] : earned.filter(id => !seenB.includes(badgeSeen(id)));
   const seenAt = (id: string) => { const i = (seenB ?? []).indexOf(badgeSeen(id)); return i < 0 ? 1e6 : i; };
@@ -740,7 +740,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     if (dT > 0) items.push({ kind: "treat", n: dT, img: `${UI}/treat.webp` });
     if (dC > 0) items.push({ kind: "coin", n: dC, img: `${UI}/coin.webp` }); else setCoinShown(v.coins);
     if (dP > 0 && puzzleOn) items.push({ kind: "piece", n: dP, img: "/puzzle/piece.webp" }); else setPieceShown(pieceReal);
-    if (v.prizes !== null && v.rowData !== null && v.dailyPrize !== null) {
+    if (v.prizes !== null && v.rowData !== null && v.dailyPrize !== null && v.wins !== null) {
       let old: unknown = null; try { old = JSON.parse(localStorage.getItem(paraKeys.b) ?? "null"); } catch { /* */ }
       if (Array.isArray(old)) earned.filter(id => !old.includes(id)).slice(0, 4).forEach(id => items.push({ kind: "badge", n: 1, img: badgeImg(id) }));
     }
@@ -754,7 +754,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     try {
       if (typeof v.coins === "number") localStorage.setItem(paraKeys.c, String(v.coins));
       if (typeof pieceReal === "number") localStorage.setItem(paraKeys.p, String(pieceReal));
-      if (v.prizes !== null && v.rowData !== null && v.dailyPrize !== null) localStorage.setItem(paraKeys.b, JSON.stringify(earned));
+      if (v.prizes !== null && v.rowData !== null && v.dailyPrize !== null && v.wins !== null) localStorage.setItem(paraKeys.b, JSON.stringify(earned));
     } catch { /* */ }
   }, [paraPending, holding, v.coins, pieceReal, earnedKey, v.prizes, v.rowData, v.dailyPrize]);   // eslint-disable-line react-hooks/exhaustive-deps
   // the parade aims at the MIDDLE of each button (Andy 10-14: fly INTO the button, it absorbs them)

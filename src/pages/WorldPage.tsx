@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, loadJarFromCloud, addTreats, addCoins, addPieces, claimPrize, loadPrizes, claimDailyPrize, loadDailyPrize, loadSeen, markSeen, claimDailyTreat, dailyClaimedToday } from "@/lib/cloudSave";
+import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, loadJarFromCloud, addTreats, addCoins, addPieces, claimPrize, loadPrizes, loadWins, claimDailyPrize, loadDailyPrize, loadSeen, markSeen, claimDailyTreat, dailyClaimedToday } from "@/lib/cloudSave";
 import { getAnimalStage, getAnimalStageIdx, type Animal } from "@/worlds/types";
 import { ALL_WORLDS, COMING_WORLDS, worldState, type WorldConfig } from "@/worlds";
 import { DEMO_COINS } from "@/cards/economy";
@@ -225,12 +225,14 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   }, [demoAt, demoKey, fedTreatsState, videoWatchedMap, activeAnimalId]);
   // prizes = names of prizes already paid (= badges won, e.g. "savanna:complete"); null = not read yet / teacher code
   const [prizes, setPrizes] = useState<string[] | null>(null);
+  const [wins, setWins] = useState<{ vocab: number; grammar: number } | null>(null); // game WIN counters (badges) - null = not read yet / teacher code
   const [pieces, setPieces] = useState<number | null>(null); // puzzle pieces to spend (READ only here; the database pays them) - Puzzle button counter (Andy 2026-10-11)
   useEffect(() => {
     if (isMaster) return;
     addCoins(code, studentName, 0).then(t => { if (typeof t === "number") setCoins(t); }); // 0 = read only
     addPieces(code, studentName, 0).then(n => { if (typeof n === "number") setPieces(n); }); // 0 = read only
     loadPrizes(code, studentName).then(list => { if (Array.isArray(list)) setPrizes(list); }); // read only
+    loadWins(code, studentName).then(w => { if (w) setWins(w); }); // read only (Vocab Champ / Grammar Star badges)
     if (!readOnly) loadDailyPrize(code, studentName).then(d => { if (d) setDailyPrize(d); }); // read only (no Daily Prize on a visit)
     loadSeen(code, studentName).then(list => { if (Array.isArray(list)) setSeen(list); }); // read only
   }, []);
@@ -575,7 +577,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   const currentWorld = (worldList.find(x => !x.finished) ?? worldList[worldList.length - 1]).world;
   const comingWorlds = COMING_WORLDS.filter(w => !ALL_WORLDS.some(a => a.id === w.id)); // My Worlds: grey + name only
 
-  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg, coins, pieces, prizes, claimPrize: claimPrizeNow, dailyPrize, claimDailyPrize: claimDailyPrizeNow, seen, markSeen: markSeenNow, switchAnimal, nudgeSeen, readOnly, rowData, worldList, currentWorld, comingWorlds };
+  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg, coins, pieces, prizes, wins, claimPrize: claimPrizeNow, dailyPrize, claimDailyPrize: claimDailyPrizeNow, seen, markSeen: markSeenNow, switchAnimal, nudgeSeen, readOnly, rowData, worldList, currentWorld, comingWorlds };
 };
 
 export type WorldView = ReturnType<typeof useWorldBrain>;

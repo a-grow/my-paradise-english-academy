@@ -79,6 +79,25 @@ export async function claimPrize(code: string, studentName: string, prize: strin
   }
 }
 
+// WINS (badges, 2026-10-15): the kid's game WIN counters (mpe_win adds them) - Vocab Champ / Grammar Star badges at 25.
+// Returns {vocab, grammar} | null = no row yet | undefined = could not read. READ ONLY.
+export async function loadWins(code: string, studentName: string): Promise<{ vocab: number; grammar: number } | null | undefined> {
+  try {
+    const { data, error } = await supabase
+      .from("student_progress")
+      .select("wins_vocab, wins_grammar")
+      .eq("code", code)
+      .eq("student_name", studentName)
+      .maybeSingle();
+    if (error) { console.error("[cloudSave] wins load failed:", error.message); return undefined; }
+    if (!data) return null;
+    return { vocab: Number(data.wins_vocab) || 0, grammar: Number(data.wins_grammar) || 0 };
+  } catch (e) {
+    console.error("[cloudSave] wins load threw:", e);
+    return undefined;
+  }
+}
+
 // PRIZES: the kid's list of prizes already paid (also = badges won, e.g. "savanna:complete").
 // Returns the list | null = no row yet | undefined = could not read.
 export async function loadPrizes(code: string, studentName: string): Promise<string[] | null | undefined> {

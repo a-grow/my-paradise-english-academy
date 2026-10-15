@@ -1,7 +1,7 @@
 // MY BADGES (launch step 6, Andy OK 2026-10-13): 12 badges. EARNED is worked out from what the kid already has (no database
 // change): hello = always; hatched / grown / treats from every world's animals (fed); visit5 = 7 Daily Prize boxes opened
-// (daily_box); world badges = '<world>:complete' in the prize list. games / grammar need win counters (planned with the Card
-// Album database session) - until then never earned. Progress from BEFORE launch counts. Pictures: public/worlds/badges/<id>.webp
+// (daily_box); world badges = '<world>:complete' in the prize list. games / grammar = 25 vocab / grammar game WINS (win counters
+// wins_vocab / wins_grammar, counted since 2026-10-14; switched on 2026-10-15). Progress from BEFORE launch counts. Pictures: public/worlds/badges/<id>.webp
 // NOTE: the world list is passed in (importing '@/worlds' here would be a circular import through the skins).
 import { getAnimalStageIdx } from "./types";
 import type { WorldConfig } from "./index";
@@ -19,9 +19,9 @@ export const FUN_BADGES: BadgeDef[] = [
 export const badgeList = (worlds: WorldConfig[]): BadgeDef[] =>
   [...FUN_BADGES, ...worlds.map(w => ({ id: w.id, name: `${w.title} World`, how: `Finish ${w.title} World`, plate: `for finishing ${w.title}` }))];
 export const badgeImg = (id: string) => `/worlds/badges/${id.split("~")[0]}.webp`; // "~n" = test copies (?bd=many)
-export const TREATS_BADGE = 100, DAILY_BADGE = 7;
+export const TREATS_BADGE = 100, DAILY_BADGE = 7, WIN_BADGE = 25;
 
-export function earnedBadges(o: { worlds: WorldConfig[]; prizes: string[] | null; rowData: any; worldId: string; fed: Record<string, number>; dailyBox: number | null }): string[] {
+export function earnedBadges(o: { worlds: WorldConfig[]; prizes: string[] | null; rowData: any; worldId: string; fed: Record<string, number>; dailyBox: number | null; wins?: { vocab: number; grammar: number } | null }): string[] {
   const out = ["hello"];
   let hatched = false, grown = false, total = 0;
   for (const w of o.worlds) {
@@ -42,6 +42,8 @@ export function earnedBadges(o: { worlds: WorldConfig[]; prizes: string[] | null
   if (grown) out.push("grown");
   if (total >= TREATS_BADGE) out.push("treats");
   if ((o.dailyBox ?? 0) >= DAILY_BADGE) out.push("visit5");
+  if ((o.wins?.vocab ?? 0) >= WIN_BADGE) out.push("games");     // Vocab Champ
+  if ((o.wins?.grammar ?? 0) >= WIN_BADGE) out.push("grammar"); // Grammar Star
   for (const w of o.worlds) if ((o.prizes ?? []).includes(`${w.id}:complete`)) out.push(w.id);
   return out;
 }
