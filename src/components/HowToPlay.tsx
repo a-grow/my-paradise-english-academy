@@ -9,9 +9,9 @@ import { FUN3D_CSS, Word3D } from "@/components/Fun3D";
 import { KeyCaps, type HintKey } from "@/components/ControlHints";
 
 export type HowStep = { art: ReactNode; text: ReactNode };
-export type HowControl = { keys?: HintKey[]; mouse?: boolean; text: ReactNode };
+export type HowControl = { keys?: HintKey[]; mouse?: boolean; pads?: string[]; finger?: boolean; text: ReactNode }; // pads/finger = touch pictures (2026-10-15)
 export type HowToProps = {
-  title: string; steps: HowStep[]; controls: HowControl[]; tip?: ReactNode;
+  title: string; steps: HowStep[]; controls: HowControl[]; touch?: HowControl[]; tip?: ReactNode;
   bg?: string; muted?: boolean; onDone: () => void;
 };
 
@@ -38,7 +38,25 @@ export const GreenArrow = ({ w = 110 }: { w?: number }) => (
   </svg>
 );
 
-export default function HowToPlay({ title, steps, controls, tip, bg, muted, onDone }: HowToProps) {
+
+// TOUCH pictures (2026-10-15): pads = the game's round on-screen buttons ("left"/"right"/"up"/"down" = arrows, any other text = a word button);
+// finger = Teacher Andy's pointing hand tapping. Shown instead of the keyboard/mouse row on touch devices when a How has `touch`.
+type Pad = "left" | "right" | "up" | "down" | string;
+const PAD_ROT: Record<string, number> = { up: 0, right: 90, down: 180, left: 270 };
+const isTouchDevice = () => typeof window !== "undefined" && ("ontouchstart" in window || (navigator.maxTouchPoints || 0) > 0);
+function TouchCaps({ pads = [], finger = false }: { pads?: Pad[]; finger?: boolean }) {
+  return (
+    <span className="hw-tcaps">
+      {pads.map((p, i) => p === "stick" ? <span key={i} className="hw-stick"><i /></span> : p in PAD_ROT
+        ? <span key={i} className="hw-pad"><svg width="30" height="30" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform={`rotate(${PAD_ROT[p]} 11 11)`} /></svg></span>
+        : <span key={i} className="hw-pad word">{p}</span>)}
+      {finger && <span className="hw-finger"><i className="hw-ripple" /><img src="/worlds/ui/hand_point.webp" alt="" /></span>}
+    </span>
+  );
+}
+
+export default function HowToPlay({ title, steps, controls, touch, tip, bg, muted, onDone }: HowToProps) {
+  const ctrls = touch && isTouchDevice() ? touch : controls; // iPad / phone: touch pictures (2026-10-15)
   // FIT (Andy 2026-10-07: cut off on full screen): measure the REAL content size (it can be taller/wider than 1600x900)
   // and shrink it so everything always shows, on any window shape. Re-measures when pictures/fonts load or the window changes.
   const stageRef = useRef<HTMLDivElement>(null);
@@ -94,9 +112,10 @@ export default function HowToPlay({ title, steps, controls, tip, bg, muted, onDo
           ))}
         </div>
         <div className="hw-ctrls" style={d(tCtrl)}>
-          {controls.map((c, i) => (
+          {ctrls.map((c, i) => (
             <div key={i} className="hw-ctrl">
-              <KeyCaps keys={c.keys || []} mouse={c.mouse} big />
+              {!!(c.keys?.length || c.mouse) && <KeyCaps keys={c.keys || []} mouse={c.mouse} big />}
+              {!!(c.pads?.length || c.finger) && <TouchCaps pads={c.pads} finger={c.finger} />}
               <span className="hw-ctext">{c.text}</span>
             </div>
           ))}
@@ -141,5 +160,17 @@ const CSS = `
 .hw-tap{margin-top:auto;margin-bottom:22px;padding-top:18px;font-family:'Lilita One','Fredoka',sans-serif;font-size:40px;letter-spacing:1px;color:#fff;-webkit-text-stroke:6px #1d1240;paint-order:stroke fill;
  opacity:0;animation:hw-fade .4s ease-out both,hw-blink 1.4s ease-in-out infinite}
 @keyframes hw-blink{0%,100%{opacity:1}50%{opacity:.45}}
+.hw-tcaps{display:flex;align-items:center;gap:12px}
+.hw-stick{position:relative;width:66px;height:66px;flex:none;border-radius:50%;background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.75);box-shadow:0 5px 0 rgba(0,0,0,.3)}
+.hw-stick i{position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px;border-radius:50%;background:rgba(255,255,255,.9);animation:hw-stk 2.4s ease-in-out infinite}
+@keyframes hw-stk{0%,100%{transform:translate(0,0)}20%{transform:translate(13px,-11px)}45%{transform:translate(-13px,-6px)}70%{transform:translate(-9px,12px)}85%{transform:translate(12px,10px)}}
+.hw-pad{width:60px;height:60px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.75);box-shadow:0 5px 0 rgba(0,0,0,.3)}
+.hw-pad.word{width:auto;padding:0 20px;border-radius:999px;font-family:'Lilita One','Fredoka',sans-serif;font-size:26px;color:#fff;letter-spacing:1px}
+.hw-tcaps .hw-pad+.hw-finger{margin-left:10px}
+.hw-finger{position:relative;width:78px;height:64px;flex:none}
+.hw-finger img{position:absolute;left:10px;bottom:8px;height:58px;animation:hw-tap 1.3s ease-in-out infinite}
+.hw-ripple{position:absolute;left:-4px;top:40px;width:30px;height:30px;border-radius:50%;border:4px solid #ffd84a;opacity:0;animation:hw-rip 1.3s ease-out infinite}
+@keyframes hw-tap{0%,100%{transform:translate(10px,-10px)}40%,55%{transform:translate(0,0)}}
+@keyframes hw-rip{0%,42%{transform:scale(.3);opacity:0}48%{opacity:1}100%{transform:scale(1.6);opacity:0}}
 @media (prefers-reduced-motion: reduce){.hw-step,.hw-arrow,.hw-ctrls,.hw-tip{animation:none}.hw-arrow svg,.hw-tap{animation:none;opacity:1}}
 `;

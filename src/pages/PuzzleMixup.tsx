@@ -14,7 +14,7 @@ import { useClickSfx } from "@/lib/clickSfx";
 import HowToPlay from "@/components/HowToPlay";
 import { PUZZLE_HOWTO } from "@/components/howtos";
 import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
-import { DEMO_COINS } from "@/cards/economy";
+import { DEMO_COINS, demoCoinsGet, demoCoinsSet } from "@/cards/economy";
 import { loadPuzzle, puzzlePop, addCoins, claimPrize, loadPrizes } from "@/lib/cloudSave";
 import { lockLeft, LOCK_IMG } from "@/lib/locks";
 import LockMsg from "@/components/LockMsg";
@@ -279,7 +279,8 @@ export default function PuzzleMixup() {
   const [gone, setGone] = useState<Set<number>>(() => (saved ? new Set(saved.gone) : almost()));   // covers already popped off
   const [rem, setRem] = useState<number[]>(() => pz.need.slice());  // number showing on each cover (counts down while paying)
   const [pieces, setPieces] = useState(() => { if (real) return 0; const n = parseInt(qs.get("pc") ?? "", 10); return Number.isFinite(n) ? n : demoPiecesGet(); });   // 1006 = the tab's shared pretend count
-  const [coins, setCoins] = useState(real ? 0 : saved?.coins ?? DEMO_COINS);
+  const [coins, setCoins] = useState(real ? 0 : isMaster ? demoCoinsGet() : saved?.coins ?? DEMO_COINS);
+  useEffect(() => { if (isMaster) demoCoinsSet(coins); }, [isMaster, coins]); // 1006: one pretend coin number for the tab (2026-10-15)
   const [doneList, setDoneList] = useState<number[]>(() => saved?.done ?? Array.from({ length: startIdx }, (_, i) => i));
   const [phase, setPhase] = useState<Phase>("intro");
   const [round, setRound] = useState(0);

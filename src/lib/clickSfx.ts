@@ -5,9 +5,33 @@
 import { useEffect, useRef } from "react";
 
 const URL = "/worlds/ui/click.mp3";
+// FAST PATH (2026-10-15): Web Audio - decoded once, starts at once (an <audio> tag lags on iPad and ignores volume there).
+let wctx: AudioContext | null = null;
+const wbufs: Record<string, AudioBuffer | null | undefined> = {};
+const fast = (url: string, vol: number): boolean => {
+  try {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AC) return false;
+    wctx = wctx || new AC();
+    if (wctx.state === "suspended") wctx.resume().catch(() => { });
+    const b = wbufs[url];
+    if (b === undefined) {                     // first time: load it (this tap uses the old way)
+      wbufs[url] = null;
+      const c = wctx;
+      fetch(url).then(r => r.arrayBuffer()).then(d => c.decodeAudioData(d)).then(x => { wbufs[url] = x; }).catch(() => { wbufs[url] = undefined; });
+      return false;
+    }
+    if (!b) return false;                      // still loading
+    const src = wctx.createBufferSource(), g = wctx.createGain();
+    src.buffer = b; g.gain.value = vol; src.connect(g); g.connect(wctx.destination); src.start();
+    return true;
+  } catch { return false; }
+};
+
 let pool: HTMLAudioElement[] = [];
 let n = 0;
 export const playClick = () => {
+  if (fast(URL, 0.5)) return;
   try {
     if (!pool.length) pool = [0, 1, 2].map(() => { const a = new Audio(URL); a.volume = 0.5; return a; });
     const a = pool[n++ % pool.length];
@@ -31,6 +55,7 @@ const tappable = (start: EventTarget | null) => {
 let beeps: HTMLAudioElement[] = [];
 let bn = 0;
 export const playCloseBeep = () => {
+  if (fast("/worlds/ui/close_beep.mp3", 0.6)) return;
   try {
     if (!beeps.length) beeps = [0, 1].map(() => { const a = new Audio("/worlds/ui/close_beep.mp3"); a.volume = 0.6; return a; });
     const a = beeps[bn++ % beeps.length];

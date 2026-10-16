@@ -52,6 +52,7 @@ export const gardenHowTo = (diff: string): How => ({
     { art: <img src="/vocab/garden/basket-big.webp" alt="" style={{ width: 230 }} />, text: <><b>Fill</b> the basket to <b>win!</b></> },
   ],
   controls: [{ mouse: true, text: <>Click to <b>whack</b></> }],
+  touch: [{ finger: true, text: <>Tap to <b>whack</b></> }],
   tip: diff === "easy"
     ? <>Don't hit the <em>red X!</em></>
     : <>Don't hit the <em>red X!</em><br /><span style={{ color: "#ffb347" }}>Careful!</span> Some words are <em>spelled wrong!</em></>,
@@ -81,6 +82,7 @@ export const TICKET_HOWTO: How = {
       </div>, text: <><b>Spell</b> the word to <b>win!</b></> },
   ],
   controls: [{ keys: K("left", "up", "down", "right"), text: <>Drive the <b>train</b></> }],
+  touch: [{ pads: ["stick"], text: <>Use the <b>joystick</b> to drive</> }],
   tip: <><em>Wrong</em> letters cost a heart!</>,
 };
 
@@ -99,6 +101,7 @@ export const SPACE_HOWTO: How = {
     { art: <img src="/vocab/space/mission.webp" alt="" style={{ width: 340 }} />, text: <><b>Win</b> the mission!</> },
   ],
   controls: [{ keys: K("left", "right"), text: <>Move</> }, { keys: K("space"), text: <><b>Shoot</b></> }],
+  touch: [{ pads: ["left", "right"], text: <>Move</> }, { pads: ["SHOOT"], text: <><b>Shoot</b></> }],
   tip: <><b>Dodge</b> the bubbles!</>,
 };
 
@@ -121,6 +124,7 @@ export const RUN_HOWTO: How = {
       text: <>Get them <b>all</b> to <b>win!</b></> },
   ],
   controls: [{ keys: K("left", "right"), text: <>Run</> }, { keys: K("up", "space"), text: <><b>Jump</b></> }],
+  touch: [{ pads: ["left", "right"], text: <>Run</> }, { pads: ["JUMP"], text: <><b>Jump</b></> }],
   tip: <>Watch out for <em>crows</em> and <em>hedgehogs!</em><Pics srcs={[`${G}/crow.webp`, `${G}/hedgehog.webp`]} /></>,
 };
 
@@ -140,6 +144,7 @@ export const SWIM_HOWTO: How = {
       text: <><b>Fill</b> the meter to <b>win!</b></> },
   ],
   controls: [{ keys: K("left", "up", "down", "right"), text: <>Swim</> }],
+  touch: [{ pads: ["stick"], text: <>Use the <b>joystick</b> to swim</> }],
   tip: <>Watch out for <em>sharks</em> & <em>jellyfish!</em><Pics srcs={[`${G}/shark.webp`, `${G}/jelly.webp`]} /></>,
 };
 
@@ -156,6 +161,7 @@ export const DIG_HOWTO: How = {
     { art: <img src={`${G}/dig-win.webp`} alt="" style={{ height: 230 }} />, text: <><b>Build</b> the sentence to <b>win!</b></> },
   ],
   controls: [{ keys: K("left", "up", "down", "right"), text: <>Walk</> }, { mouse: true, text: <>Click to <b>dig</b></> }],
+  touch: [{ pads: ["left", "up", "down", "right"], text: <>Walk</> }, { pads: ["DIG"], text: <><b>Dig</b></> }],
   tip: <><b>Bop</b> the worms!<Pics srcs={[`${G}/worm.webp`]} h={70} /></>,
 };
 
@@ -174,6 +180,7 @@ export const GRAB_HOWTO: How = {
     { art: <img src={`${G}/grab-andy.webp`} alt="" style={{ height: 240 }} />, text: <><b>Fix</b> the sentence to <b>win!</b></> },
   ],
   controls: [{ keys: K("left", "right"), text: <>Move the claw</> }, { keys: K("space"), mouse: true, text: <><b>Grab!</b></> }],
+  touch: [{ pads: ["left", "right"], text: <>Move the claw</> }, { finger: true, text: <>Tap <b>GRAB!</b></> }],
   tip: <>Don't grab the <em>X box!</em><Pics srcs={[`${G}/box-x.webp`]} /></>,
 };
 
@@ -196,6 +203,7 @@ export const worldHowTo = (stages: string[]): How => ({
       </div>, text: <>Watch it <b>grow up!</b></> },
   ],
   controls: [{ mouse: true, text: <>Click or tap the <b>buttons</b></> }],
+  touch: [{ finger: true, text: <>Tap the <b>buttons</b></> }],
   tip: <>Come back <b>every day</b> for a <b>Daily Prize!</b><Pics srcs={[`${UI}/btn_daily.webp`]} h={80} /></>,
 });
 
@@ -229,6 +237,7 @@ export const PUZZLE_HOWTO: How = {
       </div>, text: <>Open them all for a <b>surprise!</b></> },
   ],
   controls: [{ mouse: true, text: <>Click or tap a <b>cover</b></> }],
+  touch: [{ finger: true, text: <>Tap a <b>cover</b></> }],
   tip: <>Every picture wins <b>coins</b> and <b>treats!</b><Pics srcs={[`${UI}/coin.webp`, `${UI}/treat.webp`]} h={70} /></>,
 };
 export const ALBUM_HOWTO: How = {
@@ -248,5 +257,37 @@ export const ALBUM_HOWTO: How = {
       </div>, text: <>Collect <b>every card!</b></> },
   ],
   controls: [{ mouse: true, text: <>Click or tap a <b>pack</b> or a <b>set</b></> }],
+  touch: [{ finger: true, text: <>Tap a <b>pack</b> or a <b>set</b></> }],
   tip: <>Finish a set for a <b>prize!</b><Pics srcs={[`${UI}/coin.webp`, `${UI}/treat.webp`]} h={70} /></>,
+};
+// SWAP METER rules (Andy 10-16: same big screen as the album's, very simple). Opens when the Swap Meter is tapped.
+const dot = (d: number): CSSProperties => ({ width: d, height: d, borderRadius: "50%", border: "4px solid #fff", flex: "none",
+  background: "radial-gradient(circle at 35% 35%,#fff6c8,#ffb800)", boxShadow: "0 0 14px 3px rgba(255,216,74,.85)" });
+const tag = (bg: string): CSSProperties => ({ position: "absolute", padding: "2px 16px 6px", borderRadius: 18, border: "5px solid #fff", background: bg,
+  fontFamily: "'Titan One',sans-serif", fontSize: 42, color: "#fff", transform: "rotate(-8deg)", boxShadow: "0 4px 8px rgba(0,0,0,.4)" });
+export const SWAP_HOWTO: How = {
+  title: "Swap Meter",
+  bg: `${CU}/table_neutral.webp`,
+  steps: [
+    { art: <div style={box(300, 244)}>
+        <img src="/cards/s01/c03.webp" alt="" style={abs({ left: 20, top: 30, height: 200, transform: "rotate(-10deg)" })} />
+        <img src="/cards/s01/c03.webp" alt="" style={abs({ left: 128, top: 22, height: 200, transform: "rotate(8deg)" })} />
+        <div style={tag("#8a4fe0")}>+1</div>
+      </div>, text: <>Same card <b>again?</b></> },
+    { art: <div style={{ ...box(300, 244), display: "flex", flexWrap: "wrap", gap: 14, alignContent: "center", justifyContent: "center" }}>
+        {Array.from({ length: 10 }, (_, i) => <i key={i} style={dot(44)} />)}
+      </div>, text: <>Fill <b>10 dots</b></> },
+    { art: <div style={box(300, 244)}>
+        <div style={abs({ left: 70, top: 14, width: 150, height: 216, borderRadius: 16, background: "#f1d9ad", border: "7px solid #e3c189",
+          boxShadow: "0 0 26px 8px rgba(255,216,74,.9)", display: "flex", alignItems: "center", justifyContent: "center",
+          fontFamily: "'Titan One',sans-serif", fontSize: 90, color: "#d6b57c" })}>?</div>
+        <img src="/worlds/ui/hand_point.webp" alt="" style={abs({ left: 176, top: 120, height: 120 })} />
+      </div>, text: <><b>Pick</b> any card!</> },
+  ],
+  controls: [],
+  tip: <>A <b>gold</b> card again = <b>3 dots!</b>
+    <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, marginTop: 10 }}>
+      <img src="/cards/s01/c10.webp" alt="" style={{ height: 100, filter: "drop-shadow(0 6px 8px rgba(0,0,0,.4))" }} />
+      <i style={dot(34)} /><i style={dot(34)} /><i style={dot(34)} />
+    </span></>,
 };

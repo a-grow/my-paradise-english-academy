@@ -46,7 +46,7 @@ const CRIT = [ // [name, width, height, size factor]
 const CRIT_OW: Record<string, [number, number]> = { bunny: [248, 311], mole: [288, 231], mouse: [282, 328], squirrel: [317, 293] };
 
 const SND: Record<string, [string, number]> = {
-  right: [`${ART}/snd_right.mp3`, 0.3], oof: [`${ART}/snd_oof.mp3`, 0.6],   // all a little softer (Andy 14:29)
+  right: [`${ART}/snd_right.mp3`, 0.3], oof: [`${ART}/snd_oof.mp3`, 0.9],   // all a little softer (Andy 14:29)
   bonk: [`${ART}/snd_bonk.mp3`, 0.45], boing: [`${ART}/snd_boing.mp3`, 0.65], giggle: [`${ART}/snd_giggle.mp3`, 0.65], // Andy 10-05
   levelup: ["/vocab/snd_levelup.mp3", 0.4], // win: big basket (Andy 15:37)
   gasp: [`${ART}/snd_gasp.mp3`, 0.55], intro: [`${ART}/intro_music.mp3`, 1], // intro song: first 3.6s of cute-cute-music, levelled down
@@ -126,7 +126,7 @@ const useSfx = (on: boolean) => {
       if (type === "thud") osc(240, 0, 0.1, 0.22, "triangle", 90); // empty swing / X board
       if (type === "pop") osc(520, 0, 0.07, 0.05, "sine", 900);
       if (type === "life") [784, 988, 1175, 1568].forEach((f, i) => osc(f, i * 0.08, 0.22, 0.2, "triangle"));
-      if (type === "coin") { osc(988, 0, 0.08, 0.14, "square"); osc(1319, 0.07, 0.24, 0.14, "square"); }
+      if (type === "coin") { osc(988, 0, 0.08, 0.3, "square"); osc(1319, 0.07, 0.24, 0.3, "square"); /* louder coin (iPad round 3) */ }
     } catch { /* */ }
     return true;
   }, []);

@@ -13,6 +13,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Reac
 import GrammarGameBar from "@/components/GrammarGameBar";
 import ControlHints, { HINT_BOTTOM_LEFT } from "@/components/ControlHints";
 import HowToPlay from "@/components/HowToPlay";
+import { PAUSE } from "@/lib/pause";
 import { wantHowto, seenHowto } from "@/lib/howtoSeen";
 import { TICKET_HOWTO } from "@/components/howtos";
 
@@ -51,8 +52,8 @@ const ITEM_UP = Infinity; // coins + hearts stay until the train takes them (And
 
 const SND: Record<string, [string, number, number?]> = {
   levelup: ["/vocab/snd_levelup.mp3", 0.4],
-  click: [`${ART}/click.mp3`, 1], // the Grab game's button sound
-  oof: ["/vocab/garden/snd_oof.mp3", 0.6], // placeholder until Andy's train sounds
+  click: [`${ART}/click.mp3`, 0.35], // the Grab game's button sound
+  oof: ["/vocab/garden/snd_oof.mp3", 0.9], // placeholder until Andy's train sounds
   // "thank you" from the passenger whose ticket you took (by face number, see TY below)
   "ty-asianwoman": [`${ART}/ty-asianwoman.mp3`, 0.9], "ty-woman": [`${ART}/ty-woman.mp3`, 0.9], "ty-oldlady": [`${ART}/ty-oldlady.mp3`, 0.9],
   "ty-man": [`${ART}/ty-man.mp3`, 0.9], "ty-gent": [`${ART}/ty-gent.mp3`, 0.9],
@@ -128,7 +129,7 @@ const useSfx = (on: boolean) => {
       if (type === "thud") osc(240, 0, 0.1, 0.22, "triangle", 90);
       if (type === "pop") osc(520, 0, 0.07, 0.05, "sine", 900);
       if (type === "life") [784, 988, 1175, 1568].forEach((f, i) => osc(f, i * 0.08, 0.22, 0.2, "triangle"));
-      if (type === "coin") { osc(988, 0, 0.08, 0.14, "square"); osc(1319, 0.07, 0.24, 0.14, "square"); }
+      if (type === "coin") { osc(988, 0, 0.08, 0.3, "square"); osc(1319, 0.07, 0.24, 0.3, "square"); /* louder coin (iPad round 3) */ }
     } catch { /* */ }
   }, []);
 };
@@ -163,6 +164,9 @@ const useChug = (on: boolean) => {
 };
 
 type Dir = { x: number; y: number };
+// on-screen arrow pad (2026-10-15): touch devices only, same as the arrow keys
+const TOUCH = typeof window !== "undefined" && ("ontouchstart" in window || (navigator.maxTouchPoints || 0) > 0);
+const PADS: { k: string; d: Dir; r: number }[] = [{ k: "u", d: { x: 0, y: -1 }, r: 0 }, { k: "l", d: { x: -1, y: 0 }, r: 270 }, { k: "r", d: { x: 1, y: 0 }, r: 90 }, { k: "d", d: { x: 0, y: 1 }, r: 180 }];
 type Pt = { x: number; y: number; dx: number; dy: number; face: number };
 type Item = { id: number; kind: "pax" | "coin" | "heart"; x: number; y: number; ch: string; li: number; face: number; v: number;
   miss: number; until: number; born: number };
@@ -215,7 +219,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
     x: -150, y: 0, dir: { x: 1, y: 0 } as Dir, face: 1, trail: [] as Pt[], cars: [] as number[], items: [] as Item[], fx: [] as Fx[],
     id: 0, wi: 0, pos: 0, faces: [] as number[], busy: true, playing: true, invincible: false, cooldown: false,
     lastCoin: 0, lastHeart: 0, lastTurn: 0, lastSmoke: 0, carColor: 0,
-    target: null as null | { x: number; y: number }, keyDir: null as Dir | null, keyAt: 0, stopped: false, freeze: true, timers: [] as number[], finalCars: [] as number[],
+    target: null as null | { x: number; y: number }, keyDir: null as Dir | null, keyDir2: null as Dir | null, joy: null as null | { a: Dir; b: Dir | null }, keyAt: 0, stopped: false, freeze: true, timers: [] as number[], finalCars: [] as number[],
   });
 
   const finish = (fn: () => void) => { if (doneRef.current) return; doneRef.current = true; fn(); };
@@ -468,6 +472,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
       return false;
     };
     const loop = (now: number) => {
+      if (PAUSE.on) { last = now; raf = requestAnimationFrame(loop); return; } // frozen while "Turn sideways" shows (2026-10-15)
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       if (G.playing && !doneRef.current && !G.freeze) {
         const { X, Y } = gridXY(), nc = X.length, nr = Y.length;
@@ -476,6 +481,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
         if (G.x >= Rw) shiftAll(-W); else if (G.x < Lw) shiftAll(W);
         const near = (arr: number[], v: number) => arr.reduce((b, a, i) => Math.abs(a - v) < Math.abs(arr[b] - v) ? i : b, 0);
         if (G.dir.x) G.y = Y[near(Y, G.y)]; else G.x = X[near(X, G.x)]; // always exactly on the rails
+        if (G.joy) { G.keyDir = G.joy.a; G.keyDir2 = G.joy.b; G.keyAt = now; G.target = null; } // joystick held = keep asking for that way (iPad/phone, Andy 10-15)
         let rem = speedNow() * dt;
         for (let guard = 0; guard < 3 && rem > 0; guard++) {
           let dist = rem + 1, c = -1, r = -1, cm = 0; // distance to the next crossing straight ahead
@@ -488,8 +494,9 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
           const opts = DIRS.filter(d => !(d.x === -G.dir.x && d.y === -G.dir.y) && (d.x !== 0 ? (WRAP_ROW[r] || (c + d.x >= 0 && c + d.x < nc)) : (r + d.y >= 0 && r + d.y < nr))); // sideways: only along track that exists
           const has = (d: Dir | null) => !!d && opts.some(o => o.x === d.x && o.y === d.y);
           let pick: Dir | null = null;
-          if (G.keyDir && now - G.keyAt > 1100) G.keyDir = null; // a key press waits for the next crossing, but not forever
-          if (G.keyDir && has(G.keyDir)) { pick = G.keyDir; G.keyDir = null; }
+          if (G.keyDir && now - G.keyAt > 1100) { G.keyDir = null; G.keyDir2 = null; } // a key press waits for the next crossing, but not forever
+          if (G.keyDir && has(G.keyDir)) { pick = G.keyDir; G.keyDir = null; G.keyDir2 = null; }
+          else if (G.keyDir2 && has(G.keyDir2)) { pick = G.keyDir2; G.keyDir = null; G.keyDir2 = null; } // joystick on a slant: the other way when the main way has no track
           else {
             // the train NEVER turns by itself - only the player's keys/mouse turn it, or the end of the track forces it
             const nxt = (d: Dir) => X[(c + d.x + nc) % nc];
@@ -558,15 +565,35 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
     return () => { cancelAnimationFrame(raf); window.clearTimeout(t1); G.timers.forEach(id => window.clearTimeout(id)); };
   }, []);
 
-  // mouse / touch: drive towards that spot
+  // iPad/phone: a JOYSTICK drives the train - a finger on the screen never steers (Andy 10-15). The mouse never steered (10-07).
   const fieldRef = useRef<HTMLDivElement>(null);
-  const aim = (e: React.PointerEvent) => {
-    if (e.pointerType === "mouse") return; // mouse never steers (Andy 2026-10-07) - arrow keys only; a finger (iPad) still does
-    if (e.type === "pointermove" && !e.buttons) return;
-    const r = fieldRef.current?.getBoundingClientRect(); if (!r) return;
-    const bx = box();
-    g.current.target = { x: Math.max(bx.L, Math.min(bx.R, (e.clientX - r.left) / fitRef.current.s)), y: Math.max(bx.T, Math.min(bx.B, (e.clientY - r.top) / fitRef.current.s)) };
-    g.current.keyDir = null;
+  const joyRef = useRef<HTMLDivElement>(null), knobRef = useRef<HTMLElement>(null), joyId = useRef<number | null>(null);
+  const joyT = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    const el = joyRef.current; if (!el) return;
+    let t: React.Touch | null = null;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const c = e.changedTouches[i];
+      if (e.type === "touchstart" ? joyId.current === null : c.identifier === joyId.current) { t = c; break; }
+    }
+    if (!t) return;
+    joyId.current = t.identifier;
+    const r = el.getBoundingClientRect(), R = r.width / 2;
+    let dx = t.clientX - (r.left + R), dy = t.clientY - (r.top + R);
+    const d = Math.hypot(dx, dy);
+    if (d > R) { dx *= R / d; dy *= R / d; }
+    if (knobRef.current) knobRef.current.style.transform = `translate(${dx}px,${dy}px)`;
+    if (d < R * 0.25) { g.current.joy = null; return; } // middle = no wish
+    const ax = Math.abs(dx), ay = Math.abs(dy);
+    const hz: Dir = { x: dx > 0 ? 1 : -1, y: 0 }, vt: Dir = { x: 0, y: dy > 0 ? 1 : -1 };
+    g.current.joy = ax >= ay ? { a: hz, b: ay > ax * 0.4 ? vt : null } : { a: vt, b: ax > ay * 0.4 ? hz : null };
+  };
+  const joyEnd = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    for (let i = 0; i < e.changedTouches.length; i++) if (e.changedTouches[i].identifier === joyId.current) {
+      joyId.current = null; g.current.joy = null;
+      if (knobRef.current) knobRef.current.style.transform = "";
+    }
   };
 
   const G = g.current;
@@ -580,7 +607,10 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
       <style>{CSS}</style>
       <GrammarGameBar onBack={onBack} muted={!musicOn} onToggleMute={onToggleMusic}
         stats={{ coins, lives, solved, total: TOTAL }} />
-      <div className={"tp-field" + (ouch ? " ouch" : "")} ref={fieldRef} onPointerMove={aim} onPointerDown={aim}>
+      <div className={"tp-field" + (ouch ? " ouch" : "")} ref={fieldRef}>
+        {TOUCH && (
+          <div className="tp-joy" data-noclick ref={joyRef} onTouchStart={joyT} onTouchMove={joyT} onTouchEnd={joyEnd} onTouchCancel={joyEnd}><i ref={knobRef} /></div>
+        )}
         <div className="tp-stage" style={{ width: sw, height: sh, transform: `scale(${s})` }}>
           <ControlHints keys={["left", "up", "down", "right"]} style={HINT_BOTTOM_LEFT} /> {/* controls as pictures (Andy 23:32) */}
           <div className={"tp-meter" + (solved >= TOTAL ? " full" : "")}>
@@ -701,6 +731,13 @@ const CSS = `
 .tp-field.ouch::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 120px 40px rgba(255,30,30,.55)}
 @keyframes tp-ouch{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 .tp-stage{position:absolute;left:0;top:0;transform-origin:0 0}
+.tp-joy{position:absolute;left:24px;bottom:24px;width:180px;height:180px;border-radius:50%;background:rgba(0,0,0,.25);border:4px solid rgba(255,255,255,.85);z-index:30;touch-action:none;box-sizing:border-box;box-shadow:0 0 0 6px rgba(255,255,255,.12)}
+.tp-joy i{position:absolute;left:50%;top:50%;width:80px;height:80px;margin:-40px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#d8f1ff 60%,#9fd3ee);box-shadow:0 4px 10px rgba(0,0,0,.35);pointer-events:none}
+.tp-pb{position:absolute;width:68px;height:68px;border-radius:18px;background:rgba(0,0,0,.3);border:3px solid rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;padding:0;touch-action:none;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+.tp-pb:active{background:rgba(255,255,255,.4)}
+.tp-pb svg{pointer-events:none}
+.tp-pb.u{left:68px;top:0}.tp-pb.d{left:68px;bottom:0}.tp-pb.l{left:0;top:68px}.tp-pb.r{right:0;top:68px}
+@media (max-height:500px){.tp-joy{width:130px;height:130px;left:14px;bottom:14px}.tp-joy i{width:58px;height:58px;margin:-29px}}
 .tp-target{display:flex;align-items:center;gap:8px;background:rgba(40,25,5,.55);border:1.5px solid rgba(255,220,120,.45);border-radius:999px;padding:2px 10px 2px 22px}
 .tp-zh{font-family:'Nunito',sans-serif;font-weight:900;font-size:30px;line-height:1.2;color:#ffe066;white-space:nowrap}
 .tp-say{background:none;border:none;cursor:pointer;padding:4px;display:flex}

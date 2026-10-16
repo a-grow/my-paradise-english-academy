@@ -26,7 +26,7 @@ import HowToPlay from "@/components/HowToPlay";
 import { worldHowTo } from "@/components/howtos";
 import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL, demoCoinsGet, demoCoinsSet } from "@/cards/economy";
 import { badgeSeen } from "@/lib/cloudSave";
-import { isCloseBtn, playCloseBeep } from "@/lib/clickSfx";
+import { isCloseBtn, playCloseBeep, playClick } from "@/lib/clickSfx";
 import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
 import { REAL_CODES as PUZZLE_REAL_CODES, demoPiecesGet, demoPiecesSet } from "@/pages/PuzzleMixup";
 import { lockLeft, LOCK_IMG, UNLOCK_IMG, type LockId } from "@/lib/locks";
@@ -70,7 +70,7 @@ const STAGE_W = 1600, STAGE_H = 1000; // design size; scaled to fit any window (
 const useFit = () => {
   const calc = () => {
     const w = window.innerWidth || STAGE_W, h = window.innerHeight || STAGE_H; // 0 in a hidden window -> design size
-    const s = Math.min(w / STAGE_W, h / STAGE_H);
+    const s = Math.min(w / 1300, h / STAGE_H); // fill the HEIGHT down to a 1300-wide stage (iPad: no strip at the bottom, 2026-10-15); wider windows = same as before
     return { s, sw: w / s, sh: h / s };
   };
   const [f, setF] = useState(calc);
@@ -950,14 +950,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   };
 
   // Click sound on everything a kid can tap (class sv-tap). Follows the brain's sound on/off.
-  const clicks = useRef<HTMLAudioElement[]>([]);
-  const clickN = useRef(0);
   const onPointerDown = (e: React.PointerEvent) => {
     if (!v.sfxOn || !(e.target as HTMLElement).closest(".sv-tap")) return;
     if (isCloseBtn(e.target)) { playCloseBeep(); return; }   // red X = beep instead of the click (Andy 2026-10-07)
-    if (!clicks.current.length) clicks.current = [0, 1, 2].map(() => { const a = new Audio(`${UI}/click.mp3`); a.volume = 0.5; return a; });
-    const a = clicks.current[clickN.current++ % 3];
-    a.currentTime = 0; a.play().catch(() => { });
+    playClick(); // shared fast click (same click.mp3 at 0.5, instant on iPad - 2026-10-15)
   };
 
   return (

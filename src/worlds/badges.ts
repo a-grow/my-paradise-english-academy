@@ -17,7 +17,9 @@ export const FUN_BADGES: BadgeDef[] = [
   { id: "grammar", name: "Grammar Star", how: "Win 25 grammar games", plate: "for 25 grammar wins" },
 ];
 export const badgeList = (worlds: WorldConfig[]): BadgeDef[] =>
-  [...FUN_BADGES, ...worlds.map(w => ({ id: w.id, name: `${w.title} World`, how: `Finish ${w.title} World`, plate: `for finishing ${w.title}` }))];
+  [...FUN_BADGES, ...worlds.map(w => ({ id: w.id, name: `${w.title} World`, how: `Finish ${w.title} World`, plate: `for finishing ${w.title}` })), CARDS_BADGE];
+// CARD MASTER (Andy 10-16): the whole Card Album finished = the DB prize 'cards:a1:album'. Last in the list (starts the 2nd wall).
+export const CARDS_BADGE: BadgeDef = { id: "cards", name: "Card Master", how: "Finish the Card Album", plate: "for a full Card Album" };
 export const badgeImg = (id: string) => `/worlds/badges/${id.split("~")[0]}.webp`; // "~n" = test copies (?bd=many)
 export const TREATS_BADGE = 100, DAILY_BADGE = 7, WIN_BADGE = 25;
 
@@ -45,5 +47,6 @@ export function earnedBadges(o: { worlds: WorldConfig[]; prizes: string[] | null
   if ((o.wins?.vocab ?? 0) >= WIN_BADGE) out.push("games");     // Vocab Champ
   if ((o.wins?.grammar ?? 0) >= WIN_BADGE) out.push("grammar"); // Grammar Star
   for (const w of o.worlds) if ((o.prizes ?? []).includes(`${w.id}:complete`)) out.push(w.id);
+  if ((o.prizes ?? []).includes("cards:a1:album")) out.push("cards");   // Card Master
   return out;
 }

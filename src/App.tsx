@@ -26,6 +26,7 @@ import NotFound from "./pages/NotFound";
 import TeacherHQ from "./pages/TeacherHQ";
 import CardAlbum from "./pages/CardAlbum";
 import PuzzleMixup from "./pages/PuzzleMixup";
+import TurnSideways from "./components/TurnSideways";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ const App = () => (
               <Route path="/mpe-teacher-secret-hq" element={<TeacherHQ />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <TurnSideways />{/* iPad/phone held upright on a kid page -> "Turn your iPad sideways!" (2026-10-15) */}
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>

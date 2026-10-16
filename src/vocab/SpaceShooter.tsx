@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Reac
 import GrammarGameBar from "@/components/GrammarGameBar";
 import ControlHints, { HINT_BOTTOM } from "@/components/ControlHints";
 import HowToPlay from "@/components/HowToPlay";
+import { PAUSE } from "@/lib/pause";
 import { wantHowto, seenHowto } from "@/lib/howtoSeen";
 import { SPACE_HOWTO } from "@/components/howtos";
 
@@ -25,21 +26,21 @@ const MAX_LIVES = 5;
 // UFO shots + heart orbs per difficulty (slow + rare on easy/medium - Andy 2026-10-04)
 const EXTRA: Record<Diff, { shotMs: number; shotSpeed: number; orbMs: number }> = {
   easy: { shotMs: 4000, shotSpeed: 220, orbMs: 16000 },   // UFOs shoot more (Andy 2026-10-07; was 5200 / 3800 / 2400)
-  medium: { shotMs: 2600, shotSpeed: 220, orbMs: 20000 },   // shots fall as slowly as on easy (Andy 10:01)
-  hard: { shotMs: 1300, shotSpeed: 220, orbMs: 24000 },
+  medium: { shotMs: 3600, shotSpeed: 220, orbMs: 20000 },   // fewer UFO shots (Andy 10-15: was 2600)   // shots fall as slowly as on easy (Andy 10:01)
+  hard: { shotMs: 1800, shotSpeed: 220, orbMs: 24000 },   // fewer UFO shots (Andy 10-15: was 1300, 2 at once)
 };
 
 // UFO falling speed per level (Andy 20:18: easy slower, medium faster, hard a little faster). Was the shared cfg.speedMult.
 const FALL: Record<Diff, number> = { easy: 0.5, medium: 0.75, hard: 0.95 };
 // Andy 2026-10-07: a few more UFOs (+1/+2/+3 on screen, hard spawns faster), more CORRECT UFOs at the same time
 // (up to 2/2/3), and on hard two UFOs can shoot at once
-const MORE: Record<Diff, number> = { easy: 1, medium: 0, hard: -2 }; // Andy 10:01: fewer UFOs = easy 4, medium 6, hard 7 (was 4 / 8 / 12)
+const MORE: Record<Diff, number> = { easy: 0, medium: 0, hard: -2 }; // easy 3 on screen (Andy 10-15, was 4) // Andy 10:01: fewer UFOs = easy 4, medium 6, hard 7 (was 4 / 8 / 12)
 const SPAWNX: Record<Diff, number> = { easy: 1, medium: 0.9, hard: 0.75 };
 const TGT: Record<Diff, number> = { easy: 2, medium: 2, hard: 2 }; // at most 2 correct UFOs, far apart (Andy 10:01)
-const SHOTS: Record<Diff, number> = { easy: 1, medium: 1, hard: 2 };
+const SHOTS: Record<Diff, number> = { easy: 0, medium: 1, hard: 1 }; // easy: UFOs never shoot (Andy 10-15)
 // Andy's sounds (trimmed copies in public/vocab/space; originals in BACKUPFILES/vocab_art/space/originals) + volume
 const SND: Record<string, [string, number]> = {
-  shoot: [`${ART}/snd_shoot.mp3`, 0.35], ufoshot: [`${ART}/snd_ufoshot.mp3`, 0.16],
+  shoot: [`${ART}/snd_shoot.mp3`, 0.7], ufoshot: [`${ART}/snd_ufoshot.mp3`, 0.24],
   hit: [`${ART}/snd_hit.mp3`, 0.55], boom: [`${ART}/snd_boom.mp3`, 0.75], // boom a bit louder, music down (Andy 2026-10-05)
   levelup: ["/vocab/snd_levelup.mp3", 0.4], // win: MISSION ACCOMPLISHED (Andy 15:37)
 };
@@ -101,10 +102,10 @@ const useSfx = (on: boolean) => {
         g.gain.setValueAtTime(v, c.currentTime + t); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + t + d);
         o.start(c.currentTime + t); o.stop(c.currentTime + t + d + 0.01);
       };
-      if (type === "wrong") { osc(220, 0, 0.25, 0.22, "sawtooth"); osc(160, 0.12, 0.2, 0.16, "sawtooth"); }
+      if (type === "wrong") { osc(220, 0, 0.25, 0.44, "sawtooth"); osc(160, 0.12, 0.2, 0.32, "sawtooth"); }
       if (type === "life") [784, 988, 1175, 1568].forEach((f, i) => osc(f, i * 0.08, 0.22, 0.2, "triangle"));
       if (type === "countdown") osc(460, 0, 0.16, 0.34, "square");
-      if (type === "coin") { osc(988, 0, 0.08, 0.14, "square"); osc(1319, 0.07, 0.24, 0.14, "square"); }
+      if (type === "coin") { osc(988, 0, 0.08, 0.3, "square"); osc(1319, 0.07, 0.24, 0.3, "square"); /* louder coin (iPad round 3) */ }
       if (type === "shield") { // ricochet 'pi-yoong'
         const o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination); o.type = "triangle";
         o.frequency.setValueAtTime(1500, c.currentTime); o.frequency.exponentialRampToValueAtTime(420, c.currentTime + 0.3);
@@ -140,11 +141,14 @@ type Orb = { id: number; x0: number; x: number; y: number; t: number };
 type Fx = { id: number; x: number; y: number; kind: "happy" | "wrong" | "life" | "coin" | "spark"; idx: number; word: string }; // coin: idx = value
 type Coin = { id: number; x0: number; x: number; y: number; t: number; v: 1 | 2 | 3 };
 
+const SPACE_TOUCH = typeof window !== "undefined" && ("ontouchstart" in window || (navigator.maxTouchPoints || 0) > 0);
+let spaceHintRounds = 0; // touch: the tapping-hand hint shows in the first 2 rounds of each visit (Andy 10-15)
 const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose }: {
   unit: Unit; diff: Diff; cfg: Cfg; sfxOn: boolean; musicOn: boolean; onToggleMusic: () => void;
   onBack: () => void; onWin: (coins: number) => void; onLose: (reason: "timeout" | "lives") => void;
 }) => {
   const sfx = useSfx(sfxOn);
+  const [tapHint, setTapHint] = useState(() => SPACE_TOUCH && spaceHintRounds++ < 2); // hand taps the screen until the first shot
   const X = EXTRA[diff];
   const MAXU = cfg.maxOnScreen + MORE[diff];
   const TOTAL = unit.vocab.length * 2; // every word twice (Andy 2026-10-07)
@@ -161,7 +165,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
   const shipTop = () => fitRef.current.sh - 235;
 
   const [, setTick] = useState(0);
-  const [target, setTarget] = useState(unit.vocab[0]);
+  const [target, setTarget] = useState(() => unit.vocab[Math.floor(Math.random() * unit.vocab.length)]); // random first word every round (Andy 10-16; was always word 1)
   const targetRef = useRef(target); targetRef.current = target;
   const [lives, setLives] = useState(MAX_LIVES);
   const livesRef = useRef(MAX_LIVES);
@@ -215,6 +219,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
     if (now - G.lastShot < 200) return;
     G.lastShot = now;
     sfx("shoot");
+    setTapHint(false);
     G.shots.push({ id: G.id++, x: G.shipX, y: shipTop() + 8 });
     addFx({ x: G.shipX, y: shipTop() + 4, kind: "spark", idx: 0, word: "" }); // quick sparkle at the nose
   };
@@ -231,6 +236,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
     const G = g.current;
     if (!G.start) { G.start = last; G.lastDrop = last; G.lastOrb = last; G.lastTgt = last - 1800; }
     const loop = (now: number) => {
+      if (PAUSE.on) { last = now; raf = requestAnimationFrame(loop); return; } // frozen while "Turn sideways" shows (2026-10-15)
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       const { sw, sh } = fitRef.current;
       const top = sh - 235;
@@ -248,8 +254,8 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
         // new UFO (same rules as the old game)
         // a RIGHT UFO is always falling: none on screen for ~2.8s -> one comes now (Andy 15:06, all levels)
         if (G.ufos.some(a => a.word === targetRef.current)) G.lastTgt = now;
-        const needT = now - G.lastTgt > 5000;                                  // right one not seen for 5s -> send it
-        const gapAny = now - G.lastSpawn > 3000 && G.ufos.length < MAXU + 2; // nothing new for 3s -> send something
+        const needT = now - G.lastTgt > (diff === "easy" ? 3000 : 5000); // easy: the correct one comes sooner (Andy 10-15)                                  // right one not seen for 5s -> send it
+        const gapAny = now - G.lastSpawn > 3000 && G.ufos.length < MAXU + (diff === "easy" ? 0 : 2); // nothing new for 3s -> send something
         if (needT || gapAny || (now - G.lastSpawn > cfg.spawnMs * SPAWNX[diff] && G.ufos.length < MAXU)) {
           G.lastSpawn = now;
           if (needT) G.lastTgt = now;
@@ -259,7 +265,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
           const onS = new Set(G.ufos.map(a => a.word)), pool = unit.vocab.filter(v => !onS.has(v) && v !== G.lastWord);
           const pool2 = pool.length ? pool : unit.vocab.filter(v => v !== G.lastWord);
           const pick = pool2.length ? pool2 : unit.vocab;
-          const more = onScreen < TGT[diff] && Math.random() < 0.4; // another correct UFO now and then
+          const more = onScreen < TGT[diff] && Math.random() < (diff === "hard" ? 0.4 : 0.75); // more correct UFOs on easy (10-15) + medium (10-16); hard unchanged (Andy 10-16) // another correct UFO now and then
           const word = force || more ? targetRef.current : pick[Math.floor(Math.random() * pick.length)];
           G.lastWord = word;
           // never right behind another UFO: keep about a UFO width apart so either side can be shot (Andy 15:06)
@@ -309,6 +315,12 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
         if (G.orb) {
           G.orb.t += dt; G.orb.y += 70 * dt; G.orb.x = G.orb.x0 + Math.sin(G.orb.t * 1.3) * 60;
           if (G.orb.y > sh + 60) { G.orb = null; G.lastOrb = now; }
+          // the ship flying into the heart catches it too, like a coin (Andy 10-16)
+          else if (Math.abs(G.orb.x - G.shipX) < 64 && G.orb.y > top - 20 && G.orb.y < top + 110) {
+            addFx({ x: G.orb.x, y: G.orb.y, kind: "life", idx: 0, word: "" });
+            G.orb = null; G.lastOrb = now;
+            livesRef.current = Math.min(MAX_LIVES, livesRef.current + 1); setLives(livesRef.current); sfx("life");
+          }
         }
         // coins drift down slowly with a gentle sway
         if (G.coins.length < 3 && now - G.lastCoin > COIN_MS) {
@@ -403,6 +415,14 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
     e.stopPropagation(); const k = dir < 0 ? "ArrowLeft" : "ArrowRight";
     if (e.type === "touchstart") g.current.keys.add(k); else g.current.keys.delete(k);
   };
+  // SHOOT held down = keeps shooting (Andy 10-15)
+  const fireRef = useRef<number | null>(null);
+  const fireHold = (e: React.TouchEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if (fireRef.current) { window.clearInterval(fireRef.current); fireRef.current = null; }
+    if (e.type === "touchstart") { shoot(); fireRef.current = window.setInterval(() => shoot(), 260); }
+  };
+  useEffect(() => () => { if (fireRef.current) window.clearInterval(fireRef.current); }, []);
 
   const G = g.current;
   const { s, sw, sh } = fit;
@@ -423,7 +443,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
             </button>
           </span>
         } />
-      <div className="ss-field" ref={fieldRef} onTouchMove={touchX} onTouchEnd={() => shoot()}>
+      <div className="ss-field" ref={fieldRef}>{/* iPad/phone: ONLY the pads move and the SHOOT button shoots (Andy 10-15) */}
         <div className="ss-stage" style={{ width: sw, height: sh, transform: `scale(${s})` }}>
           <div className={"ss-meter" + (solved >= TOTAL ? " full" : "") + (mission ? " flown" : "")}>
             <div className="ss-track"><div className="ss-fill" style={{ width: `${Math.max(5, (solved / TOTAL) * 100)}%` }} /></div>
@@ -483,10 +503,15 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
           )}
         </div>
         {isTouch && (
-          <div className="ss-pads">
-            <button onTouchStart={hold(-1)} onTouchEnd={hold(-1)}>{"◀"}</button>
-            <button onTouchStart={hold(1)} onTouchEnd={hold(1)}>{"▶"}</button>
+          <div className="ss-pads" data-noclick onTouchMove={e => e.stopPropagation()}>{/* a finger sliding on a button never moves the ship there */}
+            <button aria-label="left" onTouchStart={hold(-1)} onTouchEnd={hold(-1)} onTouchCancel={hold(-1)}><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(270 11 11)" /></svg></button>
+            <button aria-label="right" onTouchStart={hold(1)} onTouchEnd={hold(1)} onTouchCancel={hold(1)}><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(90 11 11)" /></svg></button>
           </div>
+        )}
+        {isTouch && (
+          <button className="ss-fire" data-noclick aria-label="shoot" onTouchStart={fireHold} onTouchEnd={fireHold} onTouchCancel={fireHold}>SHOOT
+            {tapHint && <span className="ss-taphint" aria-hidden="true"><i /><img src="/worlds/ui/hand_point.webp" alt="" /></span>}
+          </button>
         )}
       </div>
       {countdown && <Countdown sfx={sfx} onDone={() => {
@@ -596,8 +621,19 @@ const CSS = `
 @keyframes ss-plus{0%{transform:translate(-50%,-50%) scale(.5);opacity:0}25%{opacity:1;transform:translate(-50%,-80%) scale(1.1)}100%{transform:translate(-50%,-180%) scale(1);opacity:0}}
 .ss-help{position:absolute;left:0;right:0;bottom:14px;text-align:center;color:#fbbf24;font-family:'Fredoka One','Nunito',sans-serif;font-size:24px;pointer-events:none;text-shadow:0 2px 4px rgba(0,0,0,.8)}
 .ss-help .zh{font-family:'Nunito',sans-serif;font-size:20px;margin-top:2px}
-.ss-pads{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:24px}
-.ss-pads button{width:84px;height:52px;border-radius:16px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.4);color:#fff;font-size:28px;user-select:none}
+.ss-pads{position:absolute;left:18px;bottom:12px;display:flex;gap:14px;z-index:20} /* left side (Andy 10-15) */
+.ss-taphint{position:absolute;left:calc(50% - 14px);top:calc(50% - 90px);width:120px;height:110px;z-index:25;pointer-events:none} /* inside the SHOOT button: the fingertip lands on its middle */
+.ss-fire{position:absolute;right:22px;bottom:30px;width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.16);border:3px solid rgba(255,255,255,.75);color:#fff;font:700 24px Arial,sans-serif;letter-spacing:1px;display:flex;align-items:center;justify-content:center;padding:0;z-index:20;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+.ss-fire:active{background:rgba(255,255,255,.4)}
+.ss-fire .ss-taphint{left:calc(50% - 106px);top:calc(50% - 90px);transform:scaleX(-1)} /* hand mirrored: comes from the upper-left so it never runs off the right edge */
+.ss-taphint img{position:absolute;left:14px;bottom:10px;height:100px;animation:ss-tap 1.1s ease-in-out infinite}
+.ss-taphint i{position:absolute;left:-10px;top:66px;width:48px;height:48px;border-radius:50%;border:5px solid #ffd84a;opacity:0;animation:ss-rip 1.1s ease-out infinite}
+@keyframes ss-tap{0%,100%{transform:translate(16px,-16px)}40%,55%{transform:translate(0,0)}}
+@keyframes ss-rip{0%,42%{transform:scale(.3);opacity:0}48%{opacity:1}100%{transform:scale(1.7);opacity:0}}
+.ss-pads button{width:96px;height:68px;border-radius:18px;background:rgba(255,255,255,.16);border:3px solid rgba(255,255,255,.75);display:flex;align-items:center;justify-content:center;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+.ss-pads button:active{background:rgba(255,255,255,.4)}
+.ss-pads button svg{pointer-events:none}
+@media (max-height:500px){.ss-pads button{width:76px;height:54px}.ss-fire{width:96px;height:96px;font-size:18px;right:14px;bottom:10px}}
 .ss-count{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;justify-content:center}
 .ss-countn{font-family:'Nunito',sans-serif;font-weight:900;font-size:144px;line-height:1;color:#fbbf24;text-shadow:0 0 70px rgba(251,191,36,.9);animation:ss-cp .4s cubic-bezier(.34,1.56,.64,1)}
 .ss-countn.go{font-size:80px;color:#4ade80;text-shadow:0 0 70px rgba(74,222,128,.9)}

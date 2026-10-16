@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka:wght@400;500;600;700&display=swap');
 
+/* KID PAGES on iPad / phone (2026-10-15): a long press never selects text, shows the copy bubble or 'save image';
+   taps are instant (no double-tap zoom wait). Set by TurnSideways.tsx on worlds, games, Album, Puzzle only. Typing (pet name) still works. */
+html.mpe-kid, html.mpe-kid body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+html.mpe-kid img { -webkit-touch-callout: none; -webkit-user-drag: none; }
+html.mpe-kid input, html.mpe-kid textarea { -webkit-user-select: text; user-select: text; }
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

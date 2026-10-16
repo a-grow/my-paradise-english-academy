@@ -15,9 +15,9 @@ import { PACK_PRICE, DEMO_COINS, demoCoinsGet, demoCoinsSet } from "@/cards/econ
 import { Word3D, FUN3D_CSS } from "@/components/Fun3D";
 import { useClickSfx } from "@/lib/clickSfx";
 import HowToPlay from "@/components/HowToPlay";
-import { ALBUM_HOWTO } from "@/components/howtos";
+import { ALBUM_HOWTO, SWAP_HOWTO } from "@/components/howtos";
 import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
-import { loadPrizes, loadCards, openPacks, markSeen, cardSeen, type CardPacks } from "@/lib/cloudSave";
+import { loadPrizes, loadCards, openPacks, pickCard, markSeen, cardSeen, type CardPacks } from "@/lib/cloudSave";
 import { REAL_CODES } from "@/pages/PuzzleMixup";   // ONE list of real-saving codes for Puzzle + Album
 import { lockLeft, LOCK_IMG } from "@/lib/locks";
 import LockMsg from "@/components/LockMsg";
@@ -33,6 +33,7 @@ const TBL = { w: 1376, h: 768, left: 235, right: 1200, plantL: 1210 };        //
 const STAGE_W = 1600, STAGE_H = 1000;
 const SET_PRIZE = { treats: 5, coins: 50 };   // shown only - the database will pay (cloud step)
 const ALBUM_PRIZE = { treats: 20, coins: 200 };
+const allOwned = (o: Record<string, number>) => CARD_SETS.every(st => st.cards.every(c => (o[`${st.id}-${c.n}`] ?? 0) > 0));   // whole album done
 
 // Picture on each set's round badge (card number) + its colour.
 const BADGE: Record<number, { n: number; c: string }> = {
@@ -67,9 +68,13 @@ const demoAlbum = () => {
   });
   owned[key(1, 1)] = 2; owned[key(2, 4)] = 3;                                   // a few doubles (+1 / +2 tags)
   const d5 = CARD_SETS[4].cards.find(c => owned[key(5, c.n)]); if (d5) owned[key(5, d5.n)] = 2;
+  if (new URLSearchParams(window.location.search).get("ac") === "1") {   // TEST (1006, ?ac=1): every card but one (set 12) -> pick it (?sw=10) -> album party
+    CARD_SETS.forEach(st => st.cards.forEach(c => { owned[key(st.id, c.n)] = owned[key(st.id, c.n)] || 1; }));
+    delete owned[key(12, CARD_SETS[11].cards[0].n)];
+  }
   const fresh = new Set<string>(Object.keys(owned).filter(k => k.startsWith("1-")).slice(0, 2));
   Object.keys(owned).filter(k => k.startsWith("3-")).slice(0, 1).forEach(k => fresh.add(k));
-  return { owned, fresh, coins: demoCoinsGet(), swap: 7 };   // 1006 coins = the tab's pretend coins (shared with the world page, 2026-10-14)
+  return { owned, fresh, coins: demoCoinsGet(), swap: Math.min(10, Number(new URLSearchParams(window.location.search).get("sw")) || 7) };   // ?sw=10 = test Pick a Card (1006)   // 1006 coins = the tab's pretend coins (shared with the world page, 2026-10-14)
 };
 
 // ONE PACK (plan): 1 card 45% / 2 cards 40% / 3 cards 15%; a card is gold 8% of the time; a card the kid does NOT
@@ -94,6 +99,20 @@ const drawPack = (owned: Owned): Pull[] => {
 const MAX_OPEN = 10;
 const PACK_AR = 600 / 354;   // pack_closed.webp height / width
 
+// a tiny 'ting' made in the browser (no file) for each new Swap Meter dot; each dot a little higher (Andy 10-16)
+const ting = (i: number) => {
+  try {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ac = new AC(), t = ac.currentTime, f = 1318.5 * Math.pow(1.122, i);
+    [f, f * 2].forEach((fr, k) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = "sine"; o.frequency.setValueAtTime(fr, t);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(k ? 0.04 : 0.12, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + 0.4);
+      if (!k) o.onended = () => { ac.close().catch(() => { }); };
+    });
+  } catch { /* no sound */ }
+};
 const play = (src: string, vol = 0.6) => { try { const a = new Audio(src); a.volume = vol; a.play().catch(() => { }); } catch { /* */ } };
 
 // ---------- MAGIC: one canvas over the whole stage. Round glowing dots only (no star shapes). ----------
@@ -272,16 +291,6 @@ function PackOpen({ count, coins, cx, cy, fx, draw, getTarget, onFlyStart, onLan
   const [pourOn, setPourOn] = useState(false);
   useEffect(() => { if (!pouring.current) setWc(coins); }, [coins]);
   useEffect(() => () => pourT.current.forEach(t => window.clearTimeout(t)), []);
-  const fall = (ms: number) => {   // PLACEHOLDER falling tone (the album meter's rising sound backwards; Andy can send a clip)
-    try {
-      const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const ac = new AC(), o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime, d = Math.max(0.8, ms / 1000);
-      o.type = "triangle"; o.frequency.setValueAtTime(990, t); o.frequency.exponentialRampToValueAtTime(330, t + d);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.07, t + 0.15);
-      g.gain.setValueAtTime(0.07, t + d - 0.25); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + d + 0.05); o.onended = () => { ac.close().catch(() => { }); };
-    } catch { /* no sound */ }
-  };
   const pour = (n: number, all: boolean) => {   // returns how long the pour takes (ms)
     const root = poRef.current; if (!root) { onFlyStart(n); return 0; }
     pouring.current = true;
@@ -294,7 +303,7 @@ function PackOpen({ count, coins, cx, cy, fx, draw, getTarget, onFlyStart, onLan
       const clink = () => { const a = new Audio("/celebration/coins_land.mp3"); a.volume = 0.45; a.play().catch(() => { }); return a; };
       const a1 = clink(); pourT.current.push(window.setTimeout(() => { a1.pause(); clink(); }, 1550));
     } catch { /* */ }
-    fall(ms - 200);
+    // (falling tone removed 10-16: Andy - it sounded like losing coins; the coins_land clink above stays)
     for (let j = 0; j < k; j++) {
       pourT.current.push(window.setTimeout(() => {
         const c = document.createElement("img");
@@ -547,6 +556,59 @@ function SetDone({ set, cx, cy, fx, coinAt, onCollect }: {
   );
 }
 
+// ALBUM COMPLETE party (Andy 10-16): after the last Set Complete screen. The book glows gold, light dots burst, Teacher Andy
+// slides in and claps, then 200 coins + 20 treats fly out (the DATABASE already paid 'cards:a1:album' once; this only shows it).
+const GIFT = "/worlds/gift";
+const CLAPF = ["andy_clap_flat", "andy_clap_mid", "andy_clap_out", "andy_clap_mid"];
+function AlbumDone({ cx, cy, fx, coinAt, onCollect }: {
+  cx: number; cy: number; fx: () => Fx | null; coinAt: { x: number; y: number }; onCollect: () => void;
+}) {
+  const [ready, setReady] = useState(false);
+  const [going, setGoing] = useState(false);
+  const [clapping, setClapping] = useState(false);
+  const [fr, setFr] = useState(0);
+  useEffect(() => {
+    play("/celebration/win_fanfare.mp3", 0.7); play(CHIME, 0.4);
+    const t = [
+      window.setTimeout(() => fx()?.burst(cx, cy - 40, { glow: 320, fairies: 90, embers: 30, w: 300 }), 600),
+      window.setTimeout(() => setClapping(true), 1300),
+      window.setTimeout(() => fx()?.burst(cx - 430, cy - 220, { fairies: 40, embers: 14, w: 80 }), 1500),
+      window.setTimeout(() => fx()?.burst(cx + 430, cy - 220, { fairies: 40, embers: 14, w: 80 }), 1900),
+      window.setTimeout(() => setReady(true), 2600),
+      window.setTimeout(() => { setClapping(false); setFr(0); }, 4300),
+    ];
+    return () => t.forEach(x => window.clearTimeout(x));
+  }, []);
+  useEffect(() => {
+    if (!clapping) return;
+    let i = 0; play(`${GIFT}/clap.mp3`, 0.5);
+    const id = window.setInterval(() => { i++; setFr(i % 4); if (i % 4 === 0) play(`${GIFT}/clap.mp3`, 0.5); }, 90);
+    return () => window.clearInterval(id);
+  }, [clapping]);
+  const collect = () => {
+    if (!ready || going) return;
+    setGoing(true); play(WHOOSH, 0.75);
+    const f = fx();
+    f?.emit(900, () => { for (let j = 0; j < 2; j++) f.fairy(cx + (Math.random() - 0.5) * 300, cy + 190, 0.6); });
+    window.setTimeout(() => { play("/cookiejar/snd_drop1.mp3", 0.4); }, 350);
+    window.setTimeout(() => { fx()?.burst(coinAt.x, coinAt.y, { glow: 120, fairies: 40, embers: 12, w: 50 }); onCollect(); }, 900);
+  };
+  return (
+    <div className={"ca-sd" + (going ? " going" : "")} onClick={collect}>
+      <div className="ca-congrats sd" style={{ top: cy - 380 }}><Word3D text="Album Complete!" palette="gold" stagger={45} /></div>
+      <div className="ca-adbook" style={{ left: cx, top: cy - 250 }}><img src={`${U}/album_closed.webp`} alt="" draggable={false} /></div>
+      <div className="ca-adandy"><img src={`${GIFT}/${clapping ? CLAPF[fr] : "andy_gift"}.webp`} alt="" draggable={false} /></div>
+      <div className="ca-sdprize" style={{ top: cy + 165 }}>
+        <div className="ca-sdp t" style={{ ["--fx" as string]: `${-cx + 60}px`, ["--fy" as string]: `${cy + 245}px` } as CSSProperties}>
+          <img src="/worlds/ui/treat.webp" alt="" /><span>x{ALBUM_PRIZE.treats}</span></div>
+        <div className="ca-sdp c" style={{ ["--fx" as string]: `${coinAt.x - cx - 80}px`, ["--fy" as string]: `${coinAt.y - cy - 215}px` } as CSSProperties}>
+          <img src="/worlds/ui/coin.webp" alt="" /><span>x{ALBUM_PRIZE.coins}</span></div>
+      </div>
+      {ready && !going && <div className="ca-sdtap" style={{ top: cy + 345 }}>TAP TO COLLECT</div>}
+    </div>
+  );
+}
+
 export default function CardAlbum() {
   const { code: rawCode, studentName: rawName } = useParams();
   const code = (rawCode ?? "").toUpperCase(), name = (rawName ?? "").toLowerCase();
@@ -586,7 +648,15 @@ export default function CardAlbum() {
   const [fontReady, setFontReady] = useState(false);
   const [wiggle, setWiggle] = useState<string | null>(null);
   const [bumps, setBumps] = useState<Record<number, number>>({});
-  const [setDone, setSetDone] = useState<number | null>(null);   // a SET COMPLETE screen is showing for this set
+  const [setDone, setSetDone] = useState<number | null>(null);
+  // PICK A CARD (Andy 10-16): a full Swap Meter (10 points) = choose ONE missing card. pickOn = the ? cards glow; pickAsk = the chosen card popup.
+  const [pickOn, setPickOn] = useState(false);
+  const [pickAsk, setPickAsk] = useState<{ set: number; c: CardInfo; ph: "ask" | "wait" | "got" } | null>(null);
+  const pickBusy = useRef(false);
+  const [albumDone, setAlbumDone] = useState(false);   // the ALBUM COMPLETE party is showing
+  const albumDue = useRef(false);                      // the whole album was finished: party after the last Set Complete screen
+  const [swapHelp, setSwapHelp] = useState(false);   // Swap Meter rules popup (tap the meter, Andy 10-16)
+  const owedAlbum = useRef(0);                         // real kids: album prize paid by the DB but not yet collected on screen   // a SET COMPLETE screen is showing for this set
   const doneQ = useRef<number[]>([]);                               // sets this pack completed (shown after the cards land)
   const albumRef = useRef<{ owned: Owned } | null>(null);
   // REAL kids: read the album (cards, coins, swap). NEW = owned and not in the seen list (cardSeen = 'card:<set>:<n>' in letters).
@@ -725,6 +795,19 @@ export default function CardAlbum() {
     const r = el.getBoundingClientRect(), b = st.getBoundingClientRect(), k = geo.current.s;
     return { x: (r.left + r.width / 2 - b.left) / k, y: (r.top + r.height / 2 - b.top) / k };
   };
+  // NEW SWAP DOTS (Andy 10-16): when the pack screen closes, the dots won turn gold one by one (ting each) + a fading '+N'.
+  const swapBefore = useRef<number | null>(null);
+  const [swapAnim, setSwapAnim] = useState<{ from: number; to: number; k: number } | null>(null);
+  useEffect(() => {
+    if (poN > 0) { if (swapBefore.current === null) swapBefore.current = album.swap; return; }
+    const from = swapBefore.current; swapBefore.current = null;
+    if (from === null || album.swap <= from) return;
+    const to = album.swap, k = Date.now();
+    setSwapAnim({ from, to, k });
+    const ts = Array.from({ length: to - from }, (_, j) => window.setTimeout(() => ting(j), 500 + j * 260));
+    ts.push(window.setTimeout(() => setSwapAnim(a => (a && a.k === k ? null : a)), 900 + (to - from) * 260 + 1400));
+    return () => ts.forEach(x => window.clearTimeout(x));
+  }, [poN]);   // eslint-disable-line react-hooks/exhaustive-deps
   const openPack = () => {
     if (!(packs > 0 && !poN && phase === "open" && !setId && !setDone)) return;
     setPoN(Math.min(packs, MAX_OPEN));
@@ -752,6 +835,7 @@ export default function CardAlbum() {
     if (!r.ok || !r.packs) { setAlbum(a => ({ ...a, coins: r.coins, swap: r.swap })); return null; }
     dbAfter.current = r;
     paidSets.current = [...paidSets.current, ...(r.sets ?? [])];
+    if (r.album) { albumDue.current = true; owedAlbum.current = 1; }
     const out = r.packs.map(pk => pk.map(x => ({ set: x.set, c: CARD_SETS[x.set - 1]?.cards.find(c => c.n === x.n), isNew: x.new, pts: x.pts })));
     if (out.some(pk => pk.some(x => !x.c))) return null;                         // unknown card: saved, shown after the sync
     albumRef.current = { owned };
@@ -764,7 +848,7 @@ export default function CardAlbum() {
     setAlbum(a => {
       const fresh2 = new Set(a.fresh);
       Object.keys(r.cards).forEach(k => { if ((r.cards[k] ?? 0) > 0 && !(a.owned[k] > 0)) fresh2.add(k); });
-      return { ...a, owned: r.cards, fresh: fresh2, coins: r.coins - SET_PRIZE.coins * owedSets.current, swap: r.swap };
+      return { ...a, owned: r.cards, fresh: fresh2, coins: r.coins - SET_PRIZE.coins * owedSets.current - ALBUM_PRIZE.coins * owedAlbum.current, swap: r.swap };
     });
   }, [real, poN]);
   const batchDone = () => { albumRef.current = null; const n = doneQ.current.shift(); if (n) setSetDone(n); };
@@ -773,13 +857,16 @@ export default function CardAlbum() {
     if (real) owedSets.current = Math.max(0, owedSets.current - 1);   // real kids: the DATABASE already paid it - this only moves the shown number
     setSetDone(null);
     const n = doneQ.current.shift(); if (n) window.setTimeout(() => setSetDone(n), 400);
+    else if (albumDue.current) { albumDue.current = false; window.setTimeout(() => setAlbumDone(true), 500); }
   };
+  const collectAlbum = () => { setAlbum(a => ({ ...a, coins: a.coins + ALBUM_PRIZE.coins })); owedAlbum.current = 0; setAlbumDone(false); };   // shown number only (DB already paid)
   const onFlyStart = (n: number) => setAlbum(a => ({ ...a, coins: a.coins - PACK_PRICE * n }));
   const onLand = (x: Pull) => {
     const cur = albumRef.current?.owned ?? owned, kk0 = key(x.set, x.c.n);
     const full = (o: Owned) => CARD_SETS[x.set - 1].cards.every(c => (o[key(x.set, c.n)] ?? 0) > 0);
     const after: Owned = { ...cur, [kk0]: (cur[kk0] ?? 0) + 1 };
     if (!full(cur) && full(after) && !doneQ.current.includes(x.set) && (!real || paidSets.current.includes(x.set))) { doneQ.current.push(x.set); if (real) owedSets.current++; }
+    if (!real && !allOwned(cur) && allOwned(after)) albumDue.current = true;   // 1006: pretend album finished
     if (albumRef.current) albumRef.current = { owned: after };
     setAlbum(a => {
       const kk = key(x.set, x.c.n), owned2: Owned = { ...a.owned, [kk]: (a.owned[kk] ?? 0) + 1 }, fresh2 = new Set(a.fresh);
@@ -813,8 +900,41 @@ export default function CardAlbum() {
     setSetId(next);
   };
   const tapCard = (st: CardSet, c: CardInfo) => {
+    if (pickOn && !owned[key(st.id, c.n)]) { setPickAsk({ set: st.id, c, ph: "ask" }); return; }
     if (owned[key(st.id, c.n)]) setZoom({ set: st.id, c });
     else { setWiggle(key(st.id, c.n)); window.setTimeout(() => setWiggle(null), 500); }
+  };
+
+  // PICK IT: real kids = the DATABASE first (takes the 10 points, gives the card, pays a finished set once); then the card shows.
+  // No answer / refused = nothing changes on screen except the database's own numbers. 1006 = pretend (memory only).
+  const doPick = async () => {
+    const p = pickAsk; if (!p || p.ph !== "ask" || pickBusy.current) return;
+    pickBusy.current = true; setPickAsk({ ...p, ph: "wait" });
+    const kk = key(p.set, p.c.n);
+    const full = (o: Owned) => CARD_SETS[p.set - 1].cards.every(c => (o[key(p.set, c.n)] ?? 0) > 0);
+    if (real) {
+      const r = await pickCard(code, name, p.set, p.c.n);
+      pickBusy.current = false;
+      if (!r || !r.ok) {
+        if (r) setAlbum(a => ({ ...a, owned: r.cards, swap: r.swap, coins: r.coins - SET_PRIZE.coins * owedSets.current - ALBUM_PRIZE.coins * owedAlbum.current }));
+        setPickAsk(null); setPickOn(false); return;
+      }
+      paidSets.current = [...paidSets.current, ...(r.sets ?? [])];
+    if (r.album) { albumDue.current = true; owedAlbum.current = 1; }
+      if (!full(owned) && full(r.cards) && (r.sets ?? []).includes(p.set) && !doneQ.current.includes(p.set)) { doneQ.current.push(p.set); owedSets.current++; }
+      setAlbum(a => { const f2 = new Set(a.fresh); f2.add(kk); return { ...a, owned: r.cards, fresh: f2, swap: r.swap, coins: r.coins - SET_PRIZE.coins * owedSets.current - ALBUM_PRIZE.coins * owedAlbum.current }; });
+    } else {
+      pickBusy.current = false;
+      if (!full(owned) && full({ ...owned, [kk]: 1 }) && !doneQ.current.includes(p.set)) doneQ.current.push(p.set);
+      if (!allOwned(owned) && allOwned({ ...owned, [kk]: 1 })) albumDue.current = true;
+      setAlbum(a => { const f2 = new Set(a.fresh); f2.add(kk); return { ...a, owned: { ...a.owned, [kk]: 1 }, fresh: f2, swap: Math.max(0, a.swap - 10) }; });
+    }
+    play(CHIME, 0.7); setPickOn(false); setPickAsk({ ...p, ph: "got" });
+  };
+  const closePick = () => {
+    const was = pickAsk?.ph; if (was === "wait") return;
+    setPickAsk(null);
+    if (was === "got") { const n = doneQ.current.shift(); if (n) window.setTimeout(() => setSetDone(n), 300); }
   };
 
   if (!on) return (
@@ -900,8 +1020,14 @@ export default function CardAlbum() {
           </div>
           <button className={"ca-open" + (packs ? "" : " off")} onClick={packs ? openPack : needMore}>OPEN!</button>
           {needPop && <div key={needPop.k} className="ca-needbub">Win <span>{needPop.n}</span> more coins!</div>}
-          <div className="ca-swap">{Array.from({ length: 10 }, (_, i) => <b key={i} className={i < album.swap ? "on" : ""} />)}</div>
-          <div className="ca-swapl">Swap Meter</div>
+          <div className={"ca-swap ca-tap" + (album.swap >= 10 ? " full" : "")} onClick={() => { if (phase === "open" && !poN && !setDone && !pickOn) setSwapHelp(true); }}>{Array.from({ length: 10 }, (_, i) => {
+            const pop = !!swapAnim && i >= swapAnim.from && i < swapAnim.to;
+            return <b key={i + (pop ? "p" + swapAnim!.k : "")} className={(i < album.swap ? "on" : "") + (pop ? " pop" : "")} style={pop ? { animationDelay: `${500 + (i - swapAnim!.from) * 260}ms` } : undefined} />;
+          })}
+          {swapAnim && <span key={swapAnim.k} className="ca-swplus">+{swapAnim.to - swapAnim.from}</span>}</div>
+          {album.swap >= 10 && !pickOn
+            ? <button className="ca-open ca-pickbtn" onClick={() => { if (phase === "open" && !poN && !setDone) setPickOn(true); }}>PICK A CARD!</button>
+            : <div className="ca-swapl ca-tap" onClick={() => { if (phase === "open" && !poN && !setDone && !pickOn) setSwapHelp(true); }}>Swap Meter <b className="ca-swq">?</b></div>}
         </div>
       </>
     );
@@ -950,7 +1076,7 @@ export default function CardAlbum() {
   return (
     <div className={"ca-root" + (leaving ? " leaving" : "")}>
       <style>{FONTS + FUN3D_CSS + CSS}</style>
-      <div ref={stageRef} className={"ca-stage" + (go ? " go" : "")} data-font={fontReady ? 1 : 0} onScroll={e => { e.currentTarget.scrollTop = 0; e.currentTarget.scrollLeft = 0; }} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
+      <div ref={stageRef} className={"ca-stage" + (go ? " go" : "") + (pickOn && !pickAsk ? " ca-picking" : "")} data-font={fontReady ? 1 : 0} onScroll={e => { e.currentTarget.scrollTop = 0; e.currentTarget.scrollLeft = 0; }} style={{ width: sw, height: sh, transform: `translate(-50%,-50%) scale(${s})` }}>
         <div className="ca-table" style={{ backgroundImage: `url(${TABLE_BG})` }} />
 
         {go && (st ? setView(st) : homeView())}
@@ -970,6 +1096,22 @@ export default function CardAlbum() {
         {poN > 0 && <PackOpen count={poN} coins={album.coins} cx={cx} cy={sh / 2} fx={fx} draw={real ? drawReal : drawPacks} getTarget={getTarget} onFlyStart={onFlyStart}
           onLand={onLand} onBatchDone={batchDone} hold={setDone !== null} onClose={() => setPoN(0)} />}
         {setDone && <SetDone set={CARD_SETS[setDone - 1]} cx={cx} cy={sh / 2} fx={fx} coinAt={walletCoinAt()} onCollect={collectSet} />}
+        {albumDone && <AlbumDone cx={cx} cy={sh / 2} fx={fx} coinAt={walletCoinAt()} onCollect={collectAlbum} />}
+        {pickOn && !pickAsk && !setDone && !poN && phase === "open" && (
+          <div className="ca-pickbar">
+            <span>{setId ? "Tap a ? card to pick it!" : "Open a set, then tap a ? card!"}</span>
+            <div className="ca-tap ca-pickx" onClick={() => setPickOn(false)}><img src="/worlds/ui/rb_exit.webp" alt="Cancel" /></div>
+          </div>
+        )}
+        {pickAsk && (
+          <div className="ca-zoom">
+            <div key={pickAsk.ph === "got" ? "got" : "ask"} className={"ca-zcard" + (pickAsk.ph === "got" ? " ca-pickgot" : "")}>
+              <Card set={pickAsk.set} c={pickAsk.c} W={340} have={pickAsk.ph === "got"} fresh={pickAsk.ph === "got"} fontPx={35} onTap={() => { }} />
+            </div>
+            {pickAsk.ph !== "got" && <button className={"ca-open ca-pickgo" + (pickAsk.ph === "wait" ? " off" : "")} onClick={doPick}>PICK IT!</button>}
+            {pickAsk.ph !== "wait" && <div className="ca-rb ca-tap ca-zx" onClick={closePick}><img src="/worlds/ui/rb_exit.webp" alt="Close" /></div>}
+          </div>
+        )}
         {zoom && (
           <div className="ca-zoom">
             <div className="ca-zcard">
@@ -980,7 +1122,8 @@ export default function CardAlbum() {
         )}
         <canvas ref={cvRef} className="ca-fx" width={Math.round(sw)} height={Math.round(sh)} style={{ width: sw, height: sh }} aria-hidden="true" />
       </div>
-      {how === "open" && <HowToPlay {...ALBUM_HOWTO} onDone={closeHow} />}{/* outside the scaled stage (it fits itself to the window) */}
+      {how === "open" && <HowToPlay {...ALBUM_HOWTO} onDone={closeHow} />}
+      {swapHelp && <HowToPlay {...SWAP_HOWTO} onDone={() => setSwapHelp(false)} />}{/* outside the scaled stage (it fits itself to the window) */}
     </div>
   );
 }
@@ -1176,12 +1319,43 @@ const CSS = `
 .ca-pobox.shake.paid,.ca-pobox.shake.from.paid{animation:ca-shake 1s .5s ease-in both}
 .ca-pcoin{position:absolute;left:0;top:0;width:52px;height:52px;margin:-26px 0 0 -26px;pointer-events:none;z-index:70;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
 .ca-packbox .ca-bar span{font-size:19px}
-.ca-swap{display:flex;gap:2px;margin-top:10px}
+.ca-swap{display:flex;gap:2px;margin-top:10px;position:relative}
+.ca-swap b.on.pop{animation:ca-dotpop .45s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes ca-dotpop{0%{background:#2b1a5c;border-color:#b9a6ff;box-shadow:none;transform:scale(1)}45%{transform:scale(1.7)}100%{transform:scale(1)}}
+.ca-swplus{position:absolute;left:50%;top:-6px;translate:-50% 0;font-family:'Titan One',sans-serif;font-size:30px;color:#ffd84a;-webkit-text-stroke:6px #3a1d6e;paint-order:stroke fill;pointer-events:none;animation:ca-swplus 2s .5s ease-out both}
+@keyframes ca-swplus{0%{opacity:0;transform:translateY(10px) scale(.6)}20%{opacity:1;transform:translateY(-14px) scale(1.15)}70%{opacity:1;transform:translateY(-30px) scale(1)}100%{opacity:0;transform:translateY(-48px) scale(1)}}
 .ca-swap b{width:14px;height:14px;border-radius:50%;background:#2b1a5c;border:3px solid #b9a6ff}
-.ca-swap b.on{background:radial-gradient(circle at 35% 35%,#e3d9ff,#7b5cff);border-color:#efe8ff}
+.ca-swap b.on{background:radial-gradient(circle at 35% 35%,#fff6c8,#ffb800);border-color:#fff;box-shadow:0 0 6px rgba(255,216,74,.8)}   /* gold like the Swap Meter screen (Andy 10-16, was purple) */
 .ca-swapl{margin-top:3px;font-size:16px;-webkit-text-stroke:5px #3a1d6e}
+.ca-swq{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-left:4px;border-radius:50%;background:#7b5cff;border:2px solid #fff;font-size:14px;-webkit-text-stroke:0;vertical-align:2px}
+.ca-swh{margin-top:-90px;background:#d9efff;border:7px solid #7b5cff;border-radius:34px;padding:20px 44px 30px;box-shadow:0 10px 0 rgba(0,0,0,.3);animation:ca-zin .4s cubic-bezier(.25,1.5,.45,1) both}
+.ca-swht{font-family:'Titan One',sans-serif;font-size:46px;color:#fff;-webkit-text-stroke:9px #3a1d6e;paint-order:stroke fill;text-align:center;margin-bottom:6px}
+.ca-swhrow{display:flex;align-items:center;gap:28px;margin-top:18px}
+.ca-swhrow>div{width:140px;flex:none;display:flex;justify-content:center}
+.ca-swhrow p{margin:0;font-family:'Titan One',sans-serif;font-size:31px;line-height:1.25;color:#3a1d6e}
+.ca-swhrow p b{color:#7b5cff;font-weight:400}
+/* each section its own colours on the light blue (Andy 10-16): no blue text */
+.ca-swh .ca-swhrow:nth-child(2) p{color:#3a1d6e}.ca-swh .ca-swhrow:nth-child(2) p b{color:#d0186a}
+.ca-swh .ca-swhrow:nth-child(3) p{color:#5a2e05}.ca-swh .ca-swhrow:nth-child(3) p b{color:#c94a00}
+.ca-swh .ca-swhrow:nth-child(4) p{color:#0f5130}.ca-swh .ca-swhrow:nth-child(4) p b{color:#c8102e}
+.ca-swhex{gap:12px}
+.ca-swhex>div{display:flex;flex-direction:column;align-items:center;gap:8px}
+.ca-swh .ca-swhex .ca-swap{width:auto;flex-wrap:nowrap;gap:3px}
+.ca-swh .ca-swap{flex-wrap:wrap;width:110px;gap:5px;margin:0;justify-content:center}
 .ca-zoom{position:absolute;inset:0;z-index:50;background:rgba(10,6,40,.72);display:flex;align-items:center;justify-content:center}
 .ca-zcard{animation:ca-zin .45s cubic-bezier(.25,1.5,.45,1) both}
+.ca-swap.full b.on{background:radial-gradient(circle at 35% 35%,#fff6c8,#ffb800);border-color:#fff;box-shadow:0 0 8px #ffd84a;animation:ca-pickdot 1.2s ease-in-out infinite}
+@keyframes ca-pickdot{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.ca-open.ca-pickbtn{margin-top:8px;width:auto;height:50px;padding:0 18px;font-size:22px;white-space:nowrap;background:linear-gradient(#c9b4ff,#7b5cff);-webkit-text-stroke:6px #3a1d6e;box-shadow:0 5px 0 #3a1d6e,0 0 22px rgba(190,160,255,.9);animation:ca-pickpulse 1.3s ease-in-out infinite}
+@keyframes ca-pickpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.ca-picking .ca-empty{animation:ca-pickglow 1.2s ease-in-out infinite}
+@keyframes ca-pickglow{0%,100%{box-shadow:inset 0 0 0 5px #f7e6c4,0 0 6px 2px rgba(255,216,74,.5)}50%{box-shadow:inset 0 0 0 5px #f7e6c4,0 0 22px 8px rgba(255,216,74,1)}}
+.ca-pickbar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:45;display:flex;align-items:center;gap:14px;background:#fffbea;border:5px solid #7b5cff;border-radius:30px;padding:8px 10px 8px 26px;box-shadow:0 6px 0 rgba(0,0,0,.3)}
+.ca-pickbar span{font-family:'Titan One',sans-serif;font-size:26px;color:#3a1d6e;white-space:nowrap}
+.ca-pickx img{display:block;width:52px;height:52px}
+.ca-open.ca-pickgo{position:absolute;left:50%;bottom:140px;margin:0 0 0 -110px;width:220px;height:66px;font-size:32px}
+.ca-zcard.ca-pickgot{animation:ca-pickflip .7s cubic-bezier(.25,1.5,.45,1) both}
+@keyframes ca-pickflip{0%{transform:rotateY(90deg) scale(.8)}100%{transform:none}}
 @keyframes ca-zin{0%{transform:scale(.3) rotateY(90deg);opacity:0}100%{transform:none;opacity:1}}
 .ca-zx{position:absolute;left:50%;top:auto;bottom:40px;margin-left:-38px}
 .ca-po{position:absolute;inset:0;z-index:60;background:radial-gradient(ellipse at 50% 45%,rgba(70,40,150,.95),rgba(12,6,40,.98));animation:ca-fadein .35s both;transition:background .6s}
@@ -1217,6 +1391,12 @@ const CSS = `
 .ca-poput{position:absolute;left:0;right:0;display:flex;justify-content:center;gap:28px;z-index:2;animation:ca-pop .45s cubic-bezier(.25,1.6,.45,1) both}
 .ca-sd{position:absolute;inset:0;z-index:65;background:radial-gradient(ellipse at 50% 45%,rgba(60,30,120,.93),rgba(10,5,35,.97));animation:ca-fadein .35s both;cursor:pointer;transition:opacity .4s .55s}
 .ca-sd.going{opacity:0}
+.ca-adbook{position:absolute;translate:-50% 0;animation:ca-pop .6s .3s cubic-bezier(.25,1.5,.45,1) both;pointer-events:none}
+.ca-adbook img{display:block;height:370px;animation:ca-adglow 1.6s ease-in-out infinite}
+@keyframes ca-adglow{0%,100%{filter:drop-shadow(0 0 22px rgba(255,210,80,.8)) drop-shadow(0 0 50px rgba(255,180,40,.5))}50%{filter:drop-shadow(0 0 36px rgba(255,230,120,1)) drop-shadow(0 0 90px rgba(255,190,60,.85))}}
+.ca-adandy{position:absolute;right:30px;bottom:0;animation:ca-adin .8s cubic-bezier(.3,1.3,.5,1) .5s both;pointer-events:none}
+.ca-adandy img{display:block;height:560px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
+@keyframes ca-adin{0%{transform:translateX(120%)}100%{transform:none}}
 .ca-congrats.sd{font-size:96px}
 .ca-sdrow{position:absolute;width:840px;height:260px;animation:ca-pop .6s .35s cubic-bezier(.25,1.5,.45,1) both}
 .ca-sdbadge{position:absolute;left:0;top:0;width:250px;height:250px;border-radius:50%;background-size:165%;background-position:50% 20%;border:12px solid var(--c);

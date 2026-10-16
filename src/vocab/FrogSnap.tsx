@@ -11,6 +11,7 @@ import GrammarGameBar from "@/components/GrammarGameBar";
 import { FUN3D_CSS, Word3D } from "@/components/Fun3D";
 import ControlHints, { HINT_BOTTOM, type HintKey } from "@/components/ControlHints";
 import HowToPlay from "@/components/HowToPlay";
+import { PAUSE } from "@/lib/pause";
 import { wantHowto, seenHowto } from "@/lib/howtoSeen";
 
 type Diff = "easy" | "medium" | "hard";
@@ -55,9 +56,9 @@ const LV: Record<Diff, { spawnMs: number; max: number; v: [number, number]; coin
 };
 const SND: Record<string, [string, number]> = {
   tongue: [`${ART}/snd_tongue.mp3`, 0.75],                  // Andy's whip, loudest ~-17 heard
-  croak: [`${ART}/snd_croak.mp3`, 1],                       // Andy's frog croak (1st ribbit), plays WITH the whip (22:57)
+  croak: [`${ART}/snd_croak.mp3`, 0.5],                       // Andy's frog croak (1st ribbit), plays WITH the whip (22:57)
   giggle: ["/vocab/garden/snd_giggle.mp3", 0.65],           // wrong fly giggles at the frog
-  oof: ["/vocab/garden/snd_oof.mp3", 0.6],                  // bubble bumps the frog
+  oof: ["/vocab/garden/snd_oof.mp3", 0.9],                  // bubble bumps the frog
   levelup: ["/vocab/snd_levelup.mp3", 0.4],                 // win: Great Job!
 };
 
@@ -87,6 +88,7 @@ export const FROG_HOWTO = {
       text: <><b>Fill</b> the meter to <b>win!</b></> },
   ],
   controls: [{ keys: ["up", "down"] as HintKey[], text: <>Move</> }, { mouse: true, text: <>Click to <b>snap</b></> }],
+  touch: [{ pads: ["up", "down"], text: <>Move</> }, { finger: true, text: <>Tap a bubble to <b>snap</b></> }],
   tip: <>Don't let the bubbles <em>bump</em> you!</>,
 };
 
@@ -143,7 +145,7 @@ const useSfx = (on: boolean) => {
       if (type === "pop") { osc(520, 0, 0.09, 0.3, "sine", 1400); osc(1600, 0.05, 0.08, 0.12, "triangle", 2400); }
       if (type === "wrong") { osc(330, 0, 0.18, 0.16, "square", 220); }
       if (type === "life") [784, 988, 1175, 1568].forEach((f, i) => osc(f, i * 0.08, 0.22, 0.2, "triangle"));
-      if (type === "coin") { osc(988, 0, 0.08, 0.14, "square"); osc(1319, 0.07, 0.24, 0.14, "square"); }
+      if (type === "coin") { osc(988, 0, 0.08, 0.3, "square"); osc(1319, 0.07, 0.24, 0.3, "square"); /* louder coin (iPad round 3) */ }
     } catch { /* */ }
   }, []);
 };
@@ -177,6 +179,8 @@ type Bub = { id: number; kind: "word" | "coin" | "heart"; word: string; idx: num
 type Fx = { id: number; x: number; y: number; kind: "free" | "pop" | "coin" | "life"; n: number };
 type Tongue = { t0: number; bid: number | null; hx: number; hy: number; done: boolean };
 
+const FROG_TOUCH = typeof window !== "undefined" && ("ontouchstart" in window || (navigator.maxTouchPoints || 0) > 0);
+let frogHintRounds = 0; // touch: the tapping-hand hint shows in the first 2 rounds of each visit (Andy 10-15)
 const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose }: {
   unit: Unit; diff: Diff; sfxOn: boolean; musicOn: boolean; onToggleMusic: () => void;
   onBack: () => void; onWin: (coins: number) => void; onLose: (reason: "timeout" | "lives") => void;
@@ -203,7 +207,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
   const bubRange = () => { const f = fitRef.current, c = scene(f); return [Math.max(130, c.oy + 140 * c.k), Math.min(f.sh - 120, c.oy + 600 * c.k)]; };
 
   const [, setTick] = useState(0);
-  const [target, setTarget] = useState(unit.vocab[0]);
+  const [target, setTarget] = useState(() => unit.vocab[Math.floor(Math.random() * unit.vocab.length)]); // random first word every round (Andy 10-16; was always word 1)
   const targetRef = useRef(target); targetRef.current = target;
   const [lives, setLives] = useState(MAX_LIVES);
   const livesRef = useRef(MAX_LIVES);
@@ -215,6 +219,8 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
   const doneRef = useRef(false);
   const endRef = useRef(false);
   const [party, setParty] = useState(false);
+  const [tapHint, setTapHint] = useState<boolean | "fade">(() => FROG_TOUCH && frogHintRounds++ < 2);
+  useEffect(() => { if (tapHint !== "fade") return; const t = window.setTimeout(() => setTapHint(false), 600); return () => window.clearTimeout(t); }, [tapHint]); // hand + message fade out together (Andy 10-16) // touch: hand taps the pond until the first snap
 
   const g = useRef({ bubs: [] as Bub[], fx: [] as Fx[], tongue: null as Tongue | null, fy: 0, id: 0, start: 0, lastSpawn: 0, lastTgt: 0,
     lastCoin: 0, lastHeart: 0, held: {} as Record<string, number>, nudge: 0, dizzy: 0, happy: 0,
@@ -301,6 +307,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
       const line = G.bubs.filter(x => x.x > mx && Math.abs(x.y - my) < x.d * 0.45).sort((p, q) => p.x - q.x);
       b = line[0];
     }
+    setTapHint(h => (h === true ? "fade" : h));
     sfx("tongue"); window.setTimeout(() => sfx("croak"), 300); // ribbit right AFTER the whip (whip sound ends ~0.31s) - Andy 23:17
     G.tongue = { t0: now, bid: b ? b.id : null, hx: b ? b.x : mx + 520, hy: b ? b.y : my, done: !b };
   };
@@ -311,6 +318,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
     const G = g.current;
     if (!G.start) { G.start = last; G.lastSpawn = last - L.spawnMs + 900; G.lastTgt = last - 3000; G.lastCoin = last; G.lastHeart = last; }
     const loop = (now: number) => {
+      if (PAUSE.on) { last = now; raf = requestAnimationFrame(loop); return; } // frozen while "Turn sideways" shows (2026-10-15)
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       const { sw } = fitRef.current;
       const [fTop, fBot] = frogRange();
@@ -470,6 +478,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
           </span>
         } />
       <div className="fs-field" ref={fieldRef} onPointerDown={onDown}>
+        {tapHint && <div className={"fs-taphint" + (tapHint === "fade" ? " fs-fade" : "")} aria-hidden="true"><i /><img src="/worlds/ui/hand_point.webp" alt="" /><b className="fs-tipmsg">Poke the<br />correct bubble!</b></div>}
         <div className="fs-stage" style={{ width: sw, height: sh, transform: `scale(${s})` }}>
           <div className="fs-scene" style={{ left: sc.ox, top: sc.oy, transform: `scale(${sc.k})` }}>
             <img className="fs-bg" src={`${ART}/bg.webp`} alt="" draggable={false} />
@@ -544,9 +553,9 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
           )}
         </div>
         {isTouch && (
-          <div className="fs-pads">
-            <button onTouchStart={hold("up")} onTouchEnd={hold("up")}>{"▲"}</button>
-            <button onTouchStart={hold("down")} onTouchEnd={hold("down")}>{"▼"}</button>
+          <div className="fs-pads" data-noclick>
+            <button aria-label="up" onTouchStart={hold("up")} onTouchEnd={hold("up")} onTouchCancel={hold("up")}><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(0 11 11)" /></svg></button>
+            <button aria-label="down" onTouchStart={hold("down")} onTouchEnd={hold("down")} onTouchCancel={hold("down")}><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(180 11 11)" /></svg></button>
           </div>
         )}
       </div>
@@ -691,7 +700,19 @@ const CSS = `
 .fs-orbit{position:absolute;left:50%;top:50%;width:0;height:0;animation:fs-orb 6s linear infinite}
 .fs-orbit img{position:absolute;width:80px;margin:-31px 0 0 -40px;max-width:none;transform:rotate(var(--a)) translateX(230px) rotate(calc(var(--a) * -1))}
 @keyframes fs-orb{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-.fs-pads{position:absolute;right:18px;bottom:16px;display:flex;flex-direction:column;gap:14px}
-.fs-pads button{width:88px;height:64px;border-radius:16px;background:rgba(0,40,60,.35);border:2px solid rgba(255,255,255,.55);color:#fff;font-size:28px;user-select:none}
+.fs-pads{position:absolute;left:18px;bottom:16px;display:flex;flex-direction:column;gap:14px} /* left side (Andy 10-15) */
+.fs-pads button{width:84px;height:84px;border-radius:20px;background:rgba(0,40,60,.45);border:3px solid rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+.fs-pads button:active{background:rgba(255,255,255,.4)}
+.fs-pads button svg{pointer-events:none}
+.fs-taphint{position:absolute;left:62%;top:44%;width:120px;height:110px;z-index:25;pointer-events:none;transition:opacity .5s ease}
+.fs-taphint.fs-fade{opacity:0}
+.fs-tipmsg{position:absolute;left:50%;bottom:122px;transform:translateX(-50%);white-space:nowrap;text-align:center;background:#fff;color:#0b4a63;font-family:'Lilita One',sans-serif;font-weight:400;font-size:28px;line-height:1.1;padding:10px 20px;border-radius:22px;border:4px solid #ffd84a;box-shadow:0 6px 0 rgba(0,0,0,.25);animation:fs-msgpop .5s cubic-bezier(.3,1.6,.5,1) both}
+.fs-tipmsg::after{content:"";position:absolute;left:50%;bottom:-14px;margin-left:-12px;border:12px solid transparent;border-bottom:0;border-top:14px solid #ffd84a}
+@keyframes fs-msgpop{0%{transform:translateX(-50%) scale(.4);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}} /* touch: a hand taps the pond until the first snap (Andy 10-15) */
+.fs-taphint img{position:absolute;left:14px;bottom:10px;height:100px;animation:fs-tap 1.1s ease-in-out infinite}
+.fs-taphint i{position:absolute;left:-10px;top:66px;width:48px;height:48px;border-radius:50%;border:5px solid #ffd84a;opacity:0;animation:fs-rip 1.1s ease-out infinite}
+@keyframes fs-tap{0%,100%{transform:translate(16px,-16px)}40%,55%{transform:translate(0,0)}}
+@keyframes fs-rip{0%,42%{transform:scale(.3);opacity:0}48%{opacity:1}100%{transform:scale(1.7);opacity:0}}
+@media (max-height:500px){.fs-pads{gap:8px;bottom:8px}.fs-pads button{width:64px;height:64px}}
 @media (prefers-reduced-motion: reduce){.fs-shim,.fs-gl,.fs-spk,.fs-ripples i,.fs-fall i,.fs-fall b,.fs-foam,.fs-drop,.fs-bobber,.fs-wob,.fs-fly,.fs-padring{animation:none}}
 `;

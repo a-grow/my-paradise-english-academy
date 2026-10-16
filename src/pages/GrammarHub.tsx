@@ -50,7 +50,7 @@ export default function GrammarHub() {
       a.id = "grammar-bgm";
       a.src = "/grammar-music.mp3";
       a.loop = true;
-      a.volume = 0.27; // ~-22 LUFS like every other song (Andy 2026-10-05)
+      a.volume = 1; // the file itself is levelled to ~-24 LUFS (the iPad ignores .volume) - Andy 10-15
       document.body.appendChild(a);
     }
     audioRef.current = a;
@@ -79,10 +79,13 @@ export default function GrammarHub() {
     const a = audioRef.current;
     if (!a) { cb(); return; }
     const step = a.volume / 12;
+    let done = false;
+    const finish = () => { if (done) return; done = true; clearInterval(iv); clearTimeout(safety); a.pause(); cb(); };
     const iv = setInterval(() => {
       a.volume = Math.max(0, a.volume - step);
-      if (a.volume <= 0.02) { clearInterval(iv); a.pause(); cb(); }
+      if (a.volume <= 0.02) finish();
     }, 40);
+    const safety = setTimeout(finish, 800); // never wait forever (iPad ignored the volume -> the game never started, 2026-10-15)
   };
 
   // ---------- SCREEN 2: Choose Your Game (castle background) ----------
