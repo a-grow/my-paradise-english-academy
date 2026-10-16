@@ -20,7 +20,7 @@ import { lockLeft, LOCK_IMG } from "@/lib/locks";
 import LockMsg from "@/components/LockMsg";
 
 const MASTER_CODE = "1006";
-export const REAL_CODES = ["TEST99", "TEST77"];   // + TEST77 = Andy's brand-new test kid from the Ocean egg (10-15)   // REAL saving (puzzle cloud step 2026-10-11): test kid only until launch
+export const REAL_CODES = ["TEST99", "TEST77", "TEST88"];   // + TEST77 = Andy's brand-new test kid from the Ocean egg (10-15)   // REAL saving (puzzle cloud step 2026-10-11): test kid only until launch
 const P = "/puzzle";
 const UI = "/worlds/ui";
 const STAGE_W = 1600, STAGE_H = 1000;

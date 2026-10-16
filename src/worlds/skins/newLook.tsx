@@ -275,7 +275,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const name = v.petNameMap[animal.id] ?? "";
   const grown = stageIdx === animal.stages.length - 1;
   const sub = next
-    ? `${next.min - fed} more treats to grow!`
+    ? `${next.min - fed} more treat${next.min - fed === 1 ? "" : "s"} to grow!`
     : (v.videoWatchedMap[animal.id] ? "All grown up!" : "All grown up! Watch the video!");
 
   // TEST ONLY flags (display only): ?d=1 shows the Daily Treat button, ?n=1 makes My Animals glow.

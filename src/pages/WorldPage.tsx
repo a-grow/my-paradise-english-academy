@@ -231,10 +231,10 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
     if (isMaster) return;
     addCoins(code, studentName, 0).then(t => { if (typeof t === "number") setCoins(t); }); // 0 = read only
     addPieces(code, studentName, 0).then(n => { if (typeof n === "number") setPieces(n); }); // 0 = read only
-    loadPrizes(code, studentName).then(list => { if (Array.isArray(list)) setPrizes(list); }); // read only
+    loadPrizes(code, studentName).then(list => { if (Array.isArray(list)) setPrizes(list); else if (list === null) setPrizes([]); }); // read only; null = NO ROW yet (brand-new kid, 10-16 break-it F2) = nothing paid yet
     loadWins(code, studentName).then(w => { if (w) setWins(w); }); // read only (Vocab Champ / Grammar Star badges)
-    if (!readOnly) loadDailyPrize(code, studentName).then(d => { if (d) setDailyPrize(d); }); // read only (no Daily Prize on a visit)
-    loadSeen(code, studentName).then(list => { if (Array.isArray(list)) setSeen(list); }); // read only
+    if (!readOnly) loadDailyPrize(code, studentName).then(d => { if (d) setDailyPrize(d); else if (d === null) setDailyPrize({ day: 1, claimedToday: false, box: 0 }); }); // read only (no Daily Prize on a visit); null = no row yet = box 1
+    loadSeen(code, studentName).then(list => { if (Array.isArray(list)) setSeen(list); else if (list === null) setSeen([]); }); // read only; null = no row yet = nothing seen (welcome + How to Play show)
   }, []);
   // SEEN FLAGS (2026-10-03): e.g. "theater:savanna:giraffe" = played in the Video Theater (red dot off everywhere).
   // null = not read yet / teacher code. markSeenNow adds it here at once and in the cloud (add-only list).
@@ -355,8 +355,15 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
         // watched, this world is finished - go straight to the next world (what Ocean did before the template).
         const last = ANIMALS[ANIMALS.length - 1];
         if (world.nextWorld && !isMaster && !readOnly && getAnimalStageIdx(last, newFed[last.id] ?? 0) === 3 && (newVideoWatched[last.id] ?? false)) {
-          lsSet(`mpe_world_${code}_${studentName}`, world.nextWorld.id);
-          navigate(`${world.nextWorld.path}/${code}/${studentName}`, { replace: true });
+          // Jump straight past every world the cloud says is ALSO finished (was one hop per world = flashes, Andy 10-16).
+          let dest: { id: string; path: string } = world.nextWorld;
+          for (let i = 0; i < ALL_WORLDS.length; i++) {
+            const w = ALL_WORLDS.find(x => x.id === dest.id);
+            if (!w || !w.nextWorld || !worldState(w, result.data).finished) break;
+            dest = w.nextWorld;
+          }
+          lsSet(`mpe_world_${code}_${studentName}`, dest.id);
+          navigate(`${dest.path}/${code}/${studentName}`, { replace: true });
           return;
         }
       }

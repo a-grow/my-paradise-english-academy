@@ -109,7 +109,7 @@ export default function GrammarRun() {
           piecesWon={1}
           muted={muted}
           onChooseGame={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
-          onReturnToWorld={() => navigate(`/world/${kidCode}/${kidName}`)}
+          onReturnToWorld={() => { const r = sessionStorage.getItem("mpe_return_world") || ""; navigate(r.toLowerCase().includes(`/${kidCode.toLowerCase()}/${kidName}`) ? r : `/world/${kidCode}/${kidName}`); }}   // back to the world the kid came from, like GrammarHub (was always Ocean = flashes through finished worlds, Andy 10-16)
         />
       )}
       {lost && !won && (
@@ -117,7 +117,7 @@ export default function GrammarRun() {
           muted={muted}
           onTryAgain={() => { setLost(false); setStats(null); setTryKey((k) => k + 1); }}
           onChooseGame={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
-          onReturnToWorld={() => navigate(`/world/${kidCode}/${kidName}`)}
+          onReturnToWorld={() => { const r = sessionStorage.getItem("mpe_return_world") || ""; navigate(r.toLowerCase().includes(`/${kidCode.toLowerCase()}/${kidName}`) ? r : `/world/${kidCode}/${kidName}`); }}   // back to the world the kid came from, like GrammarHub (was always Ocean = flashes through finished worlds, Andy 10-16)
         />
       )}
     </div>
