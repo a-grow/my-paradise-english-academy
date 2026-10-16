@@ -5,6 +5,8 @@ import { saveDataToCloud, loadDataFromCloud, saveJarToCloud, loadJarFromCloud, a
 import { getAnimalStage, getAnimalStageIdx, type Animal } from "@/worlds/types";
 import { ALL_WORLDS, COMING_WORLDS, worldState, type WorldConfig } from "@/worlds";
 import { DEMO_COINS } from "@/cards/economy";
+import { claimTab, tabOk } from "@/lib/activeTab";
+import OtherDevice from "@/components/OtherDevice";
 
 const MASTER_CODE = "1006";
 const demoBooted: Record<string, boolean> = {};   // DEMO START: first brain of this page load per world = start fresh
@@ -188,12 +190,51 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
       videoSeen: videoButtonSeen,
     });
   };
+  // NEWEST TAB WINS (2026-10-16, DB newest_tab_step1_20261016.sql, src/lib/activeTab.ts): opening a world page makes THIS tab
+  // the kid's active one (mpe_claim_tab). Before feeding / saving the world we ask 'still the active tab?' (mpe_tab_ok; an answer
+  // counts for 5s, asked again when the tab comes back into view). Another tab/device opened a world page since -> nothing is
+  // sent + the 'You are playing on another device' cover (Play here = reload fresh). No answer / error = keep playing (never lock
+  // a kid out). 1006, demos and visits never claim or ask (noSave).
+  const [otherTab, setOtherTab] = useState(false);
+  const otherTabRef = useRef(false);
+  const tabClaim = useRef<Promise<void> | null>(null);
+  const tabOkAt = useRef(0);                      // when the database last said 'still active'
+  const tabAsk = useRef<Promise<boolean> | null>(null);
+  const askTab = (force = false): Promise<boolean> => {
+    if (noSave) return Promise.resolve(true);
+    if (otherTabRef.current) return Promise.resolve(false);
+    if (!force && Date.now() - tabOkAt.current < 5000) return Promise.resolve(true);
+    if (!tabAsk.current) tabAsk.current = (async () => {
+      await tabClaim.current;
+      const ok = await tabOk(code, studentName);
+      if (ok) tabOkAt.current = Date.now();
+      else { otherTabRef.current = true; setOtherTab(true); }
+      tabAsk.current = null;
+      return ok;
+    })();
+    return tabAsk.current;
+  };
+  useEffect(() => {
+    if (noSave) return;
+    tabClaim.current = claimTab(code, studentName).then(() => { tabOkAt.current = Date.now(); });
+    const again = () => { if (document.visibilityState === "visible") askTab(true); };
+    document.addEventListener("visibilitychange", again);
+    window.addEventListener("focus", again);
+    window.addEventListener("pageshow", again);
+    return () => {
+      document.removeEventListener("visibilitychange", again);
+      window.removeEventListener("focus", again);
+      window.removeEventListener("pageshow", again);
+    };
+  }, []);
+
   useEffect(() => {
     if (noSave) return;
     // FIX (2026-10-04): no save until the cloud read-back has FINISHED (it sets dataCloudReady). Before, the first render
     // already allowed saves, so a tap in the first second could save this device's old copy over the cloud.
     if (!dataCloudReady.current) return;
-    saveDataToCloud(code, studentName, activeAnimalId, gatherBlob());
+    const pet = activeAnimalId, blob = gatherBlob(); // taken NOW; sent only if this is still the active tab (newest tab wins)
+    askTab().then(ok => { if (ok) saveDataToCloud(code, studentName, pet, blob); });
     // An animal switch saves in EVERY world (fix 2026-10-07: Ocean used to skip it, so the cloud's old active_pet
     // put the previous animal back on the next visit). Ocean: active_pet column; other worlds: activePet in their blob.
   }, [fedTreatsState, petNameMap, videoWatchedMap, unlockSeenMap, videoButtonSeen, activeAnimalId, visitDaysCount, visit5Claimed, levelupSaves]);
@@ -484,7 +525,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
     } else playSfx(K.snd.rename);
   };
 
-  const handleFeed = () => {
+  const doFeed = () => {
     if (readOnly || jarTreats <= 0) return;
     if (!isMaster && !dataCloudReady.current) return; // cloud not read yet (first second): ignore the tap
     const newJar = jarTreats - 1;
@@ -508,6 +549,20 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
     }, 1000);
     setJustEarned(1);
     setTimeout(() => setJustEarned(0), 2500);
+  };
+  // NEWEST TAB WINS: feed only while this is the active tab. Fresh answer (<5s) = feed at once (and re-ask quietly after 2.5s
+  // so steady feeding never waits). Older = this ONE tap waits for the answer (~0.15s), extra taps meanwhile are ignored.
+  const feedRef = useRef(doFeed);
+  feedRef.current = doFeed;
+  const feedWaiting = useRef(false);
+  const handleFeed = () => {
+    if (noSave) { doFeed(); return; }
+    if (otherTabRef.current) { setOtherTab(true); return; }
+    const age = Date.now() - tabOkAt.current;
+    if (age < 5000) { doFeed(); if (age > 2500) askTab(true); return; }
+    if (feedWaiting.current) return;
+    feedWaiting.current = true;
+    askTab().then(ok => { feedWaiting.current = false; if (ok) feedRef.current(); });
   };
 
   const spawnHearts = (cx: number, cy: number) => {
@@ -584,7 +639,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
   const currentWorld = (worldList.find(x => !x.finished) ?? worldList[worldList.length - 1]).world;
   const comingWorlds = COMING_WORLDS.filter(w => !ALL_WORLDS.some(a => a.id === w.id)); // My Worlds: grey + name only
 
-  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg, coins, pieces, prizes, wins, claimPrize: claimPrizeNow, dailyPrize, claimDailyPrize: claimDailyPrizeNow, seen, markSeen: markSeenNow, switchAnimal, nudgeSeen, readOnly, rowData, worldList, currentWorld, comingWorlds };
+  return { world, ANIMALS, K, rawCode, rawStudentName, code, studentName, S, family, navigate, isMaster, jarTreats, setJarTreats, oldDinoJar, visitDaysKey, visit5ClaimedKey, getVisitDays, visitDaysCount, setVisitDaysCount, visit5Claimed, setVisit5Claimed, handleVisit5Days, fedTreatsState, setFedTreatsState, loading, setLoading, hearts, setHearts, petted, setPetted, eggWiggle, setEggWiggle, showDailyGift, setShowDailyGift, justEarned, setJustEarned, showSettings, setShowSettings, isRenaming, setIsRenaming, petNameMap, setPetNameMap, levelUpStage, setLevelUpStage, showVideo, setShowVideo, videoButtonSeen, setVideoButtonSeen, videoWatchedMap, setVideoWatchedMap, showUnlockFor, setShowUnlockFor, unlockSeenMap, setUnlockSeenMap, videoFadingOut, setVideoFadingOut, showLookBelow, setShowLookBelow, showComplete, setShowComplete, musicOn, setMusicOn, sfxOn, setSfxOn, volume, setVolume, feedingTreats, setFeedingTreats, heartId, feedId, creatureRef, collectionRef, pageRef, audioRef, harpRef, lullabyRef, tadaRef, completeRef, ctxRef, prevStageRef, levelUpFiredRef, displayName, activeAnimalId, setActiveAnimalId, activeAnimal, videoWatched, fedTreats, petName, stage, stageIdx, nextStage, isEgg, nearHatch, progress, dataCloudReady, gatherBlob, jarQueue, jarQueued, queueJar, sendTreats, getCtx, playSfx, closeVideo, savePetName, handleFeed, spawnHearts, handlePet, handleEggTap, claimDailyGift, openVideo, onVideoTime, dismissUnlock, closeComplete, creatureImg, coins, pieces, prizes, wins, claimPrize: claimPrizeNow, dailyPrize, claimDailyPrize: claimDailyPrizeNow, seen, markSeen: markSeenNow, switchAnimal, nudgeSeen, readOnly, rowData, worldList, currentWorld, comingWorlds, otherTab };
 };
 
 export type WorldView = ReturnType<typeof useWorldBrain>;
@@ -593,7 +648,7 @@ const WorldScreen = ({ world, readOnly = false }: { world: WorldConfig; readOnly
   const v = useWorldBrain(world, readOnly);
   const K = world.skin;
   if (v.loading) return <K.Loading v={v} />;
-  return <K.Page v={v} />;
+  return <><K.Page v={v} />{v.otherTab && <OtherDevice />}</>; // newest tab wins (2026-10-16)
 };
 
 // NAME TAG: a different world or kid = a brand-new page (fresh state + its own cloud read-back).
