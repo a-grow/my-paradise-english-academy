@@ -394,11 +394,7 @@ const Dashboard = () => {
                 const name = student.name.toLowerCase();
                 const wk = localStorage.getItem(`mpe_world_${family.code}_${name}`); // step 7: + savanna (a finished world forwards on anyway)
                 const path = wk === "dino" || wk === "savanna" || wk === "snowy" || wk === "taiwan" ? `/${wk}/${family.code}/${name}` : `/world/${family.code}/${name}`; // + snowy, taiwan (Phase 2, 2026-10-13)
-                if (localStorage.getItem(`mpe_worldnotice_seen_${family.code}`) === "true") {
-                  navigate(path);
-                } else {
-                  setWorldNotice(path);
-                }
+                navigate(path); // F1 (Andy 2026-10-17): parents popup removed - it acts like a normal game now (WorldNoticeModal kept, unused)
               }} className="relative w-full py-4 px-6 rounded-2xl font-display font-bold text-lg text-white transition-all duration-200 hover:-translate-y-1 hover:shadow-xl" style={{ background: "linear-gradient(135deg, hsl(var(--paradise-mint)), hsl(var(--paradise-teal)))", boxShadow: "0 6px 20px rgba(0,0,0,0.15)", animation: "wobble 3s ease-in-out infinite" }}>
                 <span className="absolute -top-2 left-3 text-lg" style={{ animation: "sparkleAnim 2s ease-in-out infinite" }}>✨</span>
                 🌴 {student.name}'s World
