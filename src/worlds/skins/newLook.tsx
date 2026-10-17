@@ -1112,7 +1112,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           </div>
         </div>
         {/* the Album lock sits OUTSIDE the card so the card can be muted without muting the lock */}
-        <div className="sv-albumlk">
+        <div className={"sv-albumlk" + lift}>{/* lifted WITH the card during the grow-up party, else the card covers its own lock (Andy 10-17) */}
           {alL.locked && <img className={"sv-lockico" + (rattle === "album" ? " rattle" : "")} src={LOCK_IMG} alt="Locked" />}
           {alL.opening && <img className="sv-lockico open" src={UNLOCK_IMG} alt="" />}
           {lockPop?.id === "album" && <div key={lockPop.k} className="sv-lockbub l"><LockMsg left={lockPop.n} /></div>}
