@@ -27,6 +27,7 @@ import TeacherHQ from "./pages/TeacherHQ";
 import CardAlbum from "./pages/CardAlbum";
 import PuzzleMixup from "./pages/PuzzleMixup";
 import TurnSideways from "./components/TurnSideways";
+import VersionWatcher from "./components/VersionWatcher";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <VersionWatcher />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/blog" element={<Blog />} />
