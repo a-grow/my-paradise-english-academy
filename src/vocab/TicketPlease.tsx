@@ -14,7 +14,7 @@ import GrammarGameBar from "@/components/GrammarGameBar";
 import ControlHints, { HINT_BOTTOM_LEFT } from "@/components/ControlHints";
 import HowToPlay from "@/components/HowToPlay";
 import { PAUSE } from "@/lib/pause";
-import { wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { wantHowto, seenHowto, firstHowto } from "@/lib/howtoSeen";
 import { TICKET_HOWTO } from "@/components/howtos";
 
 type Diff = "easy" | "medium" | "hard";
@@ -30,7 +30,8 @@ const COIN_IMG = "/worlds/ui/coin.webp", HEART_IMG = "/vocab/space/heart-orb.web
 // w = LENGTH along the way it drives, h = width. No tender any more: the engine pulls the cars directly.
 const ENG = { w: 104, h: 32 }, CAR = { w: 68, h: 34 }; // smaller train (2026-10-06) so it fits the track grid
 const NCARS = 7;
-const WORDS = 4; // words per game, every level (Andy 2026-10-06: it was too long)
+const WORDS = 4; // words per game on HARD (Andy 2026-10-06: it was too long)
+const WORDS_EASY_MED = 3; // easy + medium: 3 words (Andy 2026-10-18)
 // The OPEN meadow of bg.webp (fractions of that 1024x572 picture). Train, tickets and faces stay inside it - never over fences, trees, houses.
 const OPEN = { u0: 0.01, u1: 0.99, v0: 0.275, v1: 0.875 }; // new bg (2026-10-06): scenery only in thin strips at the edges, so the train may go right up to them
 const BG_W = 1376, BG_H = 768;
@@ -168,9 +169,9 @@ type Dir = { x: number; y: number };
 const TOUCH = typeof window !== "undefined" && ("ontouchstart" in window || (navigator.maxTouchPoints || 0) > 0);
 const PADS: { k: string; d: Dir; r: number }[] = [{ k: "u", d: { x: 0, y: -1 }, r: 0 }, { k: "l", d: { x: -1, y: 0 }, r: 270 }, { k: "r", d: { x: 1, y: 0 }, r: 90 }, { k: "d", d: { x: 0, y: 1 }, r: 180 }];
 type Pt = { x: number; y: number; dx: number; dy: number; face: number };
-type Item = { id: number; kind: "pax" | "coin" | "heart"; x: number; y: number; ch: string; li: number; face: number; v: number;
+type Item = { id: number; kind: "pax" | "coin" | "heart" | "hint"; x: number; y: number; ch: string; li: number; face: number; v: number;
   miss: number; until: number; born: number };
-type Fx = { id: number; x: number; y: number; kind: "happy" | "coin" | "life" | "smoke" | "off"; v: number; img?: string; face?: number };
+type Fx = { id: number; x: number; y: number; kind: "happy" | "coin" | "life" | "smoke" | "off" | "hint"; v: number; img?: string; face?: number };
 type Piece = { x: number; y: number; w: number; h: number; len: number; thick: number; rot: number; face: number; img: string }; // w,h = box on screen; len,thick,rot = the picture
 
 const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose }: {
@@ -190,7 +191,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
   useEffect(() => { const on = () => setFit(calc()); window.addEventListener("resize", on); return () => window.removeEventListener("resize", on); }, []);
 
   // words: each word once, shuffled
-  const queue = useRef<string[]>(shuffle(unit.vocab).slice(0, WORDS));
+  const queue = useRef<string[]>(shuffle(unit.vocab).slice(0, diff === "hard" ? WORDS : WORDS_EASY_MED));
   const TOTAL = queue.current.length;
   const [wi, setWi] = useState(0);
   const [pos, setPos] = useState(0);       // index (in the word) of the next letter to pick up
@@ -208,6 +209,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
   const [phase, setPhase] = useState<"count" | "play">("count"); // word shown + countdown (train frozen) -> play
   const [count, setCount] = useState(3);
   const [hints, setHints] = useState(diff === "easy" ? 3 : diff === "medium" ? 2 : 1); // the green Hints button: shows the whole word for 2 s
+  const hintsRef = useRef(diff === "easy" ? 3 : diff === "medium" ? 2 : 1); // same number for the game loop (the HINT prize)
   const [hint, setHint] = useState(false);
   const [hid, setHid] = useState<number[]>([]);    // letter positions hidden on the board while playing
   const [chugOff, setChugOff] = useState(false);
@@ -218,7 +220,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
   const g = useRef({
     x: -150, y: 0, dir: { x: 1, y: 0 } as Dir, face: 1, trail: [] as Pt[], cars: [] as number[], items: [] as Item[], fx: [] as Fx[],
     id: 0, wi: 0, pos: 0, faces: [] as number[], busy: true, playing: true, invincible: false, cooldown: false,
-    lastCoin: 0, lastHeart: 0, lastTurn: 0, lastSmoke: 0, carColor: 0,
+    lastCoin: 0, lastHeart: 0, lastTurn: 0, lastSmoke: 0, carColor: 0, extraCoins: 5, hintOutAt: 0, hintGiven: false, hintWord: -1, // 5 more coins on the track per game (Andy 2026-10-18)
     target: null as null | { x: number; y: number }, keyDir: null as Dir | null, keyDir2: null as Dir | null, joy: null as null | { a: Dir; b: Dir | null }, keyAt: 0, stopped: false, freeze: true, timers: [] as number[], finalCars: [] as number[],
   });
 
@@ -249,7 +251,11 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
   const gridXY = () => {
     const { sw, sh } = fitRef.current;
     const k = Math.max(sw / BG_W, sh / BG_H), ox = (sw - BG_W * k) / 2, oy = (sh - BG_H * k) / 2;
-    return { X: GX.map(u => ox + u * k), Y: GY.map(v => oy + v * k) };
+    // only tracks you can SEE: on an iPad shape the picture is wider than the window, so the outer tracks sit off-screen
+    // (a ticket there was invisible, the train drove down it as a 'ghost'). Computers + phones: every track fits = unchanged. (Andy 10-19)
+    const allX = GX.map(u => ox + u * k), seen = allX.filter(x => x > ENG.w * 0.5 + 8 && x < sw - ENG.w * 0.5 - 8);
+    const cut = seen.length >= 4 && seen.length < allX.length; // outer tracks off-screen: every row runs off the edge = every row wraps (as before)
+    return { X: cut ? seen : allX, Y: GY.map(v => oy + v * k), cut };
   };
 
   // the horizontal tracks run off both sides of the picture: leave on one side, come out the same track on the other
@@ -272,7 +278,12 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
     }
     // never behind the word board + instruction at the bottom: a ticket (with its face) must always be fully visible
     const { sw, sh } = fitRef.current, bh = Math.max(175, (queue.current[G.wi]?.length || 6) * 23 + 30);
-    const okp = pts.filter(q => !(q.y + 44 > sh - 108 && Math.abs(q.x - sw / 2) < bh + 60));
+    // iPad/phone: never under (or touching) the joystick bottom-left (Andy 10-19: a letter sat under it)
+    let jx1 = -1, jy0 = 1e9;
+    const jr = joyRef.current?.getBoundingClientRect(), fr = fieldRef.current?.getBoundingClientRect();
+    if (jr && fr && jr.width > 0) { jx1 = (jr.right - fr.left) / fitRef.current.s + 80; jy0 = (jr.top - fr.top) / fitRef.current.s - 80; }
+    const okp0 = pts.filter(q => !(q.y + 44 > sh - 108 && Math.abs(q.x - sw / 2) < bh + 60) && q.x > 80 && q.x < sw - 80 && !(q.x < jx1 && q.y > jy0)); // never half off the screen edge (Andy 10-19)
+    const okp = okp0.length ? okp0 : pts;
     const pick = () => okp[Math.floor(Math.random() * okp.length)];
     for (let t = 0; t < 120; t++) {
       const { x, y } = pick();
@@ -370,6 +381,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
     const G = g.current;
     if (phase !== "play" || hint || hints <= 0 || G.busy || finale) return;
     setHints(h => h - 1); setHint(true); sfx("click");
+    hintsRef.current--; if (hintsRef.current <= 0 && !G.hintOutAt) G.hintOutAt = performance.now(); // out of hints: a HINT prize comes soon (once)
     tm(() => setHint(false), 2000);
   };
   // a new word: the train FREEZES, the whole word shows with a 3-2-1 countdown, then some letters vanish and the tickets appear
@@ -475,23 +487,45 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
       if (PAUSE.on) { last = now; raf = requestAnimationFrame(loop); return; } // frozen while "Turn sideways" shows (2026-10-15)
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       if (G.playing && !doneRef.current && !G.freeze) {
-        const { X, Y } = gridXY(), nc = X.length, nr = Y.length;
+        const { X, Y, cut } = gridXY(), nc = X.length, nr = Y.length;
+        const wrapRow = (r: number) => WRAP_ROW[r] || cut; // iPad shape: the 2nd + 3rd tracks also lead off-screen to the other side (Andy 10-19)
         const { Lw, Rw, W } = wrapInfo();
         const shiftAll = (dx: number) => { G.x += dx; for (const t of G.trail) t.x += dx; }; // the whole train moves together, so the cars follow through the wrap
         if (G.x >= Rw) shiftAll(-W); else if (G.x < Lw) shiftAll(W);
         const near = (arr: number[], v: number) => arr.reduce((b, a, i) => Math.abs(a - v) < Math.abs(arr[b] - v) ? i : b, 0);
         if (G.dir.x) G.y = Y[near(Y, G.y)]; else G.x = X[near(X, G.x)]; // always exactly on the rails
         if (G.joy) { G.keyDir = G.joy.a; G.keyDir2 = G.joy.b; G.keyAt = now; G.target = null; } // joystick held = keep asking for that way (iPad/phone, Andy 10-15)
+        // LATE TURN (Andy 10-19 iPad): a turn asked just AFTER passing a crossing still happens at that crossing
+        if (G.keyDir && !G.stopped && !(G.keyDir.x === G.dir.x && G.keyDir.y === G.dir.y) && !(G.keyDir.x === -G.dir.x && G.keyDir.y === -G.dir.y)) {
+          const GRACE = 46, kd = G.keyDir;
+          let bx: number | null = null, by: number | null = null;
+          if (G.dir.x) {
+            const r = near(Y, G.y);
+            if (r + kd.y >= 0 && r + kd.y < nr) for (let m = -1; m <= 1; m++) for (let i = 0; i < nc; i++) { const back = (G.x - (X[i] + m * W)) * G.dir.x; if (back > 0.001 && back < GRACE) bx = X[i] + m * W; }
+          } else {
+            const c = near(X, G.x);
+            for (let j = 0; j < nr; j++) { const back = (G.y - Y[j]) * G.dir.y; if (back > 0.001 && back < GRACE && (wrapRow(j) || (c + kd.x >= 0 && c + kd.x < nc))) by = Y[j]; }
+          }
+          if (bx !== null || by !== null) {
+            while (G.trail.length) { // the cars follow the trail: drop the bit past the crossing so they stay joined
+              const t = G.trail[G.trail.length - 1];
+              const past = bx !== null ? (t.x - bx) * G.dir.x : (t.y - (by as number)) * G.dir.y;
+              if (past > 0.001) G.trail.pop(); else break;
+            }
+            if (bx !== null) G.x = bx; else G.y = by as number;
+            G.dir = kd; G.lastTurn = now; if (kd.x) G.face = kd.x; G.keyDir = null; G.keyDir2 = null;
+          }
+        }
         let rem = speedNow() * dt;
         for (let guard = 0; guard < 3 && rem > 0; guard++) {
           let dist = rem + 1, c = -1, r = -1, cm = 0; // distance to the next crossing straight ahead
           if (G.stopped) { dist = 0; c = near(X, G.x); r = near(Y, G.y); } // waiting at the end of a track: decide again from here
-          else if (G.dir.x) { r = near(Y, G.y); for (let m = WRAP_ROW[r] ? -1 : 0; m <= (WRAP_ROW[r] ? 1 : 0); m++) for (let i = 0; i < nc; i++) { const d = (X[i] + m * W - G.x) * G.dir.x; if (d > 0.001 && d < dist) { dist = d; c = i; cm = m; } } r = near(Y, G.y); }
+          else if (G.dir.x) { r = near(Y, G.y); for (let m = wrapRow(r) ? -1 : 0; m <= (wrapRow(r) ? 1 : 0); m++) for (let i = 0; i < nc; i++) { const d = (X[i] + m * W - G.x) * G.dir.x; if (d > 0.001 && d < dist) { dist = d; c = i; cm = m; } } r = near(Y, G.y); }
           else { for (let j = 0; j < nr; j++) { const d = (Y[j] - G.y) * G.dir.y; if (d > 0.001 && d < dist) { dist = d; r = j; } } c = near(X, G.x); }
           if (dist > rem) { G.x += G.dir.x * rem; G.y += G.dir.y * rem; rem = 0; break; }
           // at a crossing: turn here or go straight on (only here - the track has no other turns)
           rem -= dist; G.x = X[c] + cm * W; G.y = Y[r];
-          const opts = DIRS.filter(d => !(d.x === -G.dir.x && d.y === -G.dir.y) && (d.x !== 0 ? (WRAP_ROW[r] || (c + d.x >= 0 && c + d.x < nc)) : (r + d.y >= 0 && r + d.y < nr))); // sideways: only along track that exists
+          const opts = DIRS.filter(d => !(d.x === -G.dir.x && d.y === -G.dir.y) && (d.x !== 0 ? (wrapRow(r) || (c + d.x >= 0 && c + d.x < nc)) : (r + d.y >= 0 && r + d.y < nr))); // sideways: only along track that exists
           const has = (d: Dir | null) => !!d && opts.some(o => o.x === d.x && o.y === d.y);
           let pick: Dir | null = null;
           if (G.keyDir && now - G.keyAt > 1100) { G.keyDir = null; G.keyDir2 = null; } // a key press waits for the next crossing, but not forever
@@ -527,15 +561,29 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
         }
         // pick-ups: the front of the engine
         const fx0 = G.x + G.dir.x * ENG.w * 0.5, fy0 = G.y + G.dir.y * ENG.w * 0.5; // the NOSE of the engine picks things up
+        // FAIR WRONG TICKETS (Andy 10-20: turned away in time but still 'hit' it): a wrong ticket only counts when it sits on the
+        // train's OWN track straight ahead and the nose really reaches it - and never in the first stretch after a crossing,
+        // where a late turn (LATE TURN above) can still take the train away from it.
+        let sincePass = 1e9;
+        if (G.dir.x) { for (let m = -1; m <= 1; m++) for (const xx of X) { const b = (G.x - (xx + m * W)) * G.dir.x; if (b >= 0 && b < sincePass) sincePass = b; } }
+        else { for (const yy of Y) { const b = (G.y - yy) * G.dir.y; if (b >= 0 && b < sincePass) sincePass = b; } }
+        const wrongHit = (it: Item) => {
+          if (G.stopped || sincePass < 46) return false;
+          const onLine = G.dir.x ? Math.abs(it.y - G.y) < 8 : Math.abs(wdx(it.x - G.x)) < 8;
+          if (!onLine) return false;
+          const along = G.dir.x ? wdx(it.x - G.x) * G.dir.x : (it.y - G.y) * G.dir.y;   // + = ahead of the engine's middle
+          return along < ENG.w * 0.5 + 24 && along > -ENG.w * 0.5;
+        };
         for (const it of [...G.items]) {
           const d = Math.hypot(wdx(it.x - fx0), it.y + (it.kind === "pax" ? 10 : 0) - fy0);
           if (it.kind === "pax") { // generous for the right letter, strict for a wrong one (easy to drive past)
             const right = !G.busy && it.ch.toLowerCase() === queue.current[G.wi][G.pos]?.toLowerCase();
-            if (!G.busy && now - it.born > 350 && d < (right ? 62 : 40)) pickUp(it);
+            if (!G.busy && now - it.born > 350 && (right ? d < 62 : wrongHit(it))) pickUp(it);
           }
           else if (d < 56) {
             G.items = G.items.filter(o => o !== it);
             if (it.kind === "coin") { coinsRef.current += it.v; setCoins(coinsRef.current); sfx("coin"); addFx({ x: it.x, y: it.y, kind: "coin", v: it.v }); }
+            else if (it.kind === "hint") { hintsRef.current++; setHints(h => h + 1); sfx("life"); addFx({ x: it.x, y: it.y, kind: "hint", v: 1 }); }
             else { livesRef.current = Math.min(MAX_LIVES, livesRef.current + 1); setLives(livesRef.current); sfx("life"); addFx({ x: it.x, y: it.y, kind: "life", v: 1 }); }
           }
         }
@@ -552,10 +600,33 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
           G.lastCoin = now;
           const r = Math.random(), v = r < 0.12 ? 3 : r < 0.35 ? 2 : 1, p = freeSpot(ps);
           G.items.push({ id: G.id++, kind: "coin", x: p.x, y: p.y, ch: "", li: -1, face: 0, v, miss: 0, until: now + ITEM_UP, born: now });
+          if (G.extraCoins > 0) { // the first 5 coins each bring an extra 1-coin somewhere else = 5 more coins per game, every level (Andy 2026-10-18)
+            G.extraCoins--; const p2 = freeSpot(ps);
+            G.items.push({ id: G.id++, kind: "coin", x: p2.x, y: p2.y, ch: "", li: -1, face: 0, v: 1, miss: 0, until: now + ITEM_UP, born: now });
+          }
         }
-        if (G.items.filter(it => it.kind === "heart").length < Math.min(diff === "hard" ? 1 : 2, MAX_LIVES - livesRef.current) && now - G.lastHeart > L.heartMs) {
-          G.lastHeart = now; const p = freeSpot(ps);
-          G.items.push({ id: G.id++, kind: "heart", x: p.x, y: p.y, ch: "", li: -1, face: 0, v: 0, miss: 0, until: now + ITEM_UP, born: now });
+        // HINT prize (Andy 10-19, every level): ONCE per game, 2.5 s after the last hint is used - drive over it = +1 hint
+        if (!G.hintGiven && G.hintOutAt && now - G.hintOutAt > 2500) {
+          G.hintGiven = true; const p = freeSpot(ps);
+          G.items.push({ id: G.id++, kind: "hint", x: p.x, y: p.y, ch: "", li: -1, face: 0, v: 0, miss: 0, until: now + ITEM_UP, born: now });
+        }
+        // MEDIUM + HARD (Andy 10-19): a HINT prize on the track for EVERY word (on the track grid = always reachable; one out at a time)
+        if (diff !== "easy" && G.hintWord !== G.wi) {
+          G.hintWord = G.wi;
+          if (!G.items.some(it => it.kind === "hint")) {
+            const p = freeSpot(ps);
+            G.items.push({ id: G.id++, kind: "hint", x: p.x, y: p.y, ch: "", li: -1, face: 0, v: 0, miss: 0, until: now + ITEM_UP, born: now });
+          }
+        }
+        // hearts: hard = 1 at a time; easy + medium = 2 come TOGETHER in different spots (Andy 2026-10-18)
+        if (diff === "hard"
+          ? G.items.filter(it => it.kind === "heart").length < Math.min(1, MAX_LIVES - livesRef.current) && now - G.lastHeart > L.heartMs
+          : livesRef.current < MAX_LIVES && !G.items.some(it => it.kind === "heart") && now - G.lastHeart > L.heartMs) {
+          G.lastHeart = now;
+          for (let h = 0; h < (diff === "hard" ? 1 : 2); h++) {
+            const p = freeSpot(ps); // freeSpot keeps away from items already out, so the 2nd heart lands somewhere else
+            G.items.push({ id: G.id++, kind: "heart", x: p.x, y: p.y, ch: "", li: -1, face: 0, v: 0, miss: 0, until: now + ITEM_UP, born: now });
+          }
         }
       }
       setTick(t => (t + 1) % 1000000);
@@ -639,6 +710,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
                 <img src={COIN_IMG} alt="" draggable={false} />{it.v > 1 && <b>{"×"}{it.v}</b>}
               </div>);
             if (it.kind === "heart") return <img key={it.id} className="tp-heart" src={HEART_IMG} alt="" draggable={false} style={{ left: it.x, top: it.y }} />;
+            if (it.kind === "hint") return <div key={it.id} className="tp-hintprize" style={{ left: it.x, top: it.y }}><span>HINT</span></div>;
             const missing = it.miss && now - it.miss < 900;
             const glow = L.glow && !G.busy && it.li === pos && !hid.includes(pos); // a blank must not give its letter away
             return (
@@ -665,6 +737,8 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
             : f.kind === "coin"
             ? <div key={f.id} className="tp-fx coin" style={{ left: f.x, top: f.y }}><b>+{f.v}</b>
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(k => <i key={k} style={{ ["--a" as string]: `${k * 36 + 10}deg` } as CSSProperties} />)}</div>
+            : f.kind === "hint"
+            ? <div key={f.id} className="tp-fx hint" style={{ left: f.x, top: f.y }}><b>+1 Hint</b></div>
             : f.kind === "life"
             ? <div key={f.id} className="tp-fx life" style={{ left: f.x, top: f.y }}><img src={HEART_IMG} alt="" style={{ width: 80 }} /><b>+1</b></div>
             : <div key={f.id} className={"tp-fx " + f.kind} style={{ left: f.x, top: f.y }}>
@@ -719,7 +793,7 @@ export default function TicketPlease({ unit, diff, cfg, sfxOn = true, musicOn, o
   const restart = () => { onRestart?.(); setResult(null); setRun(r => r + 1); };
   if (result === "win") return <>{renderWin(restart, coinsWon, coinStart)}</>;
   if (result) return <>{renderLose(result, restart)}</>;
-  if (howto) return <HowToPlay {...TICKET_HOWTO} muted={!musicOn} onDone={() => { setHowto(false); seenHowto("snake"); }} />;
+  if (howto) return <HowToPlay {...TICKET_HOWTO} muted={!musicOn} needOk={firstHowto("snake")} onDone={() => { setHowto(false); seenHowto("snake"); }} />;
   return <Play key={run} unit={unit} diff={diff} sfxOn={sfxOn && musicOn} musicOn={musicOn} onToggleMusic={onToggleMusic}
     onBack={onBack} onWin={c => { setCoinsWon(c); setResult("win"); }} onLose={r => setResult(r)} />;
 }
@@ -794,6 +868,10 @@ const CSS = `
 .tp-coin b{position:absolute;left:70%;top:36%;font-family:'Fredoka','Nunito',sans-serif;font-weight:800;font-size:28px;color:#fff;white-space:nowrap;
  text-shadow:-2px -2px 0 #7a3f08,2px -2px 0 #7a3f08,-2px 2px 0 #7a3f08,2px 2px 0 #7a3f08,0 3px 0 #7a3f08}
 @keyframes tp-spin{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.6)}}
+.tp-hintprize{position:absolute;transform:translate(-50%,-50%);z-index:15;pointer-events:none;animation:tp-in .35s ease-out both} /* HINT prize (Andy 10-19: bright blue) */
+.tp-hintprize span{display:block;font-family:'Titan One','Fredoka',sans-serif;font-size:26px;line-height:1;color:#fff;padding:12px 18px;border-radius:18px;border:3px solid #fff;background:linear-gradient(180deg,#5fe0ff,#1aa7ff 55%,#0a6fe0);box-shadow:0 0 18px 6px rgba(40,170,255,.85),0 4px 0 #064c9c;text-shadow:0 2px 0 #064c9c;animation:tp-hintbob 1.4s ease-in-out infinite}
+@keyframes tp-hintbob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.06)}}
+.tp-fx.hint b{color:#7fe3ff;text-shadow:-2px -2px 0 #064c9c,2px -2px 0 #064c9c,-2px 2px 0 #064c9c,2px 2px 0 #064c9c,0 4px 0 #064c9c}
 .tp-heart{position:absolute;width:74px;transform:translate(-50%,-50%);z-index:15;pointer-events:none;filter:drop-shadow(0 0 10px rgba(255,140,120,.9));animation:tp-in .35s ease-out both}
 
 .tp-train{position:absolute;inset:0;pointer-events:none}

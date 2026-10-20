@@ -5,7 +5,7 @@ import GrammarGameBar from "@/components/GrammarGameBar";
 import { useClickSfx } from "@/lib/clickSfx";
 import ControlHints, { HINT_BOTTOM_LEFT } from "@/components/ControlHints";
 import HowToPlay from "@/components/HowToPlay";
-import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { useHowtoSeen, wantHowto, seenHowto, firstHowto } from "@/lib/howtoSeen";
 import { GRAB_HOWTO } from "@/components/howtos";
 import { installIdleCursor } from "@/lib/idleCursor";
 import WinCelebration from "@/components/WinCelebration";
@@ -94,7 +94,7 @@ export default function GrammarGrab() {
           frameRef.current?.contentWindow?.focus(); // keep arrow keys working after the click
         }}
       />
-      {howto && <HowToPlay {...GRAB_HOWTO} muted={muted} onDone={() => { setHowto(false); seenHowto("ggrab"); }} />} {/* How to Play first; the game loads after (Andy 2026-10-07) */}
+      {howto && <HowToPlay {...GRAB_HOWTO} muted={muted} needOk={firstHowto("ggrab")} onDone={() => { setHowto(false); seenHowto("ggrab"); }} />} {/* How to Play first; the game loads after (Andy 2026-10-07) */}
       {howto === false && <iframe
         key={tryKey}
         ref={frameRef}

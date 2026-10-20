@@ -101,7 +101,7 @@ export const SPACE_HOWTO: How = {
     { art: <img src="/vocab/space/mission.webp" alt="" style={{ width: 340 }} />, text: <><b>Win</b> the mission!</> },
   ],
   controls: [{ keys: K("left", "right"), text: <>Move</> }, { keys: K("space"), text: <><b>Shoot</b></> }],
-  touch: [{ pads: ["left", "right"], text: <>Move</> }, { pads: ["SHOOT"], text: <><b>Shoot</b></> }],
+  touch: [{ pads: ["stick"], text: <>Use the <b>joystick</b> to move</> }, { pads: ["SHOOT"], text: <><b>Shoot</b></> }],
   tip: <><b>Dodge</b> the bubbles!</>,
 };
 
@@ -124,7 +124,7 @@ export const RUN_HOWTO: How = {
       text: <>Get them <b>all</b> to <b>win!</b></> },
   ],
   controls: [{ keys: K("left", "right"), text: <>Run</> }, { keys: K("up", "space"), text: <><b>Jump</b></> }],
-  touch: [{ pads: ["left", "right"], text: <>Run</> }, { pads: ["JUMP"], text: <><b>Jump</b></> }],
+  touch: [{ pads: ["stick"], text: <>Use the <b>joystick</b> to run</> }, { pads: ["JUMP"], text: <><b>Jump</b></> }],
   tip: <>Watch out for <em>crows</em> and <em>hedgehogs!</em><Pics srcs={[`${G}/crow.webp`, `${G}/hedgehog.webp`]} /></>,
 };
 
@@ -161,7 +161,7 @@ export const DIG_HOWTO: How = {
     { art: <img src={`${G}/dig-win.webp`} alt="" style={{ height: 230 }} />, text: <><b>Build</b> the sentence to <b>win!</b></> },
   ],
   controls: [{ keys: K("left", "up", "down", "right"), text: <>Walk</> }, { mouse: true, text: <>Click to <b>dig</b></> }],
-  touch: [{ pads: ["left", "up", "down", "right"], text: <>Walk</> }, { pads: ["DIG"], text: <><b>Dig</b></> }],
+  touch: [{ pads: ["stick"], text: <>Use the <b>joystick</b> to walk</> }, { pads: ["DIG"], text: <><b>Dig</b></> }],
   tip: <><b>Bop</b> the worms!<Pics srcs={[`${G}/worm.webp`]} h={70} /></>,
 };
 
@@ -180,7 +180,7 @@ export const GRAB_HOWTO: How = {
     { art: <img src={`${G}/grab-andy.webp`} alt="" style={{ height: 240 }} />, text: <><b>Fix</b> the sentence to <b>win!</b></> },
   ],
   controls: [{ keys: K("left", "right"), text: <>Move the claw</> }, { keys: K("space"), mouse: true, text: <><b>Grab!</b></> }],
-  touch: [{ pads: ["left", "right"], text: <>Move the claw</> }, { finger: true, text: <>Tap <b>GRAB!</b></> }],
+  touch: [{ pads: ["stick"], text: <>Use the <b>joystick</b> to move the claw</> }, { finger: true, text: <>Tap <b>GRAB!</b></> }],
   tip: <>Don't grab the <em>X box!</em><Pics srcs={[`${G}/box-x.webp`]} /></>,
 };
 

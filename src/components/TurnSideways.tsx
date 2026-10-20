@@ -32,6 +32,15 @@ export default function TurnSideways() {
   const shown = upright && kid;
   // kid pages: no long-press selection / copy bubble / save-image pop-up, no double-tap zoom delay (index.css html.mpe-kid)
   useEffect(() => { document.documentElement.classList.toggle("mpe-kid", kid); }, [kid]);
+  // iPad 'Share...' bubble (Andy 10-19): on a kid page a long press never starts a text selection or a press-and-hold menu
+  // (touch devices only; typing in a name box still works)
+  useEffect(() => {
+    if (!kid || !isTouch()) return;
+    const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
+    const stop = (e: Event) => { if (!typing(e.target)) e.preventDefault(); };
+    document.addEventListener("selectstart", stop); document.addEventListener("contextmenu", stop);
+    return () => { document.removeEventListener("selectstart", stop); document.removeEventListener("contextmenu", stop); };
+  }, [kid]);
 
   useEffect(() => {
     PAUSE.on = shown;

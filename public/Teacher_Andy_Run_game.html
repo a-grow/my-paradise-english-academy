@@ -561,11 +561,7 @@ function resetGame() {
         // skip coins right on top of pits
         coin(x, 545);
     }
-    // a few floaty ones
-    for (let q = 0; q < QUESTIONS.length; q++) {
-        const baseX = firstX + q * spacing;
-        coin(baseX + 150, 360);
-    }
+    // (the floaty coins up among the answer blocks are gone - Andy 2026-10-18)
 
 
     /* ----- ENEMIES ----- (patrol between stations) */
@@ -1666,14 +1662,12 @@ requestAnimationFrame(gameLoop);
 #mpeTouch button{position:fixed;bottom:14px;width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.18);border:3px solid rgba(255,255,255,.55);color:#fff;font:700 30px Arial,sans-serif;padding:0;z-index:50;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;display:flex;align-items:center;justify-content:center}
 #mpeTouch button svg{pointer-events:none}
 #mpeTouch button.down{background:rgba(255,255,255,.42)}
-#mpeTL{left:18px}
-#mpeTR{left:116px}
+#mpeJ{position:fixed;left:24px;bottom:24px;width:240px;height:120px;border-radius:60px;background:rgba(0,0,0,.25);border:4px solid rgba(255,255,255,.85);box-sizing:border-box;z-index:50;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;box-shadow:0 0 0 6px rgba(255,255,255,.12)}#mpeJ i{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#d8f1ff 60%,#9fd3ee);box-shadow:0 4px 10px rgba(0,0,0,.35);pointer-events:none}@media (max-height:500px){#mpeJ{width:180px;height:90px;left:14px;bottom:14px}#mpeJ i{width:62px;height:62px;margin:-31px}}
 #mpeTJ{right:18px;width:120px !important;height:120px !important;font-size:24px !important;letter-spacing:1px}
 @media (max-height:500px){#mpeTouch button{width:62px;height:62px;bottom:10px}#mpeTL{left:12px}#mpeTR{left:84px}#mpeTJ{right:12px;width:92px !important;height:92px !important;font-size:19px !important}}
 </style>
 <div id="mpeTouch">
-  <button id="mpeTL" aria-label="Left"><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(270 11 11)"/></svg></button>
-  <button id="mpeTR" aria-label="Right"><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(90 11 11)"/></svg></button>
+  <div id="mpeJ"><i></i></div>
   <button id="mpeTJ" aria-label="Jump">JUMP</button>
 </div>
 <script>
@@ -1691,7 +1685,8 @@ requestAnimationFrame(gameLoop);
     b.addEventListener('touchend', off, { passive: false });
     b.addEventListener('touchcancel', off, { passive: false });
   }
-  hold('mpeTL', 'ArrowLeft'); hold('mpeTR', 'ArrowRight'); hold('mpeTJ', 'Space');
+  hold('mpeTJ', 'Space');
+  /* LEFT/RIGHT JOYSTICK (Andy 10-19: no arrow buttons in any game) - acts like the arrow keys */ var J = document.getElementById('mpeJ'), K = J.firstChild, jid = null; function clr(){ keys['ArrowLeft'] = keys['ArrowRight'] = false; } var jo = 0, jo2 = 0, want = null, wt = 0; function setWant(w){ if (w === want) return; want = w; clearTimeout(wt); clr(); if (w) wt = setTimeout(function(){ if (jid !== null && want === w) keys[w] = true; }, 60); } /* NO DRIFT (Andy 10-19): a finger landing ON the knob = that spot is still; 30% still zone; a new way starts after 60 ms (a finger rolling off never moves) */ function jmove(e){ e.preventDefault(); var t = null; for (var i = 0; i < e.changedTouches.length; i++){ var c = e.changedTouches[i]; if (e.type === 'touchstart' ? jid === null : c.identifier === jid){ t = c; break; } } if (!t) return; if (e.type === 'touchstart') wake(); jid = t.identifier; var r = J.getBoundingClientRect(), R = (r.width - r.height) / 2 + r.height * 0.15, mid = r.left + r.width / 2; if (e.type === 'touchstart') jo = Math.abs(t.clientX - mid) < r.height * 0.35 ? t.clientX : mid; var dx = Math.max(-R, Math.min(R, t.clientX - jo)); K.style.transform = 'translateX(' + Math.max(-R, Math.min(R, t.clientX - mid)) + 'px)'; setWant(Math.abs(dx) < R * 0.3 ? null : (dx > 0 ? 'ArrowRight' : 'ArrowLeft')); } function jend(e){ e.preventDefault(); for (var i = 0; i < e.changedTouches.length; i++) if (e.changedTouches[i].identifier === jid){ jid = null; want = null; clearTimeout(wt); clr(); K.style.transform = ''; } } J.addEventListener('touchstart', jmove, { passive: false }); J.addEventListener('touchmove', jmove, { passive: false }); J.addEventListener('touchend', jend, { passive: false }); J.addEventListener('touchcancel', jend, { passive: false });
 })();
 </script>
 <script>/* MPE pause (2026-10-15): frozen while the site shows "Turn your iPad sideways!" */

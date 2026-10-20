@@ -12,7 +12,7 @@ export type HowStep = { art: ReactNode; text: ReactNode };
 export type HowControl = { keys?: HintKey[]; mouse?: boolean; pads?: string[]; finger?: boolean; text: ReactNode }; // pads/finger = touch pictures (2026-10-15)
 export type HowToProps = {
   title: string; steps: HowStep[]; controls: HowControl[]; touch?: HowControl[]; tip?: ReactNode;
-  bg?: string; muted?: boolean; onDone: () => void;
+  bg?: string; muted?: boolean; onDone: () => void; needOk?: boolean;
 };
 
 const W = 1600, H = 900;
@@ -55,7 +55,7 @@ function TouchCaps({ pads = [], finger = false }: { pads?: Pad[]; finger?: boole
   );
 }
 
-export default function HowToPlay({ title, steps, controls, touch, tip, bg, muted, onDone }: HowToProps) {
+export default function HowToPlay({ title, steps, controls, touch, tip, bg, muted, onDone, needOk = false }: HowToProps) {
   const ctrls = touch && isTouchDevice() ? touch : controls; // iPad / phone: touch pictures (2026-10-15)
   // FIT (Andy 2026-10-07: cut off on full screen): measure the REAL content size (it can be taller/wider than 1600x900)
   // and shrink it so everything always shows, on any window shape. Re-measures when pictures/fonts load or the window changes.
@@ -94,7 +94,7 @@ export default function HowToPlay({ title, steps, controls, touch, tip, bg, mute
   };
   const d = (ms: number) => ({ animationDelay: `${ms}ms` } as CSSProperties);
   return (
-    <div className={"hw-root" + (out ? " out" : "")} onPointerDown={close} role="dialog" aria-label={`How to play ${title}`}>
+    <div className={"hw-root" + (out ? " out" : "") + (needOk ? " ok" : "")} onPointerDown={needOk ? undefined : close} role="dialog" aria-label={`How to play ${title}`}>
       <style>{FUN3D_CSS + CSS}</style>
       {bg && <div className="hw-bg" style={{ backgroundImage: `url(${bg})` }} />}
       <div className="hw-dim" />
@@ -121,7 +121,9 @@ export default function HowToPlay({ title, steps, controls, touch, tip, bg, mute
           ))}
         </div>
         {tip && <div className="hw-tip" style={d(tTip)}>{tip}</div>}
-        <div className="hw-tap" style={d(tTap)}>TAP TO CONTINUE</div>
+        {needOk /* FIRST TIME (Andy 10-17): only the OK button closes it; later times: tap anywhere */
+          ? <div className="hw-okrow" style={d(tTap)}><button className="f3-btn f3-yellow" style={{ fontSize: 46 }} onClick={close}>OK!</button></div>
+          : <div className="hw-tap" style={d(tTap)}>TAP TO CONTINUE</div>}
       </div>
     </div>
   );
@@ -129,6 +131,8 @@ export default function HowToPlay({ title, steps, controls, touch, tip, bg, mute
 
 const CSS = `
 .hw-root{position:fixed;inset:0;z-index:400;overflow:hidden;cursor:pointer;user-select:none;-webkit-user-select:none}
+.hw-root.ok{cursor:default}
+.hw-okrow{margin-top:auto;margin-bottom:22px;padding-top:18px;opacity:0;animation:hw-fade .4s ease-out both}
 .hw-bg{position:absolute;inset:-20px;background:center/cover no-repeat;filter:blur(3px) saturate(.9);animation:hw-fade .5s ease-out both}
 .hw-dim{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(10,14,40,.72),rgba(4,6,20,.9));animation:hw-fade .5s ease-out both}
 .hw-root.out .hw-dim,.hw-root.out .hw-bg{animation:hw-fadeout .38s ease-in both}

@@ -11,7 +11,7 @@ import GrammarGameBar from "@/components/GrammarGameBar";
 import ControlHints, { HINT_BOTTOM } from "@/components/ControlHints";
 import HowToPlay from "@/components/HowToPlay";
 import { PAUSE } from "@/lib/pause";
-import { wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { wantHowto, seenHowto, firstHowto } from "@/lib/howtoSeen";
 import { SPACE_HOWTO } from "@/components/howtos";
 
 type Diff = "easy" | "medium" | "hard";
@@ -181,8 +181,8 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
   const endRef = useRef(false);              // all words done: MISSION ACCOMPLISHED is playing
   const [mission, setMission] = useState(false);
 
-  const g = useRef({ ufos: [] as Ufo[], shots: [] as Pt[], drops: [] as Pt[], bounces: [] as Bounce[], orb: null as Orb | null, fx: [] as Fx[], coins: [] as Coin[], lastCoin: -1700,
-    shipX: FW / 2, id: 0, lastSpawn: 0, lastDrop: 0, lastOrb: 0, start: 0, lastShot: 0, lastTgt: 0, held: {} as Record<string, number>, nudge: 0,
+  const g = useRef({ ufos: [] as Ufo[], shots: [] as Pt[], drops: [] as Pt[], bounces: [] as Bounce[], orbs: [] as Orb[], fx: [] as Fx[], coins: [] as Coin[], lastCoin: -1700,
+    shipX: FW / 2, id: 0, lastSpawn: 0, lastDrop: 0, lastOrb: 0, start: 0, lastShot: 0, lastTgt: 0, held: {} as Record<string, number>, nudge: 0, joyX: 0, joyS: 0,
     lastWord: "", cooldown: false, invincible: false, cleared: new Set<string>(), keys: new Set<string>(), hits: {} as Record<string, number>, solvedN: 0 });
 
   const nextTarget = (cleared: Set<string>) => {
@@ -249,6 +249,8 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
           // STEADY speed while held (Andy 15:42); a quick tap (< 0.15s) = only the 28px nudge from keydown
           if (now - G.held[k] > 150) G.shipX += dir * sw * 0.42 * dt;
         }
+        G.joyS += (G.joyX - G.joyS) * Math.min(1, dt * 12); // eased, so a finger lifting off never jerks the ship (Andy 10-19)
+        if (Math.abs(G.joyS) > 0.02) G.shipX += G.joyS * sw * 0.5 * dt; // iPad/phone joystick: further = faster
         if (G.keys.has(" ")) shoot();
         G.shipX = Math.max(70, Math.min(sw - 70, G.shipX));
         // new UFO (same rules as the old game)
@@ -308,19 +310,29 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
         if (bh) { G.bounces = G.bounces.filter(d => d !== bh); hurt(); }
         G.bounces = G.bounces.filter(d => d.y < sh + 30 && d.x > -40 && d.x < sw + 40);
         // heart orb: floats down slowly while the kid has fewer than 5 lives
-        if (!G.orb && livesRef.current < MAX_LIVES && now - G.lastOrb > X.orbMs) {
-          const x0 = 160 + Math.random() * (sw - 320);
-          G.orb = { id: G.id++, x0, x: x0, y: -60, t: 0 };
-        }
-        if (G.orb) {
-          G.orb.t += dt; G.orb.y += 70 * dt; G.orb.x = G.orb.x0 + Math.sin(G.orb.t * 1.3) * 60;
-          if (G.orb.y > sh + 60) { G.orb = null; G.lastOrb = now; }
-          // the ship flying into the heart catches it too, like a coin (Andy 10-16)
-          else if (Math.abs(G.orb.x - G.shipX) < 64 && G.orb.y > top - 20 && G.orb.y < top + 110) {
-            addFx({ x: G.orb.x, y: G.orb.y, kind: "life", idx: 0, word: "" });
-            G.orb = null; G.lastOrb = now;
-            livesRef.current = Math.min(MAX_LIVES, livesRef.current + 1); setLives(livesRef.current); sfx("life");
+        // a GROUP of heart orbs: easy 2, medium/hard 3, each in its own part of the screen + at its own height (Andy 2026-10-18)
+        if (!G.orbs.length && livesRef.current < MAX_LIVES && now - G.lastOrb > X.orbMs) {
+          const n = diff === "easy" ? 2 : 3, zw = (sw - 320) / n;
+          for (let i = 0; i < n; i++) {
+            const x0 = 160 + zw * i + zw * (0.2 + Math.random() * 0.6);
+            G.orbs.push({ id: G.id++, x0, x: x0, y: -60 - Math.random() * 220, t: Math.random() * 5 });
           }
+        }
+        if (G.orbs.length) {
+          for (const o of [...G.orbs]) {
+            o.t += dt; o.y += 70 * dt; o.x = o.x0 + Math.sin(o.t * 1.3) * 60;
+            // a heart never sits on a robot: near one, it slides sideways away from it (Andy 10-19)
+            for (const a of G.ufos) { const dx = o.x - a.x; if (Math.abs(o.y - a.y) < 110 && Math.abs(dx) < UFO_W * 0.6 + ORB_W * 0.6) o.x0 += (dx >= 0 ? 1 : -1) * 320 * dt; }
+            o.x0 = Math.max(90, Math.min(sw - 90, o.x0)); o.x = o.x0 + Math.sin(o.t * 1.3) * 60;
+            if (o.y > sh + 60) G.orbs = G.orbs.filter(q => q !== o);
+            // the ship flying into the heart catches it too, like a coin (Andy 10-16)
+            else if (Math.abs(o.x - G.shipX) < 64 && o.y > top - 20 && o.y < top + 110) {
+              addFx({ x: o.x, y: o.y, kind: "life", idx: 0, word: "" });
+              G.orbs = G.orbs.filter(q => q !== o);
+              livesRef.current = Math.min(MAX_LIVES, livesRef.current + 1); setLives(livesRef.current); sfx("life");
+            }
+          }
+          if (!G.orbs.length) G.lastOrb = now; // the wait for the next group starts when this group is all gone
         }
         // coins drift down slowly with a gentle sway
         if (G.coins.length < 3 && now - G.lastCoin > COIN_MS) {
@@ -342,9 +354,10 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
         // kid's shots
         for (const b of G.shots) b.y -= 1100 * dt;
         for (const b of [...G.shots]) {
-          if (G.orb && Math.hypot(b.x - G.orb.x, b.y - G.orb.y) < ORB_W * 0.62) {
-            addFx({ x: G.orb.x, y: G.orb.y, kind: "life", idx: 0, word: "" });
-            G.orb = null; G.lastOrb = now; G.shots = G.shots.filter(s => s !== b);
+          const ho = G.orbs.find(o => Math.hypot(b.x - o.x, b.y - o.y) < ORB_W * 0.62);
+          if (ho) {
+            addFx({ x: ho.x, y: ho.y, kind: "life", idx: 0, word: "" });
+            G.orbs = G.orbs.filter(o => o !== ho); if (!G.orbs.length) G.lastOrb = now; G.shots = G.shots.filter(s => s !== b);
             livesRef.current = Math.min(MAX_LIVES, livesRef.current + 1); setLives(livesRef.current); sfx("life");
             continue;
           }
@@ -366,7 +379,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
             if (G.solvedN >= TOTAL) { // meter full (Andy 15:06): green, MISSION ACCOMPLISHED flies to the middle, then the win screen
               endRef.current = true;
               for (const a of G.ufos) addFx({ x: a.x, y: a.y, kind: "happy", idx: a.idx, word: a.word });
-              G.ufos = []; G.drops = []; G.bounces = []; G.coins = []; G.orb = null;
+              G.ufos = []; G.drops = []; G.bounces = []; G.coins = []; G.orbs = [];
               window.setTimeout(() => { setMission(true); sfx("levelup"); }, 500);
               window.setTimeout(() => finish(() => onWin(coinsRef.current)), 3700);
             }
@@ -406,17 +419,51 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
   }, []);
 
   const fieldRef = useRef<HTMLDivElement>(null);
+  // iPad 'Share...' bubble (Andy 10-19): a long press anywhere on the play field never starts an iPad menu (the field has no
+  // tap actions on touch - only the joystick and SHOOT, which still get their touches)
+  useEffect(() => {
+    const el = fieldRef.current; if (!el) return;
+    const stop = (e: TouchEvent) => { if (e.cancelable) e.preventDefault(); };
+    el.addEventListener("touchstart", stop, { passive: false });
+    return () => el.removeEventListener("touchstart", stop);
+  }, []);
   const touchX = (e: React.TouchEvent) => {
     const r = fieldRef.current?.getBoundingClientRect(); if (!r) return;
     g.current.shipX = (e.touches[0].clientX - r.left) / fitRef.current.s;
   };
   const isTouch = typeof window !== "undefined" && "ontouchstart" in window;
-  const hold = (dir: number) => (e: React.TouchEvent<HTMLButtonElement>) => {
-    e.stopPropagation(); const k = dir < 0 ? "ArrowLeft" : "ArrowRight";
-    if (e.type === "touchstart") g.current.keys.add(k); else g.current.keys.delete(k);
+  // left/right JOYSTICK (Andy 10-19: no arrow buttons in any game) - the knob slides sideways only
+  const joyRef = useRef<HTMLDivElement>(null), knobRef = useRef<HTMLElement>(null), joyId = useRef<number | null>(null), joyO = useRef(0);
+  const joyT = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    const el = joyRef.current; if (!el) return;
+    let t: React.Touch | null = null;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const c = e.changedTouches[i];
+      if (e.type === "touchstart" ? joyId.current === null : c.identifier === joyId.current) { t = c; break; }
+    }
+    if (!t) return;
+    joyId.current = t.identifier;
+    const r = el.getBoundingClientRect(), R = (r.width - r.height) / 2 + r.height * 0.15;   // how far the knob can slide
+    const mid = r.left + r.width / 2;
+    // NO DRIFT (Andy 10-19): a finger that lands ON the knob makes that spot 'still'; a bigger still zone; the ship eases in
+    if (e.type === "touchstart") joyO.current = Math.abs(t.clientX - mid) < r.height * 0.35 ? t.clientX : mid;
+    const dx = Math.max(-R, Math.min(R, t.clientX - joyO.current));
+    if (knobRef.current) knobRef.current.style.transform = `translateX(${Math.max(-R, Math.min(R, t.clientX - mid))}px)`;
+    const k = dx / R;
+    g.current.joyX = Math.abs(k) < 0.3 ? 0 : Math.sign(k) * Math.min(1, (Math.abs(k) - 0.3) / 0.45);   // still zone 30%, 75% out = full speed
+  };
+  const joyEnd = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    for (let i = 0; i < e.changedTouches.length; i++) if (e.changedTouches[i].identifier === joyId.current) {
+      joyId.current = null; g.current.joyX = 0; g.current.joyS = 0;
+      if (knobRef.current) knobRef.current.style.transform = "";
+    }
   };
   // SHOOT held down = keeps shooting (Andy 10-15)
   const fireRef = useRef<number | null>(null);
+  // load every picture at the start, so robots/hearts/coins never show up as empty boxes on a slow connection (Andy 10-19 iPad)
+  useEffect(() => { [1, 2, 3, 4, 5, 6].map(n => `${ART}/ufo-${n}.webp`).concat([`${ART}/heart-orb.webp`, `${ART}/ship-1.webp`, `${ART}/ship-2.webp`, `${ART}/mission.webp`, "/worlds/ui/coin.webp"]).forEach(u => { new Image().src = u; }); }, []);
   const fireHold = (e: React.TouchEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     if (fireRef.current) { window.clearInterval(fireRef.current); fireRef.current = null; }
@@ -467,11 +514,11 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
               </div>
             </div>
           ))}
-          {G.orb && (
-            <div className="ss-orb" style={{ left: G.orb.x, top: G.orb.y }}>
+          {G.orbs.map(o => (
+            <div key={o.id} className="ss-orb" style={{ left: o.x, top: o.y }}>
               <img src={`${ART}/heart-orb.webp`} alt="" style={{ width: ORB_W }} draggable={false} />
             </div>
-          )}
+          ))}
           {G.coins.map(c => (
             <div key={c.id} className="ss-coin" style={{ left: c.x, top: c.y }}>
               <img src="/worlds/ui/coin.webp" alt="" style={{ width: c.v > 1 ? COIN_W * 1.15 : COIN_W }} draggable={false} />
@@ -503,10 +550,7 @@ const Play = ({ unit, diff, cfg, sfxOn, musicOn, onToggleMusic, onBack, onWin, o
           )}
         </div>
         {isTouch && (
-          <div className="ss-pads" data-noclick onTouchMove={e => e.stopPropagation()}>{/* a finger sliding on a button never moves the ship there */}
-            <button aria-label="left" onTouchStart={hold(-1)} onTouchEnd={hold(-1)} onTouchCancel={hold(-1)}><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(270 11 11)" /></svg></button>
-            <button aria-label="right" onTouchStart={hold(1)} onTouchEnd={hold(1)} onTouchCancel={hold(1)}><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(90 11 11)" /></svg></button>
-          </div>
+          <div className="ss-joy" data-noclick ref={joyRef} onTouchStart={joyT} onTouchMove={joyT} onTouchEnd={joyEnd} onTouchCancel={joyEnd}><i ref={knobRef} /></div>
         )}
         {isTouch && (
           <button className="ss-fire" data-noclick aria-label="shoot" onTouchStart={fireHold} onTouchEnd={fireHold} onTouchCancel={fireHold}>SHOOT
@@ -549,7 +593,7 @@ export default function SpaceShooter2({ unit, diff, cfg, sfxOn = true, musicOn, 
   const restart = () => { onRestart?.(); setResult(null); setRun(r => r + 1); };
   if (result === "win") return <>{renderWin(restart, coinsWon, coinStart)}</>;
   if (result) return <>{renderLose(result, restart)}</>;
-  if (howto) return <HowToPlay {...SPACE_HOWTO} muted={!musicOn} onDone={() => { setHowto(false); seenHowto("space"); }} />;
+  if (howto) return <HowToPlay {...SPACE_HOWTO} muted={!musicOn} needOk={firstHowto("space")} onDone={() => { setHowto(false); seenHowto("space"); }} />;
   return <Play key={run} unit={unit} diff={diff} cfg={cfg} sfxOn={sfxOn && musicOn} musicOn={musicOn} onToggleMusic={onToggleMusic}
     onBack={onBack} onWin={c => { setCoinsWon(c); setResult("win"); }} onLose={r => setResult(r)} />;
 }
@@ -622,6 +666,10 @@ const CSS = `
 .ss-help{position:absolute;left:0;right:0;bottom:14px;text-align:center;color:#fbbf24;font-family:'Fredoka One','Nunito',sans-serif;font-size:24px;pointer-events:none;text-shadow:0 2px 4px rgba(0,0,0,.8)}
 .ss-help .zh{font-family:'Nunito',sans-serif;font-size:20px;margin-top:2px}
 .ss-pads{position:absolute;left:18px;bottom:12px;display:flex;gap:14px;z-index:20} /* left side (Andy 10-15) */
+.ss-fire::before{content:"";position:absolute;inset:-40px;border-radius:50%} /* a touch a little outside SHOOT still shoots (Andy 10-19) */
+.ss-joy{position:absolute;left:24px;bottom:24px;width:240px;height:120px;border-radius:60px;background:rgba(0,40,60,.45);border:4px solid rgba(255,255,255,.85);box-sizing:border-box;touch-action:none;z-index:30;box-shadow:0 0 0 6px rgba(255,255,255,.12)} /* left/right joystick (Andy 10-19) */
+.ss-joy i{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#d8f1ff 60%,#9fd3ee);box-shadow:0 4px 10px rgba(0,0,0,.35);pointer-events:none}
+@media (max-height:500px){.ss-joy{width:180px;height:90px;left:14px;bottom:14px}.ss-joy i{width:62px;height:62px;margin:-31px}}
 .ss-taphint{position:absolute;left:calc(50% - 14px);top:calc(50% - 90px);width:120px;height:110px;z-index:25;pointer-events:none} /* inside the SHOOT button: the fingertip lands on its middle */
 .ss-fire{position:absolute;right:22px;bottom:30px;width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.16);border:3px solid rgba(255,255,255,.75);color:#fff;font:700 24px Arial,sans-serif;letter-spacing:1px;display:flex;align-items:center;justify-content:center;padding:0;z-index:20;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
 .ss-fire:active{background:rgba(255,255,255,.4)}

@@ -16,7 +16,7 @@ import { Word3D, FUN3D_CSS } from "@/components/Fun3D";
 import { useClickSfx } from "@/lib/clickSfx";
 import HowToPlay from "@/components/HowToPlay";
 import { ALBUM_HOWTO, SWAP_HOWTO } from "@/components/howtos";
-import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { useHowtoSeen, wantHowto, seenHowto, firstHowto } from "@/lib/howtoSeen";
 import { loadPrizes, loadCards, openPacks, pickCard, markSeen, cardSeen, type CardPacks } from "@/lib/cloudSave";
 import { REAL_CODES } from "@/pages/PuzzleMixup";   // ONE list of real-saving codes for Puzzle + Album
 import { lockLeft, LOCK_IMG } from "@/lib/locks";
@@ -937,6 +937,14 @@ export default function CardAlbum() {
     if (was === "got") { const n = doneQ.current.shift(); if (n) window.setTimeout(() => setSetDone(n), 300); }
   };
 
+  // STILL READING THE CLOUD (Andy 10-17 iPad: a flash of 'Card Album' + 'Back' on plain purple before the album): show only the
+  // table picture. If the cloud is very slow (4s), the old screen with its Back button comes back so a kid is never stuck.
+  const reading = !isMaster && (lockN < 0 || (real && lockN === 0 && cardsLoad === "wait"));
+  const [slow, setSlow] = useState(false);
+  useEffect(() => { if (!reading) return; const t = window.setTimeout(() => setSlow(true), 4000); return () => window.clearTimeout(t); }, [reading]);
+  if (!on && reading && !slow) return (
+    <div className="ca-root"><style>{CSS}</style><div className="ca-table" style={{ backgroundImage: `url(${TABLE_BG})`, animation: "none" }} /></div>
+  );
   if (!on) return (
     <div className="ca-root"><style>{FONTS + FUN3D_CSS + CSS}</style>
       <div className="ca-soon">
@@ -1122,7 +1130,7 @@ export default function CardAlbum() {
         )}
         <canvas ref={cvRef} className="ca-fx" width={Math.round(sw)} height={Math.round(sh)} style={{ width: sw, height: sh }} aria-hidden="true" />
       </div>
-      {how === "open" && <HowToPlay {...ALBUM_HOWTO} onDone={closeHow} />}
+      {how === "open" && <HowToPlay {...ALBUM_HOWTO} needOk={!go && firstHowto("album")} onDone={closeHow} />}
       {swapHelp && <HowToPlay {...SWAP_HOWTO} onDone={() => setSwapHelp(false)} />}{/* outside the scaled stage (it fits itself to the window) */}
     </div>
   );

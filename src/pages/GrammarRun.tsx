@@ -5,7 +5,7 @@ import GrammarGameBar from "@/components/GrammarGameBar";
 import { useClickSfx } from "@/lib/clickSfx";
 import ControlHints, { HINT_BOTTOM } from "@/components/ControlHints";
 import HowToPlay from "@/components/HowToPlay";
-import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { useHowtoSeen, wantHowto, seenHowto, firstHowto } from "@/lib/howtoSeen";
 import { RUN_HOWTO } from "@/components/howtos";
 import { installIdleCursor } from "@/lib/idleCursor";
 import WinCelebration from "@/components/WinCelebration";
@@ -62,7 +62,10 @@ export default function GrammarRun() {
         else addPieces(kidCode, kidName, 1);   // odd level in the URL = still pay the piece
         addTreats(kidCode, kidName, 2).then(total => { if (typeof total === "number") { localStorage.setItem(jarKey, String(total)); setTreatsAfter(total); } });
         // let the game's own ending (fireworks / chest / last grab) play, then show the celebration
-        window.setTimeout(() => setWon(true), 2000);
+        window.setTimeout(() => {
+          setWon(true);
+          frameRef.current?.contentWindow?.postMessage({ type: "MPE_FADE_OUT", ms: 400 }, "*"); // quick fade of the game's music (Andy 10-17 iPad: Run kept playing - same as Swim/Dig/Grab now)
+        }, 2000);
       }
       if (e.data && e.data.type === "MPE_STATS") {
         const d = e.data;
@@ -91,7 +94,7 @@ export default function GrammarRun() {
           frameRef.current?.contentWindow?.focus(); // keep arrow keys working after the click
         }}
       />
-      {howto && <HowToPlay {...RUN_HOWTO} muted={muted} onDone={() => { setHowto(false); seenHowto("grun"); }} />} {/* How to Play first; the game loads after (Andy 2026-10-07) */}
+      {howto && <HowToPlay {...RUN_HOWTO} muted={muted} needOk={firstHowto("grun")} onDone={() => { setHowto(false); seenHowto("grun"); }} />} {/* How to Play first; the game loads after (Andy 2026-10-07) */}
       {howto === false && <iframe
         key={tryKey}
         ref={frameRef}

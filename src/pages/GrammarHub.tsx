@@ -426,7 +426,16 @@ export default function GrammarHub() {
         >
           Grammar
         </span>
-        <div style={{ width: 72 }} />
+        {/* Return to World (Andy 10-19 iPad) - same blue pill as the vocab pages; same place as Exit goes */}
+        <button
+          onClick={() => {
+            const r = sessionStorage.getItem("mpe_return_world") || "";
+            navigate(r.toLowerCase().includes(`/${kidCode.toLowerCase()}/${kidName}`) ? r : `/world/${kidCode}/${kidName}`);
+          }}
+          style={{ background: "linear-gradient(180deg,#b8f4ff,#4fd2f6 55%,#1ca3dc)", border: "2px solid #0a5a86", color: "white", fontFamily: F, fontWeight: 900, fontSize: "0.95rem", padding: "0.32rem 1rem", borderRadius: 999, cursor: "pointer", textShadow: "0 1px 2px rgba(0,0,0,.45)", boxShadow: "0 3px 0 #0a5a86", whiteSpace: "nowrap", marginRight: 64 /* clear of the fixed sound button top-right (Andy 10-19: they overlapped) */ }}
+        >
+          Return to World
+        </button>
       </nav>
 
       <style>{`@media (max-width: 760px){.mpe-level-grid{grid-template-columns:1fr !important;grid-auto-rows:auto !important}}`}</style>

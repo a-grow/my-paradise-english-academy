@@ -73,9 +73,11 @@ export default function WinParade({ cx, sh, items, sfxOn, target, onLand, onDone
       const side = dst.x >= p1.x ? 1 : -1, lift = 110 + Math.random() * 90;
       const c1 = { x: p1.x + (dst.x - p1.x) * 0.25, y: Math.min(p1.y, dst.y) - lift };      // rises in a soft arc...
       const c2 = { x: dst.x - side * (30 + Math.random() * 50), y: dst.y - 80 - Math.random() * 50 };   // ...and comes down into the button
-      const t0 = performance.now();
-      const step = (now: number) => {
-        const t = now - t0;
+      // SMOOTH ON iPAD (Andy 10-19: laggy even on the fast build): the whole flight is worked out FIRST and handed to the
+      // browser as ONE animation - it runs on the graphics chip, so the world page updating its numbers can't stutter it.
+      const D = POP + FLIGHT, N = 40, frames: Keyframe[] = [];
+      for (let n = 0; n <= N; n++) {
+        const t = (n / N) * D;
         let x: number, y: number, s: number, o = 1;
         if (t < POP) {
           const k = 1 - Math.pow(1 - t / POP, 3);
@@ -86,13 +88,11 @@ export default function WinParade({ cx, sh, items, sfxOn, target, onLand, onDone
           y = m * m * m * p1.y + 3 * m * m * k * c1.y + 3 * m * k * k * c2.y + k * k * k * dst.y;
           s = u < 0.8 ? 1.15 - 0.2 * (u / 0.8) : 0.95 - 0.7 * ((u - 0.8) / 0.2);           // shrinks as it goes in
           if (u > 0.88) o = Math.max(0, 1 - (u - 0.88) / 0.12);
-          if (u >= 1) { c.remove(); flash(dst.x, dst.y); return; }
         }
-        c.style.transform = `translate(${x}px,${y}px) scale(${s})`;
-        c.style.opacity = String(o);
-        rafs.push(requestAnimationFrame(step));
-      };
-      rafs.push(requestAnimationFrame(step));
+        frames.push({ transform: `translate(${x}px,${y}px) scale(${s})`, opacity: o, offset: n / N });
+      }
+      const an = c.animate(frames, { duration: D, easing: "linear", fill: "forwards" });
+      an.onfinish = () => { c.remove(); flash(dst.x, dst.y); };
     };
 
     play("/celebration/win_pop.mp3", 0.7);                    // the prizes pop up
@@ -167,9 +167,9 @@ const CSS = `
 @keyframes wp-in{0%{opacity:0;transform:scale(.2)}100%{opacity:1;transform:scale(1)}}
 .wp-in img{display:block;filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))}
 .wp-n{margin-top:2px;font-family:'Titan One',sans-serif;font-size:34px;line-height:1;color:#fff;paint-order:stroke fill;-webkit-text-stroke:6px #3a1d6e;white-space:nowrap}
-.wp-fly{position:absolute;left:0;top:0;pointer-events:none;z-index:2}
+.wp-fly{position:absolute;left:0;top:0;pointer-events:none;z-index:2;will-change:transform,opacity}
 .wp-fly > div{width:100%;height:100%}
-.wp-fly img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
+.wp-fly img{display:block;width:100%;height:100%;object-fit:contain} /* no shadow filter while flying: the iPad redrew it every frame (Andy 10-19 lag) */
 .wp-tumble{animation:wp-tumble .35s linear infinite}
 .wp-flash{position:absolute;left:0;top:0;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;pointer-events:none;z-index:3;
  background:radial-gradient(circle,#fff 0%,#fffbe0 16%,#ffef5a 38%,rgba(255,222,40,.6) 58%,rgba(255,210,0,0) 72%)}

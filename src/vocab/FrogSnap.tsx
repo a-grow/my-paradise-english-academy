@@ -12,7 +12,7 @@ import { FUN3D_CSS, Word3D } from "@/components/Fun3D";
 import ControlHints, { HINT_BOTTOM, type HintKey } from "@/components/ControlHints";
 import HowToPlay from "@/components/HowToPlay";
 import { PAUSE } from "@/lib/pause";
-import { wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { wantHowto, seenHowto, firstHowto } from "@/lib/howtoSeen";
 
 type Diff = "easy" | "medium" | "hard";
 type Cfg = { spawnMs: number; speedMult: number; timerSec: number; maxOnScreen: number };
@@ -22,7 +22,7 @@ const ART = "/vocab/frog";
 export const FROG_MUSIC = `${ART}/music.mp3`; // Andy's 'funny bouncy cartoon mischief', levelled to ~-22.4 LUFS
 const FW = 1600, FH = 944;                    // design field (under the 56px bar)
 const BW = 1376, BH = 768;                    // lagoon picture size (water effects use these pixels)
-const FX = 150;                               // frog centre x (stage px)
+let FX = 150;                                 // frog centre x (stage px); iPad/phone: set each frame so the frog sits right of the joystick (Andy 10-17)
 const FROG_W = 125, FROG_H = 118, PAD_W = 192, PAD_H = 121; // a little smaller (Andy 23:05)
 const MOUTH = { x: 29, y: 0 };  // inside the open mouth (frog-2 pixel 229,147 of 312x294) - Andy 23:07               // tongue starts here (from the frog centre), measured on frog-2
 const MAX_LIVES = 5;
@@ -50,7 +50,7 @@ const fitWord = (word: string, d: number): { fs: number; two?: [string, string] 
 };
 // per level: new bubble every spawnMs, max bubbles at once, drift speed px/s [min, max]
 const LV: Record<Diff, { spawnMs: number; max: number; v: [number, number]; coinMs: number; heartMs: number }> = {
-  easy: { spawnMs: 2300, max: 4, v: [70, 100], coinMs: 4200, heartMs: 7000 },
+  easy: { spawnMs: 2300, max: 4, v: [70, 100], coinMs: 4200, heartMs: 7000 },   // hearts come one at a time on easy
   medium: { spawnMs: 1600, max: 6, v: [113, 169], coinMs: 4800, heartMs: 9000 },
   hard: { spawnMs: 1050, max: 8, v: [155, 230], coinMs: 5400, heartMs: 12000 },
 };
@@ -88,7 +88,7 @@ export const FROG_HOWTO = {
       text: <><b>Fill</b> the meter to <b>win!</b></> },
   ],
   controls: [{ keys: ["up", "down"] as HintKey[], text: <>Move</> }, { mouse: true, text: <>Click to <b>snap</b></> }],
-  touch: [{ pads: ["up", "down"], text: <>Move</> }, { finger: true, text: <>Tap a bubble to <b>snap</b></> }],
+  touch: [{ pads: ["stick"], text: <>Use the <b>joystick</b> to move</> }, { finger: true, text: <>Tap a bubble to <b>snap</b></> }],
   tip: <>Don't let the bubbles <em>bump</em> you!</>,
 };
 
@@ -197,6 +197,8 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
   };
   const [fit, setFit] = useState(calc);
   const fitRef = useRef(fit); fitRef.current = fit;
+  // touch: the joystick sits bottom-left (right edge 144px, 104px on a phone) - keep the frog + lily pad clear of it
+  FX = FROG_TOUCH ? Math.max(150, Math.round((window.innerHeight <= 500 ? 104 : 144) / fitRef.current.s) + PAD_W / 2 + 14) : 150;
   useEffect(() => { const on = () => setFit(calc()); window.addEventListener("resize", on); return () => window.removeEventListener("resize", on); }, []);
   // the lagoon picture covers the field: picture pixel -> stage px
   const scene = (f = fitRef.current) => {
@@ -223,7 +225,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
   useEffect(() => { if (tapHint !== "fade") return; const t = window.setTimeout(() => setTapHint(false), 600); return () => window.clearTimeout(t); }, [tapHint]); // hand + message fade out together (Andy 10-16) // touch: hand taps the pond until the first snap
 
   const g = useRef({ bubs: [] as Bub[], fx: [] as Fx[], tongue: null as Tongue | null, fy: 0, id: 0, start: 0, lastSpawn: 0, lastTgt: 0,
-    lastCoin: 0, lastHeart: 0, held: {} as Record<string, number>, nudge: 0, dizzy: 0, happy: 0,
+    lastCoin: 0, lastHeart: 0, heartTwin: 0, joyY: 0, joyS: 0, held: {} as Record<string, number>, nudge: 0, dizzy: 0, happy: 0,
     lastWord: "", cooldown: false, invincible: false, cleared: new Set<string>(), keys: new Set<string>(), hits: {} as Record<string, number>, solvedN: 0 });
   if (!g.current.fy) { const [a, b] = frogRange(); g.current.fy = (a + b) / 2; }
 
@@ -326,6 +328,8 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
         // frog: arrow keys / W S (tap = small glide, hold = steady speed); not while dizzy
         if (G.dizzy < now) {
           if (G.nudge) { const st = Math.abs(G.nudge) < 0.5 ? G.nudge : G.nudge * Math.min(1, dt * 14); G.fy += st; G.nudge -= st; }
+          G.joyS += (G.joyY - G.joyS) * Math.min(1, dt * 12); // eased, so a finger lifting off never jerks the frog (Andy 10-19)
+          if (Math.abs(G.joyS) > 0.02) G.fy += G.joyS * 430 * dt;   // iPad/phone joystick (Andy 10-17): further = faster
           for (const [k, dir] of [["up", -1], ["down", 1]] as const) {
             if (!G.keys.has(k)) { delete G.held[k]; continue; }
             if (!G.held[k]) G.held[k] = now;
@@ -362,6 +366,11 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
         }
         if (livesRef.current < MAX_LIVES && now - G.lastHeart > L.heartMs && !G.bubs.some(b => b.kind === "heart")) {
           G.lastHeart = now; G.bubs.push(mkBub("heart", "", HEART_D, sw, bTop, bBot));
+          if (diff !== "easy") G.heartTwin = now + 1500;   // medium + hard: a 2nd heart follows (Andy 10-17)
+        }
+        if (G.heartTwin && now > G.heartTwin) {
+          G.heartTwin = 0;
+          if (livesRef.current < MAX_LIVES) G.bubs.push(mkBub("heart", "", HEART_D, sw, bTop, bBot));
         }
         // drift left with a gentle bob
         for (const b of G.bubs) { b.ph += dt; b.x -= b.vx * dt; b.y = b.y0 + Math.sin(b.ph * 1.4) * 14; }
@@ -440,9 +449,33 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
     if (hit) shoot(hit.b.id);
   };
   const isTouch = typeof window !== "undefined" && "ontouchstart" in window;
-  const hold = (k: "up" | "down") => (e: React.TouchEvent<HTMLButtonElement>) => {
+  // iPad/phone: an UP/DOWN JOYSTICK moves the frog (Andy 10-17; was 2 arrow buttons). The knob only slides up and down.
+  const joyRef = useRef<HTMLDivElement>(null), knobRef = useRef<HTMLElement>(null), joyId = useRef<number | null>(null), joyO = useRef(0);
+  const joyT = (e: React.TouchEvent) => {
     e.stopPropagation();
-    if (e.type === "touchstart") g.current.keys.add(k); else g.current.keys.delete(k);
+    const el = joyRef.current; if (!el) return;
+    let t: React.Touch | null = null;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const c = e.changedTouches[i];
+      if (e.type === "touchstart" ? joyId.current === null : c.identifier === joyId.current) { t = c; break; }
+    }
+    if (!t) return;
+    joyId.current = t.identifier;
+    const r = el.getBoundingClientRect(), R = (r.height - r.width) / 2 + r.width * 0.15;   // how far the knob can slide
+    const mid = r.top + r.height / 2;
+    // NO DRIFT (Andy 10-19): a finger that lands ON the knob makes that spot 'still'; a bigger still zone; the frog eases in
+    if (e.type === "touchstart") joyO.current = Math.abs(t.clientY - mid) < r.width * 0.35 ? t.clientY : mid;
+    const dy = Math.max(-R, Math.min(R, t.clientY - joyO.current));
+    if (knobRef.current) knobRef.current.style.transform = `translateY(${Math.max(-R, Math.min(R, t.clientY - mid))}px)`;
+    const k = dy / R;
+    g.current.joyY = Math.abs(k) < 0.3 ? 0 : Math.sign(k) * Math.min(1, (Math.abs(k) - 0.3) / 0.45);   // still zone 30%, 75% out = full speed
+  };
+  const joyEnd = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    for (let i = 0; i < e.changedTouches.length; i++) if (e.changedTouches[i].identifier === joyId.current) {
+      joyId.current = null; g.current.joyY = 0; g.current.joyS = 0;
+      if (knobRef.current) knobRef.current.style.transform = "";
+    }
   };
 
   const G = g.current;
@@ -553,10 +586,7 @@ const Play = ({ unit, diff, sfxOn, musicOn, onToggleMusic, onBack, onWin, onLose
           )}
         </div>
         {isTouch && (
-          <div className="fs-pads" data-noclick>
-            <button aria-label="up" onTouchStart={hold("up")} onTouchEnd={hold("up")} onTouchCancel={hold("up")}><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(0 11 11)" /></svg></button>
-            <button aria-label="down" onTouchStart={hold("down")} onTouchEnd={hold("down")} onTouchCancel={hold("down")}><svg width="34" height="34" viewBox="0 0 22 22"><path d="M11 5 L18 15 H4 Z" fill="#fff" transform="rotate(180 11 11)" /></svg></button>
-          </div>
+          <div className="fs-joy" data-noclick ref={joyRef} onTouchStart={joyT} onTouchMove={joyT} onTouchEnd={joyEnd} onTouchCancel={joyEnd}><i ref={knobRef} /></div>
         )}
       </div>
     </div>
@@ -581,7 +611,7 @@ export default function FrogSnap({ unit, diff, sfxOn = true, musicOn, onToggleMu
   const restart = () => { onRestart?.(); setResult(null); setRun(r => r + 1); };
   if (result === "win") return <>{renderWin(restart, coinsWon, coinStart)}</>;
   if (result) return <>{renderLose(result, restart)}</>;
-  if (howto) return <HowToPlay {...FROG_HOWTO} bg={`${ART}/bg.webp`} muted={!musicOn} onDone={() => { setHowto(false); seenHowto("arrow"); }} />;
+  if (howto) return <HowToPlay {...FROG_HOWTO} bg={`${ART}/bg.webp`} muted={!musicOn} needOk={firstHowto("arrow")} onDone={() => { setHowto(false); seenHowto("arrow"); }} />;
   return <Play key={run} unit={unit} diff={diff} sfxOn={sfxOn && musicOn} musicOn={musicOn} onToggleMusic={onToggleMusic}
     onBack={onBack} onWin={c => { setCoinsWon(c); setResult("win"); }} onLose={r => setResult(r)} />;
 }
@@ -700,6 +730,8 @@ const CSS = `
 .fs-orbit{position:absolute;left:50%;top:50%;width:0;height:0;animation:fs-orb 6s linear infinite}
 .fs-orbit img{position:absolute;width:80px;margin:-31px 0 0 -40px;max-width:none;transform:rotate(var(--a)) translateX(230px) rotate(calc(var(--a) * -1))}
 @keyframes fs-orb{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.fs-joy{position:absolute;left:24px;bottom:24px;width:120px;height:240px;border-radius:60px;background:rgba(0,40,60,.45);border:4px solid rgba(255,255,255,.85);box-sizing:border-box;touch-action:none;z-index:30;box-shadow:0 0 0 6px rgba(255,255,255,.12)}
+.fs-joy i{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#d8f1ff 60%,#9fd3ee);box-shadow:0 4px 10px rgba(0,0,0,.35);pointer-events:none}
 .fs-pads{position:absolute;left:18px;bottom:16px;display:flex;flex-direction:column;gap:14px} /* left side (Andy 10-15) */
 .fs-pads button{width:84px;height:84px;border-radius:20px;background:rgba(0,40,60,.45);border:3px solid rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;padding:0;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
 .fs-pads button:active{background:rgba(255,255,255,.4)}
@@ -713,6 +745,6 @@ const CSS = `
 .fs-taphint i{position:absolute;left:-10px;top:66px;width:48px;height:48px;border-radius:50%;border:5px solid #ffd84a;opacity:0;animation:fs-rip 1.1s ease-out infinite}
 @keyframes fs-tap{0%,100%{transform:translate(16px,-16px)}40%,55%{transform:translate(0,0)}}
 @keyframes fs-rip{0%,42%{transform:scale(.3);opacity:0}48%{opacity:1}100%{transform:scale(1.7);opacity:0}}
-@media (max-height:500px){.fs-pads{gap:8px;bottom:8px}.fs-pads button{width:64px;height:64px}}
+@media (max-height:500px){.fs-pads{gap:8px;bottom:8px}.fs-pads button{width:64px;height:64px}.fs-joy{width:90px;height:180px;left:14px;bottom:14px}.fs-joy i{width:62px;height:62px;margin:-31px}}
 @media (prefers-reduced-motion: reduce){.fs-shim,.fs-gl,.fs-spk,.fs-ripples i,.fs-fall i,.fs-fall b,.fs-foam,.fs-drop,.fs-bobber,.fs-wob,.fs-fly,.fs-padring{animation:none}}
 `;

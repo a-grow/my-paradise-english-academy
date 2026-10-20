@@ -12,7 +12,7 @@
 //          album / worlds = 'Coming soon!' for now (Vocab needs a savanna return in GamePage first - step 5.4).
 // HARD RULES: scenery stays still (only the animal + UI move); never window.prompt/alert/confirm;
 // gold panels = pre-built images, never CSS border-image; Titan One for all code text; no emojis.
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { startTransition, useEffect, useRef, useState, type ComponentType } from "react";
 import type { WorldSkin } from "../skin";
 import type { WorldView } from "@/pages/WorldPage";
 import CookieJar from "@/components/CookieJar";
@@ -762,8 +762,12 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     : k === "badge" ? at(badgesRef.current, 0.5, 0.5) : at(puzzleRef.current, 0.5, 0.5);
   const [meterGlow, setMeterGlow] = useState(0);
   const paradeLand = (k: PrizeKind, add: number) => {
-    if (k === "treat") dailyLand("treat", add); else partyLand(k, add);
-    if (k === "coin") setMeterGlow(Date.now());
+    // iPad (Andy 10-20: treats into the jar a little laggy): the world redraw for each landing runs in small pieces between
+    // frames, so the jar's drop + hop and the flying prizes keep moving smoothly. Same result, a few ms later.
+    startTransition(() => {
+      if (k === "treat") dailyLand("treat", add); else partyLand(k, add);
+      if (k === "coin") setMeterGlow(Date.now());
+    });
   };
   useEffect(() => { if (!meterGlow) return; const t = window.setTimeout(() => setMeterGlow(0), 700); return () => window.clearTimeout(t); }, [meterGlow]);
   // PACK READY moment: the meter passes a full pack while coins land -> the pack bounces, OPEN! glows, the red number pops in.
@@ -1213,7 +1217,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
             muted={!v.sfxOn} onIntro={q => theaterMusic(q)} />
         )}
 
-        {howto === "open" && <HowToPlay {...worldHowTo((v.ANIMALS[0]?.stages ?? []).map(st => st.img))} muted={!v.sfxOn} onDone={closeHowto} />}
+        {howto === "open" && <HowToPlay {...worldHowTo((v.ANIMALS[0]?.stages ?? []).map(st => st.img))} muted={!v.sfxOn} needOk={howAuto.current} onDone={closeHowto} />}
         {parade && (
           <WinParade cx={cx} sh={sh} items={parade} sfxOn={v.sfxOn} target={paradeTarget} onLand={paradeLand}
             onDone={() => { if (testWp) setTestKeep(true); setParade(null); }} />
@@ -1348,9 +1352,9 @@ const CSS = `
 .sv-flyshadow{position:absolute;top:800px;width:300px;height:44px;margin-left:-150px;border-radius:50%;pointer-events:none;
  background:radial-gradient(ellipse at center,rgba(40,25,5,.5) 0%,rgba(40,25,5,.25) 45%,rgba(40,25,5,0) 72%);animation:sv-flyshadow 3.6s ease-in-out infinite}
 @keyframes sv-flyshadow{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.86);opacity:.75}}
-.sv-nametag{position:absolute;left:50%;top:824px;transform:translateX(-50%);animation:sv-nameBob 1.6s ease-in-out infinite}
-.sv-nametag img{display:block;height:54px;width:auto;filter:drop-shadow(0 5px 5px rgba(0,0,0,.4))}
-@keyframes sv-nameBob{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
+.sv-nametag{position:absolute;left:50%;top:824px;transform:translateX(-50%)}
+.sv-nametag img{display:block;height:54px;width:393px;filter:drop-shadow(0 5px 5px rgba(0,0,0,.4));animation:sv-nameBob 1.6s ease-in-out infinite} /* bob on the picture, fixed width: iPad Safari put the label off-centre (Andy 10-20) */
+@keyframes sv-nameBob{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 .sv-petname{position:absolute;left:50%;top:820px;transform:translateX(-50%);font-size:58px;line-height:1;color:#fff;white-space:nowrap;
  text-shadow:-3px -3px 0 #7a3f08,3px -3px 0 #7a3f08,-3px 3px 0 #7a3f08,3px 3px 0 #7a3f08,0 -3px 0 #7a3f08,0 3px 0 #7a3f08,-3px 0 0 #7a3f08,3px 0 0 #7a3f08,0 7px 0 #7a3f08,0 10px 12px rgba(0,0,0,.45)}
 .sv-feed{position:absolute;left:50%;top:892px;width:430px;transform:translateX(-50%);filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
@@ -1674,7 +1678,7 @@ const CSS = `
 .sv-vcard .sv-x{right:-36px;top:-36px;z-index:2}
 .sv-video{display:block;width:100%;aspect-ratio:16/9;border-radius:24px;background:#000}
 @media (prefers-reduced-motion: reduce){.sv-watch{animation:none;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}}
-@media (prefers-reduced-motion: reduce){.sv-animals.beacon{animation:sv-goldglow 1.3s ease-in-out infinite}.sv-sd,.sv-ss,.sv-st{display:none}.sv-halo{animation:none}.sv-animal,.sv-animal.egg,.sv-nametag,.sv-daily,.sv-animals.glow,.sv-hop.go,.sv-big.ready{animation:none}}
+@media (prefers-reduced-motion: reduce){.sv-animals.beacon{animation:sv-goldglow 1.3s ease-in-out infinite}.sv-sd,.sv-ss,.sv-st{display:none}.sv-halo{animation:none}.sv-animal,.sv-animal.egg,.sv-nametag,.sv-nametag img,.sv-daily,.sv-animals.glow,.sv-hop.go,.sv-big.ready{animation:none}}
 @media (prefers-reduced-motion: reduce){.sv-animal.mv-float,.sv-animal.mv-float.egg,.sv-animal.mv-still.fly,.sv-flyshadow{animation:none}}
 `;
 

@@ -7,7 +7,7 @@ import { loadSeen, markSeen } from "@/lib/cloudSave";
 
 const TEACHER = "1006";
 const WORDS = ["one", "two", "three"];
-const TIMES = WORDS.length;
+const TIMES = 2; // Andy 10-17: shown twice (1st = must tap OK, 2nd = tap anywhere), then only with '?'
 const LIMIT: Record<string, number> = { puzzle: 2, album: 2 }; // Andy 2026-10-11: Puzzle Mixup + Card Album show twice, then only with '?'
 const times = (id: string) => LIMIT[id] ?? TIMES;
 const st = { code: "", name: "", list: null as string[] | null };
@@ -30,6 +30,7 @@ export function useHowtoSeen(code?: string, name?: string) {
 
 const count = (id: string) => (st.list ?? []).filter(f => f.startsWith(`howto:${id}:`)).length;
 export const wantHowto = (id: string) => count(id) < times(id);
+export const firstHowto = (id: string) => count(id) === 0;   // never closed before = the kid must tap OK (Andy 10-17)
 export function seenHowto(id: string) {
   const k = count(id);
   if (k >= times(id)) return;

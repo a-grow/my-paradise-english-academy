@@ -44,8 +44,37 @@ export function installIosVolumeFix() {
     // asked to PLAY while quiet (e.g. the world song's 'start on the next tap' firing while the Badge room is open): stay silent
     // and start when the volume comes up. A muted play + pause keeps the sound allowed to start later (Andy 10-15 23:17).
     const nativePlay = P.play;
+    // BLOCKED SOUND FALLBACK (Andy 10-19 iPad: no win music): iOS refuses play() when no finger tap started it (win screens,
+    // prize parades - sounds started by a timer). The Web Audio channel below was woken by an earlier tap, so a refused SHORT
+    // sound (not looping, not a video, under 12 s) plays through it instead. Music and videos are never touched.
+    let fb: AudioContext | null = null;
+    try { const W2 = window as unknown as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext }; const A = W2.AudioContext || W2.webkitAudioContext; if (A) fb = new A(); } catch { fb = null; }
+    const bufs = new Map<string, Promise<AudioBuffer>>();
+    const viaWebAudio = (el: M) => {
+      try {
+        const src = el.currentSrc || el.src;
+        if (!fb || !src || el.muted || el.loop || el instanceof HTMLVideoElement || fb.state !== "running") return;
+        let b = bufs.get(src);
+        if (!b) {
+          const ctx = fb;
+          b = fetch(src).then(r => r.arrayBuffer()).then(a => new Promise<AudioBuffer>((ok, no) => { ctx.decodeAudioData(a, ok, no); }));
+          bufs.set(src, b); b.catch(() => bufs.delete(src));
+        }
+        const t0 = performance.now();
+        b.then(buf => {
+          if (!fb || buf.duration > 12 || performance.now() - t0 > 1500) return; // late or long = skip (never a stray song)
+          const sn = fb.createBufferSource(), gn = fb.createGain();
+          sn.buffer = buf; gn.gain.value = Math.max(0, Math.min(1, el.__mpeVol ?? 1));
+          sn.connect(gn); gn.connect(fb.destination); sn.start();
+        }).catch(() => { });
+      } catch { /* never break the app over sound */ }
+    };
     P.play = function (this: M) {
-      if ((this.__mpeVol ?? 1) > QUIET) return nativePlay.call(this);
+      if ((this.__mpeVol ?? 1) > QUIET) {
+        const p0 = nativePlay.call(this);
+        if (p0 && p0.catch) p0.catch((err: unknown) => { if (err && (err as { name?: string }).name === "NotAllowedError") viaWebAudio(this); });
+        return p0;
+      }
       this.__mpeQuiet = true;
       const wasMuted = this.muted; this.muted = true;
       const p = nativePlay.call(this);

@@ -11,7 +11,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Reac
 import GrammarGameBar from "@/components/GrammarGameBar";
 import ControlHints, { HINT_BOTTOM_LEFT } from "@/components/ControlHints";
 import HowToPlay from "@/components/HowToPlay";
-import { wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { wantHowto, seenHowto, firstHowto } from "@/lib/howtoSeen";
 import { gardenHowTo } from "@/components/howtos";
 
 type Diff = "easy" | "medium" | "hard";
@@ -507,7 +507,7 @@ export default function WhackGarden({ unit, diff, cfg, sfxOn = true, musicOn, on
   const restart = () => { onRestart?.(); setPlaying(false); setResult(null); setRun(r => r + 1); };
   if (result === "win") return <>{renderWin(restart, coinsWon, coinStart)}</>;
   if (result) return <>{renderLose(result, restart)}</>;
-  if (howto) return <HowToPlay {...gardenHowTo(diff)} muted={!musicOn} onDone={() => { setHowto(false); seenHowto("whack"); }} />;
+  if (howto) return <HowToPlay {...gardenHowTo(diff)} muted={!musicOn} needOk={firstHowto("whack")} onDone={() => { setHowto(false); seenHowto("whack"); }} />;
   return <Play key={run} unit={unit} diff={diff} cfg={cfg} sfxOn={sfxOn && musicOn} musicOn={musicOn} onToggleMusic={onToggleMusic}
     onBack={onBack} onWin={c => { setCoinsWon(c); setResult("win"); }} onLose={r => setResult(r)} intro={run === 0} onPlaying={() => setPlaying(true)} />;
 }

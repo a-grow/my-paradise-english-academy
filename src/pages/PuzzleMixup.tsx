@@ -13,7 +13,7 @@ import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
 import { useClickSfx } from "@/lib/clickSfx";
 import HowToPlay from "@/components/HowToPlay";
 import { PUZZLE_HOWTO } from "@/components/howtos";
-import { useHowtoSeen, wantHowto, seenHowto } from "@/lib/howtoSeen";
+import { useHowtoSeen, wantHowto, seenHowto, firstHowto } from "@/lib/howtoSeen";
 import { DEMO_COINS, demoCoinsGet, demoCoinsSet } from "@/cards/economy";
 import { loadPuzzle, puzzlePop, addCoins, claimPrize, loadPrizes } from "@/lib/cloudSave";
 import { lockLeft, LOCK_IMG } from "@/lib/locks";
@@ -331,10 +331,23 @@ export default function PuzzleMixup() {
   const howReady = useHowtoSeen(code, name);
   const [how, setHow] = useState<"ask" | "open" | "done">("ask");
   const [go, setGo] = useState(false);
+  // PICTURE READY FIRST (Andy 10-19 iPad: the open parts showed plain grey at first): the board drops in only once the iPad has
+  // the picture loaded + decoded (or after 4 s at most); every puzzle picture is fetched at the start too.
+  const picUrl = `${P}/${pz.img}.webp`;
+  const [picOk, setPicOk] = useState("");
+  useEffect(() => { PUZZLES.forEach(q => { new Image().src = `${P}/${q.img}.webp`; }); }, []);
   useEffect(() => {
-    if (!on || !loaded || how !== "ask" || !howReady) return;
+    let alive = true;
+    const done = () => { if (alive) setPicOk(picUrl); };
+    const im = new Image(); im.src = picUrl;
+    (im.decode ? im.decode() : Promise.resolve()).then(done, done);
+    const t = window.setTimeout(done, 4000);
+    return () => { alive = false; window.clearTimeout(t); };
+  }, [picUrl]);
+  useEffect(() => {
+    if (!on || !loaded || how !== "ask" || !howReady || picOk !== picUrl) return;
     if (wantHowto("puzzle")) setHow("open"); else { setHow("done"); setGo(true); }
-  }, [on, loaded, how, howReady]);
+  }, [on, loaded, how, howReady, picOk, picUrl]);
   const closeHow = () => { if (!go) { seenHowto("puzzle"); setGo(true); } setHow("done"); };
 
   const cvRef = useRef<HTMLCanvasElement>(null);
@@ -692,7 +705,7 @@ export default function PuzzleMixup() {
         )}
         <canvas ref={cvRef} className="pz-fx" width={Math.round(sw)} height={Math.round(sh)} style={{ width: sw, height: sh }} aria-hidden="true" />
       </div>
-      {how === "open" && <HowToPlay {...PUZZLE_HOWTO} onDone={closeHow} />}{/* outside the scaled stage (it fits itself to the window) */}
+      {how === "open" && <HowToPlay {...PUZZLE_HOWTO} needOk={!go && firstHowto("puzzle")} onDone={closeHow} />}{/* outside the scaled stage (it fits itself to the window) */}
     </div>
   );
 }
@@ -730,8 +743,8 @@ const CSS = `
 @keyframes pz-fglow{0%,100%{filter:drop-shadow(0 14px 18px rgba(40,0,70,.5))}50%{filter:drop-shadow(0 0 26px rgba(255,230,120,.95))}}
 .pz-pic{position:absolute;overflow:hidden;border-radius:34px;background:#cbbfd8}
 .pz-pic>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
-.pz-mute{filter:saturate(.16) brightness(1.04) contrast(.9)}
-.pz-pic.hide>img{visibility:hidden}   /* the picture is never seen before the covers are on (Andy 13:26) */
+.pz-mute{filter:saturate(.16) brightness(1.04) contrast(.9);transform:translateZ(0)} /* own layer: Safari paints the muted picture reliably */
+.pz-pic.hide>img{opacity:0}   /* the picture is never seen before the covers are on (Andy 13:26) */
 .pz-color{clip-path:circle(0% at 50% 50%);transition:clip-path 2.2s cubic-bezier(.45,0,.3,1)}
 .pz-color.on{clip-path:circle(75% at 50% 50%)}
 .pz-ring{position:absolute;left:50%;top:50%;width:0;height:0;border-radius:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none;
