@@ -54,6 +54,11 @@ export interface LookSettings {
 }
 const KEYS = ["egg", "baby", "young", "grown"];
 const UI = "/worlds/ui";
+// STAGE PRIZE BUBBLE (Andy 2026-10-20): what each stage pays - MUST match the database (mpe_claim_prize v5:
+// baby 5c+2t+1p, young 10c+3t+2p, grown 15c+10t+3p, '<world>:complete' 25c+15t+5p). Display only.
+const STAGE_PRIZE: ({ t: number; c: number; p: number } | null)[] = [null, { t: 2, c: 5, p: 1 }, { t: 3, c: 10, p: 2 }, { t: 10, c: 15, p: 3 }];
+const WORLD_PRIZE = { t: 15, c: 25, p: 5 };
+const STAGE_TIP_NAME = ["", "Baby prize", "Young prize", "Grown-up prize"];
 // LOCKS test flag ?lk (1006): stages grown in this TAB, kept through Album/Puzzle and back; a fresh page load starts at 0.
 const LK_KEY = "mpe_demo_lkgrown";
 let lkBooted = false;
@@ -277,6 +282,15 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const sub = next
     ? `${next.min - fed} more treat${next.min - fed === 1 ? "" : "s"} to grow!`
     : (v.videoWatchedMap[animal.id] ? "All grown up!" : "All grown up! Watch the video!");
+  const [stageTip, setStageTip] = useState<number | null>(null);
+  useEffect(() => {
+    if (stageTip === null) return;
+    const t = window.setTimeout(() => setStageTip(null), 4000);
+    const off = () => setStageTip(null);
+    const add = window.setTimeout(() => document.addEventListener("pointerdown", off, true), 0); // the tap that opened it does not close it
+    return () => { window.clearTimeout(t); window.clearTimeout(add); document.removeEventListener("pointerdown", off, true); };
+  }, [stageTip]);
+  useEffect(() => { setStageTip(null); }, [animal.id]);
 
   // TEST ONLY flags (display only): ?d=1 shows the Daily Treat button, ?n=1 makes My Animals glow.
   const onTest = window.location.pathname.startsWith("/world-test/");
@@ -974,7 +988,8 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
           <div className="sv-bar">
             <div className="sv-barfill" style={{ width: `calc(${pct * 100}% - 6px)` }} />
             {animal.stages.map((st, i) => (
-              <div key={i} className={"sv-stop" + (fed >= st.min ? "" : " off")} style={{ left: `${(st.min / max) * 100}%` }}>
+              <div key={i} className={"sv-stop" + (fed >= st.min ? "" : " off") + (i > 0 ? " sv-tap" : "")} style={{ left: `${(st.min / max) * 100}%` }}
+                onClick={i > 0 ? () => setStageTip(i) : undefined}>
                 <img src={art(animal, i, true)} alt="" />
               </div>
             ))}
@@ -1217,6 +1232,31 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
             muted={!v.sfxOn} onIntro={q => theaterMusic(q)} />
         )}
 
+        {stageTip !== null && STAGE_PRIZE[stageTip] && (() => {
+          const st = animal.stages[stageTip], pr = STAGE_PRIZE[stageTip]!, got = fed >= st.min;
+          const last = stageTip === animal.stages.length - 1 && v.ANIMALS[v.ANIMALS.length - 1]?.id === animal.id;
+          const chips = (q: { t: number; c: number; p: number }) => (
+            <div className="sv-stip-row">
+              <span><img src={`${UI}/treat.webp`} alt="treats" />x{q.t}</span>
+              <span><img src={`${UI}/coin.webp`} alt="coins" />x{q.c}</span>
+              <span><img src="/puzzle/piece.webp" alt="puzzle pieces" />x{q.p}</span>
+            </div>
+          );
+          return (
+            <div className="sv-stipwrap" style={{ left: cx - 290 + 70 + (st.min / max) * 440, top: 160 }}>
+              <div className={"sv-stip" + (got ? " got" : "")}>
+                <div className="sv-stip-t">{STAGE_TIP_NAME[stageTip]}</div>
+                {chips(pr)}
+                {last && <>
+                  <div className="sv-stip-t">World prize</div>
+                  {chips(WORLD_PRIZE)}
+                  <div className="sv-stip-badge"><img src={`/worlds/badges/${v.world.id}.webp`} alt="" />+ badge</div>
+                </>}
+                {got && <div className="sv-stip-got"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7" fill="none" stroke="#2f9a1c" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" /></svg>Got it!</div>}
+              </div>
+            </div>
+          );
+        })()}
         {howto === "open" && <HowToPlay {...worldHowTo((v.ANIMALS[0]?.stages ?? []).map(st => st.img))} muted={!v.sfxOn} needOk={howAuto.current} onDone={closeHowto} />}
         {parade && (
           <WinParade cx={cx} sh={sh} items={parade} sfxOn={v.sfxOn} target={paradeTarget} onLand={paradeLand}
@@ -1323,6 +1363,21 @@ const CSS = `
 .sv-bar{position:absolute;left:70px;right:70px;top:84px;height:30px;background:#6b3a12;border-radius:16px;box-shadow:inset 0 3px 6px rgba(0,0,0,.45)}
 .sv-barfill{position:absolute;left:3px;top:3px;bottom:3px;border-radius:13px;background:linear-gradient(#ffe36b,#ffb000);box-shadow:inset 0 3px 0 rgba(255,255,255,.55);transition:width .6s cubic-bezier(.3,1.4,.5,1)}
 .sv-stop{position:absolute;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:#fff3d1;border:4px solid #c47a2c;box-shadow:0 3px 0 #8a4f1d}
+.sv-stop.sv-tap{cursor:pointer}
+.sv-stipwrap{position:absolute;z-index:60;transform:translateX(-50%);pointer-events:none}
+.sv-stip{position:relative;background:#fffdf5;border:4px solid #c47a2c;border-radius:22px;padding:10px 20px 12px;box-shadow:0 5px 0 #8a4f1d,0 10px 18px rgba(0,0,0,.35);
+ color:#5a2d08;text-align:center;white-space:nowrap;transform-origin:50% 0;animation:sv-stipIn .28s cubic-bezier(.3,1.6,.5,1) both}
+.sv-stip::before{content:"";position:absolute;left:50%;top:-16px;margin-left:-14px;border:14px solid transparent;border-top:0;border-bottom:16px solid #c47a2c}
+.sv-stip::after{content:"";position:absolute;left:50%;top:-10px;margin-left:-10px;border:10px solid transparent;border-top:0;border-bottom:12px solid #fffdf5}
+.sv-stip-t{font-size:22px;color:#8a4f1d;margin:2px 0 4px}
+.sv-stip-row{display:flex;gap:16px;justify-content:center;align-items:center;font-size:26px}
+.sv-stip-row span{display:flex;align-items:center;gap:4px}
+.sv-stip-row img{width:44px;height:44px;object-fit:contain}
+.sv-stip.got .sv-stip-row,.sv-stip.got .sv-stip-badge{opacity:.45}
+.sv-stip-badge{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px;font-size:22px}
+.sv-stip-badge img{width:46px;height:46px;object-fit:contain}
+.sv-stip-got{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;font-size:22px;color:#2f9a1c}
+@keyframes sv-stipIn{0%{opacity:0;transform:scale(.6)}100%{opacity:1;transform:scale(1)}}
 .sv-stop img{display:block;width:100%;height:100%;border-radius:50%;transition:filter .6s,opacity .6s}
 .sv-stop.off img{filter:brightness(0) blur(2.5px);opacity:.45}
 .sv-sub{position:absolute;left:0;right:0;top:122px;text-align:center;font-size:18px;color:#6b3a12;white-space:nowrap}
