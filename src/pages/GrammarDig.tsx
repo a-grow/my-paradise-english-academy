@@ -99,7 +99,7 @@ export default function GrammarDig() {
         key={tryKey}
         ref={frameRef}
         onLoad={() => { frameRef.current?.contentWindow?.focus(); sendMute(muted); try { const d = frameRef.current?.contentDocument; if (d) installIdleCursor(d); } catch { /* */ } }}
-        src={`/Teacher_Andy_Dig_game.html?level=${level || 1}`}
+        src={`/Teacher_Andy_Dig_game.html?level=${level || 1}&v=${__MPE_GRAMMAR_V__.Dig}`}
         title="Teacher Andy Dig"
         style={{ width: "100%", flex: 1, minHeight: 0, border: "none", display: "block" }}
       />}

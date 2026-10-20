@@ -975,7 +975,7 @@ function update(dt) {
             gameState = "win"; winKeyAt = performance.now();
             winTapHandoff();          // tell the app right away (treats paid now; app shows its win screen after the fireworks)
             duckMusic(0, 400);        // fade the background music out quickly
-            playSound(sndFanfare);    // triumphant victory fanfare
+            // (no fanfare here any more - Andy 10-20: the win screen plays it once, so it is never cut off)
             playSound(sndFireworks);  // fireworks whistle+boom over the celebration
             winTimer = 0;
             fireworks = [];

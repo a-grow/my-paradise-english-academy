@@ -9,6 +9,7 @@ type M = HTMLMediaElement & { __mpeVol?: number; __mpeQuiet?: boolean };
 
 // iPad sound (Andy 10-15): sound effects also play when the iPad is on silent, and every Web Audio sound wakes up on a
 // finger LIFT / click / key (iOS only unlocks sound then, not on touchstart). Harmless on computers.
+const ALL_CTX: AudioContext[] = []; // every Web Audio channel the app opens (the blocked-sound fallback re-uses a woken one)
 function installAudioWake() {
   try {
     const nav = navigator as Navigator & { audioSession?: { type: string } };
@@ -16,7 +17,7 @@ function installAudioWake() {
     const w = window as unknown as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext };
     const AC0 = w.AudioContext || w.webkitAudioContext;
     if (!AC0) return;
-    const all: AudioContext[] = [];
+    const all = ALL_CTX;
     const ACW = function (o?: AudioContextOptions) { const c = o ? new AC0(o) : new AC0(); all.push(c); return c; } as unknown as typeof AudioContext;
     ACW.prototype = AC0.prototype;
     w.AudioContext = ACW; if (w.webkitAudioContext) w.webkitAudioContext = ACW;
@@ -47,25 +48,29 @@ export function installIosVolumeFix() {
     // BLOCKED SOUND FALLBACK (Andy 10-19 iPad: no win music): iOS refuses play() when no finger tap started it (win screens,
     // prize parades - sounds started by a timer). The Web Audio channel below was woken by an earlier tap, so a refused SHORT
     // sound (not looping, not a video, under 12 s) plays through it instead. Music and videos are never touched.
-    let fb: AudioContext | null = null;
-    try { const W2 = window as unknown as { AudioContext?: typeof AudioContext; webkitAudioContext?: typeof AudioContext }; const A = W2.AudioContext || W2.webkitAudioContext; if (A) fb = new A(); } catch { fb = null; }
-    const bufs = new Map<string, Promise<AudioBuffer>>();
+    // 10-20 review: it RE-USES a channel the app already opened and a tap already woke (older iPads limit how many channels a
+    // page may open - an extra one could have silenced another sound).
+    const bufs = new WeakMap<AudioContext, Map<string, Promise<AudioBuffer>>>();
     const viaWebAudio = (el: M) => {
       try {
         const src = el.currentSrc || el.src;
-        if (!fb || !src || el.muted || el.loop || el instanceof HTMLVideoElement || fb.state !== "running") return;
-        let b = bufs.get(src);
+        if (!src || el.muted || el.loop || el instanceof HTMLVideoElement) return;
+        const ctx = ALL_CTX.find(c => c.state === "running");
+        if (!ctx) return;
+        let m = bufs.get(ctx);
+        if (!m) { m = new Map(); bufs.set(ctx, m); }
+        let b = m.get(src);
         if (!b) {
-          const ctx = fb;
+          const mm = m;
           b = fetch(src).then(r => r.arrayBuffer()).then(a => new Promise<AudioBuffer>((ok, no) => { ctx.decodeAudioData(a, ok, no); }));
-          bufs.set(src, b); b.catch(() => bufs.delete(src));
+          mm.set(src, b); b.catch(() => mm.delete(src));
         }
         const t0 = performance.now();
         b.then(buf => {
-          if (!fb || buf.duration > 12 || performance.now() - t0 > 1500) return; // late or long = skip (never a stray song)
-          const sn = fb.createBufferSource(), gn = fb.createGain();
+          if (ctx.state !== "running" || buf.duration > 12 || performance.now() - t0 > 1500) return; // late or long = skip (never a stray song)
+          const sn = ctx.createBufferSource(), gn = ctx.createGain();
           sn.buffer = buf; gn.gain.value = Math.max(0, Math.min(1, el.__mpeVol ?? 1));
-          sn.connect(gn); gn.connect(fb.destination); sn.start();
+          sn.connect(gn); gn.connect(ctx.destination); sn.start();
         }).catch(() => { });
       } catch { /* never break the app over sound */ }
     };

@@ -99,7 +99,7 @@ export default function GrammarRun() {
         key={tryKey}
         ref={frameRef}
         onLoad={() => { frameRef.current?.contentWindow?.focus(); sendMute(muted); try { const d = frameRef.current?.contentDocument; if (d) installIdleCursor(d); } catch { /* */ } }}
-        src={`/Teacher_Andy_Run_game.html?level=${level || 1}`}
+        src={`/Teacher_Andy_Run_game.html?level=${level || 1}&v=${__MPE_GRAMMAR_V__.Run}`}
         title="Teacher Andy Run"
         style={{ width: "100%", flex: 1, minHeight: 0, border: "none", display: "block" }}
       />}
@@ -111,6 +111,7 @@ export default function GrammarRun() {
           treatsTotal={treatsAfter}
           piecesWon={1}
           muted={muted}
+          fanfare   // Andy 10-20: the win music. Run's own flag fanfare is now faded with the game's music when this screen opens (10-17), so Run plays this one like Swim/Dig/Grab
           onChooseGame={() => navigate(`/grammar-hub/${kidCode}/${kidName}${level ? `/${level}` : ""}`)}
           onReturnToWorld={() => { const r = sessionStorage.getItem("mpe_return_world") || ""; navigate(r.toLowerCase().includes(`/${kidCode.toLowerCase()}/${kidName}`) ? r : `/world/${kidCode}/${kidName}`); }}   // back to the world the kid came from, like GrammarHub (was always Ocean = flashes through finished worlds, Andy 10-16)
         />

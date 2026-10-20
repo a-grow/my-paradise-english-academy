@@ -603,7 +603,7 @@ export default function PuzzleMixup() {
         {/* THE BOARD: muted picture, colour picture (revealed at the end), the covers, then the frame on top */}
         {go && <div key={round} className={"pz-board" + (phase === "out" ? " out" : " drop") + (phase === "finale" || phase === "prize" ? " glow" : "")}
           style={{ left: fl, top: FT, width: FW, height: FH }}>
-          <div className={"pz-pic" + (phase === "intro" ? " hide" : "")} style={{ left: PIC.x, top: PIC.y, width: PIC.w, height: PIC.h }}>
+          <div className="pz-pic" style={{ left: PIC.x, top: PIC.y, width: PIC.w, height: PIC.h }}>
             <img className="pz-mute" src={`${P}/${pz.img}.webp`} alt="" />
             <img className={"pz-color" + (reveal ? " on" : "")} src={`${P}/${pz.img}.webp`} alt="" />
             <div className={"pz-ring" + (reveal ? " on" : "")} />
@@ -613,6 +613,9 @@ export default function PuzzleMixup() {
                 <linearGradient id="pzc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#fffaf0" /><stop offset="1" stopColor="#f3dcae" /></linearGradient>
                 <filter id="pzs" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#5a2a00" floodOpacity="0.35" /></filter>
               </defs>
+              {/* WHILE THE COVERS DROP IN (Andy 10-20: open parts showed plain grey for 1-2 s): only the spots still waiting for
+                  their cover get the plain colour; parts already uncovered show the picture at once - nothing hidden can be seen */}
+              {phase === "intro" && covers.filter(c => !gone.has(c.i)).map(c => <path key={"veil" + c.i} d={c.d} fill="#cbbfd8" stroke="#cbbfd8" strokeWidth={4} />)}
               {covers.filter(c => !gone.has(c.i)).map((c, k) => {
                 const n = rem[c.i], fs = c.fs, iw = c.iw, gx = c.lx;   // safe spot found in makeCovers (never touches a line)
                 const anim = cls[c.i] || (hint === c.i ? "hint" : phase === "intro" ? "in" : "");
@@ -744,7 +747,6 @@ const CSS = `
 .pz-pic{position:absolute;overflow:hidden;border-radius:34px;background:#cbbfd8}
 .pz-pic>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .pz-mute{filter:saturate(.16) brightness(1.04) contrast(.9);transform:translateZ(0)} /* own layer: Safari paints the muted picture reliably */
-.pz-pic.hide>img{opacity:0}   /* the picture is never seen before the covers are on (Andy 13:26) */
 .pz-color{clip-path:circle(0% at 50% 50%);transition:clip-path 2.2s cubic-bezier(.45,0,.3,1)}
 .pz-color.on{clip-path:circle(75% at 50% 50%)}
 .pz-ring{position:absolute;left:50%;top:50%;width:0;height:0;border-radius:50%;transform:translate(-50%,-50%);opacity:0;pointer-events:none;

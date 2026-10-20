@@ -99,7 +99,7 @@ export default function GrammarSwim() {
         key={tryKey}
         ref={frameRef}
         onLoad={() => { frameRef.current?.contentWindow?.focus(); sendMute(muted); try { const d = frameRef.current?.contentDocument; if (d) installIdleCursor(d); } catch { /* */ } }}
-        src={`/Teacher_Andy_Swim_game.html?level=${level || 1}`}
+        src={`/Teacher_Andy_Swim_game.html?level=${level || 1}&v=${__MPE_GRAMMAR_V__.Swim}`}
         title="Teacher Andy Swim"
         style={{ width: "100%", flex: 1, minHeight: 0, border: "none", display: "block" }}
       />}

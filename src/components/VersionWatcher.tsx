@@ -48,6 +48,19 @@ async function checkForUpdate(): Promise<boolean> {
   return updateWaiting;
 }
 
+// FRESH RELOAD (2026-10-20): a plain reload can get the browser's saved copy of the page back (GitHub Pages lets devices keep
+// it up to 10 min) = old code again. A new address (?mpev=...) can't come from that saved copy; index.html removes the
+// mpev bit from the address bar straight away, so kids never see it.
+function freshReload(tag: string) {
+  try {
+    const u = new URL(window.location.href);
+    u.searchParams.set("mpev", tag);
+    window.location.replace(u.toString());
+  } catch {
+    window.location.reload();
+  }
+}
+
 function reloadWhenSavesDone() {
   if (reloadStarted) return;
   reloadStarted = true;
@@ -55,7 +68,7 @@ function reloadWhenSavesDone() {
   const tick = () => {
     if (!cloudBusy()) {
       try { sessionStorage.setItem(GUARD_KEY, `${latestBuild}|${Date.now()}`); } catch { /* ignore */ }
-      window.location.reload();
+      freshReload(latestBuild || String(Date.now()));
       return;
     }
     if (Date.now() - started > 15000) {
@@ -94,9 +107,19 @@ export default function VersionWatcher() {
       });
     };
     document.addEventListener("visibilitychange", onVisible);
+    // BACK BUTTON (2026-10-20): Safari/Chrome can bring back a FROZEN old copy of a page (numbers from before, maybe old code).
+    // Load it fresh instead, once any save has finished.
+    const onShow = (e: PageTransitionEvent) => {
+      if (!e.persisted || isGamePage(pathRef.current)) return; // never in the middle of a game (same rule as coming back to the tab)
+      const t0 = Date.now();
+      const go = () => { if (!cloudBusy() || Date.now() - t0 > 5000) freshReload(String(Date.now())); else setTimeout(go, 300); };
+      go();
+    };
+    window.addEventListener("pageshow", onShow);
     const timer = window.setInterval(() => { checkForUpdate(); }, CHECK_EVERY_MS);
     return () => {
       document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("pageshow", onShow);
       window.clearInterval(timer);
     };
   }, []);

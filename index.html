@@ -6,6 +6,40 @@
     <title>My Paradise English</title>
     <meta name="description" content="Fun and engaging English classes for kids and adults. Join My Paradise English today!" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      /* STORAGE SAFETY (2026-10-20): if a device blocks storage (e.g. Safari "Block All Cookies", some private modes), touching
+         localStorage/sessionStorage throws and the page would go blank. Then use an in-memory stand-in for this visit:
+         everything still works and saves to the cloud; only this device's small reminders are not kept. */
+      (function () {
+        function mem() {
+          var P = {
+            getItem: function (k) { return Object.prototype.hasOwnProperty.call(this, k) ? this[k] : null; },
+            setItem: function (k, v) { this[String(k)] = String(v); },
+            removeItem: function (k) { delete this[k]; },
+            clear: function () { for (var k in this) if (Object.prototype.hasOwnProperty.call(this, k)) delete this[k]; },
+            key: function (i) { return Object.keys(this)[i] || null; }
+          };
+          Object.defineProperty(P, "length", { get: function () { return Object.keys(this).length; } });
+          return Object.create(P);
+        }
+        ["localStorage", "sessionStorage"].forEach(function (n) {
+          try { var st = window[n], k = "__mpe_t"; st.setItem(k, "1"); st.removeItem(k); }
+          catch (e) { try { Object.defineProperty(window, n, { configurable: true, value: mem() }); } catch (e2) { /* nothing more we can do */ } }
+        });
+      })();
+      /* SELF-HEAL (2026-10-20): right after an update a device may still hold the OLD page, which points at code files the update
+         removed -> blank screen. If a code/style file fails to load, load the page again from a fresh address (at most once a minute). */
+      window.addEventListener("error", function (e) {
+        var t = e.target;
+        if (!t || (t.tagName !== "SCRIPT" && t.tagName !== "LINK")) return;
+        if ((t.src || t.href || "").indexOf("/assets/") < 0) return;
+        try { var m = /^mpeheal:(\d+)$/.exec(window.name || ""); if (m && Date.now() - Number(m[1]) < 60000) return; window.name = "mpeheal:" + Date.now(); } catch (x) { /* */ }
+        try {
+          var q = location.search, real = q.length > 1 && q.charAt(1) === "/" ? q.slice(1).replace(/~and~/g, "&") + location.hash : location.pathname + q + location.hash;
+          var u = new URL(real, location.origin); u.searchParams.set("mpev", String(Date.now())); location.replace(u.toString());
+        } catch (x) { location.reload(); }
+      }, true);
+    </script>
   </head>
   <body>
     <div id="root"></div>
@@ -17,6 +51,15 @@
           var decoded = q.slice(1).replace(/~and~/g, '&') + window.location.hash;
           window.history.replaceState(null, '', decoded);
         }
+        /* a fresh reload adds ?mpev=... (auto-refresh / self-heal): take it out of the address bar again (2026-10-20) */
+        try {
+          var u2 = new URL(window.location.href);
+          if (u2.searchParams.has('mpev')) {
+            u2.searchParams.delete('mpev');
+            var qs = u2.searchParams.toString();
+            window.history.replaceState(null, '', u2.pathname + (qs ? '?' + qs : '') + u2.hash);
+          }
+        } catch (e) { /* old browser: harmless, the extra bit just stays */ }
       })();
     </script>
     <script type="module" src="/src/main.tsx"></script>
