@@ -19,13 +19,13 @@
           {
             "word": "grandmother",
             "definition_en": "Your mother's or father's mother.",
-            "definition_zh": "祖母",
+            "definition_zh": "祖母；外祖母",
             "part_of_speech": "n."
           },
           {
             "word": "grandfather",
             "definition_en": "Your mother's or father's father.",
-            "definition_zh": "祖父",
+            "definition_zh": "祖父；外祖父",
             "part_of_speech": "n."
           },
           {
@@ -49,7 +49,7 @@
           {
             "word": "sister",
             "definition_en": "A girl who has the same parents.",
-            "definition_zh": "姐姐或妹妹",
+            "definition_zh": "姊姊或妹妹",
             "part_of_speech": "n."
           },
           {
@@ -93,37 +93,37 @@
           {
             "word": "hamster",
             "definition_en": "Small furry pet that runs on wheels.",
-            "definition_zh": "小毛茸茸的寵物，喜歡跑滾輪",
+            "definition_zh": "倉鼠",
             "part_of_speech": "n."
           },
           {
             "word": "goldfish",
             "definition_en": "Orange or gold fish kept in bowls.",
-            "definition_zh": "金色或橙色的魚，養在魚缸裡",
+            "definition_zh": "金魚",
             "part_of_speech": "n."
           },
           {
             "word": "bird",
             "definition_en": "Animal with feathers, wings, and beak.",
-            "definition_zh": "有羽毛、翅膀和喙的動物",
+            "definition_zh": "鳥",
             "part_of_speech": "n."
           },
           {
             "word": "rabbit",
             "definition_en": "Fluffy pet with long ears and soft fur.",
-            "definition_zh": "毛茸茸的寵物，有長耳朵和軟毛",
+            "definition_zh": "兔子",
             "part_of_speech": "n."
           },
           {
             "word": "lizard",
             "definition_en": "Small scaly animal with a long tail.",
-            "definition_zh": "有鱗片和長尾巴的小動物",
+            "definition_zh": "蜥蜴",
             "part_of_speech": "n."
           },
           {
             "word": "kitten",
             "definition_en": "Young cat that is small and playful.",
-            "definition_zh": "小貓，年幼、愛玩耍的貓咪",
+            "definition_zh": "小貓",
             "part_of_speech": "n."
           }
         ]
@@ -238,49 +238,49 @@
           {
             "word": "mix",
             "definition_en": "To stir things together to combine them.",
-            "definition_zh": "攪拌東西使其混合在一起",
+            "definition_zh": "混合",
             "part_of_speech": "v."
           },
           {
             "word": "mural",
             "definition_en": "A large picture painted on a wall.",
-            "definition_zh": "畫在牆上的大幅圖畫",
+            "definition_zh": "壁畫",
             "part_of_speech": "n."
           },
           {
             "word": "ocean",
             "definition_en": "A very large body of salty water.",
-            "definition_zh": "非常大的鹹水體",
+            "definition_zh": "海洋",
             "part_of_speech": "n."
           },
           {
             "word": "sand",
             "definition_en": "Tiny grains of rock found on beaches.",
-            "definition_zh": "在海灘上找到的微小石粒",
+            "definition_zh": "沙子",
             "part_of_speech": "n."
           },
           {
             "word": "seaweed",
             "definition_en": "A plant that grows in the ocean.",
-            "definition_zh": "在海洋中生長的植物",
+            "definition_zh": "海藻",
             "part_of_speech": "n."
           },
           {
             "word": "seashell",
             "definition_en": "A hard covering of sea animals.",
-            "definition_zh": "海洋動物的硬殼外殼",
+            "definition_zh": "貝殼",
             "part_of_speech": "n."
           },
           {
             "word": "jellyfish",
             "definition_en": "A soft ocean animal with long tentacles.",
-            "definition_zh": "有長觸手的軟海洋動物",
+            "definition_zh": "水母",
             "part_of_speech": "n."
           },
           {
             "word": "starfish",
             "definition_en": "A star-shaped sea animal with five arms.",
-            "definition_zh": "有五隻手臂的星形海洋動物",
+            "definition_zh": "海星",
             "part_of_speech": "n."
           }
         ]
@@ -437,7 +437,7 @@
           {
             "word": "put out",
             "definition_en": "Stop a fire from burning.",
-            "definition_zh": "撲滅",
+            "definition_zh": "放置",
             "part_of_speech": "phrase"
           }
         ]
@@ -498,7 +498,7 @@
           {
             "word": "rain",
             "definition_en": "Water falling from clouds to earth.",
-            "definition_zh": "下雨",
+            "definition_zh": "雨；下雨",
             "part_of_speech": "n."
           },
           {
@@ -554,49 +554,49 @@
           {
             "word": "watch",
             "definition_en": "Look carefully at something happening.",
-            "definition_zh": "仔細看著某件事",
+            "definition_zh": "觀看",
             "part_of_speech": "v."
           },
           {
             "word": "build a snowman",
             "definition_en": "Stack snow balls to make a person.",
-            "definition_zh": "堆雪球做成一個人",
+            "definition_zh": "堆雪人",
             "part_of_speech": "phrase"
           },
           {
             "word": "build a tree house",
             "definition_en": "Make a small house in a tree.",
-            "definition_zh": "在樹上蓋一個小房子",
+            "definition_zh": "蓋樹屋",
             "part_of_speech": "phrase"
           },
           {
             "word": "make a swing",
             "definition_en": "Create a seat that moves back forth.",
-            "definition_zh": "製作一個搖來搖去的座位",
+            "definition_zh": "做鞦韆",
             "part_of_speech": "phrase"
           },
           {
             "word": "make apple pie",
             "definition_en": "Bake a dessert with apples inside.",
-            "definition_zh": "烤一個裡面有蘋果的甜點",
+            "definition_zh": "做蘋果派",
             "part_of_speech": "phrase"
           },
           {
             "word": "grow",
             "definition_en": "Get bigger and taller over time.",
-            "definition_zh": "隨著時間變得更大更高",
+            "definition_zh": "成長；長大",
             "part_of_speech": "v."
           },
           {
             "word": "fall",
             "definition_en": "Drop down to the ground quickly.",
-            "definition_zh": "快速掉到地上",
+            "definition_zh": "掉落",
             "part_of_speech": "v."
           },
           {
             "word": "bring",
             "definition_en": "Carry something with you to somewhere.",
-            "definition_zh": "帶著東西去某個地方",
+            "definition_zh": "帶來",
             "part_of_speech": "v."
           }
         ]
@@ -957,13 +957,13 @@
           {
             "word": "neighborhood",
             "definition_en": "An area where many people live together.",
-            "definition_zh": "鄰近地區",
+            "definition_zh": "社區；鄰里",
             "part_of_speech": "n."
           },
           {
             "word": "town",
             "definition_en": "A place smaller than a city with homes.",
-            "definition_zh": "鎮",
+            "definition_zh": "城鎮",
             "part_of_speech": "n."
           },
           {
@@ -1047,7 +1047,7 @@
           {
             "word": "hotel",
             "definition_en": "Place where travelers sleep and stay.",
-            "definition_zh": "酒店",
+            "definition_zh": "飯店；旅館",
             "part_of_speech": "n."
           },
           {
@@ -1275,7 +1275,7 @@
           {
             "word": "living",
             "definition_en": "Able to grow and need food.",
-            "definition_zh": "活著的",
+            "definition_zh": "有生命的",
             "part_of_speech": "adj."
           },
           {
@@ -1311,7 +1311,7 @@
           {
             "word": "people",
             "definition_en": "Human beings, women men and children.",
-            "definition_zh": "人類",
+            "definition_zh": "人們",
             "part_of_speech": "n."
           },
           {

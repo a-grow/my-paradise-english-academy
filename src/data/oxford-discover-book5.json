@@ -51,7 +51,7 @@
         {
           "word": "exploit",
           "definition_en": "To use something in a bad way.",
-          "definition_zh": "開採",
+          "definition_zh": "剝削；濫用",
           "part_of_speech": "v."
         },
         {
@@ -136,7 +136,7 @@
         {
           "word": "naturalist",
           "definition_en": "A person who studies plants and animals in nature.",
-          "definition_zh": "博物學家",
+          "definition_zh": "博物學家；自然科學家",
           "part_of_speech": "n."
         },
         {
@@ -172,7 +172,7 @@
         {
           "word": "population",
           "definition_en": "All the animals of one kind living in one place.",
-          "definition_zh": "種群",
+          "definition_zh": "族群",
           "part_of_speech": "n."
         },
         {
@@ -272,7 +272,7 @@
         {
           "word": "cavity",
           "definition_en": "Hole in tooth from tooth decay.",
-          "definition_zh": "蛀洞",
+          "definition_zh": "蛀牙",
           "part_of_speech": "n."
         },
         {
@@ -327,7 +327,7 @@
         {
           "word": "tusk",
           "definition_en": "Long pointed tooth sticking out of mouth.",
-          "definition_zh": "象牙",
+          "definition_zh": "長牙；獠牙",
           "part_of_speech": "n."
         },
         {
@@ -381,7 +381,7 @@
         {
           "word": "lap up",
           "definition_en": "To drink liquid with tongue like a cat.",
-          "definition_zh": "舔飲",
+          "definition_zh": "舔食",
           "part_of_speech": "phrase"
         },
         {
@@ -442,7 +442,7 @@
         {
           "word": "axle",
           "definition_en": "Rod that wheels spin around on vehicles.",
-          "definition_zh": "車軸",
+          "definition_zh": "車軸；輪軸",
           "part_of_speech": "n."
         },
         {
@@ -587,7 +587,7 @@
         {
           "word": "risky",
           "definition_en": "Might result in something bad happening.",
-          "definition_zh": "危險的",
+          "definition_zh": "有風險的",
           "part_of_speech": "adj."
         },
         {
@@ -631,7 +631,7 @@
         {
           "word": "race",
           "definition_en": "Run or move very fast to win.",
-          "definition_zh": "競賽",
+          "definition_zh": "賽跑",
           "part_of_speech": "v."
         },
         {
@@ -661,7 +661,7 @@
         {
           "word": "dive",
           "definition_en": "Jump head first into water below.",
-          "definition_zh": "潛水",
+          "definition_zh": "跳水",
           "part_of_speech": "v."
         },
         {
@@ -740,7 +740,7 @@
         {
           "word": "locate",
           "definition_en": "To find where something is.",
-          "definition_zh": "定位",
+          "definition_zh": "找到；找出位置",
           "part_of_speech": "v."
         },
         {
@@ -800,7 +800,7 @@
         {
           "word": "produce",
           "definition_en": "To make or create something new.",
-          "definition_zh": "生產",
+          "definition_zh": "產生；製造",
           "part_of_speech": "v."
         }
       ]
@@ -947,7 +947,7 @@
         {
           "word": "creamy",
           "definition_en": "Smooth and thick like cream or butter.",
-          "definition_zh": "奶油似的",
+          "definition_zh": "綿密的",
           "part_of_speech": "adj."
         },
         {
@@ -965,25 +965,25 @@
         {
           "word": "ladle",
           "definition_en": "Big spoon for serving soup and liquids.",
-          "definition_zh": "勺子",
+          "definition_zh": "湯杓；舀",
           "part_of_speech": "n."
         },
         {
           "word": "sticky",
           "definition_en": "Things that stick to your hands easily.",
-          "definition_zh": "粘的",
+          "definition_zh": "黏的",
           "part_of_speech": "adj."
         },
         {
           "word": "crunchy",
           "definition_en": "Makes a loud cracking sound when chewed.",
-          "definition_zh": "爽脆的",
+          "definition_zh": "酥脆的",
           "part_of_speech": "adj."
         },
         {
           "word": "runny",
           "definition_en": "Liquid or flows easily like thin soup.",
-          "definition_zh": "流動的",
+          "definition_zh": "稀的",
           "part_of_speech": "adj."
         },
         {
@@ -995,19 +995,19 @@
         {
           "word": "whirring",
           "definition_en": "Fast spinning sound like a machine makes.",
-          "definition_zh": "呼呼聲",
+          "definition_zh": "嗡嗡作響的",
           "part_of_speech": "adj."
         },
         {
           "word": "booming",
           "definition_en": "Very loud deep sound that echoes.",
-          "definition_zh": "轟隆的",
+          "definition_zh": "低沉洪亮的",
           "part_of_speech": "adj."
         },
         {
           "word": "spot",
           "definition_en": "Small mark or stain on something.",
-          "definition_zh": "斑點",
+          "definition_zh": "斑點；注意到",
           "part_of_speech": "n."
         }
       ]
@@ -1062,7 +1062,7 @@
         {
           "word": "altitude",
           "definition_en": "How high something is above ground.",
-          "definition_zh": "高度",
+          "definition_zh": "海拔；高度",
           "part_of_speech": "n."
         },
         {
@@ -1159,13 +1159,13 @@
         {
           "word": "awestruck",
           "definition_en": "Amazed and impressed by something great.",
-          "definition_zh": "敬畏的",
+          "definition_zh": "驚嘆不已的",
           "part_of_speech": "adj."
         },
         {
           "word": "jagged",
           "definition_en": "Having sharp rough edges that stick out.",
-          "definition_zh": "參差不齊的",
+          "definition_zh": "鋸齒狀的；參差不齊的",
           "part_of_speech": "adj."
         },
         {
@@ -1177,7 +1177,7 @@
         {
           "word": "miniature",
           "definition_en": "Very small copy of something bigger.",
-          "definition_zh": "微型的",
+          "definition_zh": "微型的；縮小的",
           "part_of_speech": "adj."
         },
         {
@@ -1189,7 +1189,7 @@
         {
           "word": "arch",
           "definition_en": "Curved shape like a rainbow or bridge.",
-          "definition_zh": "拱形",
+          "definition_zh": "拱起",
           "part_of_speech": "v."
         },
         {
@@ -1201,13 +1201,13 @@
         {
           "word": "squirm",
           "definition_en": "Twist and turn your body uncomfortably.",
-          "definition_zh": "蠕動",
+          "definition_zh": "扭動；坐立不安",
           "part_of_speech": "v."
         },
         {
           "word": "scowl",
           "definition_en": "Frown with an angry unhappy expression.",
-          "definition_zh": "皺眉",
+          "definition_zh": "皺眉怒視",
           "part_of_speech": "v."
         },
         {
@@ -1286,7 +1286,7 @@
         {
           "word": "delicate",
           "definition_en": "Very soft and easily broken or hurt.",
-          "definition_zh": "精緻的",
+          "definition_zh": "脆弱的；精緻的",
           "part_of_speech": "adj."
         },
         {
@@ -1310,7 +1310,7 @@
         {
           "word": "wise",
           "definition_en": "Knowing lots of things and making good choices.",
-          "definition_zh": "聰慧的",
+          "definition_zh": "有智慧的",
           "part_of_speech": "adj."
         },
         {
@@ -1371,7 +1371,7 @@
         {
           "word": "barter",
           "definition_en": "Trade things without using money.",
-          "definition_zh": "易貨交易",
+          "definition_zh": "以物易物",
           "part_of_speech": "v."
         },
         {
@@ -1383,13 +1383,13 @@
         {
           "word": "bill",
           "definition_en": "Paper money or amount you owe.",
-          "definition_zh": "鈔票",
+          "definition_zh": "鈔票；帳單",
           "part_of_speech": "n."
         },
         {
           "word": "spend",
           "definition_en": "Use money to buy things.",
-          "definition_zh": "花錢",
+          "definition_zh": "花錢；花費",
           "part_of_speech": "v."
         },
         {
@@ -1468,13 +1468,13 @@
         {
           "word": "remarkable",
           "definition_en": "Very special and worth noticing.",
-          "definition_zh": "值得注意的",
+          "definition_zh": "非凡的；了不起的",
           "part_of_speech": "adj."
         },
         {
           "word": "ambitious",
           "definition_en": "Wanting to achieve big goals.",
-          "definition_zh": "野心勃勃的",
+          "definition_zh": "有抱負的",
           "part_of_speech": "adj."
         },
         {
@@ -1560,7 +1560,7 @@
         {
           "word": "cabin",
           "definition_en": "Small house made of wood.",
-          "definition_zh": "小木屋",
+          "definition_zh": "船艙；座艙",
           "part_of_speech": "n."
         },
         {
@@ -1578,7 +1578,7 @@
         {
           "word": "grateful",
           "definition_en": "Feeling thankful for something nice.",
-          "definition_zh": "感謝的",
+          "definition_zh": "感激的",
           "part_of_speech": "adj."
         },
         {
@@ -1596,7 +1596,7 @@
         {
           "word": "break up",
           "definition_en": "When friends or couples stop together.",
-          "definition_zh": "分手",
+          "definition_zh": "碎裂",
           "part_of_speech": "phrase"
         },
         {
@@ -1608,7 +1608,7 @@
         {
           "word": "villain",
           "definition_en": "Bad person who causes trouble.",
-          "definition_zh": "壞人",
+          "definition_zh": "反派；壞人",
           "part_of_speech": "n."
         },
         {
@@ -1767,7 +1767,7 @@
         {
           "word": "turrets",
           "definition_en": "Small towers on castle corners.",
-          "definition_zh": "城堡的小塔樓",
+          "definition_zh": "小塔樓",
           "part_of_speech": "n."
         },
         {
@@ -1821,13 +1821,13 @@
         {
           "word": "stiffen",
           "definition_en": "Become stiff or hard and rigid.",
-          "definition_zh": "變硬",
+          "definition_zh": "僵硬",
           "part_of_speech": "v."
         },
         {
           "word": "missing",
           "definition_en": "Not here or cannot be found.",
-          "definition_zh": "失蹤的",
+          "definition_zh": "不見的；失蹤的",
           "part_of_speech": "adj."
         },
         {

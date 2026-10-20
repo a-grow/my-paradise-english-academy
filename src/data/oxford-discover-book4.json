@@ -9,67 +9,67 @@
         {
           "word": "moon",
           "definition_en": "Bright object that orbits around Earth.",
-          "definition_zh": "繞地球運轉的明亮天體",
+          "definition_zh": "月亮；月球",
           "part_of_speech": "n."
         },
         {
           "word": "asteroid",
           "definition_en": "Small rocky object floating in space.",
-          "definition_zh": "漂浮在太空中的小岩石",
+          "definition_zh": "小行星",
           "part_of_speech": "n."
         },
         {
           "word": "comet",
           "definition_en": "Icy space object with a long bright tail.",
-          "definition_zh": "有長尾巴的冰凍太空物體",
+          "definition_zh": "彗星",
           "part_of_speech": "n."
         },
         {
           "word": "meteorite",
           "definition_en": "Rock from space that falls to Earth.",
-          "definition_zh": "從太空掉落到地球的岩石",
+          "definition_zh": "隕石",
           "part_of_speech": "n."
         },
         {
           "word": "solar system",
           "definition_en": "The sun and all planets around it.",
-          "definition_zh": "太陽和圍繞它的所有行星",
+          "definition_zh": "太陽系",
           "part_of_speech": "phrase"
         },
         {
           "word": "stars",
           "definition_en": "Huge balls of hot glowing gas in space.",
-          "definition_zh": "太空中閃閃發光的巨大熾熱氣體球",
+          "definition_zh": "恆星；星星",
           "part_of_speech": "n."
         },
         {
           "word": "galaxy",
           "definition_en": "Huge group of stars and space dust.",
-          "definition_zh": "由許多星星和塵埃組成的龐大星系",
+          "definition_zh": "星系",
           "part_of_speech": "n."
         },
         {
           "word": "universe",
           "definition_en": "Everything in space including all galaxies.",
-          "definition_zh": "包括所有星系的整個太空",
+          "definition_zh": "宇宙",
           "part_of_speech": "n."
         },
         {
           "word": "spacecraft",
           "definition_en": "Vehicle that travels through outer space.",
-          "definition_zh": "在外太空中旅行的交通工具",
+          "definition_zh": "太空船",
           "part_of_speech": "n."
         },
         {
           "word": "telescope",
           "definition_en": "Tool to see far away stars clearly.",
-          "definition_zh": "用來清楚看遠方星星的工具",
+          "definition_zh": "望遠鏡",
           "part_of_speech": "n."
         },
         {
           "word": "observatory",
           "definition_en": "Building with telescope for studying space.",
-          "definition_zh": "用望遠鏡研究太空的建築物",
+          "definition_zh": "天文臺",
           "part_of_speech": "n."
         }
       ]
@@ -245,7 +245,7 @@
         {
           "word": "tomb",
           "definition_en": "Underground place where dead people buried.",
-          "definition_zh": "墓葬",
+          "definition_zh": "陵墓；墳墓",
           "part_of_speech": "n."
         },
         {
@@ -257,13 +257,13 @@
         {
           "word": "clay",
           "definition_en": "Wet dirt used to make pottery.",
-          "definition_zh": "黏土",
+          "definition_zh": "黏土；陶土",
           "part_of_speech": "n."
         },
         {
           "word": "peasant",
           "definition_en": "Poor person working on farms long ago.",
-          "definition_zh": "農民",
+          "definition_zh": "佃農",
           "part_of_speech": "n."
         }
       ]
@@ -415,7 +415,7 @@
         {
           "word": "butter",
           "definition_en": "Soft yellow food made from milk cream.",
-          "definition_zh": "黃油",
+          "definition_zh": "奶油",
           "part_of_speech": "n."
         },
         {
@@ -512,7 +512,7 @@
         {
           "word": "process",
           "definition_en": "Steps to make or do something.",
-          "definition_zh": "過程",
+          "definition_zh": "加工；處理",
           "part_of_speech": "v."
         },
         {
@@ -524,7 +524,7 @@
         {
           "word": "farmer's market",
           "definition_en": "Place where farmers sell fresh food.",
-          "definition_zh": "農民市集",
+          "definition_zh": "農夫市集",
           "part_of_speech": "phrase"
         },
         {
@@ -591,67 +591,67 @@
         {
           "word": "sketch",
           "definition_en": "A quick, simple drawing done with pencil.",
-          "definition_zh": "快速簡單的鉛筆畫",
+          "definition_zh": "素描；草圖",
           "part_of_speech": "n."
         },
         {
           "word": "pastels",
           "definition_en": "Soft colored sticks used for drawing and coloring.",
-          "definition_zh": "用來畫畫和著色的軟色棒",
+          "definition_zh": "粉彩筆",
           "part_of_speech": "n."
         },
         {
           "word": "canvas",
           "definition_en": "Thick cloth used for painting pictures on.",
-          "definition_zh": "用來畫畫的厚布料",
+          "definition_zh": "畫布",
           "part_of_speech": "n."
         },
         {
           "word": "paintbrushes",
           "definition_en": "Tools with bristles for putting paint on surfaces.",
-          "definition_zh": "用來塗油漆的刷子工具",
+          "definition_zh": "畫筆",
           "part_of_speech": "n."
         },
         {
           "word": "shapes",
           "definition_en": "The outline or form of an object or thing.",
-          "definition_zh": "物體或東西的輪廓或形式",
+          "definition_zh": "形狀",
           "part_of_speech": "n."
         },
         {
           "word": "string",
           "definition_en": "Thin cord made by twisting fibers together.",
-          "definition_zh": "由纖維擰在一起製成的細繩",
+          "definition_zh": "細繩",
           "part_of_speech": "n."
         },
         {
           "word": "three-dimensional",
           "definition_en": "Having length, width, and height or depth.",
-          "definition_zh": "有長、寬和高或深度的",
+          "definition_zh": "立體的",
           "part_of_speech": "adj."
         },
         {
           "word": "prodigy",
           "definition_en": "A young person with amazing talent or ability.",
-          "definition_zh": "有驚人才能或能力的年輕人",
+          "definition_zh": "神童",
           "part_of_speech": "n."
         },
         {
           "word": "street painter",
           "definition_en": "An artist who creates paintings on sidewalks outside.",
-          "definition_zh": "在街道上創作繪畫的藝術家",
+          "definition_zh": "街頭畫家",
           "part_of_speech": "phrase"
         },
         {
           "word": "carpenter",
           "definition_en": "A person who builds and repairs things from wood.",
-          "definition_zh": "用木頭製造和修理東西的人",
+          "definition_zh": "木匠",
           "part_of_speech": "n."
         },
         {
           "word": "sculptor",
           "definition_en": "An artist who carves shapes from stone or clay.",
-          "definition_zh": "從石頭或黏土中雕刻形狀的藝術家",
+          "definition_zh": "雕塑家",
           "part_of_speech": "n."
         }
       ]
@@ -737,19 +737,19 @@
         {
           "word": "stained",
           "definition_en": "Marked or colored by something spilled on it.",
-          "definition_zh": "染色的",
+          "definition_zh": "有汙漬的；染色的",
           "part_of_speech": "adj."
         },
         {
           "word": "brilliant",
           "definition_en": "Very bright and shining with lots of light.",
-          "definition_zh": "光彩的",
+          "definition_zh": "燦爛的；明亮的",
           "part_of_speech": "adj."
         },
         {
           "word": "pale",
           "definition_en": "Very light in color, not bright or dark.",
-          "definition_zh": "蒼白的",
+          "definition_zh": "淺色的；淡的",
           "part_of_speech": "adj."
         }
       ]
@@ -810,7 +810,7 @@
         {
           "word": "street vendor",
           "definition_en": "Person selling things on the street.",
-          "definition_zh": "街邊小販",
+          "definition_zh": "路邊攤販",
           "part_of_speech": "phrase"
         },
         {
@@ -840,7 +840,7 @@
         {
           "word": "tuna",
           "definition_en": "Large fish often used for food.",
-          "definition_zh": "金槍魚",
+          "definition_zh": "鮪魚",
           "part_of_speech": "n."
         },
         {
@@ -889,7 +889,7 @@
         {
           "word": "volunteers",
           "definition_en": "People who help others without getting paid.",
-          "definition_zh": "志願者",
+          "definition_zh": "志工",
           "part_of_speech": "n."
         },
         {
@@ -913,7 +913,7 @@
         {
           "word": "city hall",
           "definition_en": "The main building where city government works.",
-          "definition_zh": "市政廳",
+          "definition_zh": "市政府",
           "part_of_speech": "phrase"
         },
         {
@@ -925,7 +925,7 @@
         {
           "word": "garbage collectors",
           "definition_en": "People who pick up trash from streets.",
-          "definition_zh": "垃圾清潔工",
+          "definition_zh": "清潔隊員",
           "part_of_speech": "n."
         },
         {
@@ -937,13 +937,13 @@
         {
           "word": "news conference",
           "definition_en": "When leaders tell reporters important information.",
-          "definition_zh": "新聞發佈會",
+          "definition_zh": "記者會",
           "part_of_speech": "phrase"
         },
         {
           "word": "playground",
           "definition_en": "A safe outdoor place where kids can play.",
-          "definition_zh": "遊樂場",
+          "definition_zh": "遊戲場",
           "part_of_speech": "n."
         }
       ]
@@ -1077,67 +1077,67 @@
         {
           "word": "system",
           "definition_en": "Group of parts working together.",
-          "definition_zh": "一起工作的部分組群",
+          "definition_zh": "系統",
           "part_of_speech": "n."
         },
         {
           "word": "blood",
           "definition_en": "Red liquid that flows in body.",
-          "definition_zh": "在身體裡流動的紅色液體",
+          "definition_zh": "血液",
           "part_of_speech": "n."
         },
         {
           "word": "heart",
           "definition_en": "Muscle that pumps blood around body.",
-          "definition_zh": "將血液泵送全身的肌肉",
+          "definition_zh": "心臟",
           "part_of_speech": "n."
         },
         {
           "word": "arteries",
           "definition_en": "Tubes that carry blood from heart.",
-          "definition_zh": "從心臟運送血液的管子",
+          "definition_zh": "動脈",
           "part_of_speech": "n."
         },
         {
           "word": "veins",
           "definition_en": "Tubes that bring blood back to heart.",
-          "definition_zh": "將血液送回心臟的管子",
+          "definition_zh": "靜脈",
           "part_of_speech": "n."
         },
         {
           "word": "capillary",
           "definition_en": "Tiny blood vessels connecting arteries veins.",
-          "definition_zh": "連接動脈和靜脈的微小血管",
+          "definition_zh": "微血管",
           "part_of_speech": "n."
         },
         {
           "word": "lungs",
           "definition_en": "Organs that help us breathe air.",
-          "definition_zh": "幫助我們呼吸的器官",
+          "definition_zh": "肺",
           "part_of_speech": "n."
         },
         {
           "word": "trachea",
           "definition_en": "Tube that carries air to lungs.",
-          "definition_zh": "將空氣運送到肺的管子",
+          "definition_zh": "氣管",
           "part_of_speech": "n."
         },
         {
           "word": "diaphragm",
           "definition_en": "Muscle below lungs that helps breathing.",
-          "definition_zh": "肺下方幫助呼吸的肌肉",
+          "definition_zh": "橫膈膜",
           "part_of_speech": "n."
         },
         {
           "word": "carbon dioxide",
           "definition_en": "Waste gas our body breathes out.",
-          "definition_zh": "我們身體呼出的廢氣",
+          "definition_zh": "二氧化碳",
           "part_of_speech": "phrase"
         },
         {
           "word": "pulse",
           "definition_en": "Heartbeat you can feel in wrist.",
-          "definition_zh": "你在手腕感受到的心跳",
+          "definition_zh": "脈搏",
           "part_of_speech": "n."
         }
       ]
@@ -1174,7 +1174,7 @@
         {
           "word": "mass media",
           "definition_en": "Ways to share information with many people.",
-          "definition_zh": "大眾傳媒",
+          "definition_zh": "大眾媒體",
           "part_of_speech": "phrase"
         },
         {
@@ -1222,19 +1222,19 @@
         {
           "word": "smartphone",
           "definition_en": "Small computer you carry in pocket.",
-          "definition_zh": "智能手機",
+          "definition_zh": "智慧型手機",
           "part_of_speech": "n."
         },
         {
           "word": "blog",
           "definition_en": "Online diary where people share thoughts.",
-          "definition_zh": "博客",
+          "definition_zh": "部落格",
           "part_of_speech": "n."
         },
         {
           "word": "social network",
           "definition_en": "Website where people connect and talk.",
-          "definition_zh": "社交網絡",
+          "definition_zh": "社群網路",
           "part_of_speech": "n."
         }
       ]
@@ -1398,13 +1398,13 @@
         {
           "word": "blizzard",
           "definition_en": "Heavy snowstorm with very strong cold winds.",
-          "definition_zh": "暴雪",
+          "definition_zh": "暴風雪",
           "part_of_speech": "n."
         },
         {
           "word": "thunderstorm",
           "definition_en": "Storm with lightning, thunder, and heavy rain.",
-          "definition_zh": "雷暴",
+          "definition_zh": "雷雨",
           "part_of_speech": "n."
         },
         {
@@ -1422,7 +1422,7 @@
         {
           "word": "power lines",
           "definition_en": "Wires that bring electricity to homes and buildings.",
-          "definition_zh": "電力線",
+          "definition_zh": "輸電線；配電線",
           "part_of_speech": "phrase"
         },
         {
@@ -1471,7 +1471,7 @@
         {
           "word": "storm shelter",
           "definition_en": "Safe place to go during bad storms.",
-          "definition_zh": "風暴避難所",
+          "definition_zh": "風暴避難所；風災避難所",
           "part_of_speech": "phrase"
         },
         {
@@ -1489,7 +1489,7 @@
         {
           "word": "storm shutters",
           "definition_en": "Strong covers that protect windows from storms.",
-          "definition_zh": "風暴百葉窗",
+          "definition_zh": "防颱百葉窗",
           "part_of_speech": "phrase"
         },
         {
@@ -1574,7 +1574,7 @@
         {
           "word": "grassland",
           "definition_en": "A large area covered mostly with grass.",
-          "definition_zh": "草地",
+          "definition_zh": "草原",
           "part_of_speech": "n."
         },
         {
@@ -1592,7 +1592,7 @@
         {
           "word": "taiga",
           "definition_en": "A cold forest with many evergreen trees.",
-          "definition_zh": "泰加林",
+          "definition_zh": "泰加林；寒溫帶針葉林",
           "part_of_speech": "n."
         },
         {
@@ -1671,7 +1671,7 @@
         {
           "word": "manta ray",
           "definition_en": "Huge flat fish with wide wings.",
-          "definition_zh": "魔鬼魚",
+          "definition_zh": "鬼蝠魟",
           "part_of_speech": "n."
         },
         {

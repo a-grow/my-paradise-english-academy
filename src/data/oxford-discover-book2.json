@@ -117,7 +117,7 @@
         {
           "word": "creep",
           "definition_en": "To move slowly and quietly along ground.",
-          "definition_zh": "爬行",
+          "definition_zh": "悄悄移動",
           "part_of_speech": "v."
         },
         {
@@ -141,7 +141,7 @@
         {
           "word": "squawk",
           "definition_en": "Loud harsh cry that birds make.",
-          "definition_zh": "刺耳叫聲",
+          "definition_zh": "發出刺耳的叫聲",
           "part_of_speech": "v."
         }
       ]
@@ -263,7 +263,7 @@
         {
           "word": "cream",
           "definition_en": "Thick white liquid from milk.",
-          "definition_zh": "奶油",
+          "definition_zh": "鮮奶油",
           "part_of_speech": "n."
         },
         {
@@ -299,13 +299,13 @@
         {
           "word": "open",
           "definition_en": "Not closed, you can go inside.",
-          "definition_zh": "打開",
+          "definition_zh": "開著的",
           "part_of_speech": "adj."
         },
         {
           "word": "closed",
           "definition_en": "Shut tight, nothing can go in.",
-          "definition_zh": "關閉",
+          "definition_zh": "關著的",
           "part_of_speech": "adj."
         },
         {
@@ -346,55 +346,55 @@
         {
           "word": "travel",
           "definition_en": "Going from one place to another place.",
-          "definition_zh": "從一個地方去另一個地方",
+          "definition_zh": "旅行",
           "part_of_speech": "v."
         },
         {
           "word": "communication",
           "definition_en": "Sharing information and ideas with other people.",
-          "definition_zh": "與他人分享信息和想法",
+          "definition_zh": "溝通；通訊",
           "part_of_speech": "n."
         },
         {
           "word": "airplane",
           "definition_en": "A big machine that flies through the sky.",
-          "definition_zh": "在天空中飛行的大機器",
+          "definition_zh": "飛機",
           "part_of_speech": "n."
         },
         {
           "word": "news",
           "definition_en": "Information about things that happened recently.",
-          "definition_zh": "最近發生的事情的信息",
+          "definition_zh": "新聞",
           "part_of_speech": "n."
         },
         {
           "word": "letter",
           "definition_en": "Words written on paper and sent by mail.",
-          "definition_zh": "寫在紙上通過郵件寄送的文字",
+          "definition_zh": "信",
           "part_of_speech": "n."
         },
         {
           "word": "text message",
           "definition_en": "A short written message sent on a phone.",
-          "definition_zh": "用手機發送的短文字信息",
+          "definition_zh": "簡訊",
           "part_of_speech": "n."
         },
         {
           "word": "e-mail",
           "definition_en": "Messages sent through a computer or phone.",
-          "definition_zh": "通過電腦或手機發送的信息",
+          "definition_zh": "電子郵件",
           "part_of_speech": "n."
         },
         {
           "word": "radio",
           "definition_en": "A machine that plays music and news sounds.",
-          "definition_zh": "播放音樂和新聞聲音的機器",
+          "definition_zh": "收音機",
           "part_of_speech": "n."
         },
         {
           "word": "Internet",
           "definition_en": "A system connecting computers around the world.",
-          "definition_zh": "連接世界各地電腦的系統",
+          "definition_zh": "網際網路",
           "part_of_speech": "n."
         }
       ]
@@ -468,7 +468,7 @@
         {
           "word": "clerk",
           "definition_en": "Person who helps customers in store.",
-          "definition_zh": "職員",
+          "definition_zh": "店員",
           "part_of_speech": "n."
         },
         {
@@ -528,19 +528,19 @@
         {
           "word": "take away",
           "definition_en": "To remove or subtract one number from another.",
-          "definition_zh": "拿走",
+          "definition_zh": "減去",
           "part_of_speech": "phrase"
         },
         {
           "word": "column",
           "definition_en": "Numbers or things arranged up and down.",
-          "definition_zh": "列",
+          "definition_zh": "直行",
           "part_of_speech": "n."
         },
         {
           "word": "row",
           "definition_en": "Numbers or things arranged left to right.",
-          "definition_zh": "行",
+          "definition_zh": "橫列",
           "part_of_speech": "n."
         },
         {
@@ -642,13 +642,13 @@
         {
           "word": "baker",
           "definition_en": "Person who makes bread and cakes.",
-          "definition_zh": "麵包師傅",
+          "definition_zh": "烘焙師傅",
           "part_of_speech": "n."
         },
         {
           "word": "cook",
           "definition_en": "Prepare food using heat for eating.",
-          "definition_zh": "烹飪",
+          "definition_zh": "烹飪；廚師",
           "part_of_speech": "v."
         }
       ]
@@ -684,55 +684,55 @@
         {
           "word": "traffic light",
           "definition_en": "Colored lights that tell cars when to stop.",
-          "definition_zh": "告訴汽車何時停止的彩色燈",
+          "definition_zh": "紅綠燈",
           "part_of_speech": "n."
         },
         {
           "word": "take turns",
           "definition_en": "Each person does something one after another.",
-          "definition_zh": "每個人輪流做某事",
+          "definition_zh": "輪流",
           "part_of_speech": "phrase"
         },
         {
           "word": "polite",
           "definition_en": "Being kind and respectful to other people.",
-          "definition_zh": "對他人友善和尊重",
+          "definition_zh": "有禮貌的",
           "part_of_speech": "adj."
         },
         {
           "word": "clean up",
           "definition_en": "To make a place neat and free of mess.",
-          "definition_zh": "整理和清潔一個地方",
+          "definition_zh": "清理；打掃",
           "part_of_speech": "phrase"
         },
         {
           "word": "litter",
           "definition_en": "Trash or garbage left on the ground.",
-          "definition_zh": "丟棄在地上的垃圾",
+          "definition_zh": "垃圾",
           "part_of_speech": "n."
         },
         {
           "word": "librarian",
           "definition_en": "Person who works in a library and helps find books.",
-          "definition_zh": "在圖書館工作幫助尋找書籍的人",
+          "definition_zh": "圖書館員",
           "part_of_speech": "n."
         },
         {
           "word": "crossing guard",
           "definition_en": "Adult who helps children safely cross the street.",
-          "definition_zh": "幫助兒童安全過馬路的成人",
+          "definition_zh": "導護人員",
           "part_of_speech": "n."
         },
         {
           "word": "principal",
           "definition_en": "The leader in charge of a school.",
-          "definition_zh": "負責學校的領導者",
+          "definition_zh": "校長",
           "part_of_speech": "n."
         },
         {
           "word": "lifeguard",
           "definition_en": "Person who watches swimmers and keeps them safe.",
-          "definition_zh": "監視游泳者並保護他們安全的人",
+          "definition_zh": "救生員",
           "part_of_speech": "n."
         }
       ]
@@ -866,7 +866,7 @@
         {
           "word": "landfill",
           "definition_en": "Place where people put garbage and trash.",
-          "definition_zh": "垃圾填埋場",
+          "definition_zh": "垃圾掩埋場",
           "part_of_speech": "n."
         },
         {
@@ -940,7 +940,7 @@
         {
           "word": "carton",
           "definition_en": "A box made from thick paper.",
-          "definition_zh": "紙箱",
+          "definition_zh": "紙盒",
           "part_of_speech": "n."
         },
         {
@@ -1023,55 +1023,55 @@
         {
           "word": "high",
           "definition_en": "Very far up in the air or sky.",
-          "definition_zh": "很高；在空中很远处",
+          "definition_zh": "高的",
           "part_of_speech": "adj."
         },
         {
           "word": "low",
           "definition_en": "Not far up; close to the ground.",
-          "definition_zh": "很低；靠近地面",
+          "definition_zh": "低的",
           "part_of_speech": "adj."
         },
         {
           "word": "excited",
           "definition_en": "Very happy and full of energy.",
-          "definition_zh": "興奮的；充滿能量和快樂",
+          "definition_zh": "興奮的",
           "part_of_speech": "adj."
         },
         {
           "word": "sleepy",
           "definition_en": "Feeling tired and wanting to sleep.",
-          "definition_zh": "困倦的；想要睡覺",
+          "definition_zh": "想睡的；睏的",
           "part_of_speech": "adj."
         },
         {
           "word": "wolf",
           "definition_en": "A wild animal like a big dog.",
-          "definition_zh": "狼；野生動物",
+          "definition_zh": "狼",
           "part_of_speech": "n."
         },
         {
           "word": "feelings",
           "definition_en": "Emotions you have inside your heart.",
-          "definition_zh": "感受；心裡的情感",
+          "definition_zh": "感受；感覺",
           "part_of_speech": "n."
         },
         {
           "word": "right",
           "definition_en": "Correct; the opposite of left.",
-          "definition_zh": "正確的；左邊的相反",
+          "definition_zh": "正確的；右邊的",
           "part_of_speech": "adj."
         },
         {
           "word": "wrong",
           "definition_en": "Not correct; not the right answer.",
-          "definition_zh": "不正確的；錯誤的",
+          "definition_zh": "錯誤的",
           "part_of_speech": "adj."
         },
         {
           "word": "trumpet",
           "definition_en": "A musical instrument you blow into.",
-          "definition_zh": "小號；吹奏的樂器",
+          "definition_zh": "小號；小喇叭",
           "part_of_speech": "n."
         }
       ]
@@ -1106,55 +1106,55 @@
         {
           "word": "notes",
           "definition_en": "Written words or musical sounds.",
-          "definition_zh": "筆記或音樂聲音",
+          "definition_zh": "筆記；音符",
           "part_of_speech": "n."
         },
         {
           "word": "wait",
           "definition_en": "Stay in one place until something happens.",
-          "definition_zh": "留在一個地方直到發生某事",
+          "definition_zh": "等待",
           "part_of_speech": "v."
         },
         {
           "word": "worried",
           "definition_en": "Feeling nervous or scared about something.",
-          "definition_zh": "對某事感到緊張或害怕",
+          "definition_zh": "擔心的",
           "part_of_speech": "adj."
         },
         {
           "word": "the flu",
           "definition_en": "A sickness that makes you feel very sick.",
-          "definition_zh": "使你感到非常生病的疾病",
+          "definition_zh": "流感",
           "part_of_speech": "phrase"
         },
         {
           "word": "tears",
           "definition_en": "Water drops that fall from your eyes.",
-          "definition_zh": "從眼睛流出的水滴",
+          "definition_zh": "眼淚",
           "part_of_speech": "n."
         },
         {
           "word": "solo",
           "definition_en": "Performing or doing something all by yourself.",
-          "definition_zh": "獨自表演或做某事",
+          "definition_zh": "獨奏的；單獨的",
           "part_of_speech": "adj."
         },
         {
           "word": "hummingbird",
           "definition_en": "Tiny bird that flies very fast and drinks nectar.",
-          "definition_zh": "飛得很快並喝花蜜的小鳥",
+          "definition_zh": "蜂鳥",
           "part_of_speech": "n."
         },
         {
           "word": "record",
           "definition_en": "Write down information to save it for later.",
-          "definition_zh": "寫下信息以便稍後保存",
+          "definition_zh": "錄音；錄影",
           "part_of_speech": "n."
         },
         {
           "word": "musician",
           "definition_en": "Person who plays music or sings songs.",
-          "definition_zh": "演奏音樂或唱歌的人",
+          "definition_zh": "音樂家",
           "part_of_speech": "n."
         }
       ]
@@ -1201,7 +1201,7 @@
         {
           "word": "movement",
           "definition_en": "When something changes position or location.",
-          "definition_zh": "運動",
+          "definition_zh": "移動",
           "part_of_speech": "n."
         },
         {
@@ -1213,7 +1213,7 @@
         {
           "word": "throw",
           "definition_en": "Use your arm to send something through air.",
-          "definition_zh": "拋",
+          "definition_zh": "拋；丟",
           "part_of_speech": "v."
         },
         {
@@ -1357,55 +1357,55 @@
         {
           "word": "crescent",
           "definition_en": "Curved shape like the moon.",
-          "definition_zh": "像月亮一样的弯曲形状",
+          "definition_zh": "新月形",
           "part_of_speech": "n."
         },
         {
           "word": "star",
           "definition_en": "Bright light in the night sky.",
-          "definition_zh": "夜空中闪亮的光",
+          "definition_zh": "星星",
           "part_of_speech": "n."
         },
         {
           "word": "spiral",
           "definition_en": "Circular pattern that winds around.",
-          "definition_zh": "绕圈旋转的图案",
+          "definition_zh": "螺旋",
           "part_of_speech": "n."
         },
         {
           "word": "oval",
           "definition_en": "Shape like an egg or circle.",
-          "definition_zh": "像鸡蛋一样的形状",
+          "definition_zh": "橢圓形",
           "part_of_speech": "n."
         },
         {
           "word": "straight",
           "definition_en": "Line that does not bend or curve.",
-          "definition_zh": "不弯曲的直线",
+          "definition_zh": "直的",
           "part_of_speech": "adj."
         },
         {
           "word": "nature",
           "definition_en": "All plants, animals, and outdoors.",
-          "definition_zh": "所有植物、动物和户外",
+          "definition_zh": "大自然",
           "part_of_speech": "n."
         },
         {
           "word": "collage",
           "definition_en": "Artwork made from cut pieces.",
-          "definition_zh": "用剪下的碎片制作的艺术作品",
+          "definition_zh": "拼貼畫",
           "part_of_speech": "n."
         },
         {
           "word": "sculpture",
           "definition_en": "3D artwork carved or shaped.",
-          "definition_zh": "雕刻或塑造的立体艺术作品",
+          "definition_zh": "雕塑",
           "part_of_speech": "n."
         },
         {
           "word": "pattern",
           "definition_en": "Design that repeats over again.",
-          "definition_zh": "重复出现的设计",
+          "definition_zh": "圖案",
           "part_of_speech": "n."
         }
       ]
@@ -1473,7 +1473,7 @@
         {
           "word": "crumple",
           "definition_en": "Squeeze something into wrinkles and bumps.",
-          "definition_zh": "皺縮",
+          "definition_zh": "揉皺",
           "part_of_speech": "v."
         },
         {

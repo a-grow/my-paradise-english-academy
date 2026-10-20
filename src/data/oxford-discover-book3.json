@@ -63,7 +63,7 @@
         {
           "word": "player",
           "definition_en": "Person who plays game or sport.",
-          "definition_zh": "運動員",
+          "definition_zh": "選手；玩家",
           "part_of_speech": "n."
         }
       ]
@@ -100,61 +100,61 @@
         {
           "word": "kick",
           "definition_en": "Hit something with your foot.",
-          "definition_zh": "用腳踢某東西",
+          "definition_zh": "踢",
           "part_of_speech": "v."
         },
         {
           "word": "tag",
           "definition_en": "A game where one person chases others.",
-          "definition_zh": "捉迷藏遊戲",
+          "definition_zh": "抓；碰",
           "part_of_speech": "n."
         },
         {
           "word": "skip",
           "definition_en": "Jump over a rope going round and round.",
-          "definition_zh": "跳過轉動的繩子",
+          "definition_zh": "跳過",
           "part_of_speech": "v."
         },
         {
           "word": "bounce",
           "definition_en": "Jump up and down repeatedly quickly.",
-          "definition_zh": "重複快速上下跳動",
+          "definition_zh": "彈跳",
           "part_of_speech": "v."
         },
         {
           "word": "drop",
           "definition_en": "Let something fall to the ground.",
-          "definition_zh": "讓某東西掉到地上",
+          "definition_zh": "掉落；使落下",
           "part_of_speech": "v."
         },
         {
           "word": "plain",
           "definition_en": "A large flat area with few trees.",
-          "definition_zh": "有很少樹的大平坦地區",
+          "definition_zh": "平原",
           "part_of_speech": "adj."
         },
         {
           "word": "lake",
           "definition_en": "A large body of water surrounded by land.",
-          "definition_zh": "被陸地包圍的大水體",
+          "definition_zh": "湖",
           "part_of_speech": "n."
         },
         {
           "word": "canyon",
           "definition_en": "A deep valley with high rocky sides.",
-          "definition_zh": "有高岩石兩側的深山谷",
+          "definition_zh": "峽谷",
           "part_of_speech": "n."
         },
         {
           "word": "cliff",
           "definition_en": "A very steep high face of rock.",
-          "definition_zh": "非常陡峭的高岩石面",
+          "definition_zh": "懸崖",
           "part_of_speech": "n."
         },
         {
           "word": "stream",
           "definition_en": "A small river that flows through land.",
-          "definition_zh": "流過陸地的小河",
+          "definition_zh": "小溪",
           "part_of_speech": "n."
         }
       ]
@@ -191,61 +191,61 @@
         {
           "word": "packing",
           "definition_en": "Putting things into bags or boxes.",
-          "definition_zh": "把东西放进袋子或盒子里",
+          "definition_zh": "打包",
           "part_of_speech": "v."
         },
         {
           "word": "moving",
           "definition_en": "Going to live in a new house.",
-          "definition_zh": "搬到一个新房子住",
+          "definition_zh": "搬家",
           "part_of_speech": "v."
         },
         {
           "word": "meeting neighbors",
           "definition_en": "Saying hello to people who live near you.",
-          "definition_zh": "和住在你附近的人打招呼",
+          "definition_zh": "認識鄰居",
           "part_of_speech": "phrase"
         },
         {
           "word": "shopping",
           "definition_en": "Buying things you need at a store.",
-          "definition_zh": "在商店购买你需要的东西",
+          "definition_zh": "購物",
           "part_of_speech": "v."
         },
         {
           "word": "ice skating",
           "definition_en": "Sliding on ice wearing special shoes.",
-          "definition_zh": "穿着特殊鞋子在冰上滑行",
+          "definition_zh": "溜冰",
           "part_of_speech": "v."
         },
         {
           "word": "fishing",
           "definition_en": "Trying to catch fish in water.",
-          "definition_zh": "试图在水中抓鱼",
+          "definition_zh": "釣魚",
           "part_of_speech": "v."
         },
         {
           "word": "raking leaves",
           "definition_en": "Gathering fallen leaves with a rake tool.",
-          "definition_zh": "用耙子把落下的叶子聚集起来",
+          "definition_zh": "耙落葉",
           "part_of_speech": "phrase"
         },
         {
           "word": "dancing",
           "definition_en": "Moving your body to music in rhythm.",
-          "definition_zh": "随着音乐有节奏地移动你的身体",
+          "definition_zh": "跳舞",
           "part_of_speech": "v."
         },
         {
           "word": "throwing snowballs",
           "definition_en": "Tossing balls of snow at people playfully.",
-          "definition_zh": "好玩地把雪球扔向别人",
+          "definition_zh": "丟雪球",
           "part_of_speech": "phrase"
         },
         {
           "word": "sledding",
           "definition_en": "Sliding down snowy hills on a sled.",
-          "definition_zh": "坐在雪橇上滑下雪山",
+          "definition_zh": "滑雪橇",
           "part_of_speech": "v."
         }
       ]
@@ -379,7 +379,7 @@
         {
           "word": "grasshopper",
           "definition_en": "Green jumping insect that eats plants.",
-          "definition_zh": "蝗蟲",
+          "definition_zh": "蚱蜢",
           "part_of_speech": "n."
         },
         {
@@ -589,7 +589,7 @@
         {
           "word": "orbit",
           "definition_en": "To travel in a circle around something.",
-          "definition_zh": "軌道",
+          "definition_zh": "繞軌道運行",
           "part_of_speech": "v."
         },
         {
@@ -601,7 +601,7 @@
         {
           "word": "multiply",
           "definition_en": "To add a number many times together.",
-          "definition_zh": "乘法",
+          "definition_zh": "乘；相乘",
           "part_of_speech": "v."
         }
       ]
@@ -666,7 +666,7 @@
         {
           "word": "earache",
           "definition_en": "Pain or hurt inside your ear area.",
-          "definition_zh": "耳痛",
+          "definition_zh": "耳朵痛",
           "part_of_speech": "n."
         },
         {
@@ -737,7 +737,7 @@
         {
           "word": "wind turbine",
           "definition_en": "Tall machine that catches wind to make power.",
-          "definition_zh": "風力渦輪機",
+          "definition_zh": "風力發電機",
           "part_of_speech": "n."
         },
         {
@@ -813,61 +813,61 @@
         {
           "word": "subway",
           "definition_en": "Underground train that moves people around cities.",
-          "definition_zh": "地下鐵路運送城市裡的人",
+          "definition_zh": "捷運；地鐵",
           "part_of_speech": "n."
         },
         {
           "word": "fire engine",
           "definition_en": "Big red truck that puts out fires.",
-          "definition_zh": "大紅車用水滅火",
+          "definition_zh": "消防車",
           "part_of_speech": "n."
         },
         {
           "word": "carpool",
           "definition_en": "Group shares one car to same place.",
-          "definition_zh": "一群人共用一輛車去同一地方",
+          "definition_zh": "共乘",
           "part_of_speech": "n."
         },
         {
           "word": "ambulance",
           "definition_en": "Special vehicle that helps sick or hurt people.",
-          "definition_zh": "幫助生病或受傷的人的車",
+          "definition_zh": "救護車",
           "part_of_speech": "n."
         },
         {
           "word": "escalator",
           "definition_en": "Moving stairs that go up and down.",
-          "definition_zh": "會動上下的樓梯",
+          "definition_zh": "手扶梯",
           "part_of_speech": "n."
         },
         {
           "word": "train",
           "definition_en": "Long vehicle on tracks carrying many people.",
-          "definition_zh": "在軌道上運送很多人的長車",
+          "definition_zh": "火車",
           "part_of_speech": "n."
         },
         {
           "word": "taxi",
           "definition_en": "Car you pay to ride to different places.",
-          "definition_zh": "付錢乘坐去不同地方的車",
+          "definition_zh": "計程車",
           "part_of_speech": "n."
         },
         {
           "word": "elevator",
           "definition_en": "Machine that moves people up and down buildings.",
-          "definition_zh": "在建築物上下移動人的機器",
+          "definition_zh": "電梯",
           "part_of_speech": "n."
         },
         {
           "word": "helicopter",
           "definition_en": "Aircraft with spinning blades that flies high.",
-          "definition_zh": "有旋轉葉片會飛的飛行器",
+          "definition_zh": "直升機",
           "part_of_speech": "n."
         },
         {
           "word": "traffic jam",
           "definition_en": "Lots of cars stuck and moving very slowly.",
-          "definition_zh": "很多車卡住動得很慢",
+          "definition_zh": "塞車",
           "part_of_speech": "n."
         }
       ]
@@ -915,7 +915,7 @@
         {
           "word": "trombone",
           "definition_en": "Brass instrument with sliding tube sound.",
-          "definition_zh": "長號",
+          "definition_zh": "長號；伸縮號",
           "part_of_speech": "n."
         },
         {
@@ -951,7 +951,7 @@
         {
           "word": "circus trainer",
           "definition_en": "Person who teaches animals circus tricks.",
-          "definition_zh": "馬戲團訓練員",
+          "definition_zh": "馬戲團馴獸師",
           "part_of_speech": "phrase"
         },
         {
@@ -994,7 +994,7 @@
         {
           "word": "zummara",
           "definition_en": "Double pipe wind instrument from Middle East.",
-          "definition_zh": "中東雙管樂器",
+          "definition_zh": "祖馬拿管；雙單簧管",
           "part_of_speech": "n."
         },
         {
@@ -1012,13 +1012,13 @@
         {
           "word": "tuba",
           "definition_en": "Big brass instrument that sounds low.",
-          "definition_zh": "大號",
+          "definition_zh": "低音號；低音大喇叭",
           "part_of_speech": "n."
         },
         {
           "word": "panpipes",
           "definition_en": "Instrument made of pipes tied together.",
-          "definition_zh": "排簫",
+          "definition_zh": "排笛；排簫",
           "part_of_speech": "n."
         },
         {
@@ -1084,61 +1084,61 @@
         {
           "word": "lever",
           "definition_en": "A bar that helps lift heavy things.",
-          "definition_zh": "幫助舉起重物的棒子",
+          "definition_zh": "槓桿",
           "part_of_speech": "n."
         },
         {
           "word": "ramp",
           "definition_en": "A sloped surface for moving things up.",
-          "definition_zh": "用來上升移動物品的斜面",
+          "definition_zh": "斜坡",
           "part_of_speech": "n."
         },
         {
           "word": "wedge",
           "definition_en": "A triangle shape that splits things apart.",
-          "definition_zh": "三角形物體用來分開東西",
+          "definition_zh": "楔子；楔形",
           "part_of_speech": "n."
         },
         {
           "word": "screw",
           "definition_en": "A twisty fastener that holds things together.",
-          "definition_zh": "旋轉的螺釘用來固定東西",
+          "definition_zh": "螺絲",
           "part_of_speech": "n."
         },
         {
           "word": "wheel and axle",
           "definition_en": "A round wheel that spins on a rod.",
-          "definition_zh": "圓形車輪在軸上旋轉",
+          "definition_zh": "輪軸",
           "part_of_speech": "phrase"
         },
         {
           "word": "light bulb",
           "definition_en": "A glass bulb that makes light when on.",
-          "definition_zh": "打開時發光的玻璃球",
+          "definition_zh": "燈泡",
           "part_of_speech": "n."
         },
         {
           "word": "doorknob",
           "definition_en": "A round handle you turn to open doors.",
-          "definition_zh": "轉動打開門的圓形把手",
+          "definition_zh": "門把",
           "part_of_speech": "n."
         },
         {
           "word": "slide",
           "definition_en": "A smooth slope you slide down for fun.",
-          "definition_zh": "光滑的斜坡可以滑下來玩",
+          "definition_zh": "溜滑梯",
           "part_of_speech": "n."
         },
         {
           "word": "axe",
           "definition_en": "A tool with sharp blade for chopping wood.",
-          "definition_zh": "用來砍木頭的銳刀工具",
+          "definition_zh": "斧頭",
           "part_of_speech": "n."
         },
         {
           "word": "seesaw",
           "definition_en": "A plank that goes up and down with two people.",
-          "definition_zh": "兩個人可以上下搖動的木板",
+          "definition_zh": "蹺蹺板",
           "part_of_speech": "n."
         }
       ]
@@ -1195,7 +1195,7 @@
         {
           "word": "workshop",
           "definition_en": "A place where people make things with tools.",
-          "definition_zh": "工作坊",
+          "definition_zh": "工坊",
           "part_of_speech": "n."
         },
         {
@@ -1225,7 +1225,7 @@
         {
           "word": "pitcher",
           "definition_en": "A container with a handle for pouring liquids.",
-          "definition_zh": "水罐",
+          "definition_zh": "水瓶；水壺",
           "part_of_speech": "n."
         }
       ]
@@ -1262,7 +1262,7 @@
         {
           "word": "soil",
           "definition_en": "Dirt where plants grow their roots.",
-          "definition_zh": "植物生長的土壤",
+          "definition_zh": "土壤",
           "part_of_speech": "n."
         },
         {
@@ -1384,7 +1384,7 @@
         {
           "word": "haze",
           "definition_en": "Thick air that makes it hard to see.",
-          "definition_zh": "霧霾",
+          "definition_zh": "霾；薄霧",
           "part_of_speech": "n."
         },
         {
@@ -1534,7 +1534,7 @@
         {
           "word": "goggles",
           "definition_en": "Special glasses that protect your eyes.",
-          "definition_zh": "護目鏡",
+          "definition_zh": "護目鏡；泳鏡",
           "part_of_speech": "n."
         },
         {
@@ -1582,7 +1582,7 @@
         {
           "word": "leafy sea dragon",
           "definition_en": "Ocean animal with leaf-like body parts.",
-          "definition_zh": "葉海龍",
+          "definition_zh": "葉形海龍",
           "part_of_speech": "phrase"
         },
         {
