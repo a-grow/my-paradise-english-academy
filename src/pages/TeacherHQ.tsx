@@ -62,6 +62,31 @@ type Row = {
 };
 const COLS = "code, student_name, treats, active_pet, data, last_login, dino_jar_moved, coins_earned, coins_spent, puzzle_earned, puzzle_used, puzzle_idx, puzzle_gone, prizes_claimed, daily_box, daily_claimed, cards, card_swap, wins_vocab, wins_grammar, wins_list";
 
+// PLAY TIME (2026-10-22): rows of student_play (one per kid per Taiwan day, filled by mpe_ping - see PlayHeartbeat.tsx)
+type PlayRow = { code: string; student_name: string; day: string; minutes: number; last_ping: string };
+type Play = { today: number; week: number; total: number; last: number; now: boolean };
+const PLAYING_MS = 150_000;   // pinged in the last 2.5 minutes = "Playing now"
+function playStats(rows: PlayRow[]): Map<string, Play> {
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" });
+  const weekAgo = new Date(Date.now() - 6 * 86400000).toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" });
+  const m = new Map<string, Play>();
+  for (const p of rows) {
+    const k = `${p.code}|${p.student_name}`;
+    const s = m.get(k) ?? { today: 0, week: 0, total: 0, last: 0, now: false };
+    const n = Number(p.minutes) || 0;
+    s.total += n;
+    if (p.day === today) s.today += n;
+    if (p.day >= weekAgo) s.week += n;
+    const t = new Date(p.last_ping).getTime();
+    if (t > s.last) s.last = t;
+    m.set(k, s);
+  }
+  for (const s of m.values()) s.now = Date.now() - s.last < PLAYING_MS;
+  return m;
+}
+const NO_PLAY: Play = { today: 0, week: 0, total: 0, last: 0, now: false };
+const mins = (n: number) => (n >= 60 ? `${Math.floor(n / 60)}h ${n % 60}m` : `${n} min`);
+
 const cap = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 const n0 = (v: any) => (typeof v === "number" && isFinite(v) ? v : Number(v) || 0);
 
@@ -131,7 +156,7 @@ function winLabel(k: string): string {
 const taiwanToday = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" }); // YYYY-MM-DD
 
 // ---- everything about one kid, worked out once ----
-function buildKid(r: Row) {
+function buildKid(r: Row, plays: Map<string, Play>) {
   const worlds = ALL_WORLDS.map((w, i) => readWorld(w, i, r.data));
   const at = worlds.find(v => !v.finished) ?? null;           // the world the kid is on (null = every world finished)
   const jar = oneJar(r);
@@ -144,10 +169,13 @@ function buildKid(r: Row) {
     worlds: ALL_WORLDS, prizes: r.prizes_claimed, rowData: r.data, worldId: "", fed: {}, dailyBox: r.daily_box,
     wins: { vocab: n0(r.wins_vocab), grammar: n0(r.wins_grammar) },
   });
-  const seen = seenInfo(r.last_login);
+  const play = plays.get(`${r.code}|${r.student_name}`) ?? NO_PLAY;
+  // last seen = the newer of the last save (last_login) and the last play-time ping
+  const loginT = r.last_login ? new Date(r.last_login).getTime() : 0;
+  const seen = seenInfo(play.last > loginT ? new Date(play.last).toISOString() : r.last_login);
   // furthest = world, then animal, then fed (for the "Furthest" sort)
   const far = at ? at.idx * 10000 + Math.max(0, at.curPos) * 1000 + (at.cur?.fed ?? 0) : 999999;
-  return { r, worlds, at, jar, coins, pieces, owned, setsDone, badges, seen, far, health: health(worlds, jar) };
+  return { r, worlds, at, jar, coins, pieces, owned, setsDone, badges, seen, play, far, health: health(worlds, jar) };
 }
 type Kid = ReturnType<typeof buildKid>;
 
@@ -185,17 +213,28 @@ export default function TeacherHQ() {
     return () => window.removeEventListener("resize", on);
   }, []);
 
-  const load = useCallback(() => {
-    setLoading(true); setErr("");
+  const [playRows, setPlayRows] = useState<PlayRow[]>([]);
+  const load = useCallback((quiet = false) => {
+    if (!quiet) { setLoading(true); setErr(""); }
     supabase.from("student_progress").select(COLS).then(({ data, error }) => {
-      if (error) setErr(error.message);
+      if (error) { if (!quiet) setErr(error.message); }
       else setRows((data as unknown as Row[]) || []);
-      setLoading(false);
+      if (!quiet) setLoading(false);
+    });
+    // play time: a missing table / error just shows no minutes (never blocks the page)
+    supabase.from("student_play").select("code, student_name, day, minutes, last_ping").then(({ data, error }) => {
+      if (!error) setPlayRows((data as unknown as PlayRow[]) || []);
     });
   }, []);
   useEffect(() => { if (ok) load(); }, [ok, load]);
+  // AUTO-REFRESH every minute (quietly) so "Playing now" stays true
+  useEffect(() => {
+    if (!ok) return;
+    const t = window.setInterval(() => { if (document.visibilityState === "visible") load(true); }, 60_000);
+    return () => window.clearInterval(t);
+  }, [ok, load]);
 
-  const kids = useMemo(() => rows.map(buildKid), [rows]);
+  const kids = useMemo(() => { const p = playStats(playRows); return rows.map(r => buildKid(r, p)); }, [rows, playRows]);
   const real = kids.filter(k => !isTest(k.r.code));
   const pool = showTests ? kids : real;
   const keyOf = (k: Kid) => `${k.r.code}|${k.r.student_name}`;
@@ -242,6 +281,7 @@ export default function TeacherHQ() {
   }
 
   const today = real.filter(k => k.seen.cls === "today").length;
+  const playingNow = real.filter(k => k.play.now).length;
   const quiet = real.filter(k => k.seen.days == null || k.seen.days >= 7).length;
 
   return (
@@ -252,12 +292,13 @@ export default function TeacherHQ() {
           <div className="hq-logo t">Teacher HQ<small>MY PARADISE ENGLISH</small></div>
           <div className="hq-chips">
             <div className="hq-chip"><b>{real.length}</b> kids</div>
+            <div className={`hq-chip${playingNow ? " hq-live" : ""}`}><span className="hq-dot hq-pulse" /><b>{playingNow}</b> playing now</div>
             <div className="hq-chip"><span className="hq-dot" style={{ background: "#2e9e5b" }} /><b>{today}</b> played today</div>
             <div className="hq-chip"><span className="hq-dot" style={{ background: "#f08c00" }} /><b>{quiet}</b> quiet 7+ days</div>
             <button data-noclick className={`hq-chip hq-snd${soundOn ? "" : " off"}`} onClick={toggleSound} title="Button sounds on / off">
               <span className="hq-sw"><i /></span>Sounds {soundOn ? "on" : "off"}
             </button>
-            <button className="hq-chip hq-btn" onClick={load} disabled={loading}>{loading ? "Loading..." : "Refresh"}</button>
+            <button className="hq-chip hq-btn" onClick={() => load()} disabled={loading}>{loading ? "Loading..." : "Refresh"}</button>
           </div>
         </header>
         {err && <div className="hq-err">Could not read the database: {err}</div>}
@@ -304,6 +345,7 @@ export default function TeacherHQ() {
                 <span className="num" title="coins"><img src={`${UI}/coin.webp`} alt="coins" /></span>
                 <span className="num opt" title="puzzle pieces"><img src={`${UI}/i_puzzle.webp`} alt="pieces" /></span>
                 <span className="num opt" title="badges"><img src={`${UI}/medal.webp`} alt="badges" /></span>
+                <span className="num opt">Today</span>
                 <span>Last seen</span>
               </div>
               {shown.map(k => <KidRow key={keyOf(k)} k={k} sel={sel != null && keyOf(sel) === keyOf(k)} onPick={() => setSelKey(keyOf(k))} />)}
@@ -331,7 +373,8 @@ function KidCard({ k, sel, onPick }: { k: Kid; sel: boolean; onPick: () => void 
         <div>
           <div className="hq-name t">{cap(k.r.student_name)}</div>
           <div className="hq-code">{k.r.code}</div>
-          <span className={`hq-seen ${k.seen.cls}`}>{k.seen.text}</span>
+          <Seen k={k} />
+          {k.play.today > 0 && <div className="hq-mins">{mins(k.play.today)} today</div>}
         </div>
       </div>
       <WhereLine k={k} />
@@ -348,6 +391,12 @@ function KidCard({ k, sel, onPick }: { k: Kid; sel: boolean; onPick: () => void 
       </div>
     </div>
   );
+}
+
+// last-seen pill, or a glowing "Playing now" pill
+function Seen({ k }: { k: Kid }) {
+  if (k.play.now) return <span className="hq-seen live"><i />Playing now</span>;
+  return <span className={`hq-seen ${k.seen.cls}`}>{k.seen.text}</span>;
 }
 
 // ---- one line in the quick list (same numbers as the card, one source: buildKid) ----
@@ -371,7 +420,8 @@ function KidRow({ k, sel, onPick }: { k: Kid; sel: boolean; onPick: () => void }
       <span className="num">{k.coins}</span>
       <span className="num opt">{k.pieces}</span>
       <span className="num opt">{k.badges.length}</span>
-      <span><span className={`hq-seen ${k.seen.cls}`}>{k.seen.text}</span></span>
+      <span className="num opt">{k.play.today ? mins(k.play.today) : "-"}</span>
+      <span><Seen k={k} /></span>
     </div>
   );
 }
@@ -440,7 +490,7 @@ function Detail({ k, wide, onClose }: { k: Kid; wide: boolean; onClose: () => vo
         <Pet k={k} big />
         <div>
           <div className="hq-name t">{cap(r.student_name)}</div>
-          <div className="hq-code">{r.code} · seen {k.seen.text.toLowerCase()}</div>
+          <div className="hq-code">{r.code} · {k.play.now ? "playing now" : `seen ${k.seen.text.toLowerCase()}`}</div>
           <span className="hq-nowchip">{at ? `Playing ${at.w.title} World` : "Finished every world"}</span>
         </div>
       </div>
@@ -469,6 +519,15 @@ function Detail({ k, wide, onClose }: { k: Kid; wide: boolean; onClose: () => vo
             </div>
           );
         })}
+      </div>
+
+      <div className="hq-sec"><h3 className="t">Play time {k.play.now && <span className="hq-seen live" style={{ marginLeft: 6 }}><i />Playing now</span>}</h3>
+        <div className="hq-wallet hq-play">
+          <div className="hq-wl"><b className="t">{mins(k.play.today)}</b><small>today</small></div>
+          <div className="hq-wl"><b className="t">{mins(k.play.week)}</b><small>last 7 days</small></div>
+          <div className="hq-wl"><b className="t">{mins(k.play.total)}</b><small>total</small></div>
+        </div>
+        <p className="hq-note">Counted only while the kid is active (from 22 Oct 2026).</p>
       </div>
 
       <div className="hq-sec"><h3 className="t">Wallet</h3>
@@ -641,12 +700,21 @@ const CSS = `
 .hq-sw i{position:absolute;top:3px;left:19px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .2s}
 .hq-snd.off .hq-sw{background:#c9d4e2}
 .hq-snd.off .hq-sw i{left:3px}
+@keyframes hqPulse{0%{box-shadow:0 0 0 0 rgba(46,158,91,.6)}70%{box-shadow:0 0 0 8px rgba(46,158,91,0)}100%{box-shadow:0 0 0 0 rgba(46,158,91,0)}}
+.hq-pulse{background:#9aa8bd}
+.hq-live .hq-pulse{background:#2ecc71;animation:hqPulse 2s infinite}
+.hq-seen.live{background:#2ecc71;color:#fff;display:inline-flex;align-items:center;gap:6px}
+.hq-seen.live i{width:8px;height:8px;border-radius:50%;background:#fff;animation:hqPulse 2s infinite}
+.hq-mins{font-size:11px;color:#6b7f99;margin-top:3px}
+.hq-play{grid-template-columns:repeat(3,1fr)}
+.hq-play b{font-size:18px!important}
+.hq-note{margin:6px 0 0;font-size:11px;color:#9aa8bd}
 .hq-viewsw{display:flex;background:#fff;border-radius:999px;padding:4px;box-shadow:0 3px 0 rgba(23,103,168,.15)}
 .hq-viewsw button{background:transparent;border-radius:999px;padding:6px 14px;font-size:14px;color:#6b7f99}
 .hq-viewsw button.on{background:#f2b705;color:#5a3d00;box-shadow:0 2px 0 #c28f00}
 .hq-pet.small{width:38px;height:38px;box-shadow:inset 0 0 0 3px var(--c)}.hq-pet.small>img:first-child{width:32px;height:32px}
 .hq-list{overflow-x:auto;background:#fff;border-radius:24px;padding:6px 10px 10px;box-shadow:0 6px 0 rgba(23,103,168,.16),0 12px 26px rgba(23,103,168,.12)}
-.hq-lh,.hq-row{display:grid;grid-template-columns:14px minmax(130px,1fr) minmax(200px,2.6fr) minmax(80px,.8fr) 46px 50px 44px 44px 150px;gap:8px;align-items:center}
+.hq-lh,.hq-row{display:grid;grid-template-columns:14px minmax(130px,1fr) minmax(200px,2.6fr) minmax(80px,.8fr) 46px 50px 44px 44px 58px 150px;gap:8px;align-items:center}
 .hq-lh{padding:10px 8px;font-size:12px;color:#6b7f99;border-bottom:2px dashed #e3eaf3;position:sticky;top:0;background:#fff;z-index:1;border-radius:18px 18px 0 0}
 .hq-lh img{width:22px;height:22px;object-fit:contain}
 .hq-lh .num,.hq-row .num{text-align:center}

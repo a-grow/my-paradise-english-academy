@@ -28,6 +28,7 @@ import CardAlbum from "./pages/CardAlbum";
 import PuzzleMixup from "./pages/PuzzleMixup";
 import TurnSideways from "./components/TurnSideways";
 import VersionWatcher from "./components/VersionWatcher";
+import PlayHeartbeat from "./components/PlayHeartbeat";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <VersionWatcher />
+            <PlayHeartbeat />{/* play time for Teacher HQ: mpe_ping once a minute while a kid is active (2026-10-22) */}
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/blog" element={<Blog />} />
