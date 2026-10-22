@@ -86,7 +86,7 @@ const FAIRY = (() => {
   });
 })();
 
-type Engine = { earn: (n: number) => void; feed: (n: number) => void; poke: () => void; destroy: () => void };
+type Engine = { earn: (n: number) => void; feed: (n: number) => void; settle: (n: number) => void; poke: () => void; destroy: () => void };
 
 function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: number, isMuted: () => boolean, cookieSrc: string, flyOut: boolean): Engine {
   cv.width = W + 2 * PADX; cv.height = H + LIFT;
@@ -250,6 +250,14 @@ function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: nu
     unlockAudio();
     for (let i = 0; i < n; i++) { if (i === 0) feedOne(); else later(feedOne, i * 260); }
   }
+  // SETTLE (Andy 2026-10-22): a big drop at once = the real (cloud) number arriving after this device's older, higher
+  // number -> just show the correct number quietly: no hops, no sounds, no lid. Feeding (1 at a time) still hops.
+  // (Before: one hop + sound per treat of difference with no limit - 170 treats = ~45 s of jumping.)
+  function settle(n: number) {
+    count = Math.max(0, n);
+    while (pile.length > Math.min(count, MAX)) { const t = topCookie(); if (!t) break; pile.splice(pile.indexOf(t), 1); }
+    render();
+  }
 
   function drawCookieAt(c2: CanvasRenderingContext2D, x: number, y: number, rot: number, mirror: boolean, scale: number, squash: number, alpha: number) {
     const ck = IMG!.cookie, w = cw(scale), h = w * ck.height / ck.width * 0.9;
@@ -390,6 +398,7 @@ function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: nu
   return {
     earn,
     feed,
+    settle,
     poke,
     destroy() {
       dead = true;
@@ -432,7 +441,9 @@ export default function CookieJar({ count, muted = false, width = "min(290px, 62
     const d = n - shown.current;
     shown.current = n;
     if (!engine.current || d === 0) return;
-    if (d > 0) engine.current.earn(d); else engine.current.feed(-d);
+    if (d > 0) engine.current.earn(d);
+    else if (-d <= 2) engine.current.feed(-d);   // feeding: 1 (maybe 2 quick taps) = normal hop
+    else engine.current.settle(n);                // big drop at once = quiet correction (Andy 2026-10-22)
   }, [count]);
 
   useEffect(() => { if (poke && engine.current) engine.current.poke(); }, [poke]);
