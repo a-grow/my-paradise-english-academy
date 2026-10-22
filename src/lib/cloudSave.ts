@@ -1,13 +1,17 @@
 import { supabase } from "./supabase";
 
+// PART 2 LOCK, STEP 1 (2026-10-22): every read of a kid's OWN row goes through the database function mpe_get_row
+// (BACKUPFILES/rls_step1_functions_20261022.sql), so it keeps working after the table's open read rule is removed.
+// Same answers as the old direct reads: data = the row (all columns) | null = no row yet; error = could not read.
+async function readRow(code: string, studentName: string): Promise<{ data: any; error: { message: string } | null }> {
+  const { data, error } = await supabase.rpc("mpe_get_row", { p_code: code, p_name: studentName });
+  return { data: error ? null : (data ?? null), error: error ? { message: error.message } : null };
+}
+
 export async function saveJarToCloud(code: string, studentName: string, treats: number) {
   try {
-    const { error } = await supabase
-      .from("student_progress")
-      .upsert(
-        { code, student_name: studentName, treats },
-        { onConflict: "code,student_name" }
-      );
+    // PART 2 STEP 1: database function (no row -> creates it with this jar; an existing jar is never changed here)
+    const { error } = await supabase.rpc("mpe_first_jar", { p_code: code, p_name: studentName, p_treats: treats });
     if (error) console.error("[cloudSave] jar save failed:", error.message);
     else { console.log("[cloudSave] jar saved:", code, studentName, treats); await updateLastLogin(code, studentName); }
   } catch (e) {
@@ -17,12 +21,7 @@ export async function saveJarToCloud(code: string, studentName: string, treats: 
 
 export async function loadJarFromCloud(code: string, studentName: string): Promise<number | null> {
   try {
-    const { data, error } = await supabase
-      .from("student_progress")
-      .select("treats")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .maybeSingle();
+    const { data, error } = await readRow(code, studentName);
     if (error) { console.error("[cloudSave] jar load failed:", error.message); return null; }
     return data ? data.treats : null;
   } catch (e) {
@@ -83,12 +82,7 @@ export async function claimPrize(code: string, studentName: string, prize: strin
 // Returns {vocab, grammar} | null = no row yet | undefined = could not read. READ ONLY.
 export async function loadWins(code: string, studentName: string): Promise<{ vocab: number; grammar: number } | null | undefined> {
   try {
-    const { data, error } = await supabase
-      .from("student_progress")
-      .select("wins_vocab, wins_grammar")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .maybeSingle();
+    const { data, error } = await readRow(code, studentName);
     if (error) { console.error("[cloudSave] wins load failed:", error.message); return undefined; }
     if (!data) return null;
     return { vocab: Number(data.wins_vocab) || 0, grammar: Number(data.wins_grammar) || 0 };
@@ -102,12 +96,7 @@ export async function loadWins(code: string, studentName: string): Promise<{ voc
 // Returns the list | null = no row yet | undefined = could not read.
 export async function loadPrizes(code: string, studentName: string): Promise<string[] | null | undefined> {
   try {
-    const { data, error } = await supabase
-      .from("student_progress")
-      .select("prizes_claimed")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .maybeSingle();
+    const { data, error } = await readRow(code, studentName);
     if (error) { console.error("[cloudSave] prizes load failed:", error.message); return undefined; }
     if (!data) return null;
     return Array.isArray(data.prizes_claimed) ? data.prizes_claimed : [];
@@ -135,12 +124,7 @@ export async function claimDailyPrize(code: string, studentName: string): Promis
 // DAILY PRIZE status: today's box number (1-7) + already taken today? | null = no row | undefined = could not read.
 export async function loadDailyPrize(code: string, studentName: string): Promise<{ day: number; claimedToday: boolean; box: number } | null | undefined> {
   try {
-    const { data, error } = await supabase
-      .from("student_progress")
-      .select("daily_claimed, daily_box")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .maybeSingle();
+    const { data, error } = await readRow(code, studentName);
     if (error) return undefined;
     if (!data) return null;
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" }); // YYYY-MM-DD
@@ -154,12 +138,7 @@ export async function loadDailyPrize(code: string, studentName: string): Promise
 // SEEN FLAGS (2026-10-03): things a kid has already seen, e.g. "theater:savanna:giraffe" (red dot off on every device).
 export async function loadSeen(code: string, studentName: string): Promise<string[] | null | undefined> {
   try {
-    const { data, error } = await supabase
-      .from("student_progress")
-      .select("seen_flags")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .maybeSingle();
+    const { data, error } = await readRow(code, studentName);
     if (error) { console.error("[cloudSave] seen load failed:", error.message); return undefined; }
     if (!data) return null;
     return Array.isArray(data.seen_flags) ? data.seen_flags : [];
@@ -201,12 +180,7 @@ export async function claimDailyTreat(code: string, studentName: string): Promis
 // Has this kid already had today's daily treat (on ANY device / world)? true / false, undefined = could not check.
 export async function dailyClaimedToday(code: string, studentName: string): Promise<boolean | undefined> {
   try {
-    const { data, error } = await supabase
-      .from("student_progress")
-      .select("daily_claimed")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .maybeSingle();
+    const { data, error } = await readRow(code, studentName);
     if (error) return undefined;
     if (!data) return false;
     const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" }); // YYYY-MM-DD
@@ -265,12 +239,7 @@ export async function loadDataFromCloud(
   studentName: string
 ): Promise<{ activePet: string | null; data: Record<string, any> | null } | null> {
   try {
-    const { data: row, error } = await supabase
-      .from("student_progress")
-      .select("active_pet, data")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .maybeSingle();
+    const { data: row, error } = await readRow(code, studentName);
     if (error) { console.error("[cloudSave] data load failed:", error.message); return null; }
     if (!row) return null;
     return { activePet: row.active_pet ?? null, data: row.data ?? null };
@@ -282,11 +251,8 @@ export async function loadDataFromCloud(
 
 export async function updateLastLogin(code: string, studentName: string) {
   try {
-    const { error } = await supabase
-      .from("student_progress")
-      .update({ last_login: new Date().toISOString() })
-      .eq("code", code)
-      .eq("student_name", studentName);
+    // PART 2 STEP 1: database function (sets last_login = now, never creates a row)
+    const { error } = await supabase.rpc("mpe_touch", { p_code: code, p_name: studentName });
     if (error) console.error("[cloudSave] last_login update failed:", error.message);
     else console.log("[cloudSave] last_login updated:", code, studentName);
   } catch (e) {
@@ -298,14 +264,7 @@ export async function updateLastLogin(code: string, studentName: string) {
 // loadPuzzle: where the kid is | null = no row | undefined = could not read.
 export async function loadPuzzle(code: string, studentName: string): Promise<{ idx: number; gone: number[]; pieces: number } | null | undefined> {
   try {
-    const { data, error } = await supabase
-      .from("student_progress")
-      .select("puzzle_idx, puzzle_gone, puzzle_earned, puzzle_used")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .order("id")
-      .limit(1)
-      .maybeSingle();
+    const { data, error } = await readRow(code, studentName);
     if (error) { console.error("[cloudSave] puzzle load failed:", error.message); return undefined; }
     if (!data) return null;
     return { idx: Number(data.puzzle_idx) || 0, gone: Array.isArray(data.puzzle_gone) ? data.puzzle_gone.map(Number) : [], pieces: (Number(data.puzzle_earned) || 0) - (Number(data.puzzle_used) || 0) };
@@ -391,14 +350,7 @@ export async function pickCard(code: string, studentName: string, set: number, n
 // loadCards: the kid's album (read only) | null = no row | undefined = could not read.
 export async function loadCards(code: string, studentName: string): Promise<{ cards: Record<string, number>; swap: number; coins: number; seen: string[] } | null | undefined> {
   try {
-    const { data, error } = await supabase
-      .from("student_progress")
-      .select("cards, card_swap, coins_earned, coins_spent, seen_flags")
-      .eq("code", code)
-      .eq("student_name", studentName)
-      .order("id")
-      .limit(1)
-      .maybeSingle();
+    const { data, error } = await readRow(code, studentName);
     if (error) { console.error("[cloudSave] cards load failed:", error.message); return undefined; }
     if (!data) return null;
     const cards = data.cards && typeof data.cards === "object" && !Array.isArray(data.cards) ? (data.cards as Record<string, number>) : {};
