@@ -5,6 +5,27 @@ import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 import { earnedBadges, badgeList, badgeImg } from "@/worlds/badges";
 import { CARD_SETS, CARDS_TOTAL } from "@/cards/cardData";
 import { PACK_PRICE } from "@/cards/economy";
+import { useClickSfx } from "@/lib/clickSfx";
+
+// SOUNDS (Andy 10-22): every button/card = the world page click (useClickSfx); sort / filter / world tiles = a soft
+// synth "bloop" (marked data-noclick so they don't click too); Close = the red-X beep (data-closex).
+let bctx: AudioContext | null = null;
+function bloop() {
+  try {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AC) return;
+    bctx = bctx || new AC();
+    if (bctx.state === "suspended") bctx.resume().catch(() => { });
+    const t = bctx.currentTime, o = bctx.createOscillator(), g = bctx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(320, t);
+    o.frequency.exponentialRampToValueAtTime(760, t + 0.09);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.22, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+    o.connect(g); g.connect(bctx.destination); o.start(t); o.stop(t + 0.18);
+  } catch { /* */ }
+}
 
 // TEACHER HQ 2.0 (Part 1, 2026-10-22): READ ONLY. One select of student_progress, nothing is ever written.
 // Every number comes from the same rules the kid pages use (world list, worldState, stages, earnedBadges, card sets).
@@ -142,6 +163,7 @@ export default function TeacherHQ() {
   const [q, setQ] = useState("");
   const [selKey, setSelKey] = useState<string | null>(null);
   const [wide, setWide] = useState(() => typeof window === "undefined" || window.innerWidth > 1100);
+  useClickSfx(true);
 
   useEffect(() => {
     const on = () => setWide(window.innerWidth > 1100);
@@ -227,8 +249,8 @@ export default function TeacherHQ() {
             const n = real.filter(k => k.at?.w.id === w.id).length;
             const on = worldFilter === w.id;
             return (
-              <button key={w.id} className={`hq-wt${on ? " on" : ""}${n === 0 ? " zero" : ""}`} style={{ ["--c" as any]: WORLD_COLOR[w.id] }}
-                onClick={() => setWorldFilter(on ? null : w.id)}>
+              <button key={w.id} data-noclick className={`hq-wt${on ? " on" : ""}${n === 0 ? " zero" : ""}`} style={{ ["--c" as any]: WORLD_COLOR[w.id] }}
+                onClick={() => { bloop(); setWorldFilter(on ? null : w.id); }}>
                 <img src={worldIcon(w)} alt="" />
                 <div><div className="n t">{n}</div><div className="l">{n === 1 ? "kid" : "kids"} in {w.title}</div></div>
               </button>
@@ -239,11 +261,11 @@ export default function TeacherHQ() {
         <div className="hq-bar">
           <input className="hq-search" value={q} onChange={e => setQ(e.target.value)} placeholder="Find a kid..." />
           <span className="hq-lbl">Sort:</span>
-          <button className={`hq-pill${sortBy === "seen" ? " on" : ""}`} onClick={() => chooseSort("seen")}>Last seen</button>
-          <button className={`hq-pill${sortBy === "name" ? " on" : ""}`} onClick={() => chooseSort("name")}>Name</button>
-          <button className={`hq-pill${sortBy === "far" ? " on" : ""}`} onClick={() => chooseSort("far")}>Furthest</button>
-          {worldFilter && <button className="hq-pill on" onClick={() => setWorldFilter(null)}>Show all worlds</button>}
-          <button className={`hq-pill hq-tests${showTests ? " on" : ""}`} onClick={toggleTests}>{showTests ? "Hide test kids" : "Show test kids"}</button>
+          <button data-noclick className={`hq-pill${sortBy === "seen" ? " on" : ""}`} onClick={() => { bloop(); chooseSort("seen"); }}>Last seen</button>
+          <button data-noclick className={`hq-pill${sortBy === "name" ? " on" : ""}`} onClick={() => { bloop(); chooseSort("name"); }}>Name</button>
+          <button data-noclick className={`hq-pill${sortBy === "far" ? " on" : ""}`} onClick={() => { bloop(); chooseSort("far"); }}>Furthest</button>
+          {worldFilter && <button data-noclick className="hq-pill on" onClick={() => { bloop(); setWorldFilter(null); }}>Show all worlds</button>}
+          <button data-noclick className={`hq-pill hq-tests${showTests ? " on" : ""}`} onClick={() => { bloop(); toggleTests(); }}>{showTests ? "Hide test kids" : "Show test kids"}</button>
         </div>
 
         <div className="hq-main">
@@ -350,7 +372,7 @@ function Detail({ k, wide, onClose }: { k: Kid; wide: boolean; onClose: () => vo
   const packs = Math.floor(k.coins / PACK_PRICE);
   return (
     <aside className={`hq-detail${wide ? "" : " pop"}`} style={{ ["--c" as any]: at ? WORLD_COLOR[at.w.id] : "#c08a00", ["--bg" as any]: at ? WORLD_BG[at.w.id] : "#fff6d6" }}>
-      {!wide && <button className="hq-x" onClick={onClose}>Close</button>}
+      {!wide && <button className="hq-x" data-closex onClick={onClose}>Close</button>}
       <div className="hq-dh">
         <Pet k={k} big />
         <div>
