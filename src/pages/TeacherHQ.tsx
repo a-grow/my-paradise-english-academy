@@ -9,8 +9,12 @@ import { useClickSfx } from "@/lib/clickSfx";
 
 // SOUNDS (Andy 10-22): every button/card = the world page click (useClickSfx); sort / filter / world tiles = a soft
 // synth "bloop" (marked data-noclick so they don't click too); Close = the red-X beep (data-closex).
+// Sound switch (Andy 10-22): one ON/OFF for all of these, remembered on this device (localStorage mpe_hq_sound).
+const SOUND_KEY = "mpe_hq_sound";
+let sfxOn = true;
 let bctx: AudioContext | null = null;
 function bloop() {
+  if (!sfxOn) return;
   try {
     const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!AC) return;
@@ -36,6 +40,7 @@ const PASSWORD = "paradise2026";
 const SESSION_KEY = "mpe_hq_ok";
 const SORT_KEY = "mpe_hq_sort";
 const TEST_KEY = "mpe_hq_tests";
+const VIEW_KEY = "mpe_hq_view";   // "cards" (big cards) | "list" (quick list, one line per kid - for many kids)
 
 const UI = "/worlds/ui";
 const STAGE_KEYS = ["egg", "baby", "young", "grown"];          // thumbnail names: /worlds/<world>/<animal>-<key>-t.webp
@@ -159,11 +164,20 @@ export default function TeacherHQ() {
     try { const s = sessionStorage.getItem(SORT_KEY); return s === "name" || s === "far" ? s : "seen"; } catch { return "seen"; }
   });
   const [showTests, setShowTests] = useState<boolean>(() => { try { return sessionStorage.getItem(TEST_KEY) === "1"; } catch { return false; } });
+  const [view, setView] = useState<"cards" | "list">(() => { try { return sessionStorage.getItem(VIEW_KEY) === "list" ? "list" : "cards"; } catch { return "cards"; } });
   const [worldFilter, setWorldFilter] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [selKey, setSelKey] = useState<string | null>(null);
   const [wide, setWide] = useState(() => typeof window === "undefined" || window.innerWidth > 1100);
-  useClickSfx(true);
+  const [soundOn, setSoundOn] = useState<boolean>(() => { try { return localStorage.getItem(SOUND_KEY) !== "off"; } catch { return true; } });
+  sfxOn = soundOn;
+  useClickSfx(soundOn);
+  function toggleSound() {
+    const v = !soundOn;
+    sfxOn = v; setSoundOn(v);
+    try { localStorage.setItem(SOUND_KEY, v ? "on" : "off"); } catch { /* */ }
+    if (v) bloop();
+  }
 
   useEffect(() => {
     const on = () => setWide(window.innerWidth > 1100);
@@ -201,6 +215,7 @@ export default function TeacherHQ() {
 
   function unlock() { setOk(true); try { localStorage.setItem(SESSION_KEY, "1"); } catch { /* */ } }
   function chooseSort(s: "seen" | "name" | "far") { setSortBy(s); try { sessionStorage.setItem(SORT_KEY, s); } catch { /* */ } }
+  function chooseView(v: "cards" | "list") { setView(v); try { sessionStorage.setItem(VIEW_KEY, v); } catch { /* */ } }
   function toggleTests() { const v = !showTests; setShowTests(v); try { sessionStorage.setItem(TEST_KEY, v ? "1" : "0"); } catch { /* */ } }
 
   if (!ok) {
@@ -239,6 +254,9 @@ export default function TeacherHQ() {
             <div className="hq-chip"><b>{real.length}</b> kids</div>
             <div className="hq-chip"><span className="hq-dot" style={{ background: "#2e9e5b" }} /><b>{today}</b> played today</div>
             <div className="hq-chip"><span className="hq-dot" style={{ background: "#f08c00" }} /><b>{quiet}</b> quiet 7+ days</div>
+            <button data-noclick className={`hq-chip hq-snd${soundOn ? "" : " off"}`} onClick={toggleSound} title="Button sounds on / off">
+              <span className="hq-sw"><i /></span>Sounds {soundOn ? "on" : "off"}
+            </button>
             <button className="hq-chip hq-btn" onClick={load} disabled={loading}>{loading ? "Loading..." : "Refresh"}</button>
           </div>
         </header>
@@ -260,6 +278,10 @@ export default function TeacherHQ() {
 
         <div className="hq-bar">
           <input className="hq-search" value={q} onChange={e => setQ(e.target.value)} placeholder="Find a kid..." />
+          <div className="hq-viewsw">
+            <button data-noclick className={view === "cards" ? "on" : ""} onClick={() => { bloop(); chooseView("cards"); }}>Cards</button>
+            <button data-noclick className={view === "list" ? "on" : ""} onClick={() => { bloop(); chooseView("list"); }}>List</button>
+          </div>
           <span className="hq-lbl">Sort:</span>
           <button data-noclick className={`hq-pill${sortBy === "seen" ? " on" : ""}`} onClick={() => { bloop(); chooseSort("seen"); }}>Last seen</button>
           <button data-noclick className={`hq-pill${sortBy === "name" ? " on" : ""}`} onClick={() => { bloop(); chooseSort("name"); }}>Name</button>
@@ -269,10 +291,25 @@ export default function TeacherHQ() {
         </div>
 
         <div className="hq-main">
-          <div className="hq-grid">
-            {shown.map(k => <KidCard key={keyOf(k)} k={k} sel={sel != null && keyOf(sel) === keyOf(k)} onPick={() => setSelKey(keyOf(k))} />)}
-            {!loading && shown.length === 0 && <div className="hq-empty">No kids here.</div>}
-          </div>
+          {view === "cards" ? (
+            <div className="hq-grid">
+              {shown.map(k => <KidCard key={keyOf(k)} k={k} sel={sel != null && keyOf(sel) === keyOf(k)} onPick={() => setSelKey(keyOf(k))} />)}
+              {!loading && shown.length === 0 && <div className="hq-empty">No kids here.</div>}
+            </div>
+          ) : (
+            <div className="hq-list">
+              <div className="hq-lh">
+                <span /><span>Kid</span><span>Where</span><span className="opt">Growing</span>
+                <span className="num" title="treats"><img src={`${UI}/treat.webp`} alt="treats" /></span>
+                <span className="num" title="coins"><img src={`${UI}/coin.webp`} alt="coins" /></span>
+                <span className="num opt" title="puzzle pieces"><img src={`${UI}/i_puzzle.webp`} alt="pieces" /></span>
+                <span className="num opt" title="badges"><img src={`${UI}/medal.webp`} alt="badges" /></span>
+                <span>Last seen</span>
+              </div>
+              {shown.map(k => <KidRow key={keyOf(k)} k={k} sel={sel != null && keyOf(sel) === keyOf(k)} onPick={() => setSelKey(keyOf(k))} />)}
+              {!loading && shown.length === 0 && <div className="hq-empty">No kids here.</div>}
+            </div>
+          )}
           {sel && <Detail k={sel} wide={wide} onClose={() => setSelKey(null)} />}
         </div>
       </div>
@@ -313,8 +350,34 @@ function KidCard({ k, sel, onPick }: { k: Kid; sel: boolean; onPick: () => void 
   );
 }
 
+// ---- one line in the quick list (same numbers as the card, one source: buildKid) ----
+function KidRow({ k, sel, onPick }: { k: Kid; sel: boolean; onPick: () => void }) {
+  const at = k.at, cur = at?.cur;
+  const goal = cur ? cur.a.stages[cur.a.stages.length - 1].min : 0;
+  const pct = cur ? Math.max(2, Math.min(100, Math.round((cur.fed / goal) * 100))) : 100;
+  return (
+    <div className={`hq-row${sel ? " sel" : ""}`} onClick={onPick}
+      style={{ ["--c" as any]: at ? WORLD_COLOR[at.w.id] : "#f2b705", ["--bg" as any]: at ? WORLD_BG[at.w.id] : "#fff6d6" }}>
+      <span className="hq-dot" title={k.health.reasons.join("\n") || "All good"} style={{ background: k.health.level === "red" ? "#d64545" : k.health.level === "yellow" ? "#f0a020" : "#2e9e5b" }} />
+      <span className="kid"><Pet k={k} small /><span><b className="t">{cap(k.r.student_name)}</b><small>{k.r.code}</small></span></span>
+      <span className="where">
+        {at ? <><img src={worldIcon(at.w)} alt="" /><span title={`${at.w.title} · ${cur ? `${cur.a.name}${cur.petName ? ` "${cur.petName}"` : ""} · ${cur.a.stages[cur.stage].name}` : "last video"}`}><b style={{ color: "var(--c)" }}>{at.w.title}</b> · {cur ? `${cur.a.name} · ${cur.a.stages[cur.stage].name}` : "last video"}</span></>
+          : <b style={{ color: "#c08a00" }}>All worlds done!</b>}
+      </span>
+      <span className="grow opt">
+        {cur && <><span className="hq-gbar"><i style={{ width: `${pct}%` }} /></span><small>{at ? `${at.curPos + 1}/${at.animals.length}` : ""} · {cur.fed}/{goal}</small></>}
+      </span>
+      <span className="num">{k.jar}</span>
+      <span className="num">{k.coins}</span>
+      <span className="num opt">{k.pieces}</span>
+      <span className="num opt">{k.badges.length}</span>
+      <span><span className={`hq-seen ${k.seen.cls}`}>{k.seen.text}</span></span>
+    </div>
+  );
+}
+
 // current animal picture in a world-coloured circle + the small world badge
-function Pet({ k, big }: { k: Kid; big?: boolean }) {
+function Pet({ k, big, small }: { k: Kid; big?: boolean; small?: boolean }) {
   const at = k.at;
   let src = `${UI}/medal.webp`;
   if (at) {
@@ -326,9 +389,9 @@ function Pet({ k, big }: { k: Kid; big?: boolean }) {
     src = thumb(last.w, v.a, v.stage);
   }
   return (
-    <div className={`hq-pet${big ? " big" : ""}`}>
+    <div className={`hq-pet${big ? " big" : ""}${small ? " small" : ""}`}>
       <img src={src} alt="" />
-      {at && <img className="wb" src={worldIcon(at.w)} alt="" />}
+      {at && !small && <img className="wb" src={worldIcon(at.w)} alt="" />}
     </div>
   );
 }
@@ -572,6 +635,37 @@ const CSS = `
 .hq-eye{background:#eef3f9;color:#4c6a8c;border-radius:14px;padding:0 14px}
 .hq-go{width:100%;background:#1767a8;color:#fff;border-radius:14px;padding:12px;font-size:16px;box-shadow:0 4px 0 #0f4c7e}
 .hq-gatecard .hq-wrong{color:#b42318;font-size:13px;margin:10px 0 0}
+.hq-snd{color:#1d3557}
+.hq-snd.off{color:#9aa8bd}
+.hq-sw{width:38px;height:22px;border-radius:999px;background:#3fb54a;position:relative;flex:none;transition:background .2s}
+.hq-sw i{position:absolute;top:3px;left:19px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .2s}
+.hq-snd.off .hq-sw{background:#c9d4e2}
+.hq-snd.off .hq-sw i{left:3px}
+.hq-viewsw{display:flex;background:#fff;border-radius:999px;padding:4px;box-shadow:0 3px 0 rgba(23,103,168,.15)}
+.hq-viewsw button{background:transparent;border-radius:999px;padding:6px 14px;font-size:14px;color:#6b7f99}
+.hq-viewsw button.on{background:#f2b705;color:#5a3d00;box-shadow:0 2px 0 #c28f00}
+.hq-pet.small{width:38px;height:38px;box-shadow:inset 0 0 0 3px var(--c)}.hq-pet.small>img:first-child{width:32px;height:32px}
+.hq-list{overflow-x:auto;background:#fff;border-radius:24px;padding:6px 10px 10px;box-shadow:0 6px 0 rgba(23,103,168,.16),0 12px 26px rgba(23,103,168,.12)}
+.hq-lh,.hq-row{display:grid;grid-template-columns:14px minmax(130px,1fr) minmax(200px,2.6fr) minmax(80px,.8fr) 46px 50px 44px 44px 150px;gap:8px;align-items:center}
+.hq-lh{padding:10px 8px;font-size:12px;color:#6b7f99;border-bottom:2px dashed #e3eaf3;position:sticky;top:0;background:#fff;z-index:1;border-radius:18px 18px 0 0}
+.hq-lh img{width:22px;height:22px;object-fit:contain}
+.hq-lh .num,.hq-row .num{text-align:center}
+.hq-row{padding:6px 8px;border-radius:14px;cursor:pointer;border:2px solid transparent}
+.hq-row:nth-child(odd){background:#f7fbff}
+.hq-row:hover{background:#eaf6ff}
+.hq-row.sel{border-color:#1767a8;background:#eaf6ff}
+.hq-row .kid{display:flex;align-items:center;gap:8px;min-width:0}
+.hq-row .kid b{font-size:16px;font-weight:400;display:block;line-height:1.1}
+.hq-row .kid small{font-size:11px;color:#9aa8bd;letter-spacing:.5px}
+.hq-row .where{display:flex;align-items:center;gap:6px;font-size:13px;min-width:0}
+.hq-row .where img{width:24px;height:24px;border-radius:50%;flex:none}
+.hq-row .where>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hq-row .hq-seen{white-space:nowrap}
+.hq-row .grow small{display:block;font-size:11px;color:#6b7f99;margin-top:2px}
+.hq-row .grow .hq-gbar{display:block;height:9px}
+.hq-row .num{font-size:15px}
+.hq-row .hq-seen{margin-top:0}
 @media (max-width:1100px){.hq-main{grid-template-columns:1fr}.hq-worlds{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:820px){.hq-lh .opt,.hq-row .opt{display:none}.hq-lh,.hq-row{grid-template-columns:14px minmax(110px,1.2fr) minmax(120px,2fr) 44px 48px minmax(90px,1fr)}}
 @media (max-width:640px){.hq-worlds{grid-template-columns:repeat(2,1fr)}.hq-wallet{grid-template-columns:repeat(2,1fr)}.hq-two{grid-template-columns:1fr}.hq-wrap{padding:16px}.hq-chips{margin-left:0}.hq-tests{margin-left:0}}
 `;
