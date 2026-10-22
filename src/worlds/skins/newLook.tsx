@@ -416,7 +416,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   useEffect(() => { // music quiet during the party, back after
     const a = v.audioRef.current, full = v.K.musicVolume ?? v.volume * 0.5;
     const on = !!(party || done);
-    if (a && on && !partyWas.current) a.volume = full * 0.15;
+    if (a && on && !partyWas.current) a.volume = 0.02; // Andy 10-22: iPad ignores 15% -> 0.02 = paused on iPad (iosVolume), almost silent on computers
     if (a && !on && partyWas.current) a.volume = full;
     partyWas.current = on;
   }, [party, done]);

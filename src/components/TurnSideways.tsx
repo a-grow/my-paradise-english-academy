@@ -38,8 +38,10 @@ export default function TurnSideways() {
     if (!kid || !isTouch()) return;
     const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
     const stop = (e: Event) => { if (!typing(e.target)) e.preventDefault(); };
-    document.addEventListener("selectstart", stop); document.addEventListener("contextmenu", stop);
-    return () => { document.removeEventListener("selectstart", stop); document.removeEventListener("contextmenu", stop); };
+    // vocab-game joysticks + SHOOT (Andy 10-22: holding them still opened the iPad Share menu; React touch handlers cannot block it)
+    const joy = (e: TouchEvent) => { if (e.cancelable && e.target instanceof Element && e.target.closest(".ss-joy,.ss-fire,.tp-joy,.fs-joy")) e.preventDefault(); };
+    document.addEventListener("selectstart", stop); document.addEventListener("contextmenu", stop); document.addEventListener("touchstart", joy, { passive: false });
+    return () => { document.removeEventListener("selectstart", stop); document.removeEventListener("contextmenu", stop); document.removeEventListener("touchstart", joy); };
   }, [kid]);
 
   useEffect(() => {
