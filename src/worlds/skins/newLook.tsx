@@ -28,7 +28,7 @@ import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL, demoCoinsGet, demoCoinsSet } fro
 import { badgeSeen } from "@/lib/cloudSave";
 import { isCloseBtn, playCloseBeep, playClick } from "@/lib/clickSfx";
 import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
-import { REAL_CODES as PUZZLE_REAL_CODES, demoPiecesGet, demoPiecesSet } from "@/pages/PuzzleMixup";
+import { isRealCode, demoPiecesGet, demoPiecesSet } from "@/pages/PuzzleMixup";
 import { lockLeft, LOCK_IMG, UNLOCK_IMG, type LockId } from "@/lib/locks";
 import LockMsg from "@/components/LockMsg";
 import { badgeList, earnedBadges, badgeImg } from "@/worlds/badges";
@@ -642,8 +642,8 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     });
   }, [lockKnown, albumLeft, puzzleLeft]);
   // ALBUM METER (Andy 2026-10-07): coins toward the next card pack; packs ready = red dot + glow (waits for the new-friend glow)
-  const albumOn = v.isMaster || ALBUM_FOR_ALL || PUZZLE_REAL_CODES.includes(v.code);   // + the real-saving codes (TEST99 now; Card Album cloud step 2026-10-14)
-  const puzzleOn = v.isMaster || PUZZLE_REAL_CODES.includes(v.code);   // Puzzle Mixup: 1006 demo + the real-saving codes in PuzzleMixup.tsx REAL_CODES (TEST99 now; every kid at launch)
+  const albumOn = v.isMaster || ALBUM_FOR_ALL || isRealCode(v.code);   // + the real-saving codes (TEST99 now; Card Album cloud step 2026-10-14)
+  const puzzleOn = v.isMaster || isRealCode(v.code);   // Puzzle Mixup: 1006 demo + the real-saving codes in PuzzleMixup.tsx REAL_CODES (TEST99 now; every kid at launch)
   const albumCoins = v.isMaster ? demoCoins : coinShown;   // the WALLET number: real = the shown coins (grows as coins land); 1006 = the tab's pretend coins
   const albumPacks = albumOn && albumLeft === 0 && !alL.locked && !alL.opening ? Math.floor(albumCoins / PACK_PRICE) : 0; // locked (or unlocking) = no pack glow / dot
   const albumPct = albumCoins >= PACK_PRICE ? 100 : (Math.max(0, albumCoins) / PACK_PRICE) * 100;   // wallet bar: full once a pack is affordable

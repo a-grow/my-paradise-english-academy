@@ -18,7 +18,7 @@ import HowToPlay from "@/components/HowToPlay";
 import { ALBUM_HOWTO, SWAP_HOWTO } from "@/components/howtos";
 import { useHowtoSeen, wantHowto, seenHowto, firstHowto } from "@/lib/howtoSeen";
 import { loadPrizes, loadCards, openPacks, pickCard, markSeen, cardSeen, type CardPacks } from "@/lib/cloudSave";
-import { REAL_CODES } from "@/pages/PuzzleMixup";   // ONE list of real-saving codes for Puzzle + Album
+import { isRealCode } from "@/pages/PuzzleMixup";   // ONE rule for real saving in Puzzle + Album (every code except 1006)
 import { lockLeft, LOCK_IMG } from "@/lib/locks";
 import LockMsg from "@/components/LockMsg";
 
@@ -626,7 +626,7 @@ export default function CardAlbum() {
     return () => { alive = false; };
   }, [isMaster, code, name]);
   // REAL kids (2026-10-14): unlocked + the album read from the database = the page works. on = show the album.
-  const real = !isMaster && REAL_CODES.includes(code);
+  const real = !isMaster && isRealCode(code);
   const [cardsLoad, setCardsLoad] = useState<"wait" | "ok" | "fail">(isMaster ? "ok" : "wait");
   const on = isMaster || (real && lockN === 0 && cardsLoad === "ok");
 

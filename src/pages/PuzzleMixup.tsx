@@ -20,7 +20,9 @@ import { lockLeft, LOCK_IMG } from "@/lib/locks";
 import LockMsg from "@/components/LockMsg";
 
 const MASTER_CODE = "1006";
-export const REAL_CODES = ["TEST99", "TEST77", "TEST88"];   // + TEST77 = Andy's brand-new test kid from the Ocean egg (10-15)   // REAL saving (puzzle cloud step 2026-10-11): test kid only until launch
+// LAUNCH (2026-10-22): EVERY kid's code reads + saves for real (Puzzle + Card Album). Only the teacher code 1006 stays the demo.
+// (Was a list of test codes: TEST99, TEST77, TEST88.) The locks (src/lib/locks.ts) still decide when a kid can open them.
+export const isRealCode = (c: string) => !!c && c.toUpperCase() !== MASTER_CODE;
 const P = "/puzzle";
 const UI = "/worlds/ui";
 const STAGE_W = 1600, STAGE_H = 1000;
@@ -253,7 +255,7 @@ export default function PuzzleMixup() {
   const code = (rawCode ?? "").toUpperCase(), name = (rawName ?? "").toLowerCase();
   const navigate = useNavigate();
   const isMaster = code === MASTER_CODE;
-  const real = !isMaster && REAL_CODES.includes(code);   // reads + saves the real piece jar (database)
+  const real = !isMaster && isRealCode(code);   // reads + saves the real piece jar (database)
   const on = isMaster || real;
   const { s, sw, sh } = useFit();
   const cx = sw / 2;
