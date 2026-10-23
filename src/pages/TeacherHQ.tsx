@@ -741,7 +741,6 @@ function GiftTools({ k, onChanged }: { k: Kid; onChanged: () => void }) {
           ))}</div>
         )}
       </div>
-      <div className="hq-gbox hq-gsoon"><div className="hq-gtitle">Change animal / stage</div><small>Coming next.</small></div>
       {ask && (
         <div className="hq-ask" onClick={e => e.stopPropagation()}>
           <div className="hq-askcard">
