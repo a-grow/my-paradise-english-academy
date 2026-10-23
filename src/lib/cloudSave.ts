@@ -107,6 +107,31 @@ export async function loadPrizes(code: string, studentName: string): Promise<str
   }
 }
 
+// TEACHER GIFT (2026-10-23): gifts a teacher gave in Teacher HQ (already PAID into the row by mpe_teacher_gift) that
+// this kid has not seen yet (database mpe_my_gifts: not undone, not shown). [] = none | undefined = could not read.
+export type TeacherGift = { id: number; treats: number; coins: number; pieces: number; message?: string };
+export async function loadMyGifts(code: string, studentName: string): Promise<TeacherGift[] | undefined> {
+  try {
+    const { data, error } = await supabase.rpc("mpe_my_gifts", { p_code: code, p_name: studentName });
+    if (error) { console.error("[cloudSave] gifts load failed:", error.message); return undefined; }
+    return Array.isArray(data) ? (data as TeacherGift[]) : [];
+  } catch (e) {
+    console.error("[cloudSave] gifts load threw:", e);
+    return undefined;
+  }
+}
+// The kid saw these gifts (mpe_gift_shown marks only this kid's own waiting gifts). Only after a real tap.
+export async function giftsShown(code: string, studentName: string, ids: number[]) {
+  try {
+    if (!ids.length) return;
+    await whenKidHere();
+    const { error } = await supabase.rpc("mpe_gift_shown", { p_code: code, p_name: studentName, p_ids: ids });
+    if (error) console.error("[cloudSave] gift shown failed:", error.message);
+  } catch (e) {
+    console.error("[cloudSave] gift shown threw:", e);
+  }
+}
+
 // DAILY PRIZE (2026-10-03): open today's box (database mpe_claim_daily_prize: one per Taiwan day, any device/world,
 // amounts live there). Returns {paid, day, treats, coins, pieces, jar} | null = no row | undefined = failed.
 export async function claimDailyPrize(code: string, studentName: string): Promise<{ paid: boolean; day?: number; treats?: number; coins?: number; pieces?: number; jar?: number } | null | undefined> {

@@ -256,6 +256,8 @@ function makeEngine(cv: HTMLCanvasElement, stage: HTMLDivElement, startCount: nu
   function settle(n: number) {
     count = Math.max(0, n);
     while (pile.length > Math.min(count, MAX)) { const t = topCookie(); if (!t) break; pile.splice(pile.indexOf(t), 1); }
+    // going UP quietly (quiet prop, 2026-10-23): cookies are simply placed, no fall, no sound
+    while (pile.length < Math.min(count, MAX)) { const sl = nextFreeSlot(); if (sl < 0) break; pile.push({ slot: sl, y: SLOTS[sl].y, vy: 0, rot: SLOTS[sl].rot, state: "rest", squash: 0, bounces: 0 }); }
     render();
   }
 
@@ -418,17 +420,20 @@ type Props = {
   width?: string;         // jar width (CSS); default fits phones
   flyOut?: boolean;       // feed: false = no cookie flying up out of the jar (the page shows its own); default true
   poke?: number;          // change this number = one short wiggle + glass tink (e.g. the kid tapped the jar)
+  quiet?: boolean;        // true = ANY drop is a quiet settle (no hop, no sound) - e.g. behind the Teacher Andy gift (2026-10-23)
   cookie?: string;        // treat picture (full path, e.g. the new world look's /worlds/ui/treat.webp); default = the jar's own cookie
   style?: CSSProperties;
 };
 
-export default function CookieJar({ count, muted = false, width = "min(290px, 62vw)", style, cookie = "cookie.webp", flyOut = true, poke = 0 }: Props) {
+export default function CookieJar({ count, muted = false, width = "min(290px, 62vw)", style, cookie = "cookie.webp", flyOut = true, poke = 0, quiet = false }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engine = useRef<Engine | null>(null);
   const shown = useRef(Math.max(0, Math.floor(Number(count) || 0)));
   const mutedRef = useRef(muted);
   mutedRef.current = muted;
+  const quietRef = useRef(quiet);
+  quietRef.current = quiet;
 
   useEffect(() => {
     const e = makeEngine(canvasRef.current!, stageRef.current!, shown.current, () => mutedRef.current, cookie, flyOut);
@@ -441,7 +446,8 @@ export default function CookieJar({ count, muted = false, width = "min(290px, 62
     const d = n - shown.current;
     shown.current = n;
     if (!engine.current || d === 0) return;
-    if (d > 0) engine.current.earn(d);
+    if (quietRef.current) engine.current.settle(n);   // quiet: any change is placed silently
+    else if (d > 0) engine.current.earn(d);
     else if (-d <= 2) engine.current.feed(-d);   // feeding: 1 (maybe 2 quick taps) = normal hop
     else engine.current.settle(n);                // big drop at once = quiet correction (Andy 2026-10-22)
   }, [count]);

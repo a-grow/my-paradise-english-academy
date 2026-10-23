@@ -25,7 +25,7 @@ import LaunchGift from "./LaunchGift";
 import HowToPlay from "@/components/HowToPlay";
 import { worldHowTo } from "@/components/howtos";
 import { PACK_PRICE, DEMO_COINS, ALBUM_FOR_ALL, demoCoinsGet, demoCoinsSet } from "@/cards/economy";
-import { badgeSeen } from "@/lib/cloudSave";
+import { badgeSeen, loadMyGifts, giftsShown } from "@/lib/cloudSave";
 import { isCloseBtn, playCloseBeep, playClick } from "@/lib/clickSfx";
 import { MixupWord, MIXUP_CSS } from "@/components/MixupWord";
 import { isRealCode, demoPiecesGet, demoPiecesSet } from "@/pages/PuzzleMixup";
@@ -525,10 +525,59 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     const t = window.setTimeout(() => setGiftFly(false), 8000);
     return () => window.clearTimeout(t);
   }, [giftFly, v.prizes]);   // eslint-disable-line react-hooks/exhaustive-deps
+  // TEACHER GIFT (Andy 2026-10-23): a gift given in Teacher HQ (already PAID into the row) shows ONCE with the SAME
+  // LaunchGift animation (Teacher Andy claps), then the gift flies in. Several gifts = one present, all added together.
+  // 'pending' = asking the database (max 4s), object = waiting, 'off' = none. A visit + 1006 never. Order: after the launch
+  // gift, before the Daily Prize. The win parade leaves the gift amounts out (they fly here) - never shown twice. When the
+  // present opens, the counters quietly step back by the gift (behind the dim screen), so the FULL gift always flies in on
+  // every device (Andy 11:55: on his Chrome the box was empty). Seen = after the kid's tap.
+  type TGift = { ids: number[]; treats: number; coins: number; pieces: number; message: string };   // message = the newest one
+  const [tg, setTg] = useState<"pending" | TGift | "off">(() => (v.readOnly || v.isMaster ? "off" : "pending"));
+  const [tgOpen, setTgOpen] = useState(false);
+  const tgWait = typeof tg === "object" ? tg : null;
+  const tgAmt = useRef({ t: 0, c: 0, p: 0 });   // what will fly (set when the win parade is decided)
+  useEffect(() => {
+    if (tg !== "pending") return;
+    let gone = false;
+    loadMyGifts(v.code, v.studentName).then(list => {
+      if (gone) return;
+      const l = (list ?? []).filter(g => g.treats + g.coins + g.pieces > 0);
+      const sum = (k: "treats" | "coins" | "pieces") => l.reduce((a, g) => a + (Number(g[k]) || 0), 0);
+      setTg(cur => (cur !== "pending" ? cur : l.length ? { ids: l.map(g => g.id), treats: sum("treats"), coins: sum("coins"), pieces: sum("pieces"), message: [...l].reverse().map(g => String(g.message ?? "").trim()).find(m => m) ?? "" } : "off"));
+    });
+    const t = window.setTimeout(() => setTg(cur => (cur === "pending" ? "off" : cur)), 4000);   // no answer: skip (it comes next visit)
+    return () => { gone = true; window.clearTimeout(t); };
+  }, []);   // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!tgWait || tgOpen || intro !== "off" || howto !== "closed" || paraPending || parade || party || done || mini || dailyDay
+      || gift === "pending" || gift === "wait" || giftOn || giftFly) return;
+    const t = window.setTimeout(() => setTgOpen(true), 800);
+    return () => window.clearTimeout(t);
+  }, [tgWait, tgOpen, intro, howto, paraPending, parade, party, done, mini, dailyDay, gift, giftFly]);   // eslint-disable-line react-hooks/exhaustive-deps
+  const [tgQuiet, setTgQuiet] = useState(false);   // the jar is quiet ONLY for the step-back (the gift treats still fall in)
+  useEffect(() => {
+    if (!tgOpen) return;
+    const a = tgAmt.current;
+    setTgQuiet(true);
+    const qt = window.setTimeout(() => setTgQuiet(false), 400);
+    // exactly 'real minus gift' (the jar may still show this device's older number - the jar is quiet while the present is open)
+    if (a.t > 0) setJarShown(Math.max(0, v.jarTreats - a.t));
+    if (a.c > 0 && typeof v.coins === "number") setCoinShown(Math.max(0, v.coins - a.c));
+    if (a.p > 0 && typeof pieceReal === "number") setPieceShown(Math.max(0, pieceReal - a.p));
+    return () => window.clearTimeout(qt);
+  }, [tgOpen]);   // eslint-disable-line react-hooks/exhaustive-deps
+  const tgSeen = () => { if (tgWait) giftsShown(v.code, v.studentName, tgWait.ids); };
+  const tgFlyIn = () => {
+    const a = tgAmt.current, items: ParadeItem[] = [];
+    if (a.t > 0) items.push({ kind: "treat", n: a.t, img: `${UI}/treat.webp` });
+    if (a.c > 0) items.push({ kind: "coin", n: a.c, img: `${UI}/coin.webp` });
+    if (a.p > 0) items.push({ kind: "piece", n: a.p, img: "/puzzle/piece.webp" });
+    if (items.length) setParade(items);
+  };
   // TEST ONLY (?dp=): nothing is saved, so after the test prize the jar + coin pill KEEP the shown numbers
   // (going back to the real number made the jar open again with the feed sound - Andy 14:19).
   const [testKeep, setTestKeep] = useState(false);
-  const holding = !!(party || done || mini || dailyDay || testKeep || parade || intro !== "off" || giftOn || giftFly);
+  const holding = !!(party || done || mini || dailyDay || testKeep || parade || intro !== "off" || giftOn || giftFly || tgWait || tgOpen);
   useEffect(() => { if (!holding && !paraPending) setCoinShown(v.coins ?? 0); }, [v.coins, holding, paraPending]);
   const pieceReal = v.isMaster ? demoPieces : v.pieces;
   useEffect(() => { if (!holding && !paraPending && pieceReal !== null) setPieceShown(pieceReal); }, [pieceReal, holding, paraPending]);
@@ -570,10 +619,10 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   const dailyReady = isTestDp ? testDp : (v.dailyPrize && !v.dailyPrize.claimedToday ? v.dailyPrize.day : 0);
   const dailyShown = useRef(false);
   useEffect(() => {
-    if (!dailyReady || dailyShown.current || party || done || paraPending || parade || howto !== "closed" || intro !== "off" || gift === "pending" || gift === "wait" || giftOn || giftFly) return;
+    if (!dailyReady || dailyShown.current || party || done || paraPending || parade || howto !== "closed" || intro !== "off" || gift === "pending" || gift === "wait" || giftOn || giftFly || tg === "pending" || tgWait || tgOpen) return;
     const t = window.setTimeout(() => { dailyShown.current = true; setDailyDay(dailyReady); }, 1200);
     return () => window.clearTimeout(t);
-  }, [dailyReady, party, done, howto, intro, paraPending, parade, gift, giftFly]);
+  }, [dailyReady, party, done, howto, intro, paraPending, parade, gift, giftFly, tg, tgOpen]);
   const dailyLand = (k: DailyKind, add: number) => {
     if (k === "treat") { setJarShown(j => j + add); setBump(b => ({ ...b, treat: (b.treat ?? 0) + 1 })); }
     else partyLand(k, add);
@@ -742,7 +791,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
   useEffect(() => { if (!paraPending) return; const t = window.setTimeout(() => setParaPending(false), 8000); return () => window.clearTimeout(t); }, [paraPending]); // never wait forever
   useEffect(() => {
     if (!paraPending && !(testWp && !wpUsed.current)) return;
-    if (intro !== "off" || howto !== "closed" || party || done || mini || dailyDay || parade) return;
+    if (intro !== "off" || howto !== "closed" || party || done || mini || dailyDay || parade || tg === "pending") return;
     if (testWp && !wpUsed.current) {
       wpUsed.current = true;
       setParade([{ kind: "treat", n: 6, img: `${UI}/treat.webp` }, { kind: "coin", n: 83, img: `${UI}/coin.webp` }, { kind: "piece", n: 2, img: "/puzzle/piece.webp" }, { kind: "badge", n: 1, img: badgeImg("games") }]);
@@ -750,7 +799,11 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     }
     if (typeof v.coins !== "number" || typeof pieceReal !== "number") return;
     const items: ParadeItem[] = [];
-    const dT = v.jarTreats - jarShown, dC = Number.isFinite(paraSeen.c) ? v.coins - paraSeen.c : 0, dP = Number.isFinite(paraSeen.p) ? pieceReal - paraSeen.p : 0;
+    // TEACHER GIFT: the whole gift flies with Teacher Andy's present (counters step back when it opens); the win parade
+    // only flies what went up BEYOND the gift
+    const fT = tgWait?.treats ?? 0, fC = tgWait?.coins ?? 0, fP = puzzleOn ? (tgWait?.pieces ?? 0) : 0;
+    tgAmt.current = { t: fT, c: fC, p: fP };
+    const dT = v.jarTreats - fT - jarShown, dC = Number.isFinite(paraSeen.c) ? v.coins - fC - paraSeen.c : 0, dP = Number.isFinite(paraSeen.p) ? pieceReal - fP - paraSeen.p : 0;
     if (dT > 0) items.push({ kind: "treat", n: dT, img: `${UI}/treat.webp` });
     if (dC > 0) items.push({ kind: "coin", n: dC, img: `${UI}/coin.webp` }); else setCoinShown(v.coins);
     if (dP > 0 && puzzleOn) items.push({ kind: "piece", n: dP, img: "/puzzle/piece.webp" }); else setPieceShown(pieceReal);
@@ -760,7 +813,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
     }
     if (items.length) setParade(items);
     setParaPending(false);
-  }, [paraPending, intro, howto, party, done, mini, dailyDay, parade, v.coins, pieceReal, v.jarTreats]);   // eslint-disable-line react-hooks/exhaustive-deps
+  }, [paraPending, intro, howto, party, done, mini, dailyDay, parade, v.coins, pieceReal, v.jarTreats, tg]);   // eslint-disable-line react-hooks/exhaustive-deps
   // Remember what is SHOWN now (only when calm): next time, what went up flies in.
   const earnedKey = earned.join(",");
   useEffect(() => {
@@ -1089,7 +1142,7 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
 
         {/* bottom left: the real jar (new treat), Daily Treat, Visit 5 days */}
         <div ref={jarRef} className={"sv-jar sv-inB" + lift} onClick={() => setJarPoke(p => p + 1)}>
-          <CookieJar count={jarShown} width="200px" cookie={`${UI}/treat.webp`} muted={!v.sfxOn} flyOut={false} poke={jarPoke} style={{ position: "absolute", left: 0, bottom: 0 }} />
+          <CookieJar count={jarShown} width="200px" cookie={`${UI}/treat.webp`} muted={!v.sfxOn} flyOut={false} poke={jarPoke} quiet={tgQuiet} style={{ position: "absolute", left: 0, bottom: 0 }} />
           <div className="sv-jarcount">{holding ? jarShown : Math.max(v.jarTreats, jarShown)}</div>
         </div>
         <img className={"sv-jarlbl sv-inB" + lift} src={`${UI}/lbl_treats.webp`} alt="My Treats" />
@@ -1264,6 +1317,9 @@ const Page = ({ v, L }: { v: WorldView; L: LookSettings }) => {
         )}
         {giftOn && (
           <LaunchGift cx={cx} sh={sh} sfxOn={v.sfxOn} onOpen={giftOpen} onTreats={() => setGiftFly(true)} onDone={() => setGift("off")} />
+        )}
+        {tgOpen && (
+          <LaunchGift cx={cx} sh={sh} sfxOn={v.sfxOn} message={tgWait?.message} onOpen={tgSeen} onTreats={tgFlyIn} onDone={() => { setTgOpen(false); setTg("off"); }} />
         )}
         {dailyDay > 0 && (
           <DailyPrize cx={cx} sh={sh} day={dailyDay} sfxOn={v.sfxOn}

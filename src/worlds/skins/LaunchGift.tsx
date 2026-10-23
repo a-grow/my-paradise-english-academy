@@ -13,8 +13,8 @@ const ANDY_H = 600, ANDY_W = Math.round(600 * 459 / 900);   // Teacher Andy pict
 const CLAP = ["andy_clap_flat", "andy_clap_mid", "andy_clap_out"];   // flat palms (clap sound) -> halfway -> apart (Andy 10-15; old in/almost unused)
 const CLAP_MS = 90;                     // the 3 present pictures share one scale (same Gemini sheet)
 
-export default function LaunchGift({ cx, sh, sfxOn, onOpen, onTreats, onDone }: {
-  cx: number; sh: number; sfxOn: boolean; onOpen: () => void; onTreats: () => void; onDone: () => void;
+export default function LaunchGift({ cx, sh, sfxOn, message, onOpen, onTreats, onDone }: {
+  cx: number; sh: number; sfxOn: boolean; message?: string; onOpen: () => void; onTreats: () => void; onDone: () => void;
 }) {
   // in -> idle (waits for the tap) -> shake -> open (lid flies off) -> out (fades while the treats fly) -> onDone
   const [phase, setPhase] = useState<"in" | "idle" | "shake" | "open" | "out">("in");
@@ -68,6 +68,10 @@ export default function LaunchGift({ cx, sh, sfxOn, onOpen, onTreats, onDone }: 
       <div className="lg-dim" />
       <img className="lg-title" src={`${G}/gift_title.webp`} alt="A Gift from Teacher Andy!" draggable={false}
         style={{ left: cx, top: rowY - 255, width: 760 }} />
+      {/* TEACHER GIFT MESSAGE (Andy 2026-10-23): the teacher's one line, above the title (nothing else sits there) */}
+      {message && (
+        <div className="lg-msg" style={{ left: cx, top: rowY - 362, fontSize: message.length <= 22 ? 62 : message.length <= 36 ? 50 : 38 }}>{message}</div>
+      )}
       <i className={"lg-glow" + (opened ? " big" : "")} style={{ left: cx, top: rowY }} />
       {!opened && (
         <div className="lg-pop" style={{ left: cx, top: bottom }}>
@@ -104,6 +108,11 @@ const CSS = `
 @keyframes lg-fade{from{opacity:0}to{opacity:1}}
 .lg-title{position:absolute;translate:-50% -50%;filter:drop-shadow(0 6px 8px rgba(0,0,0,.45));animation:lg-drop .7s cubic-bezier(.3,1.5,.5,1) .15s both;pointer-events:none}
 @keyframes lg-drop{0%{opacity:0;transform:translateY(-70px) scale(.9)}100%{opacity:1;transform:none}}
+.lg-msg{position:absolute;translate:-50% -50%;max-width:1500px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;
+ font-family:'Lilita One',sans-serif;line-height:1.25;color:#7dffe3;
+ text-shadow:4px 0 #3a1468,-4px 0 #3a1468,0 4px #3a1468,0 -4px #3a1468,3px 3px #3a1468,-3px 3px #3a1468,3px -3px #3a1468,-3px -3px #3a1468,0 8px 10px rgba(0,0,0,.55);animation:lg-msgIn .8s cubic-bezier(.3,1.5,.5,1) .5s both,lg-msgBob 3s ease-in-out 1.4s infinite}
+@keyframes lg-msgIn{0%{opacity:0;transform:scale(.6)}100%{opacity:1;transform:none}}
+@keyframes lg-msgBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .lg-glow{position:absolute;width:520px;height:520px;translate:-50% -50%;border-radius:50%;pointer-events:none;
  background:radial-gradient(closest-side,rgba(255,236,160,.75),rgba(255,214,110,.3) 55%,rgba(255,214,110,0));
  animation:lg-glow .8s ease-out .3s both;transition:transform .6s ease,opacity .6s ease}

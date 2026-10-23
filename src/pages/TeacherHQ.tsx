@@ -189,6 +189,7 @@ export default function TeacherHQ() {
   const [busy, setBusy] = useState(false);
   const [me, setMe] = useState("");
   const [pwOpen, setPwOpen] = useState(false);
+  const [allOpen, setAllOpen] = useState(false);   // Gift to all kids (2026-10-23)
   const [pw1, setPw1] = useState("");
   const [pw2, setPw2] = useState("");
   const [pwMsg, setPwMsg] = useState<{ good: boolean; t: string } | null>(null);
@@ -363,6 +364,7 @@ export default function TeacherHQ() {
               <span className="hq-sw"><i /></span>Sounds {soundOn ? "on" : "off"}
             </button>
             <button className="hq-chip hq-btn" onClick={() => load()} disabled={loading}>{loading ? "Loading..." : "Refresh"}</button>
+            <button className="hq-chip hq-btn hq-allbtn" onClick={() => setAllOpen(true)}>Gift to all kids</button>
             <button className="hq-chip hq-btn" onClick={() => { setPwMsg(null); setPw1(""); setPw2(""); setPwOpen(true); }} title={me}>Password</button>
             <button className="hq-chip hq-btn" onClick={logOut}>Log out</button>
           </div>
@@ -418,7 +420,8 @@ export default function TeacherHQ() {
               {!loading && shown.length === 0 && <div className="hq-empty">No kids here.</div>}
             </div>
           )}
-          {sel && <Detail k={sel} wide={wide} onClose={() => setSelKey(null)} />}
+          {sel && <Detail k={sel} wide={wide} onClose={() => setSelKey(null)} onChanged={() => load(true)} />}
+          {allOpen && <AllGift onClose={() => setAllOpen(false)} onChanged={() => load(true)} />}
         </div>
       </div>
     </div>
@@ -538,7 +541,7 @@ function Growth({ v, pos, total }: { v: AnimalView; pos: number; total: number }
 }
 
 // ---- everything about one kid ----
-function Detail({ k, wide, onClose }: { k: Kid; wide: boolean; onClose: () => void }) {
+function Detail({ k, wide, onClose, onChanged }: { k: Kid; wide: boolean; onClose: () => void; onChanged: () => void }) {
   const r = k.r;
   const at = k.at;
   const allBadges = badgeList(ALL_WORLDS);
@@ -630,11 +633,176 @@ function Detail({ k, wide, onClose }: { k: Kid; wide: boolean; onClose: () => vo
         </small>
       </div>
 
-      <div className="hq-tools"><h3 className="t"><img src={`${UI}/lock_closed.webp`} alt="" />Teacher tools</h3>
-        <div className="hq-tb"><span>Gift treats</span><span>Gift coins</span><span>Gift puzzle pieces</span><span>Change animal / stage</span></div>
-        <p>Coming in Part 3, after the real teacher login.</p>
-      </div>
+      <GiftTools key={`${r.code}|${r.student_name}`} k={k} onChanged={onChanged} />
     </aside>
+  );
+}
+
+// TEACHER TOOLS part 3 step 1 (2026-10-23): GIFT treats / coins / pieces + history with Undo.
+// Database: mpe_teacher_gift / mpe_teacher_undo / mpe_teacher_log_list (teachers only; each action saves the kid's
+// whole row first in mpe_teacher_log). Confirm screen before every change. Never window.confirm.
+type LogLine = { id: number; at: string; teacher: string; action: string; details: { treats?: number; coins?: number; pieces?: number; message?: string }; undone_at: string | null; undo_of: number | null; shown_at?: string | null };
+type GiftAmt = { treats: string; coins: string; pieces: string; message: string };
+const GIFT_EMPTY: GiftAmt = { treats: "", coins: "", pieces: "", message: "" };
+const giftNum = (x: string) => { const n = parseInt(x, 10); return Number.isFinite(n) && n > 0 ? n : 0; };
+function giftOf(a: GiftAmt) { return { treats: giftNum(a.treats), coins: giftNum(a.coins), pieces: giftNum(a.pieces), message: a.message.trim() }; }
+const giftTooMuch = (g: { treats: number; coins: number; pieces: number }) => g.treats > 100 || g.coins > 1000 || g.pieces > 50;
+const hqWhen = (t: string) => new Date(t).toLocaleString("en-US", { timeZone: "Asia/Taipei", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+// the 3 amount boxes + the one-line message (shared by one kid's Gift box and Gift to all kids)
+function GiftFields({ amt, setAmt }: { amt: GiftAmt; setAmt: (f: (a: GiftAmt) => GiftAmt) => void }) {
+  const g = giftOf(amt);
+  const field = (key: "treats" | "coins" | "pieces", label: string, img: string, max: number) => (
+    <label className="hq-gf">
+      <img src={img} alt="" />
+      <span>{label}</span>
+      <input type="number" inputMode="numeric" min={0} max={max} placeholder="0" value={amt[key]}
+        onChange={e => { const v = e.target.value.replace(/[^0-9]/g, "").slice(0, 4); setAmt(a => ({ ...a, [key]: v })); }} />
+    </label>
+  );
+  return (
+    <>
+      <div className="hq-gfs">
+        {field("treats", "Treats", `${UI}/treat.webp`, 100)}
+        {field("coins", "Coins", `${UI}/coin.webp`, 1000)}
+        {field("pieces", "Pieces", "/puzzle/piece.webp", 50)}
+      </div>
+      <input className="hq-gmsgin" type="text" maxLength={60} placeholder="Message (optional), e.g. Great job today!" value={amt.message}
+        onChange={e => { const v = e.target.value; setAmt(a => ({ ...a, message: v })); }} />
+      {giftTooMuch(g) && <small className="hq-gwarn">One gift: up to 100 treats, 1000 coins, 50 pieces.</small>}
+    </>
+  );
+}
+function giftWords(d: LogLine["details"]): string {
+  const p: string[] = [];
+  if (n0(d.treats)) p.push(`${n0(d.treats)} treat${n0(d.treats) === 1 ? "" : "s"}`);
+  if (n0(d.coins)) p.push(`${n0(d.coins)} coin${n0(d.coins) === 1 ? "" : "s"}`);
+  if (n0(d.pieces)) p.push(`${n0(d.pieces)} piece${n0(d.pieces) === 1 ? "" : "s"}`);
+  return p.join(" + ") || "nothing";
+}
+function GiftTools({ k, onChanged }: { k: Kid; onChanged: () => void }) {
+  const r = k.r;
+  const [amt, setAmt] = useState<GiftAmt>(GIFT_EMPTY);
+  const [ask, setAsk] = useState<null | { kind: "gift" } | { kind: "undo"; line: LogLine }>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [log, setLog] = useState<LogLine[] | null>(null);
+  const loadLog = useCallback(() => {
+    teacherDb().rpc("mpe_teacher_log_list", { p_code: r.code, p_name: r.student_name }).then(({ data, error }) => {
+      setLog(error ? [] : ((data as LogLine[]) || []));
+    });
+  }, [r.code, r.student_name]);
+  useEffect(() => { loadLog(); }, [loadLog]);
+  const g = giftOf(amt);
+  const canGive = !busy && !giftTooMuch(g) && g.treats + g.coins + g.pieces > 0;
+  async function doGift() {
+    setBusy(true); setMsg(null);
+    const { error } = await teacherDb().rpc("mpe_teacher_gift", { p_code: r.code, p_name: r.student_name, p_treats: g.treats, p_coins: g.coins, p_pieces: g.pieces, p_message: g.message || null });
+    setBusy(false); setAsk(null);
+    if (error) { setMsg({ ok: false, text: `Not given: ${error.message}` }); return; }
+    setMsg({ ok: true, text: `Given: ${giftWords(g)}.` });
+    setAmt(GIFT_EMPTY);
+    loadLog(); onChanged();
+  }
+  async function doUndo(line: LogLine) {
+    setBusy(true); setMsg(null);
+    const { error } = await teacherDb().rpc("mpe_teacher_undo", { p_log: line.id });
+    setBusy(false); setAsk(null);
+    if (error) { setMsg({ ok: false, text: `Not undone: ${error.message}` }); return; }
+    setMsg({ ok: true, text: `Undone: ${giftWords(line.details)} taken back.` });
+    loadLog(); onChanged();
+  }
+  return (
+    <div className="hq-sec hq-gift">
+      <h3 className="t">Teacher tools</h3>
+      <div className="hq-gbox">
+        <div className="hq-gtitle">Give a gift</div>
+        <GiftFields amt={amt} setAmt={setAmt} />
+        <button className="hq-gbtn" disabled={!canGive} onClick={() => { setMsg(null); setAsk({ kind: "gift" }); }}>Give gift</button>
+        {msg && <div className={`hq-gmsg${msg.ok ? "" : " bad"}`}>{msg.text}</div>}
+      </div>
+      <div className="hq-gbox">
+        <div className="hq-gtitle">History</div>
+        {log === null ? <small>Loading...</small> : log.length === 0 ? <small>No teacher changes yet.</small> : (
+          <div className="hq-glog">{log.map(l => (
+            <div key={l.id} className={`hq-gl${l.undone_at ? " off" : ""}`}>
+              <div>
+                <b>{l.action === "gift" ? "Gift" : "Undo"}: {giftWords(l.details)}</b>
+                {l.action === "gift" && l.details.message && <i className="hq-glmsg">"{l.details.message}"</i>}
+                <small>{hqWhen(l.at)} · {l.teacher.split("@")[0]}{l.undone_at ? " · undone" : ""}</small>
+              </div>
+              {l.action === "gift" && !l.undone_at && l.shown_at && <span className="hq-gseen">Seen by kid<br />{hqWhen(l.shown_at)}</span>}
+              {l.action === "gift" && !l.undone_at && !l.shown_at && <button className="hq-gundo" disabled={busy} onClick={() => { setMsg(null); setAsk({ kind: "undo", line: l }); }}>Undo</button>}
+            </div>
+          ))}</div>
+        )}
+      </div>
+      <div className="hq-gbox hq-gsoon"><div className="hq-gtitle">Change animal / stage</div><small>Coming next.</small></div>
+      {ask && (
+        <div className="hq-ask" onClick={e => e.stopPropagation()}>
+          <div className="hq-askcard">
+            <div className="hq-gtitle">{ask.kind === "gift" ? "Give this gift?" : "Undo this gift?"}</div>
+            <p><b>{cap(r.student_name)}</b> ({r.code})</p>
+            <p className="big">{ask.kind === "gift" ? giftWords(g) : `Take back ${giftWords(ask.line.details)}`}</p>
+            {ask.kind === "gift" && g.message && <p className="hq-askmsg">"{g.message}"</p>}
+            <div className="hq-askbtns">
+              <button className="hq-gbtn" disabled={busy} onClick={() => (ask.kind === "gift" ? doGift() : doUndo(ask.line))}>{busy ? "Saving..." : ask.kind === "gift" ? "Yes, give" : "Yes, undo"}</button>
+              <button className="hq-gcancel" data-closex disabled={busy} onClick={() => setAsk(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// GIFT TO ALL KIDS (2026-10-23): the database decides who 'all' is (mpe_teacher_all_kids: no TEST... test kids, no ALEX11,
+// no PEAR123) and the confirm screen lists every name. Each kid gets their own History line (own Undo until they see it).
+function AllGift({ onClose, onChanged }: { onClose: () => void; onChanged: () => void }) {
+  const [amt, setAmt] = useState<GiftAmt>(GIFT_EMPTY);
+  const [kids, setKids] = useState<{ code: string; student_name: string }[] | null>(null);
+  const [ask, setAsk] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  useEffect(() => {
+    teacherDb().rpc("mpe_teacher_all_kids").then(({ data, error }) => setKids(error ? [] : ((data as { code: string; student_name: string }[]) || [])));
+  }, []);
+  const g = giftOf(amt);
+  const canGive = !busy && !!kids && kids.length > 0 && !giftTooMuch(g) && g.treats + g.coins + g.pieces > 0;
+  async function doAll() {
+    setBusy(true); setMsg(null);
+    const { data, error } = await teacherDb().rpc("mpe_teacher_gift_all", { p_treats: g.treats, p_coins: g.coins, p_pieces: g.pieces, p_message: g.message || null });
+    setBusy(false); setAsk(false);
+    if (error) { setMsg({ ok: false, text: `Not given: ${error.message}` }); return; }
+    setMsg({ ok: true, text: `Given to ${(data as { kids?: number })?.kids ?? 0} kids: ${giftWords(g)}.` });
+    setAmt(GIFT_EMPTY);
+    onChanged();
+  }
+  return (
+    <div className="hq-ask">
+      <div className="hq-askcard hq-allcard">
+        <button className="hq-allx" data-closex disabled={busy} onClick={onClose}>Close</button>
+        <div className="hq-gtitle">Gift to all kids</div>
+        {!ask ? (
+          <>
+            <GiftFields amt={amt} setAmt={setAmt} />
+            <small className="hq-allwho">{kids === null ? "Loading kids..." : `${kids.length} kids (test kids, ALEX11 and PEAR123 left out)`}</small>
+            <button className="hq-gbtn" disabled={!canGive} onClick={() => { setMsg(null); setAsk(true); }}>Next</button>
+            {msg && <div className={`hq-gmsg${msg.ok ? "" : " bad"}`}>{msg.text}</div>}
+          </>
+        ) : (
+          <>
+            <p>Give each of these <b>{kids?.length ?? 0} kids</b>:</p>
+            <p className="big">{giftWords(g)}</p>
+            {g.message && <p className="hq-askmsg">"{g.message}"</p>}
+            <div className="hq-allnames">{(kids ?? []).map(k => <span key={k.code + "|" + k.student_name}>{cap(k.student_name)} <small>{k.code}</small></span>)}</div>
+            <div className="hq-askbtns">
+              <button className="hq-gbtn" disabled={busy} onClick={doAll}>{busy ? "Saving..." : "Yes, give all"}</button>
+              <button className="hq-gcancel" disabled={busy} onClick={() => setAsk(false)}>Back</button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -745,12 +913,49 @@ const CSS = `
 .hq-winlbl{font-size:11px;color:#6b7f99;margin-top:6px}
 .hq-wins{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
 .hq-wins span{background:#e7eef7;border-radius:999px;padding:3px 9px;font-size:12px;color:#4c6a8c}
-.hq-tools{margin-top:16px;border:3px dashed #c9d6e6;border-radius:20px;padding:12px;background:repeating-linear-gradient(45deg,#fafcff 0 10px,#f3f7fc 10px 20px)}
-.hq-tools h3{display:flex;align-items:center;gap:8px;color:#8a9bb3}
-.hq-tools h3 img{width:22px}
-.hq-tb{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.hq-tb span{background:#e7edf5;color:#9aa8bd;border-radius:14px;padding:10px;text-align:center;font-size:14px}
-.hq-tools p{margin:8px 0 0;font-size:12px;color:#8a9bb3}
+.hq-gift{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+.hq-gift h3{margin:0}
+.hq-gbox{background:#fff8e6;border:2px solid #f4d38a;border-radius:16px;padding:10px 12px}
+.hq-gtitle{font-family:"Titan One",Nunito,sans-serif;font-weight:400;font-size:16px;color:#7b3fbf;margin-bottom:6px}
+.hq-gfs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hq-gf{display:flex;flex-direction:column;align-items:center;gap:2px;background:#fff;border-radius:12px;padding:6px}
+.hq-gf img{width:30px;height:30px;object-fit:contain}
+.hq-gf span{font-size:12px;color:#6b7f99}
+.hq-gf input{width:100%;max-width:90px;text-align:center;font:inherit;font-size:18px;border:2px solid #dbe5f0;border-radius:10px;padding:4px}
+.hq-gbtn{margin-top:8px;width:100%;background:#2fa84f;color:#fff;border-radius:999px;padding:10px;font-size:16px}
+.hq-gbtn:disabled{background:#c9d6e6;cursor:default}
+.hq-gwarn{display:block;margin-top:6px;color:#c0392b}
+.hq-gmsg{margin-top:8px;font-size:14px;color:#2f7d3f}
+.hq-gmsg.bad{color:#c0392b}
+.hq-glog{display:flex;flex-direction:column;gap:6px}
+.hq-gl{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border-radius:10px;padding:6px 8px}
+.hq-gl b{display:block;font-size:14px}
+.hq-gl small{color:#6b7f99}
+.hq-gl.off b{text-decoration:line-through;color:#9aa8bd}
+.hq-gundo{background:#fdecea;color:#c0392b!important;border-radius:999px;padding:6px 12px;font-size:13px}
+.hq-gsoon{background:#f3f7fc;border-color:#dbe5f0}
+.hq-gsoon .hq-gtitle{color:#8a9bb3}
+.hq-gsoon small{color:#8a9bb3}
+.hq-ask{position:fixed;inset:0;z-index:90;background:rgba(20,40,70,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.hq-askcard{background:#fff;border-radius:22px;padding:18px;width:min(340px,100%);text-align:center;box-shadow:0 14px 30px rgba(0,0,0,.25)}
+.hq-askcard p{margin:6px 0}
+.hq-askcard .big{font-size:20px;color:#1d3557}
+.hq-askbtns{display:flex;gap:8px}
+.hq-askbtns button{flex:1}
+.hq-gcancel{margin-top:8px;background:#e7eef7;color:#4c6a8c;border-radius:999px;padding:10px;font-size:16px}
+.hq-gmsgin{margin-top:8px;width:100%;font:inherit;font-size:15px;border:2px solid #dbe5f0;border-radius:10px;padding:8px 10px;background:#fff}
+.hq-glmsg{display:block;font-size:13px;color:#7b3fbf;font-style:normal}
+.hq-gseen{font-size:11px;color:#2f7d3f;text-align:right;line-height:1.3;white-space:nowrap}
+.hq-askmsg{color:#7b3fbf;font-size:16px}
+.hq-allbtn{background:#7b3fbf!important;color:#fff!important}
+.hq-allcard{position:relative;width:min(420px,100%);max-height:calc(100vh - 32px);overflow:auto;text-align:left}
+.hq-allcard .hq-gtitle{text-align:center;margin-top:4px}
+.hq-allcard p{text-align:center}
+.hq-allx{position:absolute;top:10px;right:10px;background:#1767a8;color:#fff;border-radius:999px;padding:6px 12px;font-size:13px}
+.hq-allwho{display:block;margin-top:8px;color:#6b7f99}
+.hq-allnames{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0;max-height:180px;overflow:auto}
+.hq-allnames span{background:#f3ecfb;color:#4b2a7a;border-radius:999px;padding:4px 10px;font-size:13px}
+.hq-allnames small{color:#8a7aa8}
 .hq-gate{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:20px}
 .hq-gate .hq-logo{text-align:center}
 .hq-gatecard{background:#fff;border-radius:24px;padding:22px;width:min(360px,100%);box-shadow:0 6px 0 rgba(23,103,168,.2),0 14px 30px rgba(23,103,168,.15)}
