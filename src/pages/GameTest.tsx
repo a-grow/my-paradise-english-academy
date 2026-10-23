@@ -1427,6 +1427,9 @@ const GAMES=[
   {id:"snake",name:"Ticket Please!",emoji:"🐍",desc:"Pick up passengers to spell words!",color:"#10b981",glow:"rgba(16,185,129,0.5)",cover:"/vocab/train/cover.webp"},
   {id:"space",name:"Space Robots",emoji:"🚀",desc:"Find the correct robot!",color:"#a855f7",glow:"rgba(168,85,247,0.5)",cover:"/vocab/space/cover.webp"},
 ];
+// GAME STATS (2026-10-23): fires once when a win / lose screen opens
+const RoundEnd = ({fire}:{fire:()=>void}) => { useEffect(()=>{ fire(); },[]); return null; };
+
 type Screen="books"|"units"|"games"|"diff"|"play";
 
 interface GameTestProps {
@@ -1443,9 +1446,10 @@ interface GameTestProps {
   onCoinTotal?: () => Promise<number | null | undefined>;  // the kid's coin total (win screen pill)
   onPayCoins?: (n: number) => void;                         // pay coins collected in a game (only on a WIN)
   onPayPieces?: (key?: string) => void;                      // +1 puzzle piece for a WIN (2026-10-11) + win key for badges (2026-10-14)
+  onRound?: (ev: "start" | "win" | "lose", game?: string, level?: string, diff?: string) => void; // GAME STATS log (2026-10-23)
 }
 
-const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, treatsEarnedToday=0, fromDino=false, studentBook=1, musicOn=true, onToggleMusic, onMusicTrack, onCoinTotal, onPayCoins, onPayPieces}: GameTestProps) => {
+const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, treatsEarnedToday=0, fromDino=false, studentBook=1, musicOn=true, onToggleMusic, onMusicTrack, onCoinTotal, onPayCoins, onPayPieces, onRound}: GameTestProps) => {
   const navigate=useNavigate();
   const [screen,setScreen]=useState<Screen>("books");
   const [help,setHelp]=useState(false);
@@ -1478,33 +1482,36 @@ const GameTest = ({onClaim, onBackToWorld, claimedCombos, treatsCappedToday, tre
     : undefined;
   // WIN COUNTER (2026-10-14): the piece payment also says WHAT was won, e.g. vocab:space:1-3 (game, book, unit)
   const payWin = (onPayPieces && unit && game) ? () => onPayPieces(`vocab:${game.id}:${selectedBook}-${unit.unit}`) : onPayPieces;
+  // GAME STATS (2026-10-23): log each round - start when it begins (difficulty picked / Play again), win / lose when it ends
+  const roundStart = (d: Diff) => { if (onRound && unit && game) onRound("start", game.id, `${selectedBook}-${unit.unit}`, d); };
+  const again = (restart: () => void) => () => { roundStart(diff); restart(); };
 
   // "?" How to Play on the difficulty screen (Andy 2026-10-07): any time, does not count as a showing
   const howFor = (id:string) => id==="arrow" ? {...FROG_HOWTO, bg:"/vocab/frog/bg.webp"} : id==="whack" ? gardenHowTo("medium") : id==="snake" ? TICKET_HOWTO : SPACE_HOWTO;
-  if(screen==="diff"&&unit&&game) return <>{help&&<HowToPlay {...howFor(game.id)} muted={!musicOn} onDone={()=>setHelp(false)}/>}<DiffPicker game={game} unit={unit} onPick={(d)=>{setDiff(d);setScreen("play");}} onBack={()=>setScreen("games")} onHelp={()=>setHelp(true)}/></>;
+  if(screen==="diff"&&unit&&game) return <>{help&&<HowToPlay {...howFor(game.id)} muted={!musicOn} onDone={()=>setHelp(false)}/>}<DiffPicker game={game} unit={unit} onPick={(d)=>{setDiff(d);setScreen("play");roundStart(d);}} onBack={()=>setScreen("games")} onHelp={()=>setHelp(true)}/></>;
 
   if(screen==="play"&&unit&&game){
     const props={unit,diff,onBack:()=>{setJustClaimed(false);setScreen("games");},onClaim:handleClaim,onBackToWorld,claimState,treatsEarnedToday,fromDino,onRestart:()=>setJustClaimed(false)};
     // NEW look (Andy 2026-10-06). The old game stays above as the fallback: <ArrowShoot {...props}/>
     if(game.id==="arrow") return <FrogSnap unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
       onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
-      renderWin={(restart,cw,cs)=><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={restart} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} onPayPieces={payWin} muted={!musicOn}/>}
-      renderLose={(reason,restart)=><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={restart} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/>}/>;
+      renderWin={(restart,cw,cs)=><><RoundEnd fire={()=>onRound?.("win")}/><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={again(restart)} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} onPayPieces={payWin} muted={!musicOn}/></>}
+      renderLose={(reason,restart)=><><RoundEnd fire={()=>onRound?.("lose")}/><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={again(restart)} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/></>}/>;
     // NEW look (Andy 2026-10-05). The old game stays above as the fallback: <WhackAMole {...props}/>
     if(game.id==="whack") return <WhackGarden unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
       onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
-      renderWin={(restart,cw,cs)=><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={restart} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} onPayPieces={payWin} muted={!musicOn}/>}
-      renderLose={(reason,restart)=><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={restart} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/>}/>;
+      renderWin={(restart,cw,cs)=><><RoundEnd fire={()=>onRound?.("win")}/><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={again(restart)} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} onPayPieces={payWin} muted={!musicOn}/></>}
+      renderLose={(reason,restart)=><><RoundEnd fire={()=>onRound?.("lose")}/><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={again(restart)} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/></>}/>;
     // NEW look (Andy 2026-10-05). The old game stays above as the fallback: <WordSnake {...props}/>
     if(game.id==="snake") return <TicketPlease unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
       onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
-      renderWin={(restart,cw,cs)=><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={restart} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} onPayPieces={payWin} muted={!musicOn}/>}
-      renderLose={(reason,restart)=><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={restart} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/>}/>;
+      renderWin={(restart,cw,cs)=><><RoundEnd fire={()=>onRound?.("win")}/><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={again(restart)} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} onPayPieces={payWin} muted={!musicOn}/></>}
+      renderLose={(reason,restart)=><><RoundEnd fire={()=>onRound?.("lose")}/><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={again(restart)} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/></>}/>;
     // NEW look (Andy 2026-10-04). The old game stays above as the fallback: <SpaceShooter {...props}/>
     if(game.id==="space") return <SpaceShooter2 unit={unit} diff={diff} cfg={DIFF_CONFIG[diff]} musicOn={musicOn} onToggleMusic={onToggleMusic ?? (()=>{})}
       onMusicTrack={onMusicTrack} onBack={props.onBack} onRestart={props.onRestart} getCoinTotal={onCoinTotal}
-      renderWin={(restart,cw,cs)=><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={restart} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} onPayPieces={payWin} muted={!musicOn}/>}
-      renderLose={(reason,restart)=><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={restart} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/>}/>;
+      renderWin={(restart,cw,cs)=><><RoundEnd fire={()=>onRound?.("win")}/><UnitClearScreen unit={unit} onBack={props.onBack} onPlay={again(restart)} onClaim={handleClaim} claimState={claimState} diff={diff} treatsEarnedToday={treatsEarnedToday} fromDino={fromDino} onBackToWorld={onBackToWorld} coinsWon={cw} coinStart={cs} onPayCoins={onPayCoins} onPayPieces={payWin} muted={!musicOn}/></>}
+      renderLose={(reason,restart)=><><RoundEnd fire={()=>onRound?.("lose")}/><ResultScreen score={0} total={1} onBack={props.onBack} onPlay={again(restart)} reason={reason} onBackToWorld={onBackToWorld} fromDino={fromDino} muted={!musicOn}/></>}/>;
   }
 
   const back=()=>{

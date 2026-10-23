@@ -190,6 +190,7 @@ export default function TeacherHQ() {
   const [me, setMe] = useState("");
   const [pwOpen, setPwOpen] = useState(false);
   const [allOpen, setAllOpen] = useState(false);   // Gift to all kids (2026-10-23)
+  const [statsOpen, setStatsOpen] = useState(false);   // Game stats (2026-10-23)
   const [pw1, setPw1] = useState("");
   const [pw2, setPw2] = useState("");
   const [pwMsg, setPwMsg] = useState<{ good: boolean; t: string } | null>(null);
@@ -364,6 +365,7 @@ export default function TeacherHQ() {
               <span className="hq-sw"><i /></span>Sounds {soundOn ? "on" : "off"}
             </button>
             <button className="hq-chip hq-btn" onClick={() => load()} disabled={loading}>{loading ? "Loading..." : "Refresh"}</button>
+            <button className="hq-chip hq-btn" onClick={() => setStatsOpen(true)}>Game stats</button>
             <button className="hq-chip hq-btn hq-allbtn" onClick={() => setAllOpen(true)}>Gift to all kids</button>
             <button className="hq-chip hq-btn" onClick={() => { setPwMsg(null); setPw1(""); setPw2(""); setPwOpen(true); }} title={me}>Password</button>
             <button className="hq-chip hq-btn" onClick={logOut}>Log out</button>
@@ -422,6 +424,7 @@ export default function TeacherHQ() {
           )}
           {sel && <Detail k={sel} wide={wide} onClose={() => setSelKey(null)} onChanged={() => load(true)} />}
           {allOpen && <AllGift onClose={() => setAllOpen(false)} onChanged={() => load(true)} />}
+          {statsOpen && <ClassGames onClose={() => setStatsOpen(false)} showTests={showTests} />}
         </div>
       </div>
     </div>
@@ -633,6 +636,7 @@ function Detail({ k, wide, onClose, onChanged }: { k: Kid; wide: boolean; onClos
         </small>
       </div>
 
+      <KidGames key={`g|${r.code}|${r.student_name}`} k={k} />
       <GiftTools key={`${r.code}|${r.student_name}`} k={k} onChanged={onChanged} />
     </aside>
   );
@@ -683,6 +687,7 @@ function GiftTools({ k, onChanged }: { k: Kid; onChanged: () => void }) {
   const r = k.r;
   const [amt, setAmt] = useState<GiftAmt>(GIFT_EMPTY);
   const [ask, setAsk] = useState<null | { kind: "gift" } | { kind: "undo"; line: LogLine }>(null);
+  const [histOpen, setHistOpen] = useState(false);   // History folded by default (Andy 10-23)
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [log, setLog] = useState<LogLine[] | null>(null);
@@ -721,8 +726,8 @@ function GiftTools({ k, onChanged }: { k: Kid; onChanged: () => void }) {
         {msg && <div className={`hq-gmsg${msg.ok ? "" : " bad"}`}>{msg.text}</div>}
       </div>
       <div className="hq-gbox">
-        <div className="hq-gtitle">History</div>
-        {log === null ? <small>Loading...</small> : log.length === 0 ? <small>No teacher changes yet.</small> : (
+        <Fold title="History" n={log?.length} open={histOpen} onToggle={() => setHistOpen(o => !o)} />
+        {!histOpen ? null : log === null ? <small>Loading...</small> : log.length === 0 ? <small>No teacher changes yet.</small> : (
           <div className="hq-glog">{log.map(l => (
             <div key={l.id} className={`hq-gl${l.undone_at ? " off" : ""}`}>
               <div>
@@ -799,6 +804,164 @@ function AllGift({ onClose, onChanged }: { onClose: () => void; onChanged: () =>
               <button className="hq-gbtn" disabled={busy} onClick={doAll}>{busy ? "Saving..." : "Yes, give all"}</button>
               <button className="hq-gcancel" disabled={busy} onClick={() => setAsk(false)}>Back</button>
             </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------------------------------
+// GAME STATS (2026-10-23, BACKUPFILES/game_stats_step1_20261023.sql): every game round is one line in mpe_game_plays
+// (start; win / lose filled at the end). No result after 30 minutes = the kid QUIT. Teachers only (read rule).
+type GPlay = { id: number; code: string; student_name: string; started_at: string; ended_at: string | null; kind: string; game: string; level: string; diff: string | null; result: string | null };
+const GSEL = "id, code, student_name, started_at, ended_at, kind, game, level, diff, result";
+const GS_FROM = "23 Oct 2026";
+const GAME_NAME: Record<string, string> = { arrow: "Frog Snap", whack: "Garden", snake: "Ticket Please", space: "Space Robots", run: "Run", swim: "Swim", dig: "Dig", grab: "Grab" };
+const gName = (p: GPlay) => GAME_NAME[p.game] || cap(p.game);
+function gLevel(p: GPlay): string {
+  if (p.kind === "grammar") return `Level ${p.level}`;
+  const [b, u] = p.level.split("-");
+  return `Book ${b} Unit ${u}${p.diff ? ` · ${p.diff}` : ""}`;
+}
+function gOutcome(p: GPlay): "win" | "lose" | "quit" | "playing" {
+  if (p.result === "win" || p.result === "lose") return p.result;
+  return Date.now() - new Date(p.started_at).getTime() > 30 * 60000 ? "quit" : "playing";
+}
+function gDur(p: GPlay): string {
+  if (!p.ended_at) return "";
+  const t = Math.max(0, Math.round((new Date(p.ended_at).getTime() - new Date(p.started_at).getTime()) / 1000));
+  return t < 60 ? `${t}s` : `${Math.floor(t / 60)}m ${t % 60}s`;
+}
+const gWhen = (t: string) => new Date(t).toLocaleString("en-US", { timeZone: "Asia/Taipei", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+type GTally = { key: string; name: string; level: string; plays: number; win: number; lose: number; quit: number; kids: Set<string> };
+function tally(list: GPlay[], by: (p: GPlay) => [string, string, string]): GTally[] {
+  const m = new Map<string, GTally>();
+  for (const p of list) {
+    const [key, name, level] = by(p);
+    let t = m.get(key);
+    if (!t) { t = { key, name, level, plays: 0, win: 0, lose: 0, quit: 0, kids: new Set() }; m.set(key, t); }
+    t.plays++; t.kids.add(p.code + "|" + p.student_name);
+    const o = gOutcome(p);
+    if (o === "win") t.win++; else if (o === "lose") t.lose++; else if (o === "quit") t.quit++;
+  }
+  return [...m.values()].sort((a, b) => b.plays - a.plays);
+}
+const tooHard = (t: GTally) => t.plays >= 3 && (t.lose + t.quit) / t.plays >= 0.6;
+const pct = (n: number, d: number) => (d ? `${Math.round((100 * n) / d)}%` : "-");
+const byGame = (p: GPlay): [string, string, string] => [p.game, gName(p), ""];
+const byLevel = (p: GPlay): [string, string, string] => [`${p.game}|${p.level}|${p.diff ?? ""}`, gName(p), gLevel(p)];
+
+// a section title that opens / closes what is under it (Andy 10-23)
+function Fold({ title, n, open, onToggle, small }: { title: string; n?: number; open: boolean; onToggle: () => void; small?: boolean }) {
+  return (
+    <button data-noclick className={`hq-fold${small ? " sm" : ""}${open ? " open" : ""}`} onClick={() => { bloop(); onToggle(); }}>
+      <span className="hq-gtitle">{title}{n != null ? <small> ({n})</small> : null}</span>
+      <span className="hq-foldbtn">{open ? "Hide" : "Show"}<i /></span>
+    </button>
+  );
+}
+
+function TallyTable({ rows, levelCol, kidsCol, first = "Game" }: { rows: GTally[]; levelCol?: boolean; kidsCol?: boolean; first?: string }) {
+  return (
+    <div className="hq-gsw">
+      <table className="hq-gst">
+        <thead><tr><th>{first}</th>{levelCol && <th>{first === "Kid" ? "Code" : "Level"}</th>}<th>Plays</th>{kidsCol && <th>Kids</th>}<th>Won</th><th>Lost</th><th>Quit</th></tr></thead>
+        <tbody>
+          {rows.map(t => (
+            <tr key={t.key} className={tooHard(t) ? "hard" : ""}>
+              <td>{t.name}</td>{levelCol && <td>{t.level}</td>}<td>{t.plays}</td>{kidsCol && <td>{t.kids.size}</td>}
+              <td>{t.win} <small>{pct(t.win, t.plays)}</small></td><td>{t.lose}</td><td>{t.quit}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function gSum(list: GPlay[]) {
+  let won = 0, lost = 0, quit = 0;
+  for (const p of list) { const o = gOutcome(p); if (o === "win") won++; else if (o === "lose") lost++; else if (o === "quit") quit++; }
+  return { won, lost, quit };
+}
+
+// one kid: what they played, won, lost, quit (newest 500 rounds)
+function KidGames({ k }: { k: Kid }) {
+  const r = k.r;
+  const [list, setList] = useState<GPlay[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const [more, setMore] = useState(false);
+  const [recentOpen, setRecentOpen] = useState(false);   // latest plays folded by default (Andy 10-23)
+  useEffect(() => {
+    teacherDb().from("mpe_game_plays").select(GSEL).eq("code", r.code).eq("student_name", r.student_name)
+      .order("started_at", { ascending: false }).limit(500)
+      .then(({ data, error }) => { if (error) { setErr(error.message); setList([]); } else setList((data as GPlay[]) || []); });
+  }, [r.code, r.student_name]);
+  const sum = gSum(list || []);
+  const hard = list ? tally(list, byLevel).filter(tooHard) : [];
+  return (
+    <div className="hq-sec hq-box"><h3 className="t">Games played <span className="hq-sub">since {GS_FROM}</span></h3>
+      {list === null ? <small>Loading...</small> : list.length === 0 ? <small>{err ? `Could not read: ${err}` : "No games played yet."}</small> : (
+        <>
+          <div className="hq-gsum"><b>{list.length}</b> plays · <b>{sum.won}</b> won · <b>{sum.lost}</b> lost · <b>{sum.quit}</b> quit</div>
+          {hard.length > 0 && <div className="hq-warn yellow"><div>Too hard? {hard.map(t => `${t.name} ${t.level}`).join(", ")}</div></div>}
+          <TallyTable rows={tally(list, byGame)} />
+          <Fold title="Latest plays" n={list.length} open={recentOpen} onToggle={() => setRecentOpen(o => !o)} small />
+          {recentOpen && <div className="hq-grecent">
+            {list.slice(0, more ? 30 : 8).map(p => {
+              const o = gOutcome(p);
+              return <div key={p.id} className={`hq-gr ${o}`}><span>{gName(p)} · {gLevel(p)}</span><b>{o === "win" ? "won" : o === "lose" ? "lost" : o}</b><small>{gDur(p) ? `${gDur(p)} · ` : ""}{gWhen(p.started_at)}</small></div>;
+            })}
+          </div>}
+          {recentOpen && list.length > 8 && <button data-noclick className="hq-pill hq-gmore" onClick={() => { bloop(); setMore(m => !m); }}>{more ? "Show less" : "Show more"}</button>}
+        </>
+      )}
+    </div>
+  );
+}
+
+// the whole class: most played games + levels, too hard levels, kids
+function ClassGames({ onClose, showTests }: { onClose: () => void; showTests: boolean }) {
+  const [days, setDays] = useState(7);
+  const [list, setList] = useState<GPlay[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  useEffect(() => {
+    setList(null); setErr(null);
+    let q = teacherDb().from("mpe_game_plays").select(GSEL).order("started_at", { ascending: false }).limit(1000);
+    if (days > 0) q = q.gte("started_at", new Date(Date.now() - days * 86400000).toISOString());
+    q.then(({ data, error }) => {
+      if (error) { setErr(error.message); setList([]); return; }
+      setList(((data as GPlay[]) || []).filter(p => showTests || (!isTest(p.code) && p.code !== "ALEX11")));
+    });
+  }, [days, showTests]);
+  const all = list || [];
+  const sum = gSum(all);
+  const kids = new Set(all.map(p => p.code + "|" + p.student_name)).size;
+  const levels = tally(all, byLevel);
+  const hard = levels.filter(tooHard).sort((a, b) => (b.lose + b.quit) / b.plays - (a.lose + a.quit) / a.plays);
+  const byKid = tally(all, p => [p.code + "|" + p.student_name, cap(p.student_name), p.code]);
+  return (
+    <div className="hq-ask">
+      <div className="hq-askcard hq-allcard hq-gscard">
+        <button className="hq-allx" data-closex onClick={onClose}>Close</button>
+        <div className="hq-gtitle">Game stats</div>
+        <div className="hq-gsrange">
+          {[[7, "7 days"], [30, "30 days"], [0, "All"]].map(([d, l]) => (
+            <button key={d} data-noclick className={`hq-pill${days === d ? " on" : ""}`} onClick={() => { bloop(); setDays(d as number); }}>{l}</button>
+          ))}
+        </div>
+        {list === null ? <small>Loading...</small> : all.length === 0 ? <small>{err ? `Could not read: ${err}` : `No games played here yet (counted from ${GS_FROM}).`}</small> : (
+          <>
+            <div className="hq-gsum"><b>{all.length}</b> plays by <b>{kids}</b> {kids === 1 ? "kid" : "kids"} · <b>{sum.won}</b> won · <b>{sum.lost}</b> lost · <b>{sum.quit}</b> quit{all.length >= 1000 ? " (newest 1000)" : ""}</div>
+            <h3 className="t">Which games kids play</h3>
+            <TallyTable rows={tally(all, byGame)} kidsCol />
+            <h3 className="t">Too hard?</h3>
+            {hard.length === 0 ? <small>Nothing looks too hard yet (3+ plays and most of them lost or quit).</small> : <TallyTable rows={hard} levelCol kidsCol />}
+            <h3 className="t">Most played levels</h3>
+            <TallyTable rows={levels.slice(0, 10)} levelCol kidsCol />
+            <h3 className="t">Kids</h3>
+            <TallyTable rows={byKid} levelCol first="Kid" />
           </>
         )}
       </div>
@@ -1011,4 +1174,25 @@ const CSS = `
 @media (max-width:1100px){.hq-main{grid-template-columns:1fr}.hq-worlds{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:820px){.hq-lh .opt,.hq-row .opt{display:none}.hq-lh,.hq-row{grid-template-columns:14px minmax(110px,1.2fr) minmax(120px,2fr) 44px 48px minmax(90px,1fr)}}
 @media (max-width:640px){.hq-worlds{grid-template-columns:repeat(2,1fr)}.hq-wallet{grid-template-columns:repeat(2,1fr)}.hq-two{grid-template-columns:1fr}.hq-wrap{padding:16px}.hq-chips{margin-left:0}.hq-tests{margin-left:0}}
+.hq-gsum{font-size:13px;color:#3d5170;margin:2px 0 6px}
+.hq-gsw{overflow-x:auto;margin:4px 0 8px}
+.hq-gst{width:100%;border-collapse:collapse;font-size:13px}
+.hq-gst th{text-align:left;font-size:11px;color:#6b7f99;font-weight:600;padding:3px 6px;border-bottom:1px solid #dde7f3}
+.hq-gst td{padding:4px 6px;border-bottom:1px solid #eef3f9;white-space:nowrap}
+.hq-gst td small{color:#6b7f99;font-size:11px}
+.hq-gst tr.hard td{background:#fff1d9;color:#8a5a00}
+.hq-grecent{display:flex;flex-direction:column;gap:3px;margin-top:4px}
+.hq-gr{display:grid;grid-template-columns:1fr auto;gap:0 8px;font-size:13px;background:#fff;border-radius:10px;padding:5px 9px}
+.hq-gr b{font-size:12px}.hq-gr small{grid-column:1/-1;color:#6b7f99;font-size:11px}
+.hq-gr.win b{color:#2e9e5b}.hq-gr.lose b{color:#b42318}.hq-gr.quit b{color:#c08a00}.hq-gr.playing b{color:#1767a8}
+.hq-gmore{margin-top:6px;padding:6px 12px;font-size:12px}
+.hq-gscard{width:min(720px,100%)}
+.hq-gscard h3{margin:12px 0 2px;color:#7b3fbf}
+.hq-gsrange{display:flex;gap:6px;justify-content:center;margin:6px 0 10px}
+.hq-fold{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;padding:2px 0;text-align:left}
+.hq-fold .hq-gtitle{margin:0}.hq-fold .hq-gtitle small{font-family:Nunito,sans-serif;font-size:12px;color:#6b7f99}
+.hq-fold.sm .hq-gtitle{font-size:14px}.hq-fold.open{margin-bottom:6px}
+.hq-foldbtn{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:4px 10px;font-size:12px;color:#1767a8;box-shadow:0 2px 0 rgba(23,103,168,.15)}
+.hq-foldbtn i{width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-3px;transition:transform .2s}
+.hq-fold.open .hq-foldbtn i{transform:rotate(-135deg);margin-top:3px}
 `;

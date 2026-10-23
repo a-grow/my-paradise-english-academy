@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { addTreats, addCoins, addPieces, addWin } from "@/lib/cloudSave";
+import { addTreats, addCoins, addPieces, addWin, gameRoundStart, gameRoundEnd } from "@/lib/cloudSave";
 import GrammarGameBar from "@/components/GrammarGameBar";
 import { useClickSfx } from "@/lib/clickSfx";
 import ControlHints, { HINT_TOP } from "@/components/ControlHints";
@@ -45,6 +45,7 @@ export default function GrammarDig() {
     function onMsg(e: MessageEvent) {
       if (e.data && e.data.type === "MPE_DIG_WIN" && !claimed.current) {
         claimed.current = true;
+        gameRoundEnd(kidCode, kidName, "win"); // GAME STATS (2026-10-23)
         // COINS: bank this game's coins right now (only on a WIN), sent as "+N" like treats
         const won = coinsNow.current;
         setCoinsWon(won);
@@ -74,6 +75,7 @@ export default function GrammarDig() {
       }
       if (e.data && e.data.type === "MPE_DIG_LOSE" && !claimed.current) {
         setLost(true);
+        gameRoundEnd(kidCode, kidName, "lose"); // GAME STATS (2026-10-23)
         frameRef.current?.contentWindow?.postMessage({ type: "MPE_FADE_OUT", ms: 400 }, "*"); // game music out, game-over sting in
       }
     }
@@ -98,7 +100,7 @@ export default function GrammarDig() {
       {howto === false && <iframe
         key={tryKey}
         ref={frameRef}
-        onLoad={() => { frameRef.current?.contentWindow?.focus(); sendMute(muted); try { const d = frameRef.current?.contentDocument; if (d) installIdleCursor(d); } catch { /* */ } }}
+        onLoad={() => { gameRoundStart(kidCode, kidName, "grammar", "dig", String(level || 1)); frameRef.current?.contentWindow?.focus(); sendMute(muted); try { const d = frameRef.current?.contentDocument; if (d) installIdleCursor(d); } catch { /* */ } }}
         src={`/Teacher_Andy_Dig_game.html?level=${level || 1}&v=${__MPE_GRAMMAR_V__.Dig}`}
         title="Teacher Andy Dig"
         style={{ width: "100%", flex: 1, minHeight: 0, border: "none", display: "block" }}

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useHowtoSeen } from "@/lib/howtoSeen";
 import GameTest from "./GameTest";
-import { addTreats, addCoins, addPieces, addWin } from "@/lib/cloudSave";
+import { addTreats, addCoins, addPieces, addWin, gameRoundStart, gameRoundEnd } from "@/lib/cloudSave";
 
 const MASTER_CODE = "1006";
 const TREATS_BY_DIFF: Record<string, number> = { easy: 1, medium: 2, hard: 3 };
@@ -155,6 +155,12 @@ const GamePage = () => {
     if (key && /^vocab:[a-z]+:[0-9]{1,2}-[0-9]{1,2}$/.test(key)) addWin(code!, studentName!, key);
     else addPieces(code!, studentName!, 1);   // no / odd key = still pay the piece
   }, [isMaster, code, studentName]);
+  // GAME STATS (2026-10-23): one log line per round (start / win / lose); 1006 logs nothing
+  const onRound = useCallback((ev: "start" | "win" | "lose", game?: string, level?: string, diff?: string) => {
+    if (isMaster || !code || !studentName) return;
+    if (ev === "start") { if (game && level) gameRoundStart(code, studentName, "vocab", game, level, diff); }
+    else gameRoundEnd(code, studentName, ev);
+  }, [isMaster, code, studentName]);
 
   // Back to the world the kid came from. Ocean + Dino: as before. A new-look world (savanna...) remembered its own
   // page address in this tab (mpe_return_world, set when its Vocab button was tapped) - only used if it is this kid's.
@@ -188,6 +194,7 @@ const GamePage = () => {
         onCoinTotal={coinTotal}
         onPayCoins={payCoins}
         onPayPieces={payPieces}
+        onRound={onRound}
       />
 
     </div>

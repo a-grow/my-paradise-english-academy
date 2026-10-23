@@ -407,3 +407,19 @@ export async function loadCards(code: string, studentName: string): Promise<{ ca
     return undefined;
   }
 }
+
+// GAME STATS (2026-10-23, BACKUPFILES/game_stats_step1_20261023.sql): one log line per game round in mpe_game_plays.
+// gameRoundStart when a round begins, gameRoundEnd('win'|'lose') when it ends; a round that never ends = the kid quit.
+// Teacher code 1006 logs nothing. Never blocks or changes the game: errors are ignored.
+let gameRound: Promise<number | null> | null = null;
+export function gameRoundStart(code: string, studentName: string, kind: "vocab" | "grammar", game: string, level: string, diff?: string | null) {
+  if (!code || code === "1006") { gameRound = null; return; }
+  gameRound = Promise.resolve(supabase.rpc("mpe_game_start", { p_code: code, p_name: studentName, p_kind: kind, p_game: game, p_level: level, p_diff: diff ?? null }))
+    .then(({ data, error }) => (error || data == null ? null : Number(data)))
+    .catch(() => null);
+}
+export function gameRoundEnd(code: string, studentName: string, result: "win" | "lose") {
+  const p = gameRound; gameRound = null;
+  if (!p || !code || code === "1006") return;
+  p.then(id => { if (id) Promise.resolve(supabase.rpc("mpe_game_end", { p_code: code, p_name: studentName, p_id: id, p_result: result })).catch(() => {}); });
+}
