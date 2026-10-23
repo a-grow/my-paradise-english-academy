@@ -67,10 +67,10 @@ export default function LaunchGift({ cx, sh, sfxOn, message, onOpen, onTreats, o
       <style>{CSS}</style>
       <div className="lg-dim" />
       <img className="lg-title" src={`${G}/gift_title.webp`} alt="A Gift from Teacher Andy!" draggable={false}
-        style={{ left: cx, top: rowY - 255, width: 760 }} />
-      {/* TEACHER GIFT MESSAGE (Andy 2026-10-23): the teacher's one line, above the title (nothing else sits there) */}
+        style={{ left: cx, top: rowY - (message ? 362 : 255), width: 760 }} />
+      {/* TEACHER GIFT MESSAGE (Andy 2026-10-23): the teacher's one line UNDER the title (Andy 13:07: swapped - the title moves up into the free space) */}
       {message && (
-        <div className="lg-msg" style={{ left: cx, top: rowY - 362, fontSize: message.length <= 22 ? 62 : message.length <= 36 ? 50 : 38 }}>{message}</div>
+        <div className="lg-msg" style={{ left: cx, top: rowY - 255, fontSize: message.length <= 22 ? 62 : message.length <= 36 ? 50 : 38 }}>{message}</div>
       )}
       <i className={"lg-glow" + (opened ? " big" : "")} style={{ left: cx, top: rowY }} />
       {!opened && (
