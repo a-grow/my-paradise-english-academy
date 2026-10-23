@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { kidHere, whenKidHere } from "./kidHere";
 
 // PART 2 LOCK, STEP 1 (2026-10-22): every read of a kid's OWN row goes through the database function mpe_get_row
 // (BACKUPFILES/rls_step1_functions_20261022.sql), so it keeps working after the table's open read rule is removed.
@@ -154,6 +155,7 @@ export const badgeSeen = (id: string) => `badge:${seenWord(id)}:seen`;          
 export const cardSeen = (set: number, n: number) => `card:${seenWord(set)}:${seenWord(n)}`;   // e.g. set 3 card 7 = card:d:h
 export async function markSeen(code: string, studentName: string, flag: string) {
   try {
+    await whenKidHere();   // KID HERE (10-23): never mark anything seen before a real tap on the page
     const { error } = await supabase.rpc("mpe_mark_seen", { p_code: code, p_name: studentName, p_flag: flag });
     if (error) console.error("[cloudSave] mark seen failed:", error.message);
     else console.log("[cloudSave] seen", flag, code, studentName);
@@ -190,7 +192,27 @@ export async function dailyClaimedToday(code: string, studentName: string): Prom
   }
 }
 
+// KID HERE (2026-10-23): before the first real tap on the page a world save is only REMEMBERED (the newest one per
+// world); it is sent the moment a real tap happens. A page opened by a background loader (Safari Reading List...)
+// therefore never saves. After the first tap every save is sent at once, exactly as before.
+const saveWaiting = new Map<string, { activePet: string | null; data: Record<string, any> }>();
 export async function saveDataToCloud(
+  code: string,
+  studentName: string,
+  activePet: string | null,
+  data: Record<string, any>
+) {
+  if (kidHere()) return sendWorldSave(code, studentName, activePet, data);
+  const k = `${code}|${studentName}|${Object.keys(data).sort().join(",")}`;
+  const first = !saveWaiting.has(k);
+  saveWaiting.set(k, { activePet, data });   // the newest waiting save has everything (it is the whole world section)
+  if (!first) return;
+  await whenKidHere();
+  const p = saveWaiting.get(k);
+  saveWaiting.delete(k);
+  if (p) await sendWorldSave(code, studentName, p.activePet, p.data);
+}
+async function sendWorldSave(
   code: string,
   studentName: string,
   activePet: string | null,

@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = "https://lakcembsjvbyjsfvxczq.supabase.co";
-const SUPABASE_KEY = "sb_publishable_ibcsfyiquase9G1LHtIJYA_oVRGy55s";
+export const SUPABASE_URL = "https://lakcembsjvbyjsfvxczq.supabase.co";
+export const SUPABASE_KEY = "sb_publishable_ibcsfyiquase9G1LHtIJYA_oVRGy55s";
 
 // Counts cloud requests still in flight, so the auto-refresh (VersionWatcher) never
 // reloads the page in the middle of a save. Each request stays "busy" 1s after it ends,

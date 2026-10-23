@@ -348,7 +348,7 @@ export const useWorldBrain = (world: WorldConfig, readOnly = false) => {
       setRowData(result?.data ?? null); // step 7: every world's progress (My Worlds, Video Theater)
       if (result === null || !S.hasCloud(result.data)) {
         // This world is not in the cloud yet: push the device's progress UP first. Device wins.
-        if (!readOnly) await saveDataToCloud(code, studentName, activeAnimalId, gatherBlob());
+        if (!readOnly) saveDataToCloud(code, studentName, activeAnimalId, gatherBlob()); // no await (10-23): before a real tap it only waits
       } else {
         const r = S.readCloud(result.data, result.activePet ?? null);
         const newFed: Record<string, number> = {};

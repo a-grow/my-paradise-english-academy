@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { supabase } from "@/lib/supabase";
+import { teacherDb } from "@/lib/teacherAuth";
 import { ALL_WORLDS, worldState, type WorldConfig } from "@/worlds";
 import { getAnimalStageIdx, type Animal } from "@/worlds/types";
 import { earnedBadges, badgeList, badgeImg } from "@/worlds/badges";
@@ -35,9 +35,8 @@ function bloop() {
 // Every number comes from the same rules the kid pages use (world list, worldState, stages, earnedBadges, card sets).
 // Teacher tools (gifts, change animal) come in Part 3, after the real teacher login + tighter RLS (step 18).
 
-// ---- simple client-side gate (keeps the curious out, not the determined) ----
-const PASSWORD = "paradise2026";
-const SESSION_KEY = "mpe_hq_ok";
+// ---- TEACHER LOGIN (2026-10-23): Supabase Auth email + password; the database only lets teachers on the
+// mpe_teachers list read kids (policy "teacher can read" + mpe_is_teacher). Replaces the old paradise2026 gate.
 const SORT_KEY = "mpe_hq_sort";
 const TEST_KEY = "mpe_hq_tests";
 const VIEW_KEY = "mpe_hq_view";   // "cards" (big cards) | "list" (quick list, one line per kid - for many kids)
@@ -170,9 +169,9 @@ function buildKid(r: Row, plays: Map<string, Play>) {
     wins: { vocab: n0(r.wins_vocab), grammar: n0(r.wins_grammar) },
   });
   const play = plays.get(`${r.code}|${r.student_name}`) ?? NO_PLAY;
-  // last seen = the newer of the last save (last_login) and the last play-time ping
-  const loginT = r.last_login ? new Date(r.last_login).getTime() : 0;
-  const seen = seenInfo(play.last > loginT ? new Date(play.last).toISOString() : r.last_login);
+  // last seen (10-23) = the last REAL play (ping = a real tap / game). last_login only for kids with no ping yet:
+  // it also changes when a page opens by itself (Safari Reading List quietly reloading a saved page, Bruce 10-23).
+  const seen = seenInfo(play.last > 0 ? new Date(play.last).toISOString() : r.last_login);
   // furthest = world, then animal, then fed (for the "Furthest" sort)
   const far = at ? at.idx * 10000 + Math.max(0, at.curPos) * 1000 + (at.cur?.fed ?? 0) : 999999;
   return { r, worlds, at, jar, coins, pieces, owned, setsDone, badges, seen, play, far, health: health(worlds, jar) };
@@ -181,10 +180,54 @@ type Kid = ReturnType<typeof buildKid>;
 
 // ---------------------------------------------------------------------------------------------------
 export default function TeacherHQ() {
-  const [ok, setOk] = useState<boolean>(() => { try { return localStorage.getItem(SESSION_KEY) === "1"; } catch { return false; } });
+  const [auth, setAuth] = useState<"checking" | "out" | "in">("checking");
+  const ok = auth === "in";
+  const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [showPw, setShowPw] = useState(false);
-  const [wrongPw, setWrongPw] = useState(false);
+  const [loginMsg, setLoginMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [me, setMe] = useState("");
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pw1, setPw1] = useState("");
+  const [pw2, setPw2] = useState("");
+  const [pwMsg, setPwMsg] = useState<{ good: boolean; t: string } | null>(null);
+
+  // is this logged-in person on the teacher list? (else sign out again)
+  const checkTeacher = useCallback(async (mail: string) => {
+    const { data, error } = await teacherDb().rpc("mpe_is_teacher");
+    if (error) { setAuth("out"); setLoginMsg("Could not check the login - please try again."); return; }
+    if (data === true) { setMe(mail); setAuth("in"); setLoginMsg(""); return; }
+    await teacherDb().auth.signOut();
+    setAuth("out"); setLoginMsg("This account is not on the teacher list.");
+  }, []);
+  useEffect(() => {
+    teacherDb().auth.getSession().then(({ data }) => {
+      const s = data.session;
+      if (s) checkTeacher(s.user.email || ""); else setAuth("out");
+    });
+    const { data: sub } = teacherDb().auth.onAuthStateChange((ev) => { if (ev === "SIGNED_OUT") { setAuth("out"); setRows([]); setPlayRows([]); } });
+    return () => sub.subscription.unsubscribe();
+  }, [checkTeacher]);
+  async function logIn() {
+    const mail = email.trim().toLowerCase();
+    if (!mail || !pw) { setLoginMsg("Please type your email and password."); return; }
+    setBusy(true); setLoginMsg("");
+    const { data, error } = await teacherDb().auth.signInWithPassword({ email: mail, password: pw });
+    if (error || !data.session) { setBusy(false); setLoginMsg("Email or password isn't correct - please try again."); return; }
+    await checkTeacher(data.session.user.email || mail);
+    setPw(""); setBusy(false);
+  }
+  async function logOut() { await teacherDb().auth.signOut(); setAuth("out"); setRows([]); setPlayRows([]); }
+  async function changePw() {
+    if (pw1.length < 8) { setPwMsg({ good: false, t: "Use at least 8 characters." }); return; }
+    if (pw1 !== pw2) { setPwMsg({ good: false, t: "The two passwords are not the same." }); return; }
+    setBusy(true);
+    const { error } = await teacherDb().auth.updateUser({ password: pw1 });
+    setBusy(false);
+    if (error) setPwMsg({ good: false, t: "Could not change it: " + error.message });
+    else { setPwMsg({ good: true, t: "Password changed." }); setPw1(""); setPw2(""); }
+  }
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -216,13 +259,13 @@ export default function TeacherHQ() {
   const [playRows, setPlayRows] = useState<PlayRow[]>([]);
   const load = useCallback((quiet = false) => {
     if (!quiet) { setLoading(true); setErr(""); }
-    supabase.from("student_progress").select(COLS).then(({ data, error }) => {
+    teacherDb().from("student_progress").select(COLS).then(({ data, error }) => {
       if (error) { if (!quiet) setErr(error.message); }
       else setRows((data as unknown as Row[]) || []);
       if (!quiet) setLoading(false);
     });
     // play time: a missing table / error just shows no minutes (never blocks the page)
-    supabase.from("student_play").select("code, student_name, day, minutes, last_ping").then(({ data, error }) => {
+    teacherDb().from("student_play").select("code, student_name, day, minutes, last_ping").then(({ data, error }) => {
       if (!error) setPlayRows((data as unknown as PlayRow[]) || []);
     });
   }, []);
@@ -252,28 +295,31 @@ export default function TeacherHQ() {
 
   const sel = kids.find(k => keyOf(k) === selKey) ?? (wide ? shown[0] ?? null : null);
 
-  function unlock() { setOk(true); try { localStorage.setItem(SESSION_KEY, "1"); } catch { /* */ } }
   function chooseSort(s: "seen" | "name" | "far") { setSortBy(s); try { sessionStorage.setItem(SORT_KEY, s); } catch { /* */ } }
   function chooseView(v: "cards" | "list") { setView(v); try { sessionStorage.setItem(VIEW_KEY, v); } catch { /* */ } }
   function toggleTests() { const v = !showTests; setShowTests(v); try { sessionStorage.setItem(TEST_KEY, v ? "1" : "0"); } catch { /* */ } }
 
   if (!ok) {
-    const tryPw = () => (pw === PASSWORD ? unlock() : setWrongPw(true));
     return (
       <div className="hq">
         <style>{CSS}</style>
         <div className="hq-gate">
           <div className="hq-logo t">Teacher HQ<small>MY PARADISE ENGLISH</small></div>
           <div className="hq-gatecard">
-            <p>Enter the password to continue.</p>
-            <div className="hq-pwrow">
-              <input type={showPw ? "text" : "password"} value={pw} placeholder="Password" autoFocus
-                onChange={e => { setPw(e.target.value); setWrongPw(false); }}
-                onKeyDown={e => { if (e.key === "Enter") tryPw(); }} />
-              <button type="button" className="hq-eye" onClick={() => setShowPw(v => !v)}>{showPw ? "Hide" : "Show"}</button>
-            </div>
-            <button className="hq-go" onClick={tryPw}>Enter</button>
-            {wrongPw && <p className="hq-wrong">That password isn't correct - please try again.</p>}
+            {auth === "checking" ? <p>Checking your login...</p> : <>
+              <p>Teacher login</p>
+              <input className="hq-mail" type="email" value={email} placeholder="Email" autoFocus autoComplete="username"
+                onChange={e => { setEmail(e.target.value); setLoginMsg(""); }}
+                onKeyDown={e => { if (e.key === "Enter") logIn(); }} />
+              <div className="hq-pwrow">
+                <input type={showPw ? "text" : "password"} value={pw} placeholder="Password" autoComplete="current-password"
+                  onChange={e => { setPw(e.target.value); setLoginMsg(""); }}
+                  onKeyDown={e => { if (e.key === "Enter") logIn(); }} />
+                <button type="button" className="hq-eye" onClick={() => setShowPw(v => !v)}>{showPw ? "Hide" : "Show"}</button>
+              </div>
+              <button className="hq-go" onClick={logIn} disabled={busy}>{busy ? "Logging in..." : "Log in"}</button>
+              {loginMsg && <p className="hq-wrong">{loginMsg}</p>}
+            </>}
           </div>
         </div>
       </div>
@@ -287,6 +333,24 @@ export default function TeacherHQ() {
   return (
     <div className="hq">
       <style>{CSS}</style>
+      {pwOpen && (
+        <div className="hq-modal">
+          <div className="hq-gatecard">
+            <p>Change password for <b>{me}</b></p>
+            <input className="hq-mail" type={showPw ? "text" : "password"} value={pw1} placeholder="New password (8+ characters)" autoComplete="new-password"
+              onChange={e => { setPw1(e.target.value); setPwMsg(null); }} />
+            <div className="hq-pwrow">
+              <input type={showPw ? "text" : "password"} value={pw2} placeholder="New password again" autoComplete="new-password"
+                onChange={e => { setPw2(e.target.value); setPwMsg(null); }}
+                onKeyDown={e => { if (e.key === "Enter") changePw(); }} />
+              <button type="button" className="hq-eye" onClick={() => setShowPw(v => !v)}>{showPw ? "Hide" : "Show"}</button>
+            </div>
+            <button className="hq-go" onClick={changePw} disabled={busy}>{busy ? "Saving..." : "Save new password"}</button>
+            {pwMsg && <p className={pwMsg.good ? "hq-good" : "hq-wrong"}>{pwMsg.t}</p>}
+            <button data-closex className="hq-eye hq-pwclose" onClick={() => setPwOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
       <div className="hq-wrap">
         <header className="hq-head">
           <div className="hq-logo t">Teacher HQ<small>MY PARADISE ENGLISH</small></div>
@@ -299,6 +363,8 @@ export default function TeacherHQ() {
               <span className="hq-sw"><i /></span>Sounds {soundOn ? "on" : "off"}
             </button>
             <button className="hq-chip hq-btn" onClick={() => load()} disabled={loading}>{loading ? "Loading..." : "Refresh"}</button>
+            <button className="hq-chip hq-btn" onClick={() => { setPwMsg(null); setPw1(""); setPw2(""); setPwOpen(true); }} title={me}>Password</button>
+            <button className="hq-chip hq-btn" onClick={logOut}>Log out</button>
           </div>
         </header>
         {err && <div className="hq-err">Could not read the database: {err}</div>}
@@ -694,6 +760,10 @@ const CSS = `
 .hq-eye{background:#eef3f9;color:#4c6a8c;border-radius:14px;padding:0 14px}
 .hq-go{width:100%;background:#1767a8;color:#fff;border-radius:14px;padding:12px;font-size:16px;box-shadow:0 4px 0 #0f4c7e}
 .hq-gatecard .hq-wrong{color:#b42318;font-size:13px;margin:10px 0 0}
+.hq-mail{width:100%;box-sizing:border-box;border-radius:14px;border:2px solid #d6e2f0;padding:11px 14px;font:inherit;color:#1d3557;outline:0;margin-bottom:10px}
+.hq-gatecard .hq-good{color:#2e7d4f;font-size:13px;margin:10px 0 0}
+.hq-modal{position:fixed;inset:0;z-index:100;background:rgba(18,40,66,.45);display:flex;align-items:center;justify-content:center;padding:20px}
+.hq-pwclose{display:block;margin:12px auto 0;padding:9px 18px}
 .hq-snd{color:#1d3557}
 .hq-snd.off{color:#9aa8bd}
 .hq-sw{width:38px;height:22px;border-radius:999px;background:#3fb54a;position:relative;flex:none;transition:background .2s}

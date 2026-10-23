@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { whenKidHere } from "./kidHere";
 
 // NEWEST TAB WINS (2026-10-16). Database: BACKUPFILES/newest_tab_step1_20261016.sql (column active_tab, mpe_claim_tab, mpe_tab_ok).
 // Opening a world page makes THIS browser tab the kid's active one. If another tab/device opens a world page later,
@@ -20,6 +21,7 @@ async function rpcSoft(fn: string, args: Record<string, unknown>): Promise<{ dat
 
 // This tab is now the active one. No row yet = nothing happens. Failure = ignored.
 export async function claimTab(code: string, studentName: string): Promise<void> {
+  await whenKidHere();   // KID HERE (10-23): a page nobody has tapped yet (background loader) never takes over
   const r = await rpcSoft("mpe_claim_tab", { p_code: code, p_name: studentName, p_tab: TAB_ID });
   if (!r || r.error) console.warn("[activeTab] claim not confirmed (carry on)");
 }
